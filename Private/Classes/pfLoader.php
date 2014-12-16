@@ -15,12 +15,15 @@ class pfLoader {
 	public function __construct() {
 		// register method loader as the autoload
 		spl_autoload_register(array($this,'loader'),true);
+		// call the front
+		new pfFront();
 	}
 	
 	// method is call everytime we try to instanciate a class
 	private function loader($class) {
 		// define a array of possibilities
 		$sources = array(
+			"../Private/Classes/{$class}.php",
 			"../Private/Vendor/Polyfony/{$class}.php",
 			"../Private/Vendor/{$class}/{$class}.php",
 			"../Private/Vendor/{$class}/{$class}.class.php"

@@ -4,6 +4,12 @@
 require("../Private/Classes/pfLoader.php");
 
 // front end
-new pfFront();
+new pfLoader();
+
+/*
+var_dump(pfRequest::isPost());
+var_dump(pfRequest::isGet());
+var_dump(pfRequest::getHeaders());
+*/
 
 ?>
