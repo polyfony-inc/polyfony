@@ -1,7 +1,7 @@
 <?php
 
 // require the autoloader
-require("../Private/Classes/pfLoader.php");
+require("../Private/Vendor/Polyfony/pfLoader.php");
 
 // front end
 new pfLoader();
