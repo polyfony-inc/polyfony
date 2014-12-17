@@ -30,7 +30,7 @@ class pfSecurity {
 		self::$_granted = !self::$_granted and $level and self::hasLevel($level) ? true : false;
 		
 		// and now we check if we have the proper rights
-		!self::$_granted ? pfResponse::error403();
+		!self::$_granted ? pfResponse::redirectAfter(pfConfig::get('security','login'),3); pfResponse::error403('Not authorized');
 		
 	}
 	
@@ -47,8 +47,7 @@ class pfSecurity {
 		// get a signature using (the provided string + salt)
 		return(hash(pfConfig::get('security','algo'),
 			pfConfig::get('security','salt') . $string . pfConfig::get('security','salt')
-			)
-		);
+		));
 		
 	}
 	
@@ -56,8 +55,7 @@ class pfSecurity {
 	
 		// compute a hash with (the provided string + salt + user agent + remote ip)
 		return(hash(pfConfig::get('security','algo'), 
-			pfRequest::server('USER_AGENT') . pfRequest::server('REMOTE_ADDR').
-			pfConfig::get('security','salt') . $string
+			pfRequest::server('USER_AGENT') . pfRequest::server('REMOTE_ADDR') . pfConfig::get('security','salt') . $string
 		));
 		
 	}
