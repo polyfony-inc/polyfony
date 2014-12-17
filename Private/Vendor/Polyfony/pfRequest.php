@@ -14,6 +14,7 @@ class pfRequest {
 	private static $_url;
 	private static $_get;
 	private static $_post;
+	private static $_argv;
 	private static $_server;
 	private static $_headers;
 	private static $_context;
@@ -23,25 +24,32 @@ class pfRequest {
 	public static function init() {
 		
 		// set proper context
-		self::setContext();
-		// set globals
-		self::setGlobals();
-		// set headers
-		self::setHeaders();
-		// set proper url
-		self::setUrl();
-		// set the method
-		self::setMethod();
-		// set the current signature
-		self::setSignature();
-
-	}
-	
-	public static function setContext() {
-		
 		// depending if we are in command line
 		self::$_context = isset($_ARGV) ? 'CLI' : 'HTTP';
 		
+		// set current URL
+		// depending on the context
+		self::$_url = self::$_context == 'CLI' ? $_ARGV[2] : $_SERVER['REQUEST_URI'];
+		
+		// set the request method
+		// depending if superglobal post exists
+		self::$_method = isset($_POST) ? 'get' : 'post';
+		
+		// set the request signature
+		// with post, if any
+		self::$_signature = self::isPost() ? sha1(self::$_url.json_encode($_POST)) : sha1(self::$_url);
+		
+		// set the headers
+		// if using a FPM fix
+		function_exists('getallheaders') ? self::$_headers = getallheaders() : self::getAllHeaders();
+		
+		// set globals
+		self::$_get		= isset($_GET)?: array();
+		self::$_post	= isset($_POST)?: array();
+		self::$_server	= isset($_SERVER)?: array();
+		self::$_argv	= isset($_ARGV)?: array();
+		unset($_GET, $_POST, $_SERVER);
+
 	}
 	
 	public static function getContext() {
@@ -51,33 +59,10 @@ class pfRequest {
 		
 	}
 	
-	public static function setGlobals() {
-	
-		self::$_get    = $_GET;
-		self::$_post   = $_POST;
-		self::$_server = $_SERVER;
-		unset($_GET, $_POST, $_SERVER);
-		
-	}
-	
-	public static function setUrl() {
-		
-		// set current URL
-		self::$_url = self::$_context == 'CLI' ? $_ARGV[2] : $_SERVER['REQUEST_URI'];
-
-	}
-	
 	public static function getUrl() {
 		
 		// get current url
 		return(self::$_url ?: '/');
-		
-	}
-
-	public static function setSignature() {
-		
-		// compute the request signature
-		self::$_signature = self::isPost() ? sha1(self::$_url.json_encode(self::$_post)) : sha1(self::$_url);
 		
 	}
 	
@@ -85,13 +70,6 @@ class pfRequest {
 		
 		// return current signature
 		return(self::$_signature);
-		
-	}
-	
-	public static function setHeaders() {
-	
-		// if using FPM
-		function_exists('getallheaders') ? self::$_headers = getallheaders() : self::getAllHeaders();
 		
 	}
 	
@@ -111,20 +89,7 @@ class pfRequest {
 	public static function getHeaders($key=null,$default=null) {
 		
 	}
-	
-	public static function setMethod() {
-	
-		// depending if superglobal post exists
-		self::$_method = isset($_POST) ? 'get' : 'post';
-		
-	}
-	
-	public static function isPost() {
-		
-		// if method is post return true
-		return(self::$_method == 'post' ? true : false);
-		
-	}	
+
 	
 	/**
 	 * Get a single GET variable.
@@ -182,6 +147,20 @@ class pfRequest {
 		return isset(self::$_server['HTTP_X_REQUESTED_WITH'])
 			&& strtolower(self::$_server['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 	}
+
+	/**
+	 * Check if the request is a POST.
+	 *
+	 * @access public
+	 * @return boolean
+	 * @static
+	 */
+	public static function isPost() {
+		
+		// if method is post return true
+		return(self::$_method == 'post' ? true : false);
+		
+	}	
 
 	
 }
