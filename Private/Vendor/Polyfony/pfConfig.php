@@ -33,9 +33,24 @@ class pfConfig {
 	}
 	
 	private static function detectFromHTTP() {
-	
-		
-		
+		/*
+		switch(substr(pfRequest::server('REMOTE_ADDR'),0,9)) {
+			
+			// local ips
+			case '10.10.10.':
+			case '192.168.0':
+			case '192.168.1':
+			case '127.0.0.1':
+				self::$_environment = 'Dev';
+			break;
+			
+			// any other ip
+			default:
+				self::$_environment = 'Prod';
+			break;	
+			
+		}
+		*/
 	}
 	
 	public static function set($group,$key,$value=null) {
