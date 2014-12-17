@@ -11,6 +11,37 @@
 
 class pfDatabase {
 	
+	
+	// no database connection at first
+	protected static $_handle = null;
+	
+	
+	public static function connect() {
+	
+		// if driver is sqlite
+		pfConfig::get('database','driver') == 'sqlite' ? $pdo = 'sqlite:'.pfConfig::get('database','database');
+		
+		// if driver is mysql
+		pfConfig::get('database','driver') == 'mysql' ? $pdo = 'mysql:dbname='.pfConfig::get('database','database').';host='pfConfig::get('database','hostname');
+		
+		// if driver is unknown
+		!$pdo ? Throw new pfException('pfDatabase::connect() : Unknown driver');
+		
+		// try to connect
+		self::$_handle = new PDO($pdo,pfConfig::get('database','username'),pfConfig::get('database','password'));
+		
+		// check if connection the connexion failed
+		!self::$_handle ? Throw new pfException('pfDatabase::connect() : Failed to connect');
+		
+	}
+	
+	public static function query() {
+		
+		// if no connection to the database is ready
+		!self::$_handle ? self::connect();
+		
+	}
+	
 }	
 
 ?>

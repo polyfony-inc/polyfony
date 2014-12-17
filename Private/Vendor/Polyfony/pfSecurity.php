@@ -11,7 +11,11 @@
 
 class pfSecurity {
 	
-	public static function secure($module=null,$level_bypass=null) {
+	// default is not granted
+	protected static $_granted = false;
+	
+	
+	public static function secure($module=null,$level=null) {
 		
 		// if we have a security cookie we authenticate with it
 		pfRequest::cookie(pfConfig::get('security','cookie')) ? self::authenticate();
@@ -23,10 +27,10 @@ class pfSecurity {
 		self::$_granted = self::hasModule($module) ? true : false;
 		
 		// if we have the bypass level
-		self::$_granted = self::hasLevel($level) ? true : false;
+		self::$_granted = !self::$_granted and self::hasLevel($level) ? true : false;
 		
 		// and now we check if we have the proper rights
-		self::$_granted 
+		!self::$_granted ? pfResponse::error403();
 		
 	}
 	
@@ -34,11 +38,30 @@ class pfSecurity {
 		
 	}
 	
-	public static function login($login,$password) {
+	public static function login() {
 
 	}
 	
 	public static function getPassword($string) {
+		
+		// get a signature using (the provided string + salt)
+		return(hash(pfConfig::get('security','algo'),
+			pfConfig::get('security','salt').$string.pfConfig::get('security','salt')
+			)
+		);
+		
+	}
+	
+	public static function getSignature($string) {
+	
+		// compute a hash with (the provided string + salt + user agent + remote ip)
+		return(hash(pfConfig::get('security','algo'), json_encode(array(
+				pfConfig::get('security','salt')
+				pfRequest::server('REMOTE_ADDR'),
+				pfRequest::server('USER_AGENT')
+				$string
+			))
+		));
 		
 	}
 	
@@ -46,7 +69,7 @@ class pfSecurity {
 		
 	}
 	
-	public static function hasModule($module=null,$level_bypass=null) {
+	public static function hasModule($module=null) {
 		
 	}
 	
