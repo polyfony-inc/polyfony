@@ -10,7 +10,7 @@
  */
 
 class pfValidate {
-	
+
 }	
 
 ?>
