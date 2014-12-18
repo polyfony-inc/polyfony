@@ -6,10 +6,4 @@ require("../Private/Vendor/Polyfony/pfLoader.php");
 // front end
 new pfLoader();
 
-/*
-var_dump(pfRequest::isPost());
-var_dump(pfRequest::isGet());
-var_dump(pfRequest::getHeaders());
-*/
-
 ?>
