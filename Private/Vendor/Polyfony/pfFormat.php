@@ -13,7 +13,7 @@
 class pfFormat {
 
 	// human size
-	public static size($integer) {
+	public static function size($integer) {
 		
 		// declare units
 		$unit = array('b','Ko','Mo','Go','To','Po');
@@ -23,27 +23,46 @@ class pfFormat {
 	}
 	
 	// relative date
-	public static date($string) {
+	public static function date($string) {
 		
 	}
 	
 	// phone number
-	public static phone($string) {
+	public static function phone($string) {
 		
 	}
 	
 	// classic slug
-	public static slug($string) {
+	public static function slug($string) {
+		
+		// equivalents of accentuated caracters
+		$with = str_split("àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ _'");
+		$without = str_split("aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY---");
+		// replace accents and lowercase the string
+		$string = strtolower(str_replace($with, $without, $string));
+		// replace all but 0-9 a-z remove doubles and trim the edges
+		return(trim(str_replace('--','-',preg_replace('#[^a-z0-9\-]#','-',$string)),'-'));
+		
+	}
+	
+	// file or folder name that is safe for the filesystem
+	public static function fsSafe($string) {
+		
+		// remove any symbol that does not belong in a file name of folder name
+		return(str_replace(array('..','/','\\',':','@','$','?','*','<','>','&','(',')','{','}',',','%','`','\'','#'),'-',$string));
 		
 	}
 	
 	// screen safe
-	public static safe($string) {
+	public static function htmlSafe($string) {
+		
+		// just remove html entities
+		return(htmlentities($string));
 		
 	}
 	
 	// create a link
-	public static link($string,$url='#',$attributes=array()) {
+	public static function link($string,$url='#',$attributes=array()) {
 		
 		// build the actual link
 		return("<a {self::attributes(array_merge(array('href'=>$url),$attributes))}>{$string}</a>");
@@ -51,14 +70,14 @@ class pfFormat {
 	}
 	
 	// truncate to a certain length
-	public static truncate($string,$length=16) {
+	public static function truncate($string,$length=16) {
 	
 		// if string is longer than authorized truncate, else do nothing
 		return(strlen($string) > $length ? trim(mb_substr(strip_tags($string),0,$length-2,'UTF-8')).'…' : $string);
 		
 	}
 	
-	public static attributes($attributes=null) {
+	public static function attributes($attributes=null) {
 		
 		// set empty string
 		$string = '';
