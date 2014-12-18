@@ -35,7 +35,7 @@ class pfConfig {
 	private static function detectFromHTTP() {
 		
 		// if we are running on the development port
-		self::$_environment = pfRequest::server('SERVER_PORT') == pfConfig::get('development','port') ? 'Dev' : 'Prod';
+		self::$_environment = pfRequest::server('SERVER_PORT') == pfConfig::get('request','dev_port') ? 'Dev' : 'Prod';
 
 	}
 	
