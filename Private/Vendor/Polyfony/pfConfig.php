@@ -33,24 +33,10 @@ class pfConfig {
 	}
 	
 	private static function detectFromHTTP() {
-		/*
-		switch(substr(pfRequest::server('REMOTE_ADDR'),0,9)) {
-			
-			// local ips
-			case '10.10.10.':
-			case '192.168.0':
-			case '192.168.1':
-			case '127.0.0.1':
-				self::$_environment = 'Dev';
-			break;
-			
-			// any other ip
-			default:
-				self::$_environment = 'Prod';
-			break;	
-			
-		}
-		*/
+		
+		// if we are running on the development port
+		self::$_environment = pfRequest::server('SERVER_PORT') == pfConfig::get('development','port') ? 'Dev' : 'Prod';
+
 	}
 	
 	public static function set($group,$key,$value=null) {
