@@ -70,7 +70,7 @@ class pfFormat {
 			foreach($attributes as $key => $value) {
 				
 				// associate them
-				$string	.= $key.'="'.strip_tags($value).'" ';
+				$string .= strlen($value) > 0 ? $key.'="'.strip_tags($value).'" ' : $key.' ';
 				
 			}
 
