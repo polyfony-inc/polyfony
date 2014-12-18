@@ -19,9 +19,11 @@ class pfConfig {
 		// depending on the context, detect environment differently
 		pfRequest::getContext() == 'CLI' ? self::detectFromCLI() : self::detectFromHTTP();
 		
-	}
-	
-	public static function load() {
+		// load the main configuration
+		self::$_config = array_merge(
+			parse_ini_file("../Private/Config/Config.ini"),
+			parse_ini_file("../Private/Config/{self::$_environment}.ini")
+		);
 		
 	}
 	
@@ -41,9 +43,15 @@ class pfConfig {
 	
 	public static function set($group,$key,$value=null) {
 		
+		// set the proper value
+		self::$_config[$group][$key] = $value;
+		
 	}
 	
-	public static function get($group=null,$key=null) {
+	public static function get($group,$key=null) {
+		
+		// return the proper config
+		return($key ? self::$_config[$group][$key] : self::$_config[$group]);
 		
 	}
 	

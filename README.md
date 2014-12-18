@@ -1,2 +1,2 @@
-## This is a draft
-### Nothing interesting yet
+## This is a draft of a PHP Framework
+Nothing interesting yet
