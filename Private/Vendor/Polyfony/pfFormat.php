@@ -13,27 +13,71 @@
 class pfFormat {
 
 	// human size
-	public static size() {
+	public static size($integer) {
+		
+		// declare units
+		$unit = array('b','Ko','Mo','Go','To','Po');
+		// make human readable
+		return(round($size/pow(1024,($i=floor(log($size,1024)))),$precision).' '.$unit[$i]);
 		
 	}
 	
 	// relative date
-	public static date() {
+	public static date($string) {
 		
 	}
 	
 	// phone number
-	public static phone() {
+	public static phone($string) {
 		
 	}
 	
 	// classic slug
-	public static slug() {
+	public static slug($string) {
 		
 	}
 	
 	// screen safe
-	public static safe() {
+	public static safe($string) {
+		
+	}
+	
+	// create a link
+	public static link($string,$url='#',$attributes=array()) {
+		
+		// build the actual link
+		return("<a {self::attributes(array_merge(array('href'=>$url),$attributes))}>{$string}</a>");
+		
+	}
+	
+	// truncate to a certain length
+	public static truncate($string,$length=16) {
+	
+		// if string is longer than authorized truncate, else do nothing
+		return(strlen($string) > $length ? trim(mb_substr(strip_tags($string),0,$length-2,'UTF-8')).'…' : $string);
+		
+	}
+	
+	public static attributes($attributes=null) {
+		
+		// set empty string
+		$string = '';
+		
+		// array is provided
+		if(is_array($attributes)) {
+			
+			// for each attribute
+			foreach($attributes as $key => $value) {
+				
+				// associate them
+				$string	.= $key.'="'.strip_tags($value).'" ';
+				
+			}
+
+		}
+		
+		// return the formatted string
+		return(trim($string));
 		
 	}
 	
