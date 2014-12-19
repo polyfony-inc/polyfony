@@ -31,11 +31,11 @@ class pfRequest {
 		
 		// set current URL
 		// depending on the context
-		self::$_url = self::$_context == 'CLI' ? $_SERVER['argv'][2] : $_SERVER['REQUEST_URI'];
+		self::$_url = self::$_context == 'CLI' ? (isset($_SERVER['argv'][2]) ? $_SERVER['argv'][2] : "/") : $_SERVER['REQUEST_URI'];
 		
 		// set the request method
 		// depending if post method is properly set
-		self::$_method = $_SERVER['REQUEST_METHOD'] === 'POST' ? 'post' : 'get';
+		self::$_method = isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' ? 'post' : 'get';
 
 		// set the request signature
 		// with post, if any
