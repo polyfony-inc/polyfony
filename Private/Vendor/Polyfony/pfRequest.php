@@ -27,16 +27,16 @@ class pfRequest {
 		
 		// set proper context
 		// depending if we are in command line
-		self::$_context = isset($_SERVER['argv']) ? 'CLI' : 'HTTP';
+		self::$_context = isset($_SERVER['argv'][0]) ? 'CLI' : 'HTTP';
 		
 		// set current URL
 		// depending on the context
 		self::$_url = self::$_context == 'CLI' ? $_SERVER['argv'][2] : $_SERVER['REQUEST_URI'];
 		
 		// set the request method
-		// depending if superglobal post exists
-		//self::$_method = isset($_POST) ? 'get' : 'post';
-		self::$_method = (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') ? 'post' : 'get';
+		// depending if post method is properly set
+		self::$_method = $_SERVER['REQUEST_METHOD'] === 'POST' ? 'post' : 'get';
+
 		// set the request signature
 		// with post, if any
 		self::$_signature = self::isPost() ? sha1(self::$_url.json_encode($_POST)) : sha1(self::$_url);
@@ -51,48 +51,10 @@ class pfRequest {
 
 		// set the headers
 		// if using a FPM fix
-		function_exists('getallheaders') ? self::$_headers = getallheaders() : self::getAllHeaders();
+		function_exists('getallheaders') ? self::$_headers = getallheaders() : self::setHeaders();
 		
 		// remove globals
 		unset($_GET, $_POST, $_SERVER, $_FILES, $_COOKIE);
-
-	}
-	
-	// only necessary during debug phase
-	public static function dump() {
-		
-		echo "_url: \n<br />";
-		var_dump(self::$_url);
-		
-		echo "_get: \n<br />";
-		var_dump(self::$_get);
-		
-		echo "_post: \n<br />";
-		var_dump(self::$_post);
-		
-		echo "_server: \n<br />";
-		var_dump(self::$_server);
-		
-		echo "_files: \n<br />";
-		var_dump(self::$_files);
-		
-		echo "_cookie: \n<br />";
-		var_dump(self::$_cookie);
-		
-		echo "_argv: \n<br />";
-		var_dump(self::$_argv);
-		
-		echo "_headers: \n<br />";
-		var_dump(self::$_headers);
-		
-		echo "_context: \n<br />";
-		var_dump(self::$_context);
-		
-		echo "_method: \n<br />";
-		var_dump(self::$_method);
-		
-		echo "_signature: \n<br />";
-		var_dump(self::$_signature);
 
 	}
 	
@@ -117,9 +79,8 @@ class pfRequest {
 		
 	}
 	
-	private static function getAllHeaders() {
+	private static function setHeaders() {
 	
-self::dump();
 		// for each $_server key
 		foreach(self::$_server as $name => $value) { 
 			// if it's a header
@@ -131,8 +92,19 @@ self::dump();
 		
 	}
 	
-	public static function getHeaders($key=null,$default=null) {
-		
+	/**
+	 * Get a single Header variable.
+	 *
+	 * @access public
+	 * @param  string $variable The variable we wish to return.
+	 * @param  mixed  $default  If the variable is not found, this is returned.
+	 * @return mixed
+	 * @static
+	 */
+	public static function header($key=null,$default=null) {
+		return isset(self::$_headers[$variable])
+			? self::$_headers[$variable]
+			: $default;
 	}
 
 	
@@ -237,6 +209,43 @@ self::dump();
 		
 	}	
 
+	// only necessary during debug phase
+	public static function dump() {
+		
+		echo "_url: \n<br />";
+		var_dump(self::$_url);
+		
+		echo "_get: \n<br />";
+		var_dump(self::$_get);
+		
+		echo "_post: \n<br />";
+		var_dump(self::$_post);
+		
+		echo "_server: \n<br />";
+		var_dump(self::$_server);
+		
+		echo "_files: \n<br />";
+		var_dump(self::$_files);
+		
+		echo "_cookie: \n<br />";
+		var_dump(self::$_cookie);
+		
+		echo "_argv: \n<br />";
+		var_dump(self::$_argv);
+		
+		echo "_headers: \n<br />";
+		var_dump(self::$_headers);
+		
+		echo "_context: \n<br />";
+		var_dump(self::$_context);
+		
+		echo "_method: \n<br />";
+		var_dump(self::$_method);
+		
+		echo "_signature: \n<br />";
+		var_dump(self::$_signature);
+
+	}
 	
 }
 

@@ -21,8 +21,8 @@ class pfConfig {
 		
 		// load the main configuration
 		self::$_config = array_merge(
-			parse_ini_file("../Private/Config/Config.ini",true),
-			parse_ini_file("../Private/Config/" . self::$_environment . ".ini",true)
+			parse_ini_file("../Private/Config/Config.ini", true),
+			parse_ini_file("../Private/Config/" . self::$_environment . ".ini", true)
 		);
 		
 	}
