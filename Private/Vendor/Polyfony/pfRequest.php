@@ -51,7 +51,7 @@ class pfRequest {
 		self::$_server	= isset($_SERVER)?: array();
 		self::$_files	= isset($_FILES)?: array();
 		self::$_cookie	= isset($_COOKIE)?: array();
-		self::$_argv	= isset($_ARGV)?: array();
+		self::$_argv	= isset($_SERVER['argv'])?: array();
 		
 		// remove globals
 		unset($_GET, $_POST, $_SERVER, $_FILES, $_COOKIE);
@@ -154,6 +154,21 @@ class pfRequest {
 	public static function cookie($variable, $default = null) {
 		return isset(self::$_cookie[$variable])
 			? self::$_cookie[$variable]
+			: $default;
+	}
+	
+	/**
+	 * Get a single COOKIE variable.
+	 *
+	 * @access public
+	 * @param  string $variable The variable we wish to return.
+	 * @param  mixed  $default  If the variable is not found, this is returned.
+	 * @return mixed
+	 * @static
+	 */
+	public static function argv($variable, $default = null) {
+		return isset(self::$_argv[$variable])
+			? self::$_argv[$variable]
 			: $default;
 	}
 

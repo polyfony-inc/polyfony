@@ -14,7 +14,7 @@ class pfRouter {
 	public static function route() {
 	
 		// if cache is enabled
-		pfConfig::get('cache');
+		/*pfConfig::get('cache');*/
 	
 		pfRequest::getSignature();
 	

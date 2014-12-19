@@ -22,7 +22,7 @@ class pfConfig {
 		// load the main configuration
 		self::$_config = array_merge(
 			parse_ini_file("../Private/Config/Config.ini"),
-			parse_ini_file("../Private/Config/{self::$_environment}.ini")
+			parse_ini_file("../Private/Config/" . self::$_environment . ".ini")
 		);
 		
 	}
@@ -30,7 +30,7 @@ class pfConfig {
 	private static function detectFromCLI() {
 	
 		// use the first command line argument as environment name
-		self::$_environment = $_ARGV[1] == 'Dev' ? 'Dev' : 'Prod';
+		self::$_environment = pfRequest::argv(1) == 'Dev' ? 'Dev' : 'Prod';
 		
 	}
 	
