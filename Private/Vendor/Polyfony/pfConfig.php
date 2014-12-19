@@ -29,8 +29,8 @@ class pfConfig {
 	
 	private static function detectFromCLI() {
 	
-		// use first command line argument, or prod
-		self::$_environment = isset($_ARGV[1]) ? ucfirst(strtolower($_ARGV[1])) : 'Prod';
+		// use the first command line argument as environment name
+		self::$_environment = $_ARGV[1] == 'Dev' ? 'Dev' : 'Prod';
 		
 	}
 	
