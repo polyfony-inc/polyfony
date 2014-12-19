@@ -27,34 +27,72 @@ class pfRequest {
 		
 		// set proper context
 		// depending if we are in command line
-		self::$_context = isset($_ARGV) ? 'CLI' : 'HTTP';
+		self::$_context = isset($_SERVER['argv']) ? 'CLI' : 'HTTP';
 		
 		// set current URL
 		// depending on the context
-		self::$_url = self::$_context == 'CLI' ? $_ARGV[2] : $_SERVER['REQUEST_URI'];
+		self::$_url = self::$_context == 'CLI' ? $_SERVER['argv'][2] : $_SERVER['REQUEST_URI'];
 		
 		// set the request method
 		// depending if superglobal post exists
-		self::$_method = isset($_POST) ? 'get' : 'post';
-		
+		//self::$_method = isset($_POST) ? 'get' : 'post';
+		self::$_method = (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') ? 'post' : 'get';
 		// set the request signature
 		// with post, if any
 		self::$_signature = self::isPost() ? sha1(self::$_url.json_encode($_POST)) : sha1(self::$_url);
-		
+
+		// set globals
+		self::$_get		= isset($_GET)				? $_GET				: array();
+		self::$_post	= isset($_POST)				? $_POST			: array();
+		self::$_server	= isset($_SERVER)			? $_SERVER			: array();
+		self::$_files	= isset($_FILES)			? $_FILES			: array();
+		self::$_cookie	= isset($_COOKIE)			? $_COOKIE			: array();
+		self::$_argv	= isset($_SERVER['argv'])	? $_SERVER['argv']	: array();
+
 		// set the headers
 		// if using a FPM fix
 		function_exists('getallheaders') ? self::$_headers = getallheaders() : self::getAllHeaders();
 		
-		// set globals
-		self::$_get		= isset($_GET)?: array();
-		self::$_post	= isset($_POST)?: array();
-		self::$_server	= isset($_SERVER)?: array();
-		self::$_files	= isset($_FILES)?: array();
-		self::$_cookie	= isset($_COOKIE)?: array();
-		self::$_argv	= isset($_SERVER['argv'])?: array();
-		
 		// remove globals
 		unset($_GET, $_POST, $_SERVER, $_FILES, $_COOKIE);
+
+	}
+	
+	// only necessary during debug phase
+	public static function dump() {
+		
+		echo "_url: \n<br />";
+		var_dump(self::$_url);
+		
+		echo "_get: \n<br />";
+		var_dump(self::$_get);
+		
+		echo "_post: \n<br />";
+		var_dump(self::$_post);
+		
+		echo "_server: \n<br />";
+		var_dump(self::$_server);
+		
+		echo "_files: \n<br />";
+		var_dump(self::$_files);
+		
+		echo "_cookie: \n<br />";
+		var_dump(self::$_cookie);
+		
+		echo "_argv: \n<br />";
+		var_dump(self::$_argv);
+		
+		echo "_headers: \n<br />";
+		var_dump(self::$_headers);
+		
+		echo "_context: \n<br />";
+		var_dump(self::$_context);
+		
+		echo "_method: \n<br />";
+		var_dump(self::$_method);
+		
+		echo "_signature: \n<br />";
+		var_dump(self::$_signature);
 
 	}
 	
@@ -81,6 +119,7 @@ class pfRequest {
 	
 	private static function getAllHeaders() {
 	
+self::dump();
 		// for each $_server key
 		foreach(self::$_server as $name => $value) { 
 			// if it's a header
@@ -158,7 +197,7 @@ class pfRequest {
 	}
 	
 	/**
-	 * Get a single COOKIE variable.
+	 * Get a single argv variable.
 	 *
 	 * @access public
 	 * @param  string $variable The variable we wish to return.
