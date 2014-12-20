@@ -11,10 +11,10 @@
 
 namespace Polyfony\Store;
 
-class Filesystem implements Polyfony\StoreInterface {
+class Filesystem implements StoreInterface {
 
 	// where to store
-	protected static $_root = '../Private/Data/Store/';
+	protected static $_root = '../Private/Storage/Store/';
 
 	public static function has($variable) {
 		
@@ -53,7 +53,7 @@ class Filesystem implements Polyfony\StoreInterface {
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
 		// return it
-		return(file_get_contents(self::$_root . $variable))
+		return(unserialize(file_get_contents(self::$_root . $variable)));
 		
 	}
 	

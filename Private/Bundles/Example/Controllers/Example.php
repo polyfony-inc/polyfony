@@ -13,7 +13,6 @@ class ExampleController extends Polyfony\Controller {
 	
 		echo 'Hello world';
 		
-		
 	}
 	
 }

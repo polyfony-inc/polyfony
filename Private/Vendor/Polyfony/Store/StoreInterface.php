@@ -9,7 +9,7 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-namespace Polyfony;
+namespace Polyfony\Store;
 
 interface StoreInterface {
 	
