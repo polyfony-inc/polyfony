@@ -9,18 +9,9 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-class pfRuntime {
-	
-	protected static $_Runtimes;
-	
-	public static function set($bundle,$key,$value=null) {
-		
-	}
-	
-	public static function get($bundle,$key=null) {
-	
-	}
-	
-}
+namespace Polyfony\Store;
 
-?>
+class Database implements Polyfony\StoreInterface {
+
+
+}

@@ -9,13 +9,10 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-class pfLocales {
-	
-	public static function get($key) {
-		
-	}
-	
-	
-}
+namespace Polyfony;
+
+class Validate {
+
+}	
 
 ?>

@@ -8,23 +8,10 @@
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
- 
-class pfRouter {
-	
-	public static function route() {
-	
-		// if cache is enabled
-		/*pfConfig::get('cache');*/
-	
-		pfRequest::getSignature();
-	
-		pfRequest::getUrl();
-		
-		
-		
-	}
-	
+
+namespace Polyfony\Store;
+
+class Filesystem implements Polyfony\StoreInterface {
+
+
 }
-
-
-?>

@@ -8,22 +8,24 @@
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
+
+namespace Polyfony;
  
-class pfFront {
+class Front {
 	
 	// upon construction
 	public function __construct() {
 		
 		// init the request
 		// detect context CLI/WEB and set the proper url
-		pfRequest::init();
+		Request::init();
 		
 		// init the configuration
 		// detect env and load proper .ini files
-		pfConfig::init();
+		Config::init();
 		
 		// now route !
-		pfRouter::route();
+		Router::route();
 		
 	}
 	

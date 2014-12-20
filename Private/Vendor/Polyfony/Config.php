@@ -9,7 +9,9 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-class pfConfig {
+namespace Polyfony;
+
+class Config {
 	
 	protected static $_environment;
 	protected static $_config;
@@ -17,7 +19,7 @@ class pfConfig {
 	public static function init() {
 	
 		// depending on the context, detect environment differently
-		pfRequest::getContext() == 'CLI' ? self::detectFromCLI() : self::detectFromHTTP();
+		Request::getContext() == 'CLI' ? self::detectFromCLI() : self::detectFromHTTP();
 		
 		// load the main configuration
 		self::$_config = array_merge(
@@ -30,14 +32,14 @@ class pfConfig {
 	private static function detectFromCLI() {
 	
 		// use the first command line argument as environment name
-		self::$_environment = pfRequest::argv(1) == 'Dev' ? 'Dev' : 'Prod';
+		self::$_environment = Request::argv(1) == 'Dev' ? 'Dev' : 'Prod';
 		
 	}
 	
 	private static function detectFromHTTP() {
 		
 		// if we are running on the development port
-		self::$_environment = pfRequest::server('SERVER_PORT') == pfConfig::get('request','dev_port') ? 'Dev' : 'Prod';
+		self::$_environment = Request::server('SERVER_PORT') == Config::get('request','dev_port') ? 'Dev' : 'Prod';
 
 	}
 	

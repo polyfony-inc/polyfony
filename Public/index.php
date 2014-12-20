@@ -1,9 +1,12 @@
 <?php
 
 // require the autoloader
-require("../Private/Vendor/Polyfony/pfLoader.php");
+require("../Private/Vendor/Polyfony/Loader.php");
+
+// class loader
+new Loader(null,"../Private/Vendor/");
 
 // front end
-new pfLoader();
+new Polyfony\Front();
 
 ?>

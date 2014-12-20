@@ -9,7 +9,9 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-class pfSecurity {
+namespace Polyfony;
+
+class Security {
 	
 	// default is not granted
 	protected static $_granted = false;
@@ -18,10 +20,10 @@ class pfSecurity {
 	public static function secure($module=null,$level=null) {
 		
 		// if we have a security cookie we authenticate with it
-		pfRequest::cookie(pfConfig::get('security','cookie')) ? self::authenticate();
+		Request::cookie(Config::get('security','cookie')) ? self::authenticate();
 		
 		// if we have a post and posted a login, we log in with it
-		pfRequest::post(pfConfig::get('security','login')) ? self::login();
+		Request::post(Config::get('security','login')) ? self::login();
 		
 		// if we have the module
 		self::$_granted = $module and self::hasModule($module) ? true : false;
@@ -30,7 +32,7 @@ class pfSecurity {
 		self::$_granted = !self::$_granted and $level and self::hasLevel($level) ? true : false;
 		
 		// and now we check if we have the proper rights
-		!self::$_granted ? pfResponse::redirectAfter(pfConfig::get('security','login'),3); pfResponse::error403('Not authorized');
+		!self::$_granted ? Response::redirectAfter(Config::get('security','login'),3); Response::error403('Not authorized');
 		
 	}
 	
@@ -45,8 +47,8 @@ class pfSecurity {
 	public static function getPassword($string) {
 		
 		// get a signature using (the provided string + salt)
-		return(hash(pfConfig::get('security','algo'),
-			pfConfig::get('security','salt') . $string . pfConfig::get('security','salt')
+		return(hash(Config::get('security','algo'),
+			Config::get('security','salt') . $string . Config::get('security','salt')
 		));
 		
 	}
@@ -54,8 +56,8 @@ class pfSecurity {
 	public static function getSignature($string='') {
 	
 		// compute a hash with (the provided string + salt + user agent + remote ip)
-		return(hash(pfConfig::get('security','algo'), 
-			pfRequest::server('USER_AGENT') . pfRequest::server('REMOTE_ADDR') . pfConfig::get('security','salt') . $string
+		return(hash(Config::get('security','algo'), 
+			Request::server('USER_AGENT') . Request::server('REMOTE_ADDR') . Config::get('security','salt') . $string
 		));
 		
 	}

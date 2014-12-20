@@ -9,7 +9,9 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-class pfController {
+namespace Polyfony;
+
+class Controller {
 
 
 	// method to override
@@ -39,11 +41,16 @@ class pfController {
 		
 	}
 	
+	// build an url (or a link) ? given a route name and its parameters
+	public function link($route, $parameters=null) {
+		
+	}
+	
 	// alias
 	public function isGranted($module, $level=null) {
 		
 		// ask the pfsecurity for that module and bypass level
-		return(pfSecurity::hasModule($module,$level));
+		return(Security::hasModule($module,$level));
 		
 	}
 	

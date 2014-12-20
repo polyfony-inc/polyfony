@@ -9,7 +9,9 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-class pfDatabase {
+namespace Polyfony;
+
+class Database {
 	
 	
 	// no database connection at first
@@ -19,19 +21,19 @@ class pfDatabase {
 	public static function connect() {
 	
 		// if driver is sqlite
-		pfConfig::get('database','driver') == 'sqlite' ? $pdo = 'sqlite:'.pfConfig::get('database','database');
+		Config::get('database','driver') == 'sqlite' ? $pdo = 'sqlite:'.Config::get('database','database');
 		
 		// if driver is mysql
-		pfConfig::get('database','driver') == 'mysql' ? $pdo = 'mysql:dbname='.pfConfig::get('database','database').';host='pfConfig::get('database','hostname');
+		Config::get('database','driver') == 'mysql' ? $pdo = 'mysql:dbname='.Config::get('database','database').';host='Config::get('database','hostname');
 		
 		// if driver is unknown
-		!$pdo ? Throw new pfException('pfDatabase::connect() : Unknown driver');
+		!$pdo ? Throw new \Exception('Database::connect() : Unknown driver');
 		
 		// try to connect
-		self::$_handle = new PDO($pdo,pfConfig::get('database','username'),pfConfig::get('database','password'));
+		self::$_handle = new PDO($pdo,Config::get('database','username'),Config::get('database','password'));
 		
 		// check if connection the connexion failed
-		!self::$_handle ? Throw new pfException('pfDatabase::connect() : Failed to connect');
+		!self::$_handle ? Throw new \Exception('Database::connect() : Failed to connect');
 		
 	}
 	

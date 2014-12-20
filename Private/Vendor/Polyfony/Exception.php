@@ -9,9 +9,11 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-class pfResponse {
+namespace Polyfony;
 
+class Polyfony\Core\Exception extends Exception {
 
+	
 }
 
 ?>

@@ -9,7 +9,9 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
  
-class pfRecord {
+namespace Polyfony;
+
+class Record {
 	
 	// if of the record
 	protected $_id;

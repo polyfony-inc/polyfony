@@ -9,7 +9,9 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-class pfException extends Exception {
+namespace Polyfony;
+
+class Profiler {
 
 	
 }

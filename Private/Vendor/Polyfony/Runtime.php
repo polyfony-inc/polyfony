@@ -9,8 +9,20 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-class pfValidate {
+namespace Polyfony;
 
-}	
+class Runtime {
+	
+	protected static $_runtimes;
+	
+	public static function set($bundle,$key,$value=null) {
+		
+	}
+	
+	public static function get($bundle,$key=null) {
+	
+	}
+	
+}
 
 ?>

@@ -8,8 +8,10 @@
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
+
+namespace Polyfony;
  
-class pfRequest {
+class Request {
 	
 	private static $_url;
 	private static $_get;

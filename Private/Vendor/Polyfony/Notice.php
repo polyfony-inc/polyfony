@@ -9,7 +9,9 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-class pfNotice {
+namespace Polyfony;
+
+class Notice {
 
 	
 }

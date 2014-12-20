@@ -8,15 +8,17 @@
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
+
+namespace Polyfony;
  
-class pfLoader {
+class Loader {
 	
 	// upon construction
 	public function __construct() {
 		// register method loader as the autoload
 		spl_autoload_register(array($this,'loader'),true);
 		// call the front
-		new pfFront();
+		new Front();
 	}
 	
 	// method is call everytime we try to instanciate a class

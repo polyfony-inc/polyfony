@@ -10,7 +10,9 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-class pfFormat {
+namespace Polyfony;
+
+class Format {
 
 	// human size
 	public static function size($integer) {

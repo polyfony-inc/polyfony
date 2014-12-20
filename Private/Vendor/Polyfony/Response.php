@@ -9,9 +9,11 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-class pfProfiler {
+namespace Polyfony;
 
-	
+class Response {
+
+
 }
 
 ?>

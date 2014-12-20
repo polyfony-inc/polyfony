@@ -9,7 +9,9 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
  
-class pfQuery {
+namespace Polyfony;
+
+class Query {
 	
 	// internal attributes
 	protected	$Query;
