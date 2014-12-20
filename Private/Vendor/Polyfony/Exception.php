@@ -11,8 +11,14 @@
 
 namespace Polyfony;
 
-class Polyfony\Core\Exception extends Exception {
+class Exception extends \Exception {
 
+	// custom string representation of object
+	public function __toString() {
+	
+		return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
+	
+	}
 	
 }
 

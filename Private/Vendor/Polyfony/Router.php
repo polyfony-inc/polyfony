@@ -13,16 +13,29 @@ namespace Polyfony;
 
 class Router {
 	
+	protected static $_routes;
+	protected static $_bundle;
+	protected static $_controller;
+	protected static $_action;
+	
+	// map a route
+	public static function setRoute($name,$url,$restrict,$destination) {
+		
+	}
+	
+	// find the proper route
 	public static function route() {
-	
-		// if cache is enabled
-		/*Config::get('cache');*/
-	
-		Request::getSignature();
-	
-		Request::getUrl();
 		
+		// hard set controller/action for development purpose
+		require('../Private/Bundles/Example/Controllers/Example.php');
+
+		self::$_controller = new \ExampleController();
+		self::$_controller->indexAction();
 		
+	}
+	
+	// dispatch to the proper controller
+	public static function dispatch($bundle, $controller, $action=null) {
 		
 	}
 	

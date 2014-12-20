@@ -20,27 +20,39 @@ class Database {
 	
 	public static function connect() {
 	
-		// if driver is sqlite
-		Config::get('database','driver') == 'sqlite' ? $pdo = 'sqlite:'.Config::get('database','database');
-		
-		// if driver is mysql
-		Config::get('database','driver') == 'mysql' ? $pdo = 'mysql:dbname='.Config::get('database','database').';host='Config::get('database','hostname');
-		
-		// if driver is unknown
-		!$pdo ? Throw new \Exception('Database::connect() : Unknown driver');
-		
+		// depending on the driver
+		switch(Config::get('database','driver')) {
+			
+			case 'sqlite':
+				$pdo = 'sqlite:' . Config::get('database', 'database');
+			break;
+			
+			case 'mysql':
+				$pdo = 'mysql:dbname=' . Config::get('database', 'database') . ';host=' . Config::get('database', 'hostname');
+			break;
+			
+			default:
+				// causes exception
+				Throw new \Exception('Database::connect() : Unknown driver');
+			break;
+			
+		}
+
 		// try to connect
-		self::$_handle = new PDO($pdo,Config::get('database','username'),Config::get('database','password'));
-		
+		self::$_handle = new \PDO($pdo, Config::get('database', 'username'), Config::get('database', 'password'));
+		/*
 		// check if connection the connexion failed
 		!self::$_handle ? Throw new \Exception('Database::connect() : Failed to connect');
-		
+		*/
 	}
 	
 	public static function query() {
 		
 		// if no connection to the database is ready
-		!self::$_handle ? self::connect();
+	//	!self::$_handle ? self::connect();
+		
+		// and return a new query
+		return(new Query());
 		
 	}
 	

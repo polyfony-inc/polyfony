@@ -41,16 +41,27 @@ class Controller {
 		
 	}
 	
-	// build an url (or a link) ? given a route name and its parameters
-	public function link($route, $parameters=null) {
+	// alias to router / build an url given a route name and its parameters
+	public function url($route, $parameters=null) {
+		
+		// return the reversed route as an url
+		return(Router::reverse($route, $parameters));
 		
 	}
 	
-	// alias
+	// get an empty query
+	public function query() {
+
+		// return a new query
+		return(Database::query());
+		
+	}
+	
+	// alias to security / check if requirements are met
 	public function isGranted($module, $level=null) {
 		
 		// ask the pfsecurity for that module and bypass level
-		return(Security::hasModule($module,$level));
+		return(Security::hasModule($module, $level));
 		
 	}
 	

@@ -27,6 +27,9 @@ class Front {
 		// now route !
 		Router::route();
 		
+		// render the response
+		Response::render();
+		
 	}
 	
 }

@@ -14,6 +14,12 @@ namespace Polyfony;
 class Response {
 
 
+	public static function render() {
+		
+	
+			
+	}
+
 }
 
 ?>
