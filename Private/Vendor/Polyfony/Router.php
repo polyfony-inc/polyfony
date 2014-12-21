@@ -37,6 +37,23 @@ class Router {
 		
 	}
 	
+	// check if the route exists
+	public static function hasRoute($route_name) {
+	
+		// true if route exists, false otherwise
+		return(isset(self::$_routes[$route_name]) ? true : false);
+		
+	}
+	
+	// get a specific route
+	public static function getRoute($route_name) {
+		
+		// return the route of false
+		return(isset(self::$_routes[$route_name]) ? self::$_routes[$route_name] : false);
+		
+	}
+	
+	
 	// find the proper route
 	public static function route() {
 
@@ -52,29 +69,19 @@ class Router {
 				break;
 			}
 		}
-	
-		
-	
-		// if no match is found and no 404 route is found
+		// if no match is found and we don't have an error route to fallback on
 		if(!self::$_match and !isset(self::$_routes['error'])) {
-			// throw an exception
-			Throw new \Exception('Router::route() no matching route and no error route either');
+			// throw a native exception since there is no cleaner alternative
+			Throw new \Exception('Router::route() no matching route and no error route either',404);
 		}
-		// else we can use the 404 route
-		else {
+		// else we can use the error route
+		elseif(!self::$_match and isset(self::$_routes['error'])) {
 			// use the error handler
 			self::$_match = self::$_routes['error'];
 		}
-	
-		var_dump(self::$_match);
-		die();
-	
-		// routes has matched, load the controller/action
-		Dispatcher::loadController(
-			self::$_bundles,
-			self::$_controller,
-			self::$_action
-		);	
+		// send the matching route to the dispatcher
+		Dispatcher::forward(self::$_match);	
+		
 	}
 	
 	/**

@@ -9,7 +9,7 @@ namespace Polyfony\Store;
  * @author    Christopher Hill <cjhill@gmail.com>
  * @package   MVC
  */
-class Cookie implements Polyfony\StoreInterface
+class Cookie implements StoreInterface
 {
 	/**
 	 * Check whether the variable exists in the store.

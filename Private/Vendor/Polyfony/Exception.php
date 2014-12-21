@@ -13,11 +13,25 @@ namespace Polyfony;
 
 class Exception extends \Exception {
 
-	// custom string representation of object
-	public function __toString() {
-	
-		return __CLASS__ . ": [{$this->code}]: {$this->message}\n";
-	
+	public function __construct($message=null, $code=0, Exception $previous=null) {
+
+		// if the router has an error route registered
+		if(Router::hasRoute('error')) {
+			// store the exception so that the error controller can format it later on
+			Polyfony\Store\Request::put('exception',array(
+				'message'	=>$message,
+				'code'		=>$code,
+				'previous'	=>$previous
+			),true);
+			// dispatch to the error controller
+			Dispatcher::forward(Router::getRoute('error'));
+		}
+		// use the native exception
+		else {
+			// call the parent exception
+			die('Fuck, something screwed up.');
+		}			
+			
 	}
 	
 }

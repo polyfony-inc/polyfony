@@ -9,7 +9,7 @@ namespace Polyfony\Store;
  * @author    Christopher Hill <cjhill@gmail.com>
  * @package   MVC
  */
-class Session implements Polyfony\StoreInterface
+class Session implements StoreInterface
 {
 	/**
 	 * Check whether the variable exists in the store.

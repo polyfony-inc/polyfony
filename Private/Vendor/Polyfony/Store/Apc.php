@@ -9,7 +9,7 @@ namespace Polyfony\Store;
  * @author    Christopher Hill <cjhill@gmail.com>
  * @package   MVC
  */
-class Apc implements Polyfony\StoreInterface
+class Apc implements StoreInterface
 {
 	/**
 	 * Check whether the variable exists in the store.

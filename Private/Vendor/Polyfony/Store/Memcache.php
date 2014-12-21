@@ -9,7 +9,7 @@ namespace Polyfony\Store;
  * @author    Christopher Hill <cjhill@gmail.com>
  * @package   MVC
  */
-class Memcache implements Polyfony\StoreInterface
+class Memcache implements StoreInterface
 {
 	/**
 	 * The reference to the Memcache server.

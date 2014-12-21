@@ -9,7 +9,7 @@ namespace Polyfony\Store;
  * @author    Christopher Hill <cjhill@gmail.com>
  * @package   MVC
  */
-class Request implements Polyfony\StoreInterface
+class Request implements StoreInterface
 {
 	/**
 	 * A store for all the variables set.

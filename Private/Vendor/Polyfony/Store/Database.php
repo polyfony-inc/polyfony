@@ -11,7 +11,7 @@
 
 namespace Polyfony\Store;
 
-class Database implements Polyfony\StoreInterface {
+class Database implements StoreInterface {
 
 
 }
