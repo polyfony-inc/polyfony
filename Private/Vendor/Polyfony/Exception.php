@@ -13,23 +13,25 @@ namespace Polyfony;
 
 class Exception extends \Exception {
 	
-	public function __toString() {
+	
+	public static function init() {
+	
+		// set the handler for all non-catched exceptions
+		set_exception_handler('Polyfony\Exception::catchException');
 		
-		// if the router has an error route registered
-		if(Router::hasRoute('error')) {
+	}
+	
+	public static function catchException($exception) {
+	
+		// if the router has an exception route we catch and route to it
+		if(Router::hasRoute('exception')) {
 			// store the exception so that the error controller can format it later on
-			Store\Request::put('exception',array(
-				'message'	=>$message,
-				'code'		=>$code
-			),true);
+			Store\Request::put('exception',$exception,true);
+			// set the proper header in the response
+			
 			// dispatch to the error controller
-			Dispatcher::forward(Router::getRoute('error'));
+			Dispatcher::forward(Router::getRoute('exception'));
 		}
-		// use the native exception
-		else {
-			// call the parent exception
-			Throw new \Exception($message,$code,$previous);
-		}	
 		
 	}
 	

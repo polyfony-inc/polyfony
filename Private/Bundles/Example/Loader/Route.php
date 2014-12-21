@@ -1,8 +1,8 @@
 <?php
 
 // declare the main error route (it doesn't have to have an url)
-Polyfony\Router::addRoute('error')
-	->destination('Example','Example','error');
+Polyfony\Router::addRoute('exception')
+	->destination('Example','Example','exception');
 
 
 Polyfony\Router::addRoute('main-index')
@@ -21,5 +21,9 @@ Polyfony\Router::addRoute('dynamic')
 Polyfony\Router::addRoute('test')
 	->url('/test/')
 	->destination('Example','Example','test');
+
+Polyfony\Router::addRoute('lametest')
+	->url('/lametest/')
+	->destination('Example','Fuck','fuck');
 
 ?>

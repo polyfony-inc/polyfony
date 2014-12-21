@@ -69,13 +69,15 @@ class Router {
 				break;
 			}
 		}
+		// marker
+		Profiler::setMarker('init_router');
 		// if no match is found and we don't have an error route to fallback on
-		if(!self::$_match and !isset(self::$_routes['error'])) {
+		if(!self::$_match and !isset(self::$_routes['exception'])) {
 			// throw a native exception since there is no cleaner alternative
 			Throw new \Exception('Router::route() no matching route and no error route either',404);
 		}
 		// else we can use the error route
-		elseif(!self::$_match and isset(self::$_routes['error'])) {
+		elseif(!self::$_match and isset(self::$_routes['exception'])) {
 			// use the error handler
 			Throw new Exception('Router::route() no matching route',404);
 		}

@@ -14,62 +14,57 @@ namespace Polyfony;
 class Profiler {
 
 	// handles gobal execution time
-	protected static $_requestStart;
-	protected static $_requestEnd;
-	protected static $_requestDuration;
+	protected static $_startTime;
+	protected static $_startMemory;
+	protected static $_endTime;
+	protected static $_endMemory;
+	protected static $_totalTime;
+	protected static $_totalMemory;
 	
 	// handles different portions of execution times
 	protected static $_stack = array();
 
 	public static function init() {
 	
-		self::$_requestStart = microtime(true);
-		
+		// start time
+		self::$_startTime = microtime(true);
+		// start memory
+		self::$_startMemory = memory_get_usage();
+
 	}
 	
 	public static function stop() {
 		
-		self::$_requestEnd = microtime(true);
-		self::$_requestDuration = self::$_requestEnd - self::$_requestStart;
-			
+		// add end marker
+		self::setMarker('end');
+		// end time and end memory
+		self::$_endTime		= microtime(true);
+		self::$_totalTime	= self::$_endTime - self::$_startTime;
+		self::$_totalMemory	= memory_get_usage();
+		
 	}
 	
-	public static function register($type,$name) {
-		// Profile this request?
-		if (! Config::get('profiler', 'enable', true)) {
+	public static function setMarker($name) {
+		// profiler is disabled
+		if (!Config::get('profiler', 'enable', true)) {
 			return false;
 		}
-		array_unshift(self::$_stack, array(
-			'type'  => $type,
-			'name'  => $name,
-			'start' => microtime(true),
-			'mem'   => memory_get_usage()
-		));
+		// stack the marker
+		self::$_stack[] = array(
+			'name'	=> $name,
+			'time'	=> round(microtime(true) - self::$_startTime,4),
+			'memory'=> round(memory_get_usage()/1000,0)
+		);
 	}
 	
-	public static function unregister($type,$name) {
-		// Profile this request?
-		if (! Config::get('profiler', 'enable', true)) {
-			return false;
-		}
-		// Get the time here to get a more accurate trace
-		$microtime = microtime(true);
-		// And begin the loop
-		foreach (self::$_stack as $traceId => $trace) {
-			if ($trace['name'] == $name) {
-				self::$_stack[$traceId]['end'] = $microtime;
-				self::$_stack[$traceId]['mem'] =
-					memory_get_usage() - self::$_stack[$traceId]['mem'];
-				break;
-			}
-		}
-	}
-	
-	public static function getProfilerData() {
+	public static function getData() {
+		// stop the profier
+		self::stop();
+		// return stacked data
 		return array(
-			'requestStart' => self::$_requestStart,
-			'requestEnd'   => self::$_requestEnd,
-			'stack'        => array_reverse(self::$_stack)
+			'time'	=> self::$_totalTime,
+			'memory'=> self::$_totalMemory,
+			'stack'	=> self::$_stack
 		);
 	}
 	

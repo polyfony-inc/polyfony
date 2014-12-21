@@ -95,8 +95,25 @@ class Response {
 	}
 	
 	// register an error header and optionaly set content at the same time
-	public static function error($number,$content=null) {
-		// do domething more clever than before to output html errors if required
+	public static function error($number,$message=null) {
+
+		// set the error http header
+		
+		
+		// save the error
+		Store\Request::put('error_message',$message,true);
+		Store\Request::put('error_number',$number,true);
+		
+		// if the router has an error route
+		if(Router::hasRoute('error')) {
+			// dispatch to the error route
+			Dispatcher::forward(Router::getRoute('error'));
+		}
+		// router has no route to handle exceptions
+		else {
+			
+		}
+		
 	}
 
 	public static function render() {

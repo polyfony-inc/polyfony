@@ -21,7 +21,6 @@ class ExampleController extends Polyfony\Controller {
 	public function testAction() {
 		
 		echo 'test<br />';
-		echo pf\Format::size(memory_get_usage());
 			
 	}
 	
@@ -31,12 +30,13 @@ class ExampleController extends Polyfony\Controller {
 		
 	}
 	
-	public function errorAction() {
+	public function exceptionAction() {
 		
-	//	$exception = Polyfony\Store\Request::has('exception') ? Polyfony\Store\Request::has('exception') : array('message'=>'Internal serveur error','code'=>'500');
-		
+
 		// format the error
-		echo "<h1>Internal server error</h1>";
+		echo "<h1>Exception occured</h1>";
+		echo Polyfony\Store\Request::get('exception')->getCode();
+		echo Polyfony\Store\Request::get('exception')->getMessage();
 	
 			
 	}

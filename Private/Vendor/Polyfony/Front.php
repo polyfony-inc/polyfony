@@ -16,23 +16,41 @@ class Front {
 	// upon construction
 	public function __construct() {
 		
+		// start the exeption catcher
+		Exception::init();
+		
 		// start the profiler
 		Profiler::init();
 		
 		// detect context CLI/WEB and set the proper url
 		Request::init();
 		
+		// marker
+		Profiler::setMarker('init_request');
+		
 		// detect env and load .ini files accordingly
 		Config::init();
+		
+		// marker
+		Profiler::setMarker('init_config');
 		
 		// start the cache
 		Cache::init();
 
+		// marker
+		Profiler::setMarker('init_cache');
+
 		// prepare a response with defaults parameters
 		Response::init();
 		
+		// marker
+		Profiler::setMarker('init_response');
+		
 		// look for runtime and routes in the bundles
 		Bundles::init();
+		
+		// marker
+		Profiler::setMarker('init_bundles');
 		
 		// route the request to a matching bundle/controller/action if any
 		Router::init();

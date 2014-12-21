@@ -25,7 +25,7 @@ class Dispatcher {
 		$method = "{$route->action}Action";
 		
 		// if script is missing and it's not the error script
-		if(!file_exists($script) and $route->name != 'error') {
+		if(!file_exists($script) and $route->name != 'exception') {
 			// new polyfony exception
 			Throw new Exception("Dispatcher::forward() : Missing controller file [{$script}]",500);	
 		}
@@ -39,7 +39,7 @@ class Dispatcher {
 		require($script);
 		
 		// if class is missing from the controller and not in error route
-		if(!class_exists($class,false) and $route->name != 'error') {
+		if(!class_exists($class,false) and $route->name != 'exception') {
 			// new polyfony exception
 			Throw new Exception("Dispatcher::forward() : Missing controller class [{$class}] in [{$script}]",500);	
 		}
@@ -54,10 +54,16 @@ class Dispatcher {
 		$method = method_exists($class,$method) ? $method : 'defaultAction';
 		// pre action
 		self::$_controller->preAction();
+		// marker
+		Profiler::setMarker('preaction');
 		// call the method
 		self::$_controller->$method();
+		// marker
+		Profiler::setMarker('controller');
 		// post action
 		self::$_controller->postAction();	
+		// marker
+		Profiler::setMarker('postaction');
 		
 	}
 	
