@@ -58,8 +58,6 @@ class Profiler {
 	}
 	
 	public static function getData() {
-		// stop the profier
-		self::stop();
 		// return stacked data
 		return array(
 			'time'	=> self::$_totalTime,

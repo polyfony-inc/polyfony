@@ -54,6 +54,14 @@ class Router {
 		
 	}
 	
+	// update the current route after forwarding
+	public static function setCurrentRoute($route) {
+		
+		// update the matched route
+		self::$_match = $route;
+		
+	}
+	
 	// get the current route
 	public static function getCurrentRoute() {
 	

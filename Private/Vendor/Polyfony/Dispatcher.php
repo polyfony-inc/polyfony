@@ -36,7 +36,8 @@ class Dispatcher {
 			// new polyfony exception
 			Throw new Exception("Dispatcher::forward() : Missing controller class [{$class}] in [{$script}]",500);	
 		}
-		
+		// we passed eveything, update the route known to the router
+		Router::setCurrentRoute($route);
 		// instanciate
 		self::$_controller = new $class;
 		// if method is missing replace by default

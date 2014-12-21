@@ -1,21 +1,28 @@
 <?php
 
 use Polyfony as pf;
+use Polyfony\Store as st;
 
 // new example class to realize tests
 class ExampleController extends Polyfony\Controller {
 
 	public function preAction() {
 		
-		pf\Response::setMetas('title','Polyfony2');
-		pf\Response::setAssets('css','/bootstrap.css');
+		pf\Response::setMetas(array('title','Polyfony2'));
+		pf\Response::setAssets('css','/Assets/bootstrap.css');
 		
 	}
 
 	public function indexAction() {
 	
-		echo '<center><b style="font-size:120px;">pf2</b></center>';
+		$this->view('Polyfony');
 		
+	}
+	
+	public function helloAction() {
+		
+		$this->view('HelloWorld');
+			
 	}
 	
 	public function testAction() {
@@ -47,9 +54,9 @@ class ExampleController extends Polyfony\Controller {
 				'title'=>'Exception occured'
 			));
 			// grab some infos about the exception
-			$this->Code = pf\Store\Request::get('exception')->getCode();
-			$this->Message = pf\Store\Request::get('exception')->getMessage();
-			$this->Trace = pf\Store\Request::get('exception')->getTraceAsString();
+			$this->Code = st\Request::get('exception')->getCode();
+			$this->Message = st\Request::get('exception')->getMessage();
+			$this->Trace = st\Request::get('exception')->getTraceAsString();
 			// pass to the exception view
 			$this->view('Exception');
 		}

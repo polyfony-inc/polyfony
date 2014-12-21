@@ -15,7 +15,7 @@ class Response {
 
 	// set manually
 	protected static $_content;			// raw content before internal formatting
-	protected static $_meta;			// list of meta tags
+	protected static $_metas;			// list of meta tags
 	protected static $_assets;			// list of assets
 	protected static $_type;			// type of the output (html/json/…)
 	protected static $_headers;			// list of headers
@@ -38,12 +38,40 @@ class Response {
 		// start the output buffer
 		ob_start();
 		
+		// set default assets
+		self::$_assets = array(
+			// as empty arrays
+			'css'	=>array(),
+			'js'	=>array()
+		);
+		
+		// set default headers
+		self::$_headers = array(
+			'X-Powered-By'		=>'Polyfony',
+			'Server'			=>'Undisclosed',
+		);
+		
+		// set default metas
+		self::$_metas = array();
+		
+		// default is to allow browser cache
+		self::$_browserCache = true;
+		
 		// set the default status
 		self::setStatus(200);
 		
 		// set the default type
 		self::setType(Config::get('response','default_type'));
 		
+	}
+	
+	public static function setRedirect($url,$delay=null) {
+		
+		// destination
+		self::$_redirect = $url;
+		// waiting
+		self::$_delay = $delay;
+			
 	}
 
 	public static function setAssets($type,$assets) {
@@ -60,44 +88,33 @@ class Response {
 		
 	}
 
-	public static function setMetas($metas) {
+	public static function setMetas($metas, $replace=false) {
 		
-		// if single element provided
-		$metas = is_array($metas) ? $metas : array($metas);
-		// for each meta to set
-		foreach($metas as $meta => $value) {
-			// push meta
-			self::$_meta[$meta] = $value;
-		}
+		// replace or merge with current metas
+		self::$_metas = $replace ? self::$_metas : array_merge(self::$_metas,$metas);
 		
 	}
 
 	public static function setHeaders($headers) {	
 		
-		// if single element provided
-		$headers = is_array($headers) ? $headers : array($headers);
+		// if array provided
+		if(is_array($headers)) {
+			// merge current and new headers (replacing old ones)
+			self::$_headers = array_merge(self::$_headers,$headers);
+		}
 		
 	}
 
 	public static function setType($type) {
-	}
-
-	public static function setContent($content) {
-	}
-
-	public static function formatContent() {
 		
-		// do nothing for now
+		// if the type is allowed
+		if(in_array($type,array('html-page','json','file','csv','xml','html','js','css','text'))) {
+			// update the current type
+			self::$_type = $type;
+		}
 		
 	}
 
-	public static function outputContent() {
-	
-		// echo as is for now
-		echo self::$_content;
-		
-	}
-	
 	// register a status header for that response
 	public static function setStatus($code) {
 	
@@ -177,6 +194,91 @@ class Response {
 		
 	}
 
+	// set raw content
+	public static function setContent($content, $replace=false) {
+		
+		// replace content or append to already existing
+		/*
+		
+		if current content is an array, merge
+		
+		if current content is a string, append
+		
+		$append ? self::$_content .= $content : self::$_content = content;
+		
+		*/
+		
+	}
+
+
+
+	// format and return javascripts
+	private static function getScripts() {
+		/*
+		$this->Javascripts = array_unique($this->Javascripts);
+		$output = '';
+		foreach($this->Javascripts as $aJsFile) {
+			$output .= '<script type="text/javascript" src="'. $aJsFile .'"></script>';
+		}	
+		return($output);
+		*/
+	}
+	
+	// format an return stylesheets
+	private static function getStyles() {
+		self::$_assets['css'] = array_unique(self::$_assets['css']);
+		$output = '';
+		foreach(self::$_assets['css'] as $file) {
+			$output .= '<link rel="stylesheet" media="all" type="text/css" href="'.$file.'" />';
+		}
+		return($output);
+	}
+
+	// format and return content
+	private static function getContent() {
+		
+		// do nothing for now
+		return(self::$_content);
+	}
+	
+	private static function formatContent() {
+		
+		// base headers
+		$headers = array(
+//			'Content-Language'	=>null
+		);
+		
+		// if checksum is enabled
+		if(Config::get('response','checksum')) {
+			// generate that checksum
+			$headers['Content-MD5'] = self::$_type == 'file' ? md5_file(self::$_content) : md5(self::$_content);
+		}
+		// the content length
+		$headers['Content-length'] = self::$_type == 'file' ? filesize(self::$_content) : strlen(self::$_content);
+		// if we have a modification date
+		if(self::$_modification) {
+			// output the proper modification date
+			$headers['Last-Modified'] = date('r',self::$_modification);
+		}
+		// if cache is disabled -> specify Cache-control headers
+		if(!self::$_browserCache) {
+			// output specific headers
+			$headers['Cache-Control'] = 'must-revalidate, post-check=0, pre-check=0';	
+		}
+		// if the profiler is enabled
+		if(Config::get('profiler','enable')) {
+			// get the profiler data
+			$profiler = Profiler::getData();
+			// memory usage	
+			$headers['X-Memory-Usage'] = Format::size($profiler['memory']);
+			// execution time
+			$headers['X-Execution-Time'] = round($profiler['time']*1000) . ' ms';
+		}
+		// set some headers
+		self::setHeaders($headers);
+		
+	}	
+
 	public static function render() {
 
 		// if no content is set yet we garbage collect
@@ -184,15 +286,41 @@ class Response {
 
 		// output status
 		header(self::$_status);
-			
-		// format the content
-		self::formatContent();	
 		
-		// output the content
-		self::outputContent();
+		// stop the profiler
+		Profiler::stop();
+		
+		// format the content
+		self::formatContent();
+		
+		// for each header
+		foreach(self::$_headers as $header_key => $header_value) {
+			// output the header
+			header("{$header_key}: {$header_value}");		
+		}
+		
+		// if the type is file output from the file indicated as content
+		if(self::$_type == 'file') {
+			// get the content from the file
+			echo file_get_contents(self::$_content);	
+		}
+		// any other format
+		else {
+			// output the content
+			echo self::$_content;
+			
+		}
 		
 		// it ends here
 		exit;
+		
+	}
+	
+	public static function save($destination) {
+		
+	}
+	
+	public static function download($file_name) {
 		
 	}
 

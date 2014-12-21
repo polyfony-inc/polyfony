@@ -45,6 +45,10 @@ class Locales {
 		
 	}
 	
+	public static function getLanguage() {
+		
+	}
+	
 	public static function get($key,$language=null) {
 	
 		// if locales are not loaded yet
