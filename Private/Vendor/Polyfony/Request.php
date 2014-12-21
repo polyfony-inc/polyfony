@@ -33,11 +33,11 @@ class Request {
 		
 		// set current URL
 		// depending on the context
-		self::$_url = self::$_context == 'CLI' ? (isset($_SERVER['argv'][2]) ? $_SERVER['argv'][2] : "/") : $_SERVER['REQUEST_URI'];
+		self::$_url = self::$_context == 'CLI' ? $_SERVER['argv'][2] : $_SERVER['REQUEST_URI'];
 		
 		// set the request method
 		// depending if post method is properly set
-		self::$_method = isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' ? 'post' : 'get';
+		self::$_method = $_SERVER['REQUEST_METHOD'] === 'POST' ? 'post' : 'get';
 
 		// set the request signature
 		// with post, if any
@@ -91,6 +91,16 @@ class Request {
 				self::$_headers[str_replace(' ','-',ucwords(strtolower(str_replace('_',' ',substr($name,5)))))] = $value; 
 			} 
 		} 
+		
+	}
+	
+	public static function setVariable($type,$key,$value=null) {
+		
+		// if the type is valid
+		if(in_array($type,array('get','post','header','server','argv','cookie'))) {
+			// set the value
+			self::$_{$type}[$key] = $value;
+		}
 		
 	}
 	

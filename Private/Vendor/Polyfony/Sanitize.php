@@ -1,7 +1,7 @@
 <?php
 /**
  * PHP Version 5
- * Sanitization helper, when validation would be cause to much overweight
+ * Sanitization helper, when validation would cause too much overweight
  * just sanitize your string with this class before accepting them
  * @package Polyfony
  * @link https://github.com/SIB-FRANCE/Polyfony

@@ -1,8 +1,7 @@
 <?php
 /**
  * PHP Version 5
- * Sanitization helper, when validation would be cause to much overweight
- * just sanitize your string with this class before accepting them
+ * Helper for filesystem operations
  * @package Polyfony
  * @link https://github.com/SIB-FRANCE/Polyfony
  * @license http://www.gnu.org/licenses/lgpl.txt GNU General Public License
@@ -13,12 +12,23 @@
 
 namespace Polyfony;
 
-class Tools {
+class Filesystem {
 	
 	
-	public static function isFile($string) {
+	public static function isNormalName($string) {
 		
+		// true if not starting with a dot, false otherwise
 		return((substr($string,0,1) != '.' ) ? true : false);
+		
+	}
+	
+	
+	public static function getFolders($path, $filter_callback=null) {
+		
+	}
+	
+	
+	public static function getFiles($path ,$filter_callback=null) {
 		
 	}
 	

@@ -11,23 +11,14 @@
 
 namespace Polyfony;
 
-class Runtime {
+class Dispatcher {
 	
-	protected static $_runtimes;
+	public static function loadController($bundle,$controller,$action) {
 	
-	public static function set($bundle,$key,$value=null) {
 		
-		// if only bundle + one parameters set the whole bundle, else set a key of the bundle
-		$value != null ? self::$_runtimes[$bundle][$key] = $value : self::$_runtimes[$bundle] = $key;
 		
 	}
 	
-	public static function get($bundle,$key=null) {
-	
-
-	
-	}
-	
-}
+}	
 
 ?>

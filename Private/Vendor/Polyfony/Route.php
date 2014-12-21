@@ -1,66 +1,60 @@
 <?php
-/**
- * PHP Version 5
- * @package Polyfony
- * @link https://github.com/SIB-FRANCE/Polyfony
- * @license http://www.gnu.org/licenses/lgpl.txt GNU General Public License
- * @note This program is distributed in the hope that it will be useful - WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.
- */
- 
 namespace Polyfony;
 
-	protected $name;
-	protected $bundle;
-	protected $controller;
-	protected $action;
-	protected $parameters;
-	protected $trigger;
+/**
+ * A single route for the application.
+ *
+ * Routes can contain variables which are prepended by a colon. Paths are greedy
+ * by default, they will grab any URL that they match irrespective of what comes
+ * after the matched fragments of the request URL. Anything after the route path
+ * will be parsed as a GET variable.
+ * @copyright Copyright (c) 2012-2013 Christopher Hill
+ * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
+ * @author    Christopher Hill <cjhill@gmail.com>
+ * @package   MVC
+ */
+class Route
+{
 
-class Route {
-	
-	// set the name of the route (for reverse routing purpose)
-	public function setName($name) {
-		
+	// url to match
+	public $url;
+	// parameter restriction
+	private $parameters;
+	// name of that route
+	private $name;
+	// bundle destination
+	private $bundle;
+	// controller destination
+	private $controller;
+	// action destination
+	private $action;
+	// (optional) url variable to trigger action
+	private $trigger;
+
+
+	public function __construct($name) {
+		$this->name = $name;
+	}
+
+	public function url($url) {
+		$this->url = $url;
+		return $this;
+	}
+
+	public function restrict($parameters) {
+		$this->parameters = $parameters;
+		return $this;
 	}
 	
-	// set the full url
-	public function setUrl($url,$contraints) {
-		
-		// url including parameters if any /test/:foo/:bar/
-		
+	public function trigger($trigger) {
+		$this->trigger = $trigger;
+		return $this;
 	}
-	
-	// set the destination for that route
-	public function setDestination($bundle, $controller, $action=null) {
-		
-		// mandatory
-		
+
+	public function destination($bundle, $controller=null, $action=null) {
+		$this->bundle = $bundle;
+		$this->controller = $controller != null ? $controller : 'Index';
+		$this->action = $action != null ? $action : null;
+		return $this;
 	}
-	
-	// define a parameter than will define the action to call
-	public function setTrigger($parameter) {
-		
-		// not a mandatory method
-		
-	}
-	
-	// define the method or methods to match
-	public function setMethod($method) {
-		
-		// will not be implemented
-		
-	}
-	
-	// save this route in the router
-	public function save() {
-		
-		// save the route
-		Router::setRoute($this);
-		
-	}
-	
 }
-
-?>

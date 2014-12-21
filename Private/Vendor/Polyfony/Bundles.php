@@ -19,9 +19,12 @@ class Bundles {
 
 	// will get the list of bundles and get their routes and runtimes
 	public static function init() {
-		
+
 		// if cache is enabled and in prod load the cache, else parse bundles
 		(Cache::has('Includes') and Config::isProd()) ? self::loadCachedDependencies() : self::loadDependencies();
+		
+		// include what has been found
+		self::includeLoaders();
 		
 	}
 	
@@ -30,7 +33,9 @@ class Bundles {
 		// get from the cache
 		$cache = Cache::get('Includes');
 		// put everything at its rightful place
-		self::$_bundles = $cache['bundles'];
+		self::$_bundles		= $cache['bundles'];
+		self::$_routes		= $cache['routes'];
+		self::$_runtimes	= $cache['runtimes'];
 		
 	}
 	
@@ -41,7 +46,7 @@ class Bundles {
 		// for each available bundle
 		foreach(scandir('../Private/Bundles/') as $bundle) {
 			// if it's an actual file
-			if(Tools::isFile($bundle)) {
+			if(Filesystem::isNormalName($bundle)) {
 				// remember the bundle name
 				self::$_bundles[] = $bundle;
 				// route file
@@ -52,7 +57,6 @@ class Bundles {
 				file_exists($bundle_routes) ? self::$_routes[] = $bundle_routes : '';
 				// if a runtime file exists
 				file_exists($bundle_runtime) ? self::$_runtimes[] = $bundle_runtime : '';
-			
 			}
 		}
 		// save in the cache (overwrite)
@@ -66,7 +70,9 @@ class Bundles {
 	
 	private static function includeLoaders() {
 		
+		// for each route or runtime filavailablee
 		foreach(array_merge(self::$_routes, self::$_runtimes) as $file) {
+			// include it
 			include($file);	
 		}
 		
@@ -98,7 +104,7 @@ class Bundles {
 		
 		foreach(scandir("../Private/Bundles/{$bundle}/Locales/") as $locales) {
 			
-			if(self::isFile($locales)) {
+			if(Tools::isFile($locales)) {
 			
 			//	$locales[] = "../Private/Bundles/{$bundle}/Locales/{$locales}";
 			
@@ -110,16 +116,11 @@ class Bundles {
 		
 	}
 	
-	// get the list of bundles
-	public static function getBundles() {
+	// get the list of available bundles
+	public static function getAvailable() {
 		
 		// return the current list
 		return(self::$_bundles);
-		
-	}
-	
-	// private
-	private static function isFile() {
 		
 	}
 	

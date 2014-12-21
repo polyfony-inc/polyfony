@@ -81,8 +81,9 @@ class Response {
 		echo self::$_content;
 		
 	}
-
-	public static function error($number,$message) {
+	
+	// register an error header and optionaly set content at the same time
+	public static function error($number,$content=null) {
 		// do domething more clever than before to output html errors if required
 	}
 

@@ -18,12 +18,15 @@ class Config {
 	
 	public static function init() {
 	
+		// load the common configuration file
+		self::$_config = parse_ini_file("../Private/Config/Config.ini", true);
+	
 		// depending on the context, detect environment differently
 		Request::getContext() == 'CLI' ? self::detectFromCLI() : self::detectFromHTTP();
 		
-		// load the main configuration
+		// load the environment specific configuration
 		self::$_config = array_merge(
-			parse_ini_file("../Private/Config/Config.ini", true),
+			self::$_config,
 			parse_ini_file("../Private/Config/" . self::$_environment . ".ini", true)
 		);
 		
@@ -39,7 +42,7 @@ class Config {
 	private static function detectFromHTTP() {
 		
 		// if we are running on the development port
-		self::$_environment = Request::server('SERVER_PORT') == Config::get('request','dev_port') ? 'Dev' : 'Prod';
+		self::$_environment = Request::server('SERVER_PORT') == Config::get('request','dev_port') ? 'Dev' : 'Prod';	
 
 	}
 	
