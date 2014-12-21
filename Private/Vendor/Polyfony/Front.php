@@ -16,22 +16,32 @@ class Front {
 	// upon construction
 	public function __construct() {
 		
-		// init the request
+		// start the profiler
+		Profiler::init();
+		
 		// detect context CLI/WEB and set the proper url
 		Request::init();
 		
-		// init the configuration
-		// detect env and load proper .ini files
+		// detect env and load .ini files accordingly
 		Config::init();
 		
-		// now route !
-		Router::route();
+		// start the cache
+		Cache::init();
+
+		// prepare a response with defaults parameters
+		Response::init();
 		
-		// render the response
+		// look for runtime and routes in the bundles
+		Bundles::init();
+		
+		// route the request to a matching bundle/controller/action if any
+		Router::init();
+		
+		// render the response if it has not already been done in a controller
 		Response::render();
 		
 	}
-	
+		
 }
 
 

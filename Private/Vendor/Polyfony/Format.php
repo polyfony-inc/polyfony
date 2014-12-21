@@ -14,6 +14,7 @@ namespace Polyfony;
 
 class Format {
 
+
 	// human size
 	public static function size($integer) {
 		
@@ -59,7 +60,7 @@ class Format {
 	public static function htmlSafe($string) {
 		
 		// just remove html entities
-		return(htmlentities($string));
+		return(filter_var($string,FILTER_SANITIZE_FULL_SPECIAL_CHARS));
 		
 	}
 	
@@ -67,7 +68,7 @@ class Format {
 	public static function link($string,$url='#',$attributes=array()) {
 		
 		// build the actual link
-		return("<a {self::attributes(array_merge(array('href'=>$url),$attributes))}>{$string}</a>");
+		return('<a ' . self::attributes(array_merge(array('href'=>$url),$attributes)) . '>' . $string  . '</a>');
 		
 	}
 	
@@ -79,24 +80,39 @@ class Format {
 		
 	}
 	
+	
+	public static function highlight($text, $phrase, $highlighter = '<strong class="highlight">\\1</strong>') {
+		if (empty($text)) {
+			return '';
+		}
+		if (empty($phrase)) {
+		return $text;
+		}
+		if (is_array($phrase) or ($phrase instanceof sfOutputEscaperArrayDecorator)) {
+			foreach ($phrase as $word) {
+				$pattern[] = '/('.preg_quote($word, '/').')/i';
+				$replacement[] = $highlighter;
+			}
+		}
+		else {
+			$pattern = '/('.preg_quote($phrase, '/').')/i';
+			$replacement = $highlighter;
+		}
+		return preg_replace($pattern, $replacement, $text);
+	}
+	
 	public static function attributes($attributes=null) {
 		
 		// set empty string
 		$string = '';
-		
 		// array is provided
 		if(is_array($attributes)) {
-			
 			// for each attribute
 			foreach($attributes as $key => $value) {
-				
 				// associate them
-				$string .= strlen($value) > 0 ? $key.'="'.strip_tags($value).'" ' : $key.' ';
-				
+				$string .= strlen($value) > 0 ? $key.'="'.strip_tags($value).'" ' : $key.' ';		
 			}
-
 		}
-		
 		// return the formatted string
 		return(trim($string));
 		

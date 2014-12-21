@@ -18,6 +18,12 @@ class Router {
 	protected static $_controller;
 	protected static $_action;
 	
+	public static function init() {
+	
+		self::route();
+		
+	}
+	
 	// map a route
 	public static function setRoute($name,$url,$restrict,$destination) {
 		
@@ -36,6 +42,11 @@ class Router {
 	
 	// dispatch to the proper controller
 	public static function dispatch($bundle, $controller, $action=null) {
+		
+	}
+	
+	// get an url given the route's name and optionnaly its parameters
+	public static function reverse($route_name, $parameters=null) {
 		
 	}
 	

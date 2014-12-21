@@ -13,11 +13,45 @@ namespace Polyfony\;
 
 class Locales {
 	
-	public static function load($file) {
+	protected static $_locales = null;
+	protected static $_language = null
+	
+	public static function init() {
+		
+		// if the language is not set already we detect it
+		self::$_language !== null ?: self::detect();
+		
+		// load from the cache if available
+		Cache::has('Locales') and Config::isProd() ? self::$_locales = Cache::get('Locales') : self::load();
 		
 	}
 	
-	public static function get($key) {
+	private static function detect() {
+		
+		// if accept language header is not set we use default
+		!Request::headers('Accept-Language') ?: self::$_language = Config::get('locales','default');
+			
+		$auto_language = (Request::headers('Accept-Language') ? substr(Request::headers('Accept-Language'),0,2) : Config::get('locales','default');
+			
+	}
+	
+	private static function load($file) {
+		
+		// save the locales to the cache
+		
+	}
+	
+	public static function setLanguage() {
+		
+	}
+	
+	public static function get($key,$language=null) {
+	
+		// if locales are not loaded yet
+		$_locales !== null ?: self::init();
+		
+		// return the key in the right local or turn the key if the locale does not exist
+		return(isset(self::$_locales[self::$_language]) ? self::$_locales[self::$_language] : $key);
 		
 	}
 	

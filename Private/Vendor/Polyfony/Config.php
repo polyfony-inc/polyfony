@@ -57,6 +57,20 @@ class Config {
 		
 	}
 	
+	public static function isDev() {
+		
+		// return boolean
+		return(self::$_environment == 'Dev' ? true : false);
+			
+	}
+	
+	public static function isProd() {
+		
+		// return boolean
+		return(self::$_environment == 'Prod' ? true : false);
+		
+	}
+	
 }	
 
 ?>
