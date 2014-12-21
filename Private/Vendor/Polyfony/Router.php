@@ -53,11 +53,21 @@ class Router {
 			}
 		}
 	
-		var_dump(self::$_routes,self::$_match);
-		die();
+		
 	
-		// if not found, use route named error404
-		self::$_match != null ?: self::$_match = self::$_routes['error404'];
+		// if no match is found and no 404 route is found
+		if(!self::$_match and !isset(self::$_routes['error'])) {
+			// throw an exception
+			Throw new \Exception('Router::route() no matching route and no error route either');
+		}
+		// else we can use the 404 route
+		else {
+			// use the error handler
+			self::$_match = self::$_routes['error'];
+		}
+	
+		var_dump(self::$_match);
+		die();
 	
 		// routes has matched, load the controller/action
 		Dispatcher::loadController(
@@ -85,17 +95,61 @@ class Router {
 			// not matching
 			return(false);
 		}
-		// if we have parameters to treat
-		if(is_array($route_portions)) {
-			// get the request parameters
-			$request_portions = explode('/',str_replace($route_base,'',$request_url));
-			// remove the static portion
+		// if the route is declared to handle some parameters
+		if(is_array($route_portions)) {			
+			// remove the base portion from the request url
+			$request_portions = str_replace($route_base,'',$request_url);
+			// if the remaining request url has parameters, explode them or return an empty array
+			$request_parameters = strstr($request_portions,'/') ? explode('/',$request_portions) : array();
+			// remove the static portion of the route url
 			unset($route_portions[0]);
-			// for each parameter
-			foreach($route_portions as $parameter_index => $parameter_name) {
-				
-				
-				
+			// for clarity rename the route portions to routes parameters
+			$route_parameters = array_values($route_portions);
+			// for each parameter that the route can handle
+			foreach($route_parameters as $index => $parameter_name) {
+				// clean the parameter name
+				$parameter_name = trim($parameter_name,'/');
+				// check if it is provided in the request url
+				!isset($request_parameters[$index]) ?: Request::setUrlParameter($parameter_name,$request_parameters[$index]);
+			}
+			// for each restriction of the route, check if the parameters are matching else return false
+			foreach($route->restrictions as $parameter => $restriction) {
+				// if said parameter is set
+				if(Request::get($parameter)) {
+					// if the restriction is an array of values
+					if(is_array($restriction) and in_array(Request::get($parameter),$restriction)) {
+						// route matches
+						continue;
+					}
+					// if the restriction is a regex is has to match
+					elseif(preg_match('/^{$restriction}$/iu',Request::get($parameter))) {
+						// route matches
+						continue;	
+					}
+					// if the restriction is only to be set
+					elseif($restriction === true) {
+						// route matches
+						continue;
+					}
+					// restriction is not met
+					else {
+						// route does not match
+						return(false);	
+					}
+				}
+				// parameter is not set
+				else {
+					// if it should be
+					if($restriction === true) {
+						// route does not match
+						return(false);	
+					}
+				}
+			}
+			// if a trigger is defined use to to set the action
+			if($route->trigger !== null) {
+				// update dynamically the route's action or fallback to index if missing
+				$route->action = Request::get($route->trigger) ? Request::get($route->trigger) : 'index';
 			}
 		}
 		else {
@@ -105,10 +159,8 @@ class Router {
 				return(false);	
 			}
 		}
-		
-		
+		// we got there ? then we've find out route !
 		return($route);
-		
 
 	}
 	

@@ -2,12 +2,13 @@
 
 
 Polyfony\Router::addRoute('test')
-	->url('/test/:foo/:bar/')
+	->url('/test/:foo/:bar/:foobar/')
 	->restrict(array(
-		'bar'=>'@numeric'
+		'foo'=>array('a','b'),
+		'foobar'=>array('on','off')
 	))
 	->destination('Example','Example','index')
-	->trigger('foo');
+	->trigger('bar');
 
 
 

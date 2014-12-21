@@ -94,13 +94,10 @@ class Request {
 		
 	}
 	
-	public static function setVariable($type,$key,$value=null) {
+	public static function setUrlParameter($key,$value=null) {
 		
-		// if the type is valid
-		if(in_array($type,array('get','post','header','server','argv','cookie'))) {
-			// set the value
-			self::$_{$type}[$key] = $value;
-		}
+		// set the value
+		self::$_get[$key] = $value;
 		
 	}
 	

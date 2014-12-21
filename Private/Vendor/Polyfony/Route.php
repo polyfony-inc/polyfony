@@ -19,38 +19,48 @@ class Route
 	// url to match
 	public $url;
 	// parameter restriction
-	private $parameters;
+	public $restrictions;
 	// name of that route
-	private $name;
+	public $name;
 	// bundle destination
-	private $bundle;
+	public $bundle;
 	// controller destination
-	private $controller;
+	public $controller;
 	// action destination
-	private $action;
+	public $action;
 	// (optional) url variable to trigger action
-	private $trigger;
+	public $trigger;
 
 
+	// construct the route given its name
 	public function __construct($name) {
-		$this->name = $name;
+		$this->name			= $name;
+		$this->trigger		= null;
+		$this->bundle		= null;
+		$this->controller	= null;
+		$this->action		= null;
+		$this->restrictions	= array();
 	}
-
+	
+	// set the url to match
 	public function url($url) {
 		$this->url = $url;
 		return $this;
 	}
 
-	public function restrict($parameters) {
-		$this->parameters = $parameters;
+	// set an associative array of contraints for the url parameters
+	public function restrict($restrictions) {
+		$this->restrictions = $restrictions;
 		return $this;
 	}
 	
+	// set the name of a parameter that will trigger the action
 	public function trigger($trigger) {
 		$this->trigger = $trigger;
 		return $this;
 	}
 
+	// set the destination for that route
 	public function destination($bundle, $controller=null, $action=null) {
 		$this->bundle = $bundle;
 		$this->controller = $controller != null ? $controller : 'Index';
