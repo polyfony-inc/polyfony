@@ -28,7 +28,8 @@ class Router {
 		
 		// We cannot allow duplicate route names for reversing reasons
 		if (isset(self::$_routes[$route_name])) {
-			throw new \InvalidArgumentException("The route {$route_name} has already been declared.");
+			// throw an exception
+			throw new Exception("Router::addRoute() The route {$route_name} has already been declared");
 		}
 		// create a new route
 		self::$_routes[$route_name] = new Route($route_name);
@@ -53,6 +54,13 @@ class Router {
 		
 	}
 	
+	// get the current route
+	public static function getCurrentRoute() {
+	
+		// returned the matched route
+		return(self::$_match ? self::$_match : null);
+		
+	}
 	
 	// find the proper route
 	public static function route() {
@@ -72,13 +80,8 @@ class Router {
 		// marker
 		Profiler::setMarker('init_router');
 		// if no match is found and we don't have an error route to fallback on
-		if(!self::$_match and !isset(self::$_routes['exception'])) {
+		if(!self::$_match) {
 			// throw a native exception since there is no cleaner alternative
-			Throw new \Exception('Router::route() no matching route and no error route either',404);
-		}
-		// else we can use the error route
-		elseif(!self::$_match and isset(self::$_routes['exception'])) {
-			// use the error handler
 			Throw new Exception('Router::route() no matching route',404);
 		}
 		// send the matching route to the dispatcher
@@ -189,7 +192,7 @@ class Router {
 	public static function reverse($route_name, $parameters = array()) {
 		// Does the route actually exist?
 		if (!isset(self::$_routes[$route_name])) {
-			throw new Exception("The route {$route_name} does not exist.");
+			throw new Exception("Router::reverse() The route {$route_name} does not exist");
 		}
 
 		// Create a container for the URL

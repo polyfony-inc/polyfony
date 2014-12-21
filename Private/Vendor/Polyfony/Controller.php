@@ -42,7 +42,15 @@ class Controller {
 	// forward to another controller in the same bundle
 	final public function forward($controller, $action=null) {
 		
-		// call the pfRouter ? or fork self to preserve some context from the preAction ?
+		// get the current route as a base
+		$route = Router::getCurrentRoute();
+		
+		// and alter it
+		$route->controller	= $controller;
+		$route->action		= $action;
+		
+		// forward to the new route
+		Dispatcher::forward($route);
 		
 	}
 	

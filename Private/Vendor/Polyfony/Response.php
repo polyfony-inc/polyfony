@@ -19,6 +19,7 @@ class Response {
 	protected static $_assets;			// list of assets
 	protected static $_type;			// type of the output (html/json/…)
 	protected static $_headers;			// list of headers
+	protected static $_status;			// the HTTP status code to use
 	protected static $_redirect;		// url to redirect to
 	protected static $_delay;			// delay before redirection
 	protected static $_charset;			// charset of the response
@@ -36,6 +37,9 @@ class Response {
 	
 		// start the output buffer
 		ob_start();
+		
+		// set the default status
+		self::setStatus(200);
 		
 		// set the default type
 		self::setType(Config::get('response','default_type'));
@@ -94,32 +98,92 @@ class Response {
 		
 	}
 	
-	// register an error header and optionaly set content at the same time
-	public static function error($number,$message=null) {
-
-		// set the error http header
-		
-		
-		// save the error
-		Store\Request::put('error_message',$message,true);
-		Store\Request::put('error_number',$number,true);
-		
-		// if the router has an error route
-		if(Router::hasRoute('error')) {
-			// dispatch to the error route
-			Dispatcher::forward(Router::getRoute('error'));
-		}
-		// router has no route to handle exceptions
-		else {
+	// register a status header for that response
+	public static function setStatus($code) {
+	
+		// declare all the status
+		$status = array(
+			// 100 status range
+			'100'=>'Continue',
+			'101'=>'Switching Protocols',
+			'102'=>'Processing',
 			
+			// 200 status range
+			'200'=>'OK',
+			'201'=>'Created',
+			'202'=>'Accepted',
+			'203'=>'Non-Authoritative Information',
+			'204'=>'No Content',
+			'205'=>'Reset Content',
+			'206'=>'Partial Content',
+			'207'=>'Multi-Status',
+			'208'=>'Already Reported',
+			'226'=>'IM Used',
+			
+			// 300 status range
+			'300'=>'Multiple Choices',
+			'301'=>'Moved Permanently',
+			'302'=>'Found',
+			'303'=>'See Other',
+			'304'=>'Not Modified',
+			'305'=>'Use Proxy',
+			'306'=>'Switch Proxy',
+			'307'=>'Temporary Redirect',
+			'308'=>'Permanent Redirect',
+			
+			// 400 status range
+			'400'=>'Bad Request',
+			'401'=>'Unauthorized',
+			'402'=>'Payment Required',
+			'403'=>'Forbidden',
+			'404'=>'Not Found',
+			'405'=>'Method Not Allowed',
+			'406'=>'Not Acceptable',
+			'407'=>'Proxy Authentication Required',
+			'408'=>'Request Timeout',
+			'409'=>'Conflict',
+			'410'=>'Gone',
+			'411'=>'Length Required',
+			'412'=>'Precondition Failed',
+			'413'=>'Request Entity Too Large',
+			'414'=>'Request-URI Too Long',
+			'415'=>'Unsupported Media Type',
+			'416'=>'Requested Range Not Satisfiable',
+			'417'=>'Expectation Failed',
+			'418'=>'I\'m a teapot',
+			
+			// 500 status range
+			'500'=>'Internal Server Error',
+			'501'=>'Not Implemented',
+			'502'=>'Bad Gateway',
+			'503'=>'Service Unavailable',
+			'504'=>'Gateway Timeout',
+			'505'=>'HTTP Version Not Supported',
+			'506'=>'Variant Also Negotiates',
+			'507'=>'Insufficient Storage',
+			'508'=>'Loop Detected',
+			'509'=>'Bandwidth Limit Exceeded',
+		);
+		
+		// if the status does not exist
+		if(!array_key_exists($code,$status)) {
+			// don't go further if the code is not supported
+			return;	
 		}
+		// get the current protocol
+		$protocol = Request::server('SERVER_PROTOCOL','HTTP/1.1');
+		// set the actual status
+		self::$_status = "{$protocol} {$status[$code]}";
 		
 	}
 
 	public static function render() {
-		
+
 		// if no content is set yet we garbage collect
 		self::$_content = self::$_content ?: ob_get_clean();
+
+		// output status
+		header(self::$_status);
 			
 		// format the content
 		self::formatContent();	
