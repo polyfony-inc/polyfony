@@ -77,7 +77,7 @@ class Router {
 		// else we can use the error route
 		elseif(!self::$_match and isset(self::$_routes['error'])) {
 			// use the error handler
-			self::$_match = self::$_routes['error'];
+			Throw new Exception('Router::route() no matching route',404);
 		}
 		// send the matching route to the dispatcher
 		Dispatcher::forward(self::$_match);	
@@ -191,7 +191,7 @@ class Router {
 		}
 
 		// Create a container for the URL
-		$url = self::$_routes[$route_name]->route;
+		$url = self::$_routes[$route_name]->url;
 
 		// And replace the variables in the
 		foreach ($parameters as $variable => $value) {

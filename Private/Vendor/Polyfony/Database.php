@@ -33,7 +33,7 @@ class Database {
 			
 			default:
 				// causes exception
-				Throw new \Exception('Database::connect() : Unknown driver');
+				Throw new Exception('Database::connect() : Unknown driver');
 			break;
 			
 		}
@@ -49,7 +49,7 @@ class Database {
 	public static function query() {
 		
 		// if no connection to the database is ready
-	//	!self::$_handle ? self::connect();
+		!self::$_handle ? self::connect();
 		
 		// and return a new query
 		return(new Query());

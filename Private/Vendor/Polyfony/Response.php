@@ -46,6 +46,13 @@ class Response {
 		
 		// if single element provided
 		$assets = is_array($assets) ? $assets : array($assets);
+		// for each assets to set
+		foreach($assets as $asset) {
+			// if asset is absolute
+			$asset = (substr($asset,0,1) == '/' or substr($asset,0,4) == 'http') ? $asset : "/assets/{$type}/{$asset}";
+			// push in the list
+			self::$_assets[$type] = $asset;
+		}
 		
 	}
 
@@ -53,6 +60,11 @@ class Response {
 		
 		// if single element provided
 		$metas = is_array($metas) ? $metas : array($metas);
+		// for each meta to set
+		foreach($metas as $meta => $value) {
+			// push meta
+			self::$_meta[$meta] = $value;
+		}
 		
 	}
 

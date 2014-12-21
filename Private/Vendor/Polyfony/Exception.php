@@ -12,16 +12,15 @@
 namespace Polyfony;
 
 class Exception extends \Exception {
-
-	public function __construct($message=null, $code=0, Exception $previous=null) {
-
+	
+	public function __toString() {
+		
 		// if the router has an error route registered
 		if(Router::hasRoute('error')) {
 			// store the exception so that the error controller can format it later on
-			Polyfony\Store\Request::put('exception',array(
+			Store\Request::put('exception',array(
 				'message'	=>$message,
-				'code'		=>$code,
-				'previous'	=>$previous
+				'code'		=>$code
 			),true);
 			// dispatch to the error controller
 			Dispatcher::forward(Router::getRoute('error'));
@@ -29,9 +28,9 @@ class Exception extends \Exception {
 		// use the native exception
 		else {
 			// call the parent exception
-			die('Fuck, something screwed up.');
-		}			
-			
+			Throw new \Exception($message,$code,$previous);
+		}	
+		
 	}
 	
 }

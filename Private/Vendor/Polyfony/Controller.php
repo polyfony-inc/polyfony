@@ -34,15 +34,20 @@ class Controller {
 		
 	}
 	
+	// include a view
+	final public function view($view_name) {
+		
+	}
+	
 	// forward to another controller in the same bundle
-	public function forward($controller, $action=null) {
+	final public function forward($controller, $action=null) {
 		
 		// call the pfRouter ? or fork self to preserve some context from the preAction ?
 		
 	}
 	
 	// alias to router / build an url given a route name and its parameters
-	public function url($route, $parameters=null) {
+	final public function url($route, $parameters=null) {
 		
 		// return the reversed route as an url
 		return(Router::reverse($route, $parameters));
@@ -50,7 +55,7 @@ class Controller {
 	}
 	
 	// get an empty query
-	public function query() {
+	final public function query() {
 
 		// return a new query
 		return(Database::query());
@@ -58,7 +63,7 @@ class Controller {
 	}
 	
 	// alias to security / check if requirements are met
-	public function isGranted($module, $level=null) {
+	final public function isGranted($module, $level=null) {
 		
 		// ask the pfsecurity for that module and bypass level
 		return(Security::hasModule($module, $level));

@@ -1,7 +1,16 @@
 <?php
 
+use Polyfony as pf;
+
 // new example class to realize tests
 class ExampleController extends Polyfony\Controller {
+
+	public function preAction() {
+		
+		pf\Response::setMetas('title','Polyfony2');
+		pf\Response::setAssets('css','/bootstrap.css');
+		
+	}
 
 	public function indexAction() {
 	
@@ -11,7 +20,8 @@ class ExampleController extends Polyfony\Controller {
 	
 	public function testAction() {
 		
-		echo 'test';
+		echo 'test<br />';
+		echo pf\Format::size(memory_get_usage());
 			
 	}
 	
@@ -23,12 +33,10 @@ class ExampleController extends Polyfony\Controller {
 	
 	public function errorAction() {
 		
-		//$exception = Polyfony\Store\Request::get('exception');
+	//	$exception = Polyfony\Store\Request::has('exception') ? Polyfony\Store\Request::has('exception') : array('message'=>'Internal serveur error','code'=>'500');
 		
 		// format the error
-		echo '<h1>Internal server error</h1>';
-		echo '<p>Hum…</p>';
-		
+		echo "<h1>Internal server error</h1>";
 	
 			
 	}

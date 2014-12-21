@@ -16,12 +16,12 @@ class Format {
 
 
 	// human size
-	public static function size($integer) {
+	public static function size($integer,$precision=0) {
 		
 		// declare units
 		$unit = array('b','Ko','Mo','Go','To','Po');
 		// make human readable
-		return(round($size/pow(1024,($i=floor(log($size,1024)))),$precision).' '.$unit[$i]);
+		return(round($integer/pow(1024,($i=floor(log($integer,1024)))),$precision).' '.$unit[$i]);
 		
 	}
 	
