@@ -173,7 +173,7 @@ class Response {
 		// get the current protocol
 		$protocol = Request::server('SERVER_PROTOCOL','HTTP/1.1');
 		// set the actual status
-		self::$_status = "{$protocol} {$status[$code]}";
+		self::$_status = "{$protocol} $code {$status[$code]}";
 		
 	}
 

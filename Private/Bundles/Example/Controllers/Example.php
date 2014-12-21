@@ -43,14 +43,23 @@ class ExampleController extends Polyfony\Controller {
 		}
 		// error occured normally
 		else {
-			// format the error
-			echo "<h1>Exception occured</h1>";
-			echo pf\Store\Request::get('exception')->getCode();
-			echo pf\Store\Request::get('exception')->getMessage();
-			echo '<br />';
-			echo pf\Store\Request::get('exception')->getTraceAsString();
+			pf\Response::setMetas(array(
+				'title'=>'Exception occured'
+			));
+			// grab some infos about the exception
+			$this->Code = pf\Store\Request::get('exception')->getCode();
+			$this->Message = pf\Store\Request::get('exception')->getMessage();
+			$this->Trace = pf\Store\Request::get('exception')->getTraceAsString();
+			// pass to the exception view
+			$this->view('Exception');
 		}
 			
+	}
+	
+	public function postAction() {
+		
+		//echo 'EOF';	
+		
 	}
 
 }

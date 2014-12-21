@@ -118,6 +118,19 @@ class Format {
 		
 	}
 	
+	public static function obfuscate($string) {
+
+		// remove all formatting symbols and double spaces	
+		return(str_replace('  ',' ',str_replace(array("\t","\n","\r"),'',$string)));
+
+	}
+	
+	public static function indent($string) {
+		
+		return($string);
+		
+	}
+	
 	
 }
 

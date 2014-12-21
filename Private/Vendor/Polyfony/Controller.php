@@ -37,6 +37,19 @@ class Controller {
 	// include a view
 	final public function view($view_name) {
 		
+		// build the path for that view
+		$view_path = "../Private/Bundles/" . Router::getCurrentRoute()->bundle ."/Views/{$view_name}.php";
+		// if the file does not exist
+		if(!file_exists($view_path)) {
+			// throw an exception
+			Throw new Exception("Controller->view() View file does not exist [{$view_path}]");
+		}
+		// the file exists
+		else {
+			// simply include it
+			require($view_path);	
+		}
+		
 	}
 	
 	// forward to another controller in the same bundle

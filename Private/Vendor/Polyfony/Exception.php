@@ -30,14 +30,21 @@ class Exception extends \Exception {
 	
 		// if the router has an exception route we catch and route to it
 		if(Router::hasRoute('exception')) {
-			// store the exception so that the error controller can format it later on
-			Store\Request::put('exception', $exception, true);
 			// set the proper header in the response
 			Response::setStatus($exception->getCode() != 0 ? $exception->getCode() : 500);
+			// store the exception so that the error controller can format it later on
+			Store\Request::put('exception', $exception, true);
 			// dispatch to the exception controller
 			Dispatcher::forward(Router::getRoute('exception'));
 			// render the response
 			Response::render();
+		}
+		// no exception handler
+		else {
+			// hard set the error code
+			header(Request::server('SERVER_PROTOCOL') . ' 500 Internal Server Error', true, 500);
+			// throw exception normally
+			Throw $exception;
 		}
 		
 	}
