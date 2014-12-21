@@ -1,2 +1,4 @@
 Caches/*
 .DS_Store
+*.css
+*.js
