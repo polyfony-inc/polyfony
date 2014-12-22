@@ -217,44 +217,6 @@ class Request {
 		return(self::$_method == 'post' ? true : false);
 		
 	}	
-
-	// only necessary during debug phase
-	public static function dump() {
-		
-		echo "_url: \n<br />";
-		var_dump(self::$_url);
-		
-		echo "_get: \n<br />";
-		var_dump(self::$_get);
-		
-		echo "_post: \n<br />";
-		var_dump(self::$_post);
-		
-		echo "_server: \n<br />";
-		var_dump(self::$_server);
-		
-		echo "_files: \n<br />";
-		var_dump(self::$_files);
-		
-		echo "_cookie: \n<br />";
-		var_dump(self::$_cookie);
-		
-		echo "_argv: \n<br />";
-		var_dump(self::$_argv);
-		
-		echo "_headers: \n<br />";
-		var_dump(self::$_headers);
-		
-		echo "_context: \n<br />";
-		var_dump(self::$_context);
-		
-		echo "_method: \n<br />";
-		var_dump(self::$_method);
-		
-		echo "_signature: \n<br />";
-		var_dump(self::$_signature);
-
-	}
 	
 }
 

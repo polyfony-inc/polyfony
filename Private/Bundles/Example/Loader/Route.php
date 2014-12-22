@@ -15,6 +15,9 @@ Polyfony\Router::addRoute('hello-world')
 	->url('/HelloWorld')
 	->destination('Example','Example','hello');
 
+Polyfony\Router::addRoute('notice-test')
+	->url('/notice/')
+	->destination('Example','Example','notice');
 
 Polyfony\Router::addRoute('dynamic')
 	->url('/dynamic/:action/:id/')

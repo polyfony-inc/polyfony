@@ -13,8 +13,12 @@ namespace Polyfony;
 
 class Router {
 	
+	// all the routes
 	protected static $_routes;
+	// the currently matched route
 	protected static $_match;
+	// the currently instanciated controller
+	protected static $_controller;
 	
 	public static function init() {
 	
@@ -93,7 +97,7 @@ class Router {
 			Throw new Exception('Router::route() no matching route',404);
 		}
 		// send the matching route to the dispatcher
-		Dispatcher::forward(self::$_match);	
+		self::forward(self::$_match);	
 		
 	}
 	
@@ -212,6 +216,48 @@ class Router {
 		}
 
 		return ($url);
+	}
+	
+	public static function forward($route) {
+		
+		// set full controller
+		$script = "../Private/Bundles/{$route->bundle}/Controllers/{$route->controller}.php";
+		// set the full class
+		$class = "{$route->controller}Controller";
+		// set full method
+		$method = "{$route->action}Action";
+		
+		// if script is missing and it's not the error script
+		if(!file_exists($script)) {
+			// new polyfony exception
+			Throw new Exception("Dispatcher::forward() : Missing controller file [{$script}]",500);	
+		}
+		// include the controller's file
+		require($script);
+		// if class is missing from the controller and not in error route
+		if(!class_exists($class,false)) {
+			// new polyfony exception
+			Throw new Exception("Dispatcher::forward() : Missing controller class [{$class}] in [{$script}]",500);	
+		}
+		// update the current route
+		self::$_match = $route;
+		// instanciate
+		self::$_controller = new $class;
+		// if method is missing replace by default
+		$method = method_exists($class,$method) ? $method : 'defaultAction';
+		// pre action
+		self::$_controller->preAction();
+		// marker
+		Profiler::setMarker('preaction');
+		// call the method
+		self::$_controller->$method();
+		// marker
+		Profiler::setMarker('controller');
+		// post action
+		self::$_controller->postAction();	
+		// marker
+		Profiler::setMarker('postaction');
+		
 	}
 	
 }

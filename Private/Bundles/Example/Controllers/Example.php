@@ -25,6 +25,12 @@ class ExampleController extends Polyfony\Controller {
 			
 	}
 	
+	public function noticeAction() {
+	
+		echo new Polyfony\Notice('test');
+		
+	}
+	
 	public function testAction() {
 		
 		echo 'test<br />';

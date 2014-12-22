@@ -299,24 +299,24 @@ class Response {
 			header("{$header_key}: {$header_value}");		
 		}
 		
-		// if the type is file output from the file indicated as content
-		if(self::$_type == 'file') {
-			// get the content from the file
-			echo file_get_contents(self::$_content);	
-		}
-		// any other format
-		else {
-			// output the content
-			echo self::$_content;
-			
-		}
+		// if the type is file output from the file indicated as content else just output
+		echo self::$_type == 'file' ? file_get_contents(self::$_content) : self::$_content;
+		
+		// if cache is enabled and page is cachable
+		self::cache();
 		
 		// it ends here
 		exit;
 		
 	}
 	
-	public static function save($destination) {
+	public static function cache() {
+		
+		// if status is 200
+		
+		// save contents
+		
+		// save headers
 		
 	}
 	
