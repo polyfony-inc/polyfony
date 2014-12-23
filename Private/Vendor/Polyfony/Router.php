@@ -233,7 +233,7 @@ class Router {
 			Throw new Exception("Dispatcher::forward() : Missing controller file [{$script}]",500);	
 		}
 		// include the controller's file
-		require($script);
+		require_once($script);
 		// if class is missing from the controller and not in error route
 		if(!class_exists($class,false)) {
 			// new polyfony exception

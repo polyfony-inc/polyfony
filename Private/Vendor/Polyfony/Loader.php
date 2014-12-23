@@ -3,6 +3,7 @@
 /**
  * SplClassLoader implementation that implements the technical interoperability
  * standards for PHP 5.3 namespaces and class names.
+ * It's been modified for Polyfony 2 to support multiple vendor path (for our Bundle support)
  *
  * http://groups.google.com/group/php-standards/web/final-proposal
  *
@@ -13,6 +14,8 @@
  *
  * @author who cares ?
  */
+
+namespace Polyfony;
  
 class Loader {
     private $_fileExtension = '.php';
@@ -26,9 +29,13 @@ class Loader {
      *
      * @param string $ns The namespace to use.
      */
-    public function __construct($ns = null, $includePath = null) {
-        $this->_namespace = $ns;
-        $this->_includePath = $includePath;
+    public function __construct($namespace = null, $include_path = '../Private/Vendor/') {
+    	
+    	// configure
+        $this->_namespace = $namespace;
+        $this->_includePath = $include_path;
+        
+        // autoregister
         $this->register();
     }
 
@@ -116,7 +123,8 @@ class Loader {
                 $fileName = str_replace($this->_namespaceSeparator, DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
             }
             $fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . $this->_fileExtension;
-
+            // fix so that namespaces starting with Bundle\ will point to the bundle folder
+			$fileName = (strpos($fileName,'Bundles') === 0) ? "../$fileName" : $fileName;
             require ($this->_includePath !== null ? $this->_includePath . DIRECTORY_SEPARATOR : '') . $fileName;
         }
     }

@@ -1,6 +1,4 @@
 <?php
-namespace Polyfony;
-
 /**
  * A single route for the application.
  *
@@ -13,8 +11,10 @@ namespace Polyfony;
  * @author    Christopher Hill <cjhill@gmail.com>
  * @package   MVC
  */
-class Route
-{
+ 
+namespace Polyfony;
+
+class Route {
 
 	// url to match
 	public $url;

@@ -27,7 +27,13 @@ class ExampleController extends Polyfony\Controller {
 	
 	public function noticeAction() {
 	
-		echo new Polyfony\Notice('test');
+		// this works !
+		var_dump(
+			Bundles\Example\Model\Users::all(),
+			Bundles\Example\Model\Users::withLevel(1)
+		);
+	
+		/*echo new Polyfony\Notice('test');*/
 		
 	}
 	
@@ -60,6 +66,7 @@ class ExampleController extends Polyfony\Controller {
 				'title'=>'Exception occured'
 			));
 			// grab some infos about the exception
+			$this->Exception = st\Request::get('exception');
 			$this->Code = st\Request::get('exception')->getCode();
 			$this->Message = st\Request::get('exception')->getMessage();
 			$this->Trace = st\Request::get('exception')->getTraceAsString();

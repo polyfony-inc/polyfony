@@ -10,6 +10,7 @@
  */
  
 namespace Polyfony;
+use \PDO;
 
 class Query {
 	
@@ -38,32 +39,7 @@ class Query {
 
 	// instanciate a new query
 	public function __construct() {
-		$this->Query		= null;
-		$this->Values		= array();
-		$this->Prepared		= null;
-		$this->Success		= false;
-		$this->Result		= null;
-		$this->Array		= array();
-		$this->Action		= null;
-		$this->Hash			= null;
-		$this->Lag			= null;
-		$this->Table		= null;
-		$this->Operator		= 'AND';
-		$this->Selects		= array();
-		$this->Joins		= array();
-		$this->Conditions	= array();
-		$this->Updates		= array();
-		$this->Inserts		= array();
-		$this->Order		= array();
-		$this->Limit		= array();
-	}
-	
-	// instanciate a new query
-	public function __construct($Database,$Cache=null) {
-		// set the link to the database
-		$this->Database 	= &$Database;
-		// set the link to the cache
-		$this->Cache		= &$Cache;
+
 		// set the query as being empty for now
 		$this->Query		= null;
 		// set an array to store all values to pass to the prepared query
@@ -92,6 +68,7 @@ class Query {
 		$this->Inserts		= array();
 		$this->Order		= array();
 		$this->Limit		= array();
+		
 	}
 
 	// on garbage collection	
@@ -844,7 +821,7 @@ class Query {
 			$this->Query .= " LIMIT {$this->Limit[0]},{$this->Limit[1]}";
 		}
 		// if cache is enabled and query is a SELECT or a passtrhu starting with SELECT
-		if($this->Cache['enabled'] and ( $this->Action == 'SELECT' or ($this->Action == 'QUERY' and substr($this->Query,0,6) == 'SELECT'))) {
+		if(false and ( $this->Action == 'SELECT' or ($this->Action == 'QUERY' and substr($this->Query,0,6) == 'SELECT'))) {
 			// check if it exists in cache
 			$cached = $this->isInCache();
 			// if cache provided actual result
@@ -854,11 +831,11 @@ class Query {
 			}
 		}
 		// prepare the statement
-		$this->Prepared = $this->Database['handle']->prepare($this->Query);
+		$this->Prepared = \Polyfony\Database::handle()->prepare($this->Query);
 		// if prepare failed
 		if(!$this->Prepared) {
 			// prepare informations to be thrown
-			$exception_infos = implode(":",$this->Database['handle']->ErrorInfo()).":$this->Query";
+			$exception_infos = implode(":",\Polyfony\Database::handle()->ErrorInfo()).":$this->Query";
 			// throw an exception
 			Throw new Exception("Query->execute() : Failed to prepare query [{$exception_infos}]");
 		}
@@ -867,7 +844,7 @@ class Query {
 		// if execution failed
 		if($this->Success === false) {
 			// prepare informations to be thrown
-			$exception_infos = implode(":",$this->Database['handle']->ErrorInfo()).":$this->Query";
+			$exception_infos = implode(":",\Polyfony\Database::handle()->ErrorInfo()).":$this->Query";
 			// throw an exception
 			Throw new Exception("Query->execute() : Failed to execute query [{$exception_infos}]");
 		}
@@ -876,7 +853,7 @@ class Query {
 			// fetch as an object
 			PDO::FETCH_CLASS,
 			// of this specific class
-			'pfRecord',
+			'\Polyfony\Record',
 			// and pass it some arguments
 			array(trim($this->Table,"'"))
 		);
@@ -908,7 +885,7 @@ class Query {
 			return($this->Result
 				->select()
 				->from($this->Table)
-				->where(array('id'=>$this->Database['handle']->lastInsertId()))
+				->where(array('id'=>\Polyfony\Database::handle()->lastInsertId()))
 				->execute()
 			);
 		}
@@ -922,8 +899,16 @@ class Query {
 		$this->Lag = $lag*3600;
 	}
 	
+	private function putInCache() {
+		
+	}
+	
+	private function updateOutdated() {
+		
+	}
+	
 	// convert the value depending on the column name
-	protected static function set($column,$value) {
+	protected static function convert($column,$value) {
 		// if we find a file keyword
 		if(strpos($column,'_file') !== false) {
 			// store that file and replace it by a json value in the database
@@ -968,9 +953,12 @@ class Query {
 		return($value);
 	}
 	
-	// convert the value depending on the column name
-	protected static function get($column,$value) {
-		
+	// secure a column name
+	private function secure($column) {
+		// removes everything but letter and underscore
+		$column = preg_replace('/[^a-zA-Z0-9_\.]/', '', $column);	
+		// return cleaned column
+		return($column);
 	}
 	
 }

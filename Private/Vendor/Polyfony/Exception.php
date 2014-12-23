@@ -35,7 +35,7 @@ class Exception extends \Exception {
 			// store the exception so that the error controller can format it later on
 			Store\Request::put('exception', $exception, true);
 			// dispatch to the exception controller
-			Dispatcher::forward(Router::getRoute('exception'));
+			Router::forward(Router::getRoute('exception'));
 			// render the response
 			Response::render();
 		}

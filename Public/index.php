@@ -4,7 +4,7 @@
 require("../Private/Vendor/Polyfony/Loader.php");
 
 // class loader
-new Loader(null,"../Private/Vendor/");
+new Polyfony\Loader(null);
 
 // front end
 new Polyfony\Front();

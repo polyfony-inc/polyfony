@@ -49,10 +49,18 @@ class Database {
 	public static function query() {
 		
 		// if no connection to the database is ready
-		!self::$_handle ? self::connect();
+		self::$_handle ?: self::connect();
 		
 		// and return a new query
 		return(new Query());
+		
+	}
+	
+	// give the handle to any object that requires it
+	public static function handle() {
+		
+		// return the handle
+		return(self::$_handle);
 		
 	}
 	
