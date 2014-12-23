@@ -12,6 +12,42 @@
 namespace Polyfony;
 
 class Notice {
+	
+	private $message;
+	private $title;
+	
+	private static $type = 'info';
+
+	public function __construct($message,$title=null) {
+		// pass the message
+		$this->message = Format::htmlSafe($message);
+		// pass the title (if any)
+		$this->title = $title ? Format::htmlSafe($title) : '';
+		// auto set type
+		$this->setType();
+	}
+
+	private function setType() {
+		//$this->type = 'success';	// bootstrap green		Notice\Success
+		//$this->type = 'info';		// bootstrap blue		Notice\Info
+		//$this->type = 'warning';	// bootstrap yellow		Notice\Warning
+		//$this->type = 'danger';	// bootstrap red		Notice\Danger
+	}
+
+	public function getMessage($safe=true) {
+		return($safe ? Format::htmlSafe($this->message) : $this->message);
+	}
+	
+	public function getTitle($safe=true) {
+		return($safe ? '<strong>' . Format::htmlSafe($this->title) . '</strong> ' : $this->title);
+	}
+
+	public function __toString() {
+		
+		// format the notice 
+		return "<div class=\"alert alert-". self::$type."\" role=\"alert\">{$this->getTitle()}{$this->getMessage()}</div>";
+		
+	}
 
 	
 }

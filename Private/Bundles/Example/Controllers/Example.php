@@ -27,19 +27,20 @@ class ExampleController extends Polyfony\Controller {
 	
 	public function noticeAction() {
 	
-		// this works !
-		var_dump(
-			Bundles\Example\Model\Users::all(),
-			Bundles\Example\Model\Users::withLevel(1)
-		);
-	
-		/*echo new Polyfony\Notice('test');*/
+		
+		$this->Notice = new Polyfony\Notice\Success('Something is screwed up !','Woops');
+		
+		$this->view('Notice');
 		
 	}
 	
 	public function testAction() {
 		
-		echo 'test<br />';
+		// this works !
+		var_dump(
+			Bundles\Example\Model\Users::all(),
+			Bundles\Example\Model\Users::withLevel(1)
+		);
 			
 	}
 	

@@ -11,7 +11,7 @@
 
 namespace Polyfony\Notice;
 
-class Success extends Notice {
+class Success extends \Polyfony\Notice {
 
 	
 }
