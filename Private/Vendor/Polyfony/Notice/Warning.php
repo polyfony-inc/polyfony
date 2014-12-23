@@ -11,9 +11,9 @@
 
 namespace Polyfony\Notice;
 
-class Success extends \Polyfony\Notice {
+class Warning extends \Polyfony\Notice {
 
-	const TYPE = 'success';
+	const TYPE = 'warning';
 
 	public function __toString() {
 		// type specific

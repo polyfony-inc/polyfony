@@ -27,8 +27,19 @@ class ExampleController extends Polyfony\Controller {
 	
 	public function noticeAction() {
 	
+		switch(rand(0,3)) {
+		case 0:
+		$this->Notice = new Polyfony\Notice('Aren\'t we sexy in blue ?','Look at me'); break;
+		case 1:
+		$this->Notice = new Polyfony\Notice\Success('Nouvel utilisateur créé','Opération exécutée avec succès'); break;
+		case 2:
+		$this->Notice = new Polyfony\Notice\Danger('You crashed the database dumbass !','SQL Error:'); break;
+		case 3:
+		$this->Notice = new Polyfony\Notice\Warning('Seems like you\'re living on the edge','Meh…'); break;
+		break;
+		}
 		
-		$this->Notice = new Polyfony\Notice\Success('Something is screwed up !','Woops');
+		st\Request::put('notice',new Polyfony\Notice('Test !'),true);
 		
 		$this->view('Notice');
 		

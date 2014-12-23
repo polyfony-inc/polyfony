@@ -11,8 +11,14 @@
 
 namespace Polyfony\Notice;
 
-class Error extends Notice {
+class Danger extends \Polyfony\Notice {
 
+	const TYPE = 'danger';
+
+	public function __toString() {
+		// type specific
+		return(str_replace('__TYPE__',self::TYPE,$this->getHtml()));
+	}
 	
 }
 
