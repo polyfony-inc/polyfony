@@ -21,8 +21,21 @@ class ExampleController extends Polyfony\Controller {
 	}
 	
 	public function testAction() {
-
-		Throw new pf\Exception('You are not allowed here',403);
+		
+		pf\Response::setRedirect('/',5);
+//		Throw new pf\Exception('You are not allowed here',403);
+		
+	}
+	
+	public function secureAction() {
+	
+		pf\Security::enforce();
+		
+	}
+	
+	public function loginAction() {
+	
+		$this->view('Login');
 		
 	}
 	

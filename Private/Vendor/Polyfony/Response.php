@@ -86,7 +86,7 @@ class Response {
 		
 		// set the redirect header
 		self::setHeaders(array(
-			'Refresh' => "{intval($delay)};url=$url"
+			'Refresh' => "{$delay};url=$url"
 		));
 			
 	}

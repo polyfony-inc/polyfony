@@ -17,22 +17,27 @@ class Security {
 	protected static $_granted = false;
 	protected static $_credentials = array();
 	
-	public static function secure($module=null,$level=null) {
+	public static function enforce($module=null,$level=null) {
 		
 		// if we have a security cookie we authenticate with it
-		Request::cookie(Config::get('security','cookie')) ? self::authenticate();
+		!Request::cookie(Config::get('security','cookie')) ?: self::authenticate();
 		
 		// if we have a post and posted a login, we log in with it
-		Request::post(Config::get('security','login')) ? self::login();
-		
+		!Request::post(Config::get('security','login')) ?: self::login();
+
 		// if we have the module
-		self::$_granted = $module and self::hasModule($module) ? true : false;
-		
+		self::$_granted = ($module and self::hasModule($module)) ? true : false;
+
 		// if we have the bypass level
-		self::$_granted = !self::$_granted and $level and self::hasLevel($level) ? true : false;
-		
+		self::$_granted = (!self::$_granted and $level and self::hasLevel($level)) ? true : false;
+
 		// and now we check if we have the proper rights
-		!self::$_granted ? Response::redirectAfter(Config::get('security','login'),3); Response::error403('Not authorized');
+		if(!self::$_granted) {
+			// we will redirect to the login page
+			Response::setRedirect(Config::get('router','login_route'),3);
+			// trhow an exception
+			Throw new Exception('Not authorized',403);
+		}
 		
 	}
 	

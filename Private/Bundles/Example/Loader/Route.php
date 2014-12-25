@@ -15,5 +15,12 @@ Polyfony\Router::addRoute('test')
 	->url('/test/')
 	->destination('Example','Example','test');
 
+// a test url
+Polyfony\Router::addRoute('secure')
+	->url('/secure/')
+	->destination('Example','Example','secure');
+Polyfony\Router::addRoute('login')
+	->url('/login/')
+	->destination('Example','Example','login');
 
 ?>
