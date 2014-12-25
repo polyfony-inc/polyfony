@@ -31,8 +31,8 @@ class Router {
 	public static function addRoute($route_name) {
 		
 		// We cannot allow duplicate route names for reversing reasons
-		if (isset(self::$_routes[$route_name])) {
-			// throw an exception
+		if(isset(self::$_routes[$route_name])) {
+			// throw an exception that will not work properly since the exception catcher route may not exist yet
 			throw new Exception("Router::addRoute() The route {$route_name} has already been declared");
 		}
 		// create a new route

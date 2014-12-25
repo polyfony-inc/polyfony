@@ -16,9 +16,6 @@ class Front {
 	// upon construction
 	public function __construct() {
 		
-		// start the exeption catcher
-		Exception::init();
-		
 		// start the profiler
 		Profiler::init();
 		
@@ -30,6 +27,9 @@ class Front {
 		
 		// detect env and load .ini files accordingly
 		Config::init();
+		
+		// start the exeption catcher (quite late, but we gotta know if config has use_strict)
+		Exception::init();
 		
 		// marker
 		Profiler::setMarker('init_config');

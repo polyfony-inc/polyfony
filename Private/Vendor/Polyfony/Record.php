@@ -27,6 +27,24 @@ class Record {
 		
 	}
 	
+	public function get($column, $raw=false) {
+
+		// return the columns or null if it does not exist		
+		return(isset($this->{$column}) ? $this->convert($column, $raw) : null);
+
+	}
+	
+	public function set($column, $value) {
+		
+		// convert the value depending on the column name
+		$this->{$column} = Query::convert($column, $value);
+		
+	}
+	
+	private function convert($column) {
+		return($this->{$column});
+	}
+	
 	// update or create
 	public function save() {
 	}

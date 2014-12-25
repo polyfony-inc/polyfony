@@ -42,7 +42,7 @@ class Config {
 	private static function detectFromHTTP() {
 		
 		// if we are running on the development port
-		self::$_environment = Request::server('SERVER_PORT') == Config::get('request','dev_port') ? 'Dev' : 'Prod';	
+		self::$_environment = Request::server('SERVER_PORT') == Config::get('polyfony','dev_port') ? 'Dev' : 'Prod';	
 
 	}
 	

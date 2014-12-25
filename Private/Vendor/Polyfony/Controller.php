@@ -26,7 +26,8 @@ class Controller {
 
 	// method to override
 	public function defaultAction() {
-		
+		// default will throw an exception
+		throw new Exception('This action does not exist',500);
 	}
 	
 	// method to override

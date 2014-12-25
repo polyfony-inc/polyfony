@@ -32,21 +32,39 @@ class Security {
 		self::$_granted = (!self::$_granted and $level and self::hasLevel($level)) ? true : false;
 
 		// and now we check if we have the proper rights
-		if(!self::$_granted) {
-			// we will redirect to the login page
-			Response::setRedirect(Config::get('router','login_route'),3);
-			// trhow an exception
-			Throw new Exception('Not authorized',403);
-		}
+		self::$_granted ?: self::refuse();
+				
+	}
+	
+	private static function authenticate() {
 		
 	}
 	
-	public static function authenticate() {
+	private static function login() {
 		
-	}
-	
-	public static function login() {
+		// look for users with this login
+		$found_accounts = Database::query()
+			->select()
+			->from('Accounts')
+			->where(array(
+				'login'=>Request::post(Config::get('security','login')),
+				'is_enabled'=>'1'
+			))
+			->execute();
 
+		// user is found
+		if($found_accounts) {
+			// if the password matches
+			if($found_accounts[0]->get('password') == self::getPassword(Request::post(Config::get('security','password')))) {
+				
+				// allow 
+				self::$_granted = true;
+			}
+			// passwords dont match
+			else { self::refuse('Wrong password'); }
+		}
+		// user does not exist
+		else { self::refuse('Account does not exist or is disabled'); }
 	}
 	
 	public static function getPassword($string) {
@@ -86,6 +104,13 @@ class Security {
 		// return said credential or default
 		return(isset(self::$_credentials[$credential]) ? self::$_credentials[$credential] : $default);
 		
+	}
+	
+	private static function refuse($message='Forbidden',$code='403') {
+		// we will redirect to the login page
+		Response::setRedirect(Config::get('router','login_route'),3);
+		// trhow an exception
+		Throw new Exception($message,$code);
 	}
 	
 }	

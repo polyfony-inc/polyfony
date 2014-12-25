@@ -4,40 +4,7 @@ use Polyfony as pf;
 use Polyfony\Store as st;
 
 // new example class to realize tests
-class ExampleController extends Polyfony\Controller {
-
-	public function preAction() {
-		
-		pf\Response::setMetas(array('title'=>'Polyfony 2'));
-		pf\Response::setAssets('css','//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css');
-		
-	}
-
-	public function indexAction() {
-
-		// view the main index/welcome page
-		$this->view('Polyfony');
-		
-	}
-	
-	public function testAction() {
-		
-		pf\Response::setRedirect('/',5);
-//		Throw new pf\Exception('You are not allowed here',403);
-		
-	}
-	
-	public function secureAction() {
-	
-		pf\Security::enforce();
-		
-	}
-	
-	public function loginAction() {
-	
-		$this->view('Login');
-		
-	}
+class ExceptionController extends Polyfony\Controller {
 	
 	// this exception action is quite generic and can be kept for production
 	public function exceptionAction() {
@@ -53,6 +20,9 @@ class ExampleController extends Polyfony\Controller {
 		}
 		// error occured normally
 		else {
+			// css neat style
+			pf\Response::setAssets('css','//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css');
+			// proper title
 			pf\Response::setMetas(array(
 				'title'=>st\Request::get('exception')->getMessage()
 			));
