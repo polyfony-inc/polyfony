@@ -8,63 +8,29 @@ class ExampleController extends Polyfony\Controller {
 
 	public function preAction() {
 		
-		pf\Response::setMetas(array('title','Polyfony2'));
-		pf\Response::setAssets('css','/Assets/bootstrap.css');
+		pf\Response::setMetas(array('title'=>'Polyfony 2'));
+		pf\Response::setAssets('css','//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css');
 		
 	}
 
 	public function indexAction() {
-	
+
+		// view the main index/welcome page
 		$this->view('Polyfony');
 		
 	}
 	
-	public function helloAction() {
-		
-		$this->view('HelloWorld');
-			
-	}
-	
-	public function noticeAction() {
-	
-		switch(rand(0,3)) {
-		case 0:
-		$this->Notice = new Polyfony\Notice('Aren\'t we sexy in blue ?','Look at me'); break;
-		case 1:
-		$this->Notice = new Polyfony\Notice\Success('Nouvel utilisateur créé','Opération exécutée avec succès'); break;
-		case 2:
-		$this->Notice = new Polyfony\Notice\Danger('You crashed the database dumbass !','SQL Error:'); break;
-		case 3:
-		$this->Notice = new Polyfony\Notice\Warning('Seems like you\'re living on the edge','Meh…'); break;
-		break;
-		}
-		
-		st\Request::put('notice',new Polyfony\Notice('Test !'),true);
-		
-		$this->view('Notice');
-		
-	}
-	
 	public function testAction() {
-		
-		// this works !
-		var_dump(
-			Bundles\Example\Model\Users::all(),
-			Bundles\Example\Model\Users::withLevel(1)
-		);
-			
-	}
-	
-	public function dynamicAction() {
-	
-		echo 'Dynamic !';
+
+		Throw new pf\Exception('You are not allowed here',403);
 		
 	}
 	
+	// this exception action is quite generic and can be kept for production
 	public function exceptionAction() {
 		
-		// error occured in ajax
-		if(Polyfony\Request::isAjax()) {
+		// error occured while requesting something else than html
+		if(!in_array(pf\Response::getType(),array('html','html-page'))) {
 			// change the type
 			pf\Response::setType('json');
 			// set the stack a string
@@ -75,24 +41,21 @@ class ExampleController extends Polyfony\Controller {
 		// error occured normally
 		else {
 			pf\Response::setMetas(array(
-				'title'=>'Exception occured'
+				'title'=>st\Request::get('exception')->getMessage()
 			));
 			// grab some infos about the exception
+			$this->Notice = new Polyfony\Notice\Danger(
+				st\Request::get('exception')->getMessage(),
+				'Error '.st\Request::get('exception')->getCode()
+			);
+			// add a bootstrap table view the view, with the full trace !
 			$this->Exception = st\Request::get('exception');
-			$this->Code = st\Request::get('exception')->getCode();
-			$this->Message = st\Request::get('exception')->getMessage();
-			$this->Trace = st\Request::get('exception')->getTraceAsString();
 			// pass to the exception view
 			$this->view('Exception');
 		}
 			
 	}
 	
-	public function postAction() {
-		
-		//echo 'EOF';	
-		
-	}
 
 }
 

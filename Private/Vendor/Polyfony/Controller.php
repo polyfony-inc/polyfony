@@ -42,7 +42,7 @@ class Controller {
 		// if the file does not exist
 		if(!file_exists($view_path)) {
 			// throw an exception
-			Throw new Exception("Controller->view() View file does not exist [{$view_path}]");
+			Throw new Exception("Controller->view() View file does not exist [{$view_path}]",500);
 		}
 		// the file exists
 		else {

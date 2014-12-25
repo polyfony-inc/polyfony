@@ -1,42 +1,19 @@
 <?php
 
 
-// declare the main error route (it doesn't have to have an url)
+// declare the main exceptions route (it doesn't have to have an url)
 Polyfony\Router::addRoute('exception')
 	->destination('Example','Example','exception');
 
-
-Polyfony\Router::addRoute('main-index')
+// the / route to display a welcome message
+Polyfony\Router::addRoute('polyfony-index')
 	->url('/')
-	->destination('Example','Example','index');
+	->destination('Example','Example');
 
-
-Polyfony\Router::addRoute('hello-world')
-	->url('/HelloWorld')
-	->destination('Example','Example','hello');
-
-Polyfony\Router::addRoute('notice-test')
-	->url('/notice/')
-	->destination('Example','Example','notice');
-
-Polyfony\Router::addRoute('dynamic')
-	->url('/dynamic/:action/:id/')
-	->restrict(array(
-		'id'=>true,
-		'action'=>array('create','edit','update','delete')
-	))
-	->destination('Example','Example')
-	->trigger('action');
-
-
+// a test url
 Polyfony\Router::addRoute('test')
 	->url('/test/')
 	->destination('Example','Example','test');
-
-
-Polyfony\Router::addRoute('lametest')
-	->url('/lametest/')
-	->destination('Example','Fuck','fuck');
 
 
 ?>

@@ -224,9 +224,8 @@ class Router {
 		$script = "../Private/Bundles/{$route->bundle}/Controllers/{$route->controller}.php";
 		// set the full class
 		$class = "{$route->controller}Controller";
-		// set full method
-		$method = "{$route->action}Action";
-		
+		// set full method or index if none provided
+		$method = $route->action ? "{$route->action}Action" : 'indexAction';
 		// if script is missing and it's not the error script
 		if(!file_exists($script)) {
 			// new polyfony exception

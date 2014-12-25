@@ -1,12 +1,7 @@
-<h1>
-	Exception occured !
-</h1>
-<p>
-	Fuck, this is annoying…
-</p>
-<p>
-	<?php echo $this->Trace; ?>
-</p>
-<p>
-	<?php var_dump($this->Exception); ?>
-</p>
+<div class="jumbotron" style="padding:45px;">
+	<h1>
+		<?php echo $this->Notice->getTitle(); ?>
+	</h1>
+	<?php echo $this->Notice; ?>
+	<?php echo $this->Exception; ?>
+</div>

@@ -44,13 +44,8 @@ class Response {
 			'css'	=>array(),
 			'js'	=>array()
 		);
-		
 		// set default headers
-		self::$_headers = array(
-			'X-Powered-By'		=>'Polyfony',
-			'Server'			=>'Undisclosed',
-		);
-		
+		self::$_headers = array();
 		// set default metas
 		self::$_metas = array();
 		
@@ -60,22 +55,43 @@ class Response {
 		// set the default status
 		self::setStatus(200);
 		
+		// set default language
+		self::setHeaders(array(
+			'X-Powered-By'		=> 'Polyfony',
+			'Server'			=> 'Undisclosed',
+			'Content-Language'	=> Locales::getLanguage()
+		));
+		
+		// set defautl charset
+		self::setCharset(Config::get('response','default_charset'));
+		
 		// set the default type
 		self::setType(Config::get('response','default_type'));
 		
 	}
 	
-	public static function setRedirect($url,$delay=null) {
+	public static function disableBrowserCache() {
 		
-		// destination
-		self::$_redirect = $url;
-		// waiting
-		self::$_delay = $delay;
+		self::$_browserCache = false;
+			
+	}
+	
+	public static function setCharset($charset) {
+	
+		self::$_charset = $charset;
+		
+	}
+	
+	public static function setRedirect($url,$delay=0) {
+		
+		// set the redirect header
+		self::setHeaders(array(
+			'Refresh' => "{intval($delay)};url=$url"
+		));
 			
 	}
 
 	public static function setAssets($type,$assets) {
-		
 		// if single element provided
 		$assets = is_array($assets) ? $assets : array($assets);
 		// for each assets to set
@@ -83,26 +99,21 @@ class Response {
 			// if asset is absolute
 			$asset = (substr($asset,0,1) == '/' or substr($asset,0,4) == 'http') ? $asset : "/assets/{$type}/{$asset}";
 			// push in the list
-			self::$_assets[$type] = $asset;
+			self::$_assets[$type][] = $asset;
 		}
-		
 	}
 
 	public static function setMetas($metas, $replace=false) {
-		
 		// replace or merge with current metas
 		self::$_metas = $replace ? self::$_metas : array_merge(self::$_metas,$metas);
-		
 	}
 
 	public static function setHeaders($headers) {	
-		
 		// if array provided
 		if(is_array($headers)) {
 			// merge current and new headers (replacing old ones)
 			self::$_headers = array_merge(self::$_headers,$headers);
 		}
-		
 	}
 
 	public static function setType($type) {
@@ -112,6 +123,24 @@ class Response {
 			// update the current type
 			self::$_type = $type;
 		}
+		
+		// list of available types
+		$types = array(
+			'html-page'	=>'text/html',
+			'html'		=>'text/html',
+			'json'		=>'application/json',
+			'file'		=>'application/octet-stream',
+			'csv'		=>'text/csv',
+			'xml'		=>'text/xml',
+			'js'		=>'text/javascript',
+			'css'		=>'text/css',
+			'text'		=>'text/plain'
+		);
+		
+		// add the header
+		self::setHeaders(array(
+			'Content-type'=> $types[$type] . '; charset='.self::$_charset
+		));
 		
 	}
 
@@ -198,56 +227,99 @@ class Response {
 	public static function setContent($content, $replace=false) {
 		
 		// replace content or append to already existing
-		/*
-		
-		if current content is an array, merge
-		
-		if current content is a string, append
-		
-		$append ? self::$_content .= $content : self::$_content = content;
-		
-		*/
-		
+		self::$_content = $replace ? $content : self::$_content . $content;
+
 	}
 
+	public static function getType() {
+		// the current output type
+		return(self::$_type);
+	}
 
+	// format an return metas
+	private static function prependMetas() {
+		// de-deuplicate js files
+		self::$_metas = array_unique(self::$_metas);
+		// for each file
+		foreach(self::$_metas as $meta => $value) {
+			// add it
+			self::$_content = '<meta name="'.$meta.'" content="' . htmlentities($value) . '" />' . self::$_content;
+			// if the meta is a title, it's a bit special
+			self::$_content = $meta == 'title' ? '<title>' . htmlentities($value) . '</title>' . self::$_content : self::$_content;
+		}
+	}
 
 	// format and return javascripts
-	private static function getScripts() {
-		/*
-		$this->Javascripts = array_unique($this->Javascripts);
-		$output = '';
-		foreach($this->Javascripts as $aJsFile) {
-			$output .= '<script type="text/javascript" src="'. $aJsFile .'"></script>';
-		}	
-		return($output);
-		*/
+	private static function prependScripts() {
+		// de-deuplicate js files
+		self::$_assets['js'] = array_unique(self::$_assets['js']);
+		// for each file
+		foreach(self::$_assets['js'] as $file) {
+			// add it
+			self::$_content = '<script type="text/javascript" src="'. $file .'"></script>' . self::$_content;
+		}
 	}
 	
 	// format an return stylesheets
-	private static function getStyles() {
+	private static function prependStyles() {
+		// de-deuplicate css files
 		self::$_assets['css'] = array_unique(self::$_assets['css']);
-		$output = '';
+		// for each file
 		foreach(self::$_assets['css'] as $file) {
-			$output .= '<link rel="stylesheet" media="all" type="text/css" href="'.$file.'" />';
+			// support media specific CSS
+			$href = is_array($file) ? $file[0] : $file;
+			// default is for all medias
+			$media = is_array($file) ? $file[1] : 'all';
+			// add it
+			self::$_content = '<link rel="stylesheet" media="' . $media . '" type="text/css" href="' . $href . '" />' . self::$_content;
 		}
-		return($output);
 	}
 
-	// format and return content
+	// return current content
 	private static function getContent() {
 		
-		// do nothing for now
+		// return as is
 		return(self::$_content);
+		
 	}
 	
 	private static function formatContent() {
 		
 		// base headers
-		$headers = array(
-//			'Content-Language'	=>null
-		);
+		$headers = array();
 		
+		// case of html page
+		if(self::$_type == 'html-page') {
+			// wrap in the body
+			self::$_content = '</head><body>' . self::$_content . '</body></html>';
+			// preprend metas
+			self::prependMetas();
+			// preprend scripts
+			self::prependScripts();
+			// preprend css
+			self::prependStyles();
+			// add metas and style up top
+			self::$_content = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+			<html xmlns="http://www.w3.org/1999/xhtml"><head>
+			<meta http-equiv="content-type" content="text/html; charset='.self::$_charset.'" />' . self::$_content;
+		}
+		
+		// if the type is not a file
+		if(self::$_type != 'file') {
+			// indent
+			self::$_content = Config::get('response','indent') ? Format::indent(self::$_content) : self::$_content;
+			// obfuscate
+			self::$_content = Config::get('response','obfuscate') ? Format::obfuscate(self::$_content) : self::$_content;
+		}
+		
+		// if the type is not a file and we are allowed to compress
+		if(self::$_type != 'file' and Config::get('response','compress')) {
+			// compress
+			self::$_content = gzencode(self::$_content);
+			// add header
+			$headers['Content-Encoding'] = 'gzip';
+		}
+
 		// if checksum is enabled
 		if(Config::get('response','checksum')) {
 			// generate that checksum

@@ -14,7 +14,7 @@ namespace Polyfony;
 class Locales {
 	
 	protected static $_locales = null;
-	protected static $_language = null
+	protected static $_language = null;
 	
 	public static function init() {
 		
@@ -29,10 +29,10 @@ class Locales {
 	private static function detect() {
 		
 		// if accept language header is not set we use default
-		!Request::headers('Accept-Language') ?: self::$_language = Config::get('locales','default');
-			
-		$auto_language = (Request::headers('Accept-Language') ? substr(Request::headers('Accept-Language'),0,2) : Config::get('locales','default');
-			
+		self::$_language = Request::header('Accept-Language') ? 
+			substr(Request::header('Accept-Language'),0,2) : 
+			Config::get('locales','default');
+
 	}
 	
 	private static function load($file) {
@@ -46,6 +46,11 @@ class Locales {
 	}
 	
 	public static function getLanguage() {
+		
+		// if not set, we detect
+		self::$_language ?: self::detect();
+		// return the language
+		return(self::$_language); 
 		
 	}
 	
