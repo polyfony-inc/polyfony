@@ -108,3 +108,5 @@ class Memcache implements StoreInterface
 		return (bool)self::$_memcache->delete($variable);
 	}
 }
+
+?>

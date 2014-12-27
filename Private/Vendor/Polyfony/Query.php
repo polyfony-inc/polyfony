@@ -101,21 +101,21 @@ class Query {
 			// in case of INSERT
 			if($action == 'INSERT') {
 				// explode after INTO
-				list($null,$table) = explode('INTO ',$this->Query);
+				list(,$table) = explode('INTO ',$this->Query);
 				// isolate the table name
 				list($this->Table) = explode(' ',$table);
 			}
 			// in case of UPDATE
 			elseif($action == 'UPDATE') {
 				// explode after UPDATE
-				list($null,$table) = explode('UPDATE ',$this->Query);
+				list(,$table) = explode('UPDATE ',$this->Query);
 				// isolate the table name
 				list($this->Table) = explode(' ',$table);
 			}
 			// in case of DELETE or SELECT
 			elseif($action == 'DELETE' || $action == 'SELECT') {
 				// explode after FROM 
-				list($null,$table) = explode('FROM ',$this->Query);
+				list(,$table) = explode('FROM ',$this->Query);
 				// isolate the table name
 				list($this->Table) = explode(' ',$table);
 			}

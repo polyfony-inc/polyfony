@@ -41,8 +41,6 @@ class Bundles {
 	
 	private static function loadDependencies() {
 	
-		// declare includes to return
-		$includes = array();
 		// for each available bundle
 		foreach(scandir('../Private/Bundles/') as $bundle) {
 			// if it's an actual file

@@ -15,3 +15,5 @@ class Database implements StoreInterface {
 
 
 }
+
+?>

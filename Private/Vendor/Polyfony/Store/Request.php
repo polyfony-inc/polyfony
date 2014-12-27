@@ -93,3 +93,5 @@ class Request implements StoreInterface
 		return ! self::has($variable);
 	}
 }
+
+?>

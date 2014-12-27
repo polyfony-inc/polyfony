@@ -84,3 +84,5 @@ class Session implements StoreInterface
 		return ! self::has($variable);
 	}
 }
+
+?>

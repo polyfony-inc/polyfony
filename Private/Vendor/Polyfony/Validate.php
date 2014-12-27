@@ -132,7 +132,8 @@ class Validate {
 	 * @param  array   $testParams The parameters for this test.
 	 * @return boolean
 	 */
-	private function requiredWith($inputValue, $testParams) {
+	 
+	private function requiredWith($testParams) {
 		// Loop over each of the required other fields
 		foreach ($testParams as $inputRequired) {
 			// Do we even have a reference to this input?
@@ -148,7 +149,7 @@ class Validate {
 
 		return true;
 	}
-
+	
 	/**
 	 * Test to see if the input's length is within bounds.
 	 *

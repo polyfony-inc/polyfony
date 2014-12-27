@@ -279,7 +279,7 @@ class Response {
 	private static function getContent() {
 		
 		// return as is
-		return(self::$_content);
+		return(self::$_type == 'file' ? file_get_contents(self::$_content) : self::$_content);
 		
 	}
 	
@@ -372,7 +372,7 @@ class Response {
 		}
 		
 		// if the type is file output from the file indicated as content else just output
-		echo self::$_type == 'file' ? file_get_contents(self::$_content) : self::$_content;
+		echo self::getContent();
 		
 		// if cache is enabled and page is cachable
 		self::cache();

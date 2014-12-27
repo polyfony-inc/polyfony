@@ -29,7 +29,7 @@ class Loader {
      *
      * @param string $ns The namespace to use.
      */
-    public function __construct($namespace = null, $include_path = '../Private/Vendor/') {
+    public function __construct($namespace = null, $include_path = '../Private/Vendor') {
     	
     	// configure
         $this->_namespace = $namespace;
@@ -125,6 +125,7 @@ class Loader {
             $fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . $this->_fileExtension;
             // fix so that namespaces starting with Bundle\ will point to the bundle folder
 			$fileName = (strpos($fileName,'Bundles') === 0) ? "../$fileName" : $fileName;
+			file_put_contents('/tmp/loader'.rand(999,99999999).'.txt',($this->_includePath !== null ? $this->_includePath . DIRECTORY_SEPARATOR : '') . $fileName);
             require ($this->_includePath !== null ? $this->_includePath . DIRECTORY_SEPARATOR : '') . $fileName;
         }
     }

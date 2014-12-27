@@ -81,3 +81,5 @@ class Apc implements StoreInterface
 		return ! apc_delete($variable);
 	}
 }
+
+?>

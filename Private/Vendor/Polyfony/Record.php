@@ -48,6 +48,7 @@ class Record {
 		// convert the value depending on the column name
 		$this->{$column} = Query::convert($column, $value);
 		// update the altered list
+		self::alter($column);
 		
 	}
 	

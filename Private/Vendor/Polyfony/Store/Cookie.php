@@ -81,3 +81,5 @@ class Cookie implements StoreInterface
 		setcookie($variable, '', (time() - 3600));
 	}
 }
+
+?>
