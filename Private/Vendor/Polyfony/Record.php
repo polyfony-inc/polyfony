@@ -68,7 +68,7 @@ class Record {
 	
 	private function alter($column) {
 		// push
-		$this->_altered[] = $column
+		$this->_altered[] = $column;
 		// deduplicate
 		$this->_altered = array_unique($this->_altered);
 	}

@@ -201,7 +201,7 @@ class Query {
 			Throw new Exception("Query->update() : An incompatible action already exists : {$this->Action}");
 		}
 		// if the table is a string and is not empty
-		if(is_string($table) and !empty($table)) {
+		if(is_string($table) && !empty($table)) {
 			// set the destination table
 			$this->Table = $table;			
 		}
@@ -315,7 +315,7 @@ class Query {
 	// add into for inserts
 	public function into($table) {
 		// if $table is set
-		if(is_string($table) and $table) {
+		if(is_string($table) && $table) {
 			// set the table
 			$this->Table = $table;
 		}
@@ -573,7 +573,7 @@ class Query {
 	}
 	public function whereNull($column) {
 		// if column is set
-		if($column and !is_numeric($column)) {
+		if($column && !is_numeric($column)) {
 			// secure the column name
 			$column = $this->secure($column);
 			// save the condition
@@ -591,7 +591,7 @@ class Query {
 	}
 	public function whereNotNull($column) {
 		// if column is set
-		if($column and !is_numeric($column)) {
+		if($column && !is_numeric($column)) {
 			// secure the column name
 			$column = $this->secure($column);
 			// save the condition
@@ -607,7 +607,7 @@ class Query {
 	}
 	public function whereTrue($column) {
 		// if column is set
-		if($column and !is_numeric($column)) {
+		if($column && !is_numeric($column)) {
 			// secure the column name
 			$column = $this->secure($column);
 			// save the condition
@@ -625,7 +625,7 @@ class Query {
 	}
 	public function whereFalse($column) {
 		// if column is set
-		if($column and !is_numeric($column)) {
+		if($column && !is_numeric($column)) {
 			// secure the column name
 			$column = $this->secure($column);
 			// save the condition
@@ -655,7 +655,7 @@ class Query {
 					continue;	
 				}
 				// if the direction is not valid
-				if($direction != 'ASC' and $direction != 'DESC') {
+				if($direction != 'ASC' && $direction != 'DESC') {
 					// skip it as a wrong parameter has been provided	
 					continue;
 				}
@@ -688,7 +688,7 @@ class Query {
 	// add a limit clause
 	public function limitTo($from,$until) {
 		// if both parameters are numric
-		if(is_numeric($from) and is_numeric($until)) {
+		if(is_numeric($from) && is_numeric($until)) {
 			// build the limit to 
 			$this->Limit = array(
 				// start
@@ -785,7 +785,7 @@ class Query {
 			$this->Query = "UPDATE $this->Table SET $this->Updates";
 		}
 		// if the select has joined tables
-		if($this->Action == 'SELECT' and count($this->Joins)) {
+		if($this->Action == 'SELECT' && count($this->Joins)) {
 			// assemble the joinds
 			$this->Joins = implode(' ',$this->Joins);
 			// assemble the query
@@ -802,26 +802,26 @@ class Query {
 			}
 		}
 		// if groupings options are set
-		if($this->Action == 'SELECT' and count($this->Groups)) {
+		if($this->Action == 'SELECT' && count($this->Groups)) {
 			// assemble groups
 			$this->Groups = implode(' , ',$this->Groups);
 			// assemble query
 			$this->Query .= " GROUP BY $this->Groups";
 		}
 		// if ordering options are set
-		if($this->Action == 'SELECT' and count($this->Order)) {
+		if($this->Action == 'SELECT' && count($this->Order)) {
 			// assemble orders
 			$this->Order = implode(', ',$this->Order);
 			// add ordering to the query
 			$this->Query .= " ORDER BY $this->Order";
 		}
 		// if limit options are set
-		if($this->Action == 'SELECT' and count($this->Limit)) {
+		if($this->Action == 'SELECT' && count($this->Limit)) {
 			// assemble the limit options to the query
 			$this->Query .= " LIMIT {$this->Limit[0]},{$this->Limit[1]}";
 		}
 		// if cache is enabled and query is a SELECT or a passtrhu starting with SELECT
-		if(false and ( $this->Action == 'SELECT' || ($this->Action == 'QUERY' and substr($this->Query,0,6) == 'SELECT'))) {
+		if(false && ( $this->Action == 'SELECT' || ($this->Action == 'QUERY' && substr($this->Query,0,6) == 'SELECT'))) {
 			// check if it exists in cache
 			$cached = $this->isInCache();
 			// if cache provided actual result
@@ -858,27 +858,27 @@ class Query {
 			array(trim($this->Table,"'\"`"))
 		);
 		// if action was a pathtru and starts with UPDATE, INSERT or DELETE and Table was set and it succeeded
-		if($this->Action == 'QUERY' AND in_array(substr($this->Query,0,6),array('INSERT','UPDATE','DELETE')) AND $this->Table AND $this->Success) {
+		if($this->Action == 'QUERY' && in_array(substr($this->Query,0,6),array('INSERT','UPDATE','DELETE')) && $this->Table && $this->Success) {
 			// we must notify the cache that this table has changed to prevent giving outdated cached data later on
 			$this->updateOutdated();
 		}
 		// if action was DELETE or UPDATE or INSERT and succeeded, it altered a table state
-		if(($this->Action == 'UPDATE' || $this->Action == 'DELETE' or $this->Action == 'INSERT') and $this->Success) {
+		if(($this->Action == 'UPDATE' || $this->Action == 'DELETE' || $this->Action == 'INSERT') && $this->Success) {
 			// we must notify the cache of the new modification date for this table
 			$this->updateOutdated();
 		}
 		// if action succeeded and has some kind of useful result (SELECT or SELECT via a QUERY) and has a table set
-		if(($this->Action == 'SELECT' || ($this->Action == 'QUERY' and substr($this->Query,0,6) == 'SELECT')) and $this->Table and $this->Success) {
+		if(($this->Action == 'SELECT' || ($this->Action == 'QUERY' && substr($this->Query,0,6) == 'SELECT')) && $this->Table && $this->Success) {
 			// place result in cache
 			$this->putInCache();
 		}
 		// if action was UPDATE or DELETE or one of those via QUERY
-		if(in_array($this->Action,array('UPDATE','DELETE')) || ($this->Action == 'QUERY' AND in_array(substr($this->Query,0,6),array('UPDATE','DELETE')) AND $this->Table)) {
+		if(in_array($this->Action,array('UPDATE','DELETE')) || ($this->Action == 'QUERY' && in_array(substr($this->Query,0,6),array('UPDATE','DELETE')) AND $this->Table)) {
 			// return the number of affected rows
 			return($this->Prepared->rowCount());
 		}
 		// if the query was an insert and it succeeded
-		if($this->Action == 'INSERT' and $this->Success) {
+		if($this->Action == 'INSERT' && $this->Success) {
 			// instanciate a new query
 			$this->Result = new Query();
 			// get the newly inserted element from its id

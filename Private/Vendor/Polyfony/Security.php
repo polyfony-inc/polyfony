@@ -65,7 +65,7 @@ class Security {
 			// passwords dont match
 			else { 
 				$found_accounts[0]->set('last_failure_agent',Request::server('USER_AGENT'));
-				$found_accounts[0]->set('last_failure_origin',Request::server('REMOTE_ADDR');
+				$found_accounts[0]->set('last_failure_origin',Request::server('REMOTE_ADDR'));
 				$found_accounts[0]->set('last_failure_date',time());
 				$found_accounts[0]->save();
 				self::refuse('Wrong password');
