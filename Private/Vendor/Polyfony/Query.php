@@ -113,7 +113,7 @@ class Query {
 				list($this->Table) = explode(' ',$table);
 			}
 			// in case of DELETE or SELECT
-			elseif($action == 'DELETE' or $action == 'SELECT') {
+			elseif($action == 'DELETE' || $action == 'SELECT') {
 				// explode after FROM 
 				list($null,$table) = explode('FROM ',$this->Query);
 				// isolate the table name
@@ -275,7 +275,7 @@ class Query {
 	// select another table to join on (implicit INNER JOIN)
 	public function join($table,$match,$against) {
 		// if table_and_id is an array
-		if(!is_string($table) or !$table or !is_string($match) or !$match or !is_string($against) or !$against) {
+		if(!is_string($table) || !$table || !is_string($match) || !$match || !is_string($against) || !$against) {
 			// those actions being incompatible we throw an exception
 			Throw new Exception("Query->join() : Wrong parameter");
 		}
@@ -289,7 +289,7 @@ class Query {
 	// select another table to join on (LEFT JOIN)
 	public function leftJoin($table,$match,$against) {
 		// if table_and_id is an array
-		if(!is_string($table) or !$table or !is_string($match) or !$match or !is_string($against) or !$against) {
+		if(!is_string($table) || !$table || !is_string($match) || !$match || !is_string($against) || !$against) {
 			// those actions being incompatible we throw an exception
 			Throw new Exception("Query->join() : Wrong parameter");
 		}
@@ -302,7 +302,7 @@ class Query {
 	// select another table to join on (RIGHT JOIN)
 	public function rightJoin($table,$match,$against) {
 		// if table_and_id is an array
-		if(!is_string($table) or !$table or !is_string($match) or !$match or !is_string($against) or !$against) {
+		if(!is_string($table) || !$table || !is_string($match) || !$match || !is_string($against) || !$against) {
 			// those actions being incompatible we throw an exception
 			Throw new Exception("Query->join() : Wrong parameter");
 		}
@@ -547,7 +547,7 @@ class Query {
 		// if column is set
 		if($column and !is_numeric($column)) {
 			// if lower or higher is numeric
-			if(is_numeric($lower) and is_numeric($higher)) {
+			if(is_numeric($lower) && is_numeric($higher)) {
 				// secure the column name
 				$column = $this->secure($column);
 				// save the condition
@@ -723,7 +723,7 @@ class Query {
 				Throw new Exception('Query->execute() : Missing INTO');
 			}
 			// if missing values
-			if(!$this->Values or !count($this->Values)) {
+			if(!$this->Values || !count($this->Values)) {
 				// throw an exception
 				Throw new Exception('Query->execute() : Missing VALUES');	
 			}
@@ -763,7 +763,7 @@ class Query {
 			$this->Query = 'DELETE ';
 		}
 		// if the action has a from table
-		if($this->Action == 'SELECT' or $this->Action == 'DELETE') {
+		if($this->Action == 'SELECT' || $this->Action == 'DELETE') {
 			// add source table
 			$this->Query .= "FROM $this->Table";
 		}
@@ -792,7 +792,7 @@ class Query {
 			$this->Query .= " $this->Joins";
 		}
 		// if the action needs conditions
-		if($this->Action == 'SELECT' or $this->Action == 'UPDATE' or $this->Action == 'DELETE') {
+		if($this->Action == 'SELECT' || $this->Action == 'UPDATE' || $this->Action == 'DELETE') {
 			// if conditions are provided
 			if(count($this->Conditions)) {
 				// assemble the conditions
@@ -821,7 +821,7 @@ class Query {
 			$this->Query .= " LIMIT {$this->Limit[0]},{$this->Limit[1]}";
 		}
 		// if cache is enabled and query is a SELECT or a passtrhu starting with SELECT
-		if(false and ( $this->Action == 'SELECT' or ($this->Action == 'QUERY' and substr($this->Query,0,6) == 'SELECT'))) {
+		if(false and ( $this->Action == 'SELECT' || ($this->Action == 'QUERY' and substr($this->Query,0,6) == 'SELECT'))) {
 			// check if it exists in cache
 			$cached = $this->isInCache();
 			// if cache provided actual result
@@ -855,7 +855,7 @@ class Query {
 			// of this specific class
 			'\Polyfony\Record',
 			// and pass it some arguments
-			array(trim($this->Table,"'"))
+			array(trim($this->Table,"'\"`"))
 		);
 		// if action was a pathtru and starts with UPDATE, INSERT or DELETE and Table was set and it succeeded
 		if($this->Action == 'QUERY' AND in_array(substr($this->Query,0,6),array('INSERT','UPDATE','DELETE')) AND $this->Table AND $this->Success) {
@@ -863,17 +863,17 @@ class Query {
 			$this->updateOutdated();
 		}
 		// if action was DELETE or UPDATE or INSERT and succeeded, it altered a table state
-		if(($this->Action == 'UPDATE' or $this->Action == 'DELETE' or $this->Action == 'INSERT') and $this->Success) {
+		if(($this->Action == 'UPDATE' || $this->Action == 'DELETE' or $this->Action == 'INSERT') and $this->Success) {
 			// we must notify the cache of the new modification date for this table
 			$this->updateOutdated();
 		}
 		// if action succeeded and has some kind of useful result (SELECT or SELECT via a QUERY) and has a table set
-		if(($this->Action == 'SELECT' or ($this->Action == 'QUERY' and substr($this->Query,0,6) == 'SELECT')) and $this->Table and $this->Success) {
+		if(($this->Action == 'SELECT' || ($this->Action == 'QUERY' and substr($this->Query,0,6) == 'SELECT')) and $this->Table and $this->Success) {
 			// place result in cache
 			$this->putInCache();
 		}
 		// if action was UPDATE or DELETE or one of those via QUERY
-		if(in_array($this->Action,array('UPDATE','DELETE')) or ($this->Action == 'QUERY' AND in_array(substr($this->Query,0,6),array('UPDATE','DELETE')) AND $this->Table)) {
+		if(in_array($this->Action,array('UPDATE','DELETE')) || ($this->Action == 'QUERY' AND in_array(substr($this->Query,0,6),array('UPDATE','DELETE')) AND $this->Table)) {
 			// return the number of affected rows
 			return($this->Prepared->rowCount());
 		}

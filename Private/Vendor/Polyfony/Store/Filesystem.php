@@ -29,7 +29,7 @@ class Filesystem implements StoreInterface {
 	public static function put($variable, $value=null, $overwrite=false) {
 	
 		// already exists and no overwrite
-		if(self::has($variable) and !$overwrite) {
+		if(self::has($variable) && !$overwrite) {
 			// return false
 			return(false);
 		}

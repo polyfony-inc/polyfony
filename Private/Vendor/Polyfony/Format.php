@@ -88,7 +88,7 @@ class Format {
 		if (empty($phrase)) {
 		return $text;
 		}
-		if (is_array($phrase) or ($phrase instanceof sfOutputEscaperArrayDecorator)) {
+		if (is_array($phrase) || ($phrase instanceof sfOutputEscaperArrayDecorator)) {
 			foreach ($phrase as $word) {
 				$pattern[] = '/('.preg_quote($word, '/').')/i';
 				$replacement[] = $highlighter;

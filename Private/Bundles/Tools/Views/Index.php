@@ -4,6 +4,7 @@
 	You should probably keep it <small>(it provides the exception route)</small>.</p>
 	<p>
 		<a class="btn btn-success btn-lg" href="/tools/generateSymlinks/" role="button">Generate assets symlinks</a> 
+		<a class="btn btn-info btn-lg" href="/tools/generateBundle/" role="button">Generate CRUD bundle</a> 
 		<a class="btn btn-warning btn-lg" href="/tools/purgeCache/" role="button">Purge cache</a>
 	</p>
 </div>

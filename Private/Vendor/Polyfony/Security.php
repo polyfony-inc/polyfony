@@ -57,11 +57,19 @@ class Security {
 			// if the password matches
 			if($found_accounts[0]->get('password') == self::getPassword(Request::post(Config::get('security','password')))) {
 				
+				// Store\Cookie::put()
+				
 				// allow 
 				self::$_granted = true;
 			}
 			// passwords dont match
-			else { self::refuse('Wrong password'); }
+			else { 
+				$found_accounts[0]->set('last_failure_agent',Request::server('USER_AGENT'));
+				$found_accounts[0]->set('last_failure_origin',Request::server('REMOTE_ADDR');
+				$found_accounts[0]->set('last_failure_date',time());
+				$found_accounts[0]->save();
+				self::refuse('Wrong password');
+			}
 		}
 		// user does not exist
 		else { self::refuse('Account does not exist or is disabled'); }

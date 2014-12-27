@@ -243,9 +243,9 @@ class Response {
 		// for each file
 		foreach(self::$_metas as $meta => $value) {
 			// add it
-			self::$_content = '<meta name="'.$meta.'" content="' . htmlentities($value) . '" />' . self::$_content;
+			self::$_content = '<meta name="'.$meta.'" content="' . Format::htmlSafe($value) . '" />' . self::$_content;
 			// if the meta is a title, it's a bit special
-			self::$_content = $meta == 'title' ? '<title>' . htmlentities($value) . '</title>' . self::$_content : self::$_content;
+			self::$_content = $meta == 'title' ? '<title>' . Format::htmlSafe($value) . '</title>' . self::$_content : self::$_content;
 		}
 	}
 
@@ -313,7 +313,7 @@ class Response {
 		}
 		
 		// if the type is not a file and we are allowed to compress
-		if(self::$_type != 'file' and Config::get('response','compress')) {
+		if(self::$_type != 'file' && Config::get('response','compress')) {
 			// compress
 			self::$_content = gzencode(self::$_content);
 			// add header
