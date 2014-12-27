@@ -63,8 +63,8 @@ class Route {
 	// set the destination for that route
 	public function destination($bundle, $controller=null, $action=null) {
 		$this->bundle = $bundle;
-		$this->controller = $controller != null ? $controller : 'Index';
-		$this->action = $action != null ? $action : null;
+		$this->controller = $controller !== null ? $controller : 'Index';
+		$this->action = $action !== null ? $action : null;
 		return $this;
 	}
 }

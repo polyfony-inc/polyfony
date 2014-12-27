@@ -1,7 +1,6 @@
 <?php
 
 use Polyfony as pf;
-use Polyfony\Store as st;
 
 // new example class to realize tests
 class DemoController extends pf\Controller {

@@ -18,7 +18,7 @@ class Runtime {
 	public static function set($bundle,$key,$value=null) {
 		
 		// if only bundle + one parameters set the whole bundle, else set a key of the bundle
-		$value != null ? self::$_runtimes[$bundle][$key] = $value : self::$_runtimes[$bundle] = $key;
+		$value !== null ? self::$_runtimes[$bundle][$key] = $value : self::$_runtimes[$bundle] = $key;
 		
 	}
 	

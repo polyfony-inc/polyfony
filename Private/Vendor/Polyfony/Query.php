@@ -873,7 +873,7 @@ class Query {
 			$this->putInCache();
 		}
 		// if action was UPDATE or DELETE or one of those via QUERY
-		if(in_array($this->Action,array('UPDATE','DELETE')) || ($this->Action == 'QUERY' && in_array(substr($this->Query,0,6),array('UPDATE','DELETE')) AND $this->Table)) {
+		if(in_array($this->Action,array('UPDATE','DELETE')) || ($this->Action == 'QUERY' && in_array(substr($this->Query,0,6),array('UPDATE','DELETE')) && $this->Table)) {
 			// return the number of affected rows
 			return($this->Prepared->rowCount());
 		}

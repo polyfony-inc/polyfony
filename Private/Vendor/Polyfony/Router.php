@@ -31,8 +31,8 @@ class Router {
 	public static function addRoute($route_name) {
 		
 		// We cannot allow duplicate route names for reversing reasons
-		if(isset(self::$_routes[$route_name])) {
-			// throw an exception that will not work properly since the exception catcher route may not exist yet
+		if (isset(self::$_routes[$route_name])) {
+			// throw an exception
 			throw new Exception("Router::addRoute() The route {$route_name} has already been declared");
 		}
 		// create a new route
@@ -218,7 +218,7 @@ class Router {
 		return ($url);
 	}
 	
-	public static function forward($route) {
+	public static function forward(Route $route) {
 		
 		// set full controller
 		$script = "../Private/Bundles/{$route->bundle}/Controllers/{$route->controller}.php";
