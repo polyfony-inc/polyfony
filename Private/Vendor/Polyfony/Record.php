@@ -110,17 +110,19 @@ class Record {
 	public function __toArray($raw=false,$altered=false) {
 		// declare an empty array
 		$array = array();
+		// what to iterate on
+		$attributes = $altered ? $this->_['altered'] : array_keys(get_object_vars($this));
 		// for each attribute of this object
-		foreach(get_object_vars($this) as $key => $something){
+		foreach($attributes as $attribute){
 			// if the attribute is internal
-			if($key == '_') {
+			if($attribute == '_') {
 				// skip it
 				continue;
 			}
 			// normal attribute
 			else {
 				// convert or not
-				$array[$key] = $raw ? $this->get($key,true) : $this->get($key,false);
+				$array[$attribute] = $raw ? $this->get($attribute,true) : $this->get($attribute,false);
 			}
 		}
 		return($array);
