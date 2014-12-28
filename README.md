@@ -96,6 +96,47 @@ $account
 	->save();
 ```
 
+### Router
+
+* Each bundle has a file to place your routes
+```php
+../Private/Bundles/{BundleName}/Loader/route.php
+```
+
+In these files you can declare as many routes as you like. 
+Static routes (not accepting parameters, requirement a perfect URL match) or dynamic routes, accepting parameters, that you can optionally restrict.
+All routes must point to a Bundle and Controller when declared, specific by the `->destination($bundle,$controller[,$action])` method.
+
+Static routes point to an action that must be determined in the route, or `indexAction()` will be triggered.
+Dynamic routes can point to different actions depending on a URL parameter, specified by the `->trigger($url_parameter)` method.
+If no action is provided, indexAction is called, if an action is provided but none match, `defaultAction()` is called.
+A `preAction()` and `postAction()` wrap the action to be called.
+
+* This static route will match /about-us/ and call `../Private/Bundles/Pages/Controllers/Static.php->aboutUsAction();`
+
+```php
+Polyfony\Router::addRoute('about-us')
+	->url('/about-us/')
+	->destination('Pages','Static','aboutUs');
+```
+
+* This dynamic route will match /admin/{edit,update,delete,create}/ and /admin/
+It will call `../Private/Bundles/Admin/Controllers/Main.php->{edit,update,delete,create,index}Action();`
+```php
+Polyfony\Router::addRoute('admin')
+	->url('/admin/:action/:id/')
+	->destination('Admin','Main')
+	->restrict(array(
+		'action'=>array('edit','update','delete','create')
+	))
+	->trigger('action');
+```
+
+You can restrict parameters further, you can pass :
+an array of allowed value (it will also match no value)
+a regex (it will also match no value)
+a boolean true (it will match anything but a missing value)
+
 ### Form
 
 ### Security

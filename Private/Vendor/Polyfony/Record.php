@@ -173,7 +173,6 @@ class Record {
 		// not a magic column
 		else {
 			// return as is
-			//return(stripslashes($this->{$column}));
 			return($this->{$column});
 		}
 		
