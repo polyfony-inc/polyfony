@@ -36,7 +36,7 @@ class Accounts {
 		);
 	}
 	
-	public static function forcedRecently($what_recent_means=3600*6) {
+	public static function forcedRecently($what_recent_means=3600) {
 		return(\Polyfony\Database::query()
 			->select()
 			->from('Accounts')

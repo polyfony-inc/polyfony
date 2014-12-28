@@ -78,11 +78,12 @@ class DemoController extends pf\Controller {
 			->execute();
 		
 		// demo query from a model
-		$this->AllAccounts = Bundles\Demo\Model\Accounts::all();
-		//$this->AnotherList = Bundles\Demo\Model\Accounts::recentlyCreated();
-		//$this->AnotherList = Bundles\Demo\Model\Accounts::disabled();
-		//$this->AnotherList = Bundles\Demo\Model\Accounts::forcedRecently();
-			
+		$this->AnotherList = Bundles\Demo\Model\Accounts::all();
+		$this->AnotherList = Bundles\Demo\Model\Accounts::recentlyCreated();
+		$this->AnotherList = Bundles\Demo\Model\Accounts::disabled();
+		$this->AnotherList = Bundles\Demo\Model\Accounts::forcedRecently();
+		
+		// simple view	
 		$this->view('Database');		
 	}
 	
