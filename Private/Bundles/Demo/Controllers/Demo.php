@@ -19,6 +19,13 @@ class DemoController extends pf\Controller {
 		
 	}
 	
+	public function localesAction() {
+
+		// view the main index/welcome page
+		$this->view('Locales');
+		
+	}
+	
 	public function demoAction() {
 
 		// view the main index/welcome page

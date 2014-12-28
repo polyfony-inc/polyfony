@@ -110,7 +110,7 @@ class Format {
 			// for each attribute
 			foreach($attributes as $key => $value) {
 				// associate them
-				$string .= strlen($value) > 0 ? $key.'="'.strip_tags($value).'" ' : $key.' ';		
+				$string .= strlen($value) > 0 ? $key.'="'.self::htmlSafe($value).'" ' : $key.' ';		
 			}
 		}
 		// return the formatted string

@@ -23,6 +23,11 @@ Polyfony\Router::addRoute('demo-secure')
 	->destination('Demo','Secure')
 	->trigger('option');
 
+// this will match strictly /demo/
+Polyfony\Router::addRoute('demo-locales')
+	->url('/demo/locales/:key/')
+	->destination('Demo','Demo','locales');
+
 /*
 // this route will match only if option is (create or update or delte)
 Polyfony\Router::addRoute('demo-restricted')

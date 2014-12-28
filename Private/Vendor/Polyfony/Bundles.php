@@ -97,19 +97,23 @@ class Bundles {
 	
 	// get locales for a bundle
 	public static function getLocales($bundle) {
-		
+
+		// declare an array to hold the list
 		$locales = array();
-		
-		foreach(scandir("../Private/Bundles/{$bundle}/Locales/") as $locales) {
-			
-			if(Tools::isFile($locales)) {
-			
-			//	$locales[] = "../Private/Bundles/{$bundle}/Locales/{$locales}";
-			
+		// set the locales path
+		$locales_path = "../Private/Bundles/{$bundle}/Locales/";
+		// if the directory exists
+		if(Filesystem::exists($locales_path) && Filesystem::isDirectory($locales_path)) {
+			// for each file in the directory
+			foreach(scandir($locales_path) as $locales_file) {
+				// if the file is a normal one
+				if(Filesystem::isNormalName($locales_file)) {
+					// push it into the array of locales
+					$locales[] = $locales_path . $locales_file;
+				}
 			}
-			
 		}
-		
+		// return all found locales
 		return($locales);
 		
 	}

@@ -14,6 +14,17 @@ namespace Polyfony;
 
 class Filesystem {
 	
+	public static function isDirectory($path) {
+		
+		return(is_dir($path));
+		
+	}
+	
+	public static function exists($path) {
+		
+		return(file_exists($path));
+		
+	}
 	
 	public static function isNormalName($string) {
 		

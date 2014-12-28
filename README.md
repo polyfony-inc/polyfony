@@ -2,8 +2,8 @@
 
 ## Polyfony 2 is a PHP micro framework that brings the cool parts of Symfony in a simpler way
 
-Support for : routing, bundles, controllers, views, database abstraction, environments, locales, cache… 
-Without pre-compilation stage, cumbersome cache, dozens configuration files, composer, cli binary or other annoying steps.
+Features : routing, bundles, controllers, views, database abstraction, environments, locales, cache, vendor, helpers, authentication, profiler…
+Without pre-compilation, cumbersome cache, dozens configuration files, composer, cli binary or other annoying steps.
 
 
 ## Requirements
@@ -19,7 +19,7 @@ url.rewrite-once = ("^(?!/Assets/).*" => "/?")
 ```
 
 ## Quick tour
-You can read this quick tour, or just browe the `../Private/Bundles/Demo/` code.
+You can read this quick tour, or just browse the `../Private/Bundles/Demo/` code.
 
 ```php
 

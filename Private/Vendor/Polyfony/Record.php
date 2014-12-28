@@ -13,21 +13,48 @@ namespace Polyfony;
 
 class Record {
 	
-	// if of the record
-	protected $_id;
-	// table of the record
-	protected $_table;
-	// list of altered columns
-	protected $_altered;
+	// storing variable that do not reflect the database table structure
+	protected $_;
 	
 	// create a object from scratch, of fetch it in from its table/id
 	public function __construct($table,$conditions=null) {
 		
 		// init the list of altered columns
-		$_altered = array();
+		$this->_ = array(
+			// if of the record
+			'id'		=> null,
+			// table of the record
+			'table'		=> null,
+			// list of altered columns since the retrieval from the database
+			'altered'	=> array()
+		);
 		
 		// having a table means that we are not the result of a join query
-		$this->_table = $table ? $table : null;
+		$this->_['table'] = $table ? $table : null;
+		
+		// if conditions are provided
+		if($conditions !== null) {
+			// if conditions is not an array
+			if(!is_array($conditions)) {
+				// we assume it is the id of the record
+				$conditions = array('id'=>$conditions);	
+			}
+			// grab that object from the database
+			$records = Database::query()
+				->select()
+				->from($this->_['table'])
+				->where($conditions)
+				->execute();
+			// if the record is found
+			if($records) {
+				// return the found object
+				return($records[0]);	
+			}
+			else {
+				// return false
+				return(false);
+			}
+		}
 		
 		/*
 		$this->_id = isset($this->id) 
@@ -48,13 +75,15 @@ class Record {
 		// convert the value depending on the column name
 		$this->{$column} = Query::convert($column, $value);
 		// update the altered list
-		self::alter($column);
+		$this->alter($column);
 		
 	}
 	
 	// magic
 	public function __toArray($raw=false,$altered=false) {
+		// declare an empty array
 		$array = array();
+		// for each attribute of this object
 		foreach(get_object_vars($this) as $key => $something){
 			
 			$array[$key] = $raw ? $this->get($key,true) : $this->get($key,false);
@@ -69,13 +98,23 @@ class Record {
 	
 	private function alter($column) {
 		// push
-		$this->_altered[] = $column;
+		$this->_['altered'] = $column;
 		// deduplicate
-		$this->_altered = array_unique($this->_altered);
+		$this->_['altered'] = array_unique($this->_['altered']);
 	}
 	
 	private function convert($column, $raw=false) {
-		return($this->{$column});
+		
+		// if we want the raw result
+		if($raw) {
+			// return as is
+			return($this->{$column});
+		}
+		// otherwise convert it
+		else {
+			// conversion will happen here
+		}
+		
 	}
 	
 	// update or create
@@ -83,14 +122,17 @@ class Record {
 		
 		// if an id exist, update, else insert, and return result
 		return($this->_id ?
-			Database::query()->update($this->_table)->set($this->__toArray(false,true))->where(array('id'=>$this->_id))->execute() :
-			Database::query()->insert()->into($this->_table)->set($this->__toArray(false,true))->execute()
+			Database::query()->update($this->_['table'])->set($this->__toArray(false,true))->where(array('id'=>$this->_['id']))->execute() :
+			Database::query()->insert()->into($this->_['table'])->set($this->__toArray(false,true))->execute()
 		);
 		
 	}
 	
 	// delete
 	public function delete() {
+		
+		
+		
 	}
 	
 }
