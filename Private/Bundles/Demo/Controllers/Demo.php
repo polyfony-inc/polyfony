@@ -12,31 +12,49 @@ class DemoController extends pf\Controller {
 		
 	}
 
-	public function indexAction() {
-
+	public function welcomeAction() {
 		// view the main index/welcome page
 		$this->view('Index');
-		
+	}
+	
+	public function indexAction() {
+		// view the main demo index
+		$this->view('Demo');	
+	}
+	
+	public function loginAction() {	
+		$this->view('Login');
+	}
+	
+	public function secureAction() {	
+		pf\Security::enforce();
+		$this->view('Secure');
 	}
 	
 	public function localesAction() {
-
-		// view the main index/welcome page
-		$this->view('Locales');
-		
+		$this->view('Locales');		
 	}
 	
-	public function demoAction() {
-
-		// view the main index/welcome page
-		$this->view('Demo');
-		
-	}
-	
-	public function loginAction() {
-		
-		$this->view('Login');
+	public function databaseAction() {
+		// demo query
+		$this->Results = pf\Database::query()
+			->select()
+			->from('Accounts')
+			->where(array(
+				'id_level'=>1
+			))
+			->limitTo(0,5)
+			->execute();
 			
+		$this->view('Database');		
+	}
+	
+	public function responseAction() {
+		$this->view('Response');		
+	}
+	
+	public function requestAction() {
+		$this->view('Request');		
 	}
 	
 

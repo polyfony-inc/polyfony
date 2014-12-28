@@ -32,6 +32,9 @@ class Record {
 		// having a table means that we are not the result of a join query
 		$this->_['table'] = $table ? $table : null;
 		
+		// if we have an id available
+		$this->_['id'] = isset($this->id) ? $this->id : null;
+		
 		// if conditions are provided
 		if($conditions !== null) {
 			// if conditions is not an array
@@ -93,7 +96,8 @@ class Record {
 	
 	// magic
 	public function __toString() {
-		
+		// a string to sybolize this record
+		return("Polyfony\Record:{$this->_['table']}:{$this->_['id']}");
 	}
 	
 	private function alter($column) {
@@ -111,8 +115,13 @@ class Record {
 			return($this->{$column});
 		}
 		// otherwise convert it
-		else {
+		elseif(false) {
 			// conversion will happen here
+		}
+		// not a magic column
+		else {
+			// return as is
+			return($this->{$column});
 		}
 		
 	}

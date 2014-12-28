@@ -908,7 +908,7 @@ class Query {
 	}
 	
 	// convert the value depending on the column name
-	protected static function convert($column,$value) {
+	public static function convert($column,$value) {
 		// if we find a file keyword
 		if(strpos($column,'_file') !== false) {
 			// store that file and replace it by a json value in the database

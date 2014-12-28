@@ -1,55 +1,29 @@
 <?php
 
-// this will match strictly /demo/
-Polyfony\Router::addRoute('main-index')
+// declare a new static route for the main index
+Polyfony\Router::addRoute('index')
 	->url('/')
-	->destination('Demo','Demo','index');
+	->destination('Demo','Demo','welcome');
 
 
-// this will match strictly /demo/
-Polyfony\Router::addRoute('demo-index')
-	->url('/demo/')
-	->destination('Demo','Demo','demo');
+// declare a new route with a name « demo » for all demos
+Polyfony\Router::addRoute('demo')
+	// define the url structure (with named parameters
+	->url('/demo/:type/:something/')
+	// restrict some parameters values
+	->restrict(array(
+		// the type, if set, can only be on of those or the roule will not match
+		'type'=>array('login','secure','database','locales','request','response')
+	))
+	// set the destination for that route, Bundle, Controller, (optional) Action
+	->destination('Demo','Demo')
+	// set an optional parameter that will trigger an action
+	->trigger('type');
 
-
-// this will match strictly /demo/
-Polyfony\Router::addRoute('demo-login')
+// a shortcut for the login route
+Polyfony\Router::addRoute('login')
 	->url('/login/')
 	->destination('Demo','Demo','login');
 
-// this will match strictly /demo/
-Polyfony\Router::addRoute('demo-secure')
-	->url('/demo/secure/:option/')
-	->destination('Demo','Secure')
-	->trigger('option');
 
-// this will match strictly /demo/
-Polyfony\Router::addRoute('demo-locales')
-	->url('/demo/locales/:key/')
-	->destination('Demo','Demo','locales');
-
-/*
-// this route will match only if option is (create or update or delte)
-Polyfony\Router::addRoute('demo-restricted')
-	->url('/demo/restricted/:option/')
-	->restrict(array(
-		'option'=>array('create','update','delete')
-	))
-	->destination('Demo','Demo','restricted');
-
-// this route will match only if option is set in the url
-Polyfony\Router::addRoute('demo-required')
-	->url('/demo/required/:option/')
-	->restrict(array(
-		'option'=>true
-	))
-	->destination('Demo','Demo','required');
-
-// this route will match anything starting with /demo/dynamic/
-// option will trigger a method in the class Main
-Polyfony\Router::addRoute('demo-dynamic')
-	->url('/demo/dynamic/:option/')
-	->destination('Demo','Main')
-	->trigger('option');
-*/
 ?>
