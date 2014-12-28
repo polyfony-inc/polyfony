@@ -16,31 +16,23 @@ class Form {
 	
 
 	public static function input($name, $value=null, $attributes=array()) {
-		
 		// form the input form
-		return('<input '. Format::attributes(array_merge(array('type'=>'text', 'name'=>$name, 'value'=>$value, $attributes))) . ' />' );
-		
+		return('<input '. Format::attributes(array_merge(array('type'=>'text', 'name'=>$name, 'value'=>$value),$attributes)) . ' />' );
 	}
 	
 	public static function password($name, $value=null, $attributes=array()) {
-		
 		// form the password input form
-		return('<input '. Format::attributes(array_merge(array('type'=>'password', 'name'=>$name, 'value'=>$value, $attributes))) . ' />' );
-		
+		return('<input '. Format::attributes(array_merge(array('type'=>'password', 'name'=>$name, 'value'=>$value),$attributes)) . ' />' );
 	}
 	
 	public static function hidden($name, $value=null, $attributes=array()) {
-		
 		// form the hidden input form
-		return('<input '. Format::attributes(array_merge(array('type'=>'hidden', 'name'=>$name, 'value'=>$value, $attributes))) . ' />' );
-		
+		return('<input '. Format::attributes(array_merge(array('type'=>'hidden', 'name'=>$name, 'value'=>$value),$attributes)) . ' />' );
 	}
 	
 	public static function submit($value=null, $attributes=array()) {
-		
 		// form the submit form
-		return('<input '. Format::attributes(array_merge(array('type'=>'submit', 'value'=>$value, $attributes))) . ' />' );
-		
+		return('<input '. Format::attributes(array_merge(array('type'=>'submit', 'value'=>$value), $attributes)) . ' />' );	
 	}
 	
 	public static function select($name, $options=array(), $value=null, $attributes=array()) {

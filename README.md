@@ -21,11 +21,96 @@ url.rewrite-once = ("^(?!/Assets/).*" => "/?")
 ## Quick tour
 You can read this quick tour, or just browse the `../Private/Bundles/Demo/` code.
 
+
+### Request
+* Retrieve an url parameter
 ```php
-
-// quick tour will come soon
-
+// get a parameter named format from the url
+pf\Request::get('format');
 ```
+
+* Retrieve a posted field named `search`
+```php
+pf\Request::post('search');
+```
+
+* retrieve a cookie
+```php
+pf\Request::cookie('pfLanguage');
+```
+
+* retrieve a request header
+```php
+pf\Request::header('Accept-Encoding');
+```
+
+* check if the method is post
+```php
+pf\Request::isPost();
+```
+
+* check if the request is done using ajax
+```php
+pf\Request::isAjax();
+```
+
+
+### Database
+
+* Retrieve the login and id of 5 accounts with level 1 that logged in, in the last 24h
+```php
+// demo query
+$this->Accounts = pf\Database::query()
+	->select(array('login','id'))
+	->from('Accounts')
+	->where(array(
+		'id_level'=>1
+	))
+	->whereHigherThan('last_login_date',time()+24*3600)
+	->limitTo(0,5)
+	->execute();
+```
+
+* Retrieve a single record by its ID
+```php
+$root_account = new pf\Record('Accounts',1);
+echo $root_account;
+```
+
+* Retrieve a single record by its ID and generate an input to change a property
+```php
+$root_account = new pf\Record('Accounts',1);
+echo $root_account->input('login');
+// <input type="text" name="Accounts[login]" value="root" />
+```
+
+* Create a record, populate and insert it
+```php
+$account = new pf\Record('Accounts');
+$account
+	->set('login','test')
+	->set('id_level','1')
+	->set('last_login_date','18/04/1995')
+	->set('modules_array',array('MOD_BOOKS','MOD_USERS','MOD_EXAMPLE'))
+	->set('password',pf\Security::getPassword('test'))
+	->save();
+```
+
+### Form
+
+### Security
+
+### Locales
+
+### Exception
+
+### Notice
+
+### Response
+
+### Store
+
+### Runtime
 
 ## Performance
 Polyfony has been designed to be fast, no compromise.

@@ -1,8 +1,8 @@
 <div class="jumbotron" style="padding:45px;">
 	<h1>Locales</h1>
 	<p>
-		The translation file is a CSV, using tabs and double-quotes.<br />
-		Use as many as you need.
+		The translation file is a CSV (use as many as you like), using tabs and double-quotes.<br />
+		This example uses the <code>pf\Locales</code> class.
 	</p>
 	<code>
 		../Private/Bundles/Demo/Locales/example.csv

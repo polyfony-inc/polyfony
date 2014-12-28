@@ -17,12 +17,10 @@ class Format {
 
 	// human size
 	public static function size($integer,$precision=0) {
-		
 		// declare units
 		$unit = array('b','Ko','Mo','Go','To','Po');
 		// make human readable
 		return(round($integer/pow(1024,($i=floor(log($integer,1024)))),$precision).' '.$unit[$i]);
-		
 	}
 	
 	// relative date
@@ -37,7 +35,6 @@ class Format {
 	
 	// classic slug
 	public static function slug($string) {
-		
 		// equivalents of accentuated caracters
 		$with = str_split("àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ _'");
 		$without = str_split("aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY---");
@@ -45,39 +42,30 @@ class Format {
 		$string = strtolower(str_replace($with, $without, $string));
 		// replace all but 0-9 a-z remove doubles and trim the edges
 		return(trim(str_replace('--','-',preg_replace('#[^a-z0-9\-]#','-',$string)),'-'));
-		
 	}
 	
 	// file or folder name that is safe for the filesystem
 	public static function fsSafe($string) {
-		
 		// remove any symbol that does not belong in a file name of folder name
 		return(str_replace(array('..','/','\\',':','@','$','?','*','<','>','&','(',')','{','}',',','%','`','\'','#'),'-',$string));
-		
 	}
 	
 	// screen safe
 	public static function htmlSafe($string) {
-		
 		// just remove html entities
 		return(filter_var($string,FILTER_SANITIZE_FULL_SPECIAL_CHARS));
-		
 	}
 	
 	// create a link
 	public static function link($string,$url='#',$attributes=array()) {
-		
 		// build the actual link
 		return('<a ' . self::attributes(array_merge(array('href'=>$url),$attributes)) . '>' . $string  . '</a>');
-		
 	}
 	
 	// truncate to a certain length
 	public static function truncate($string,$length=16) {
-	
 		// if string is longer than authorized truncate, else do nothing
 		return(strlen($string) > $length ? trim(mb_substr(strip_tags($string),0,$length-2,'UTF-8')).'…' : $string);
-		
 	}
 	
 	
@@ -102,7 +90,6 @@ class Format {
 	}
 	
 	public static function attributes($attributes=null) {
-		
 		// set empty string
 		$string = '';
 		// array is provided
@@ -115,14 +102,11 @@ class Format {
 		}
 		// return the formatted string
 		return(trim($string));
-		
 	}
 	
 	public static function obfuscate($string) {
-
 		// remove all formatting symbols and double spaces	
 		return(str_replace('  ',' ',str_replace(array("\t","\n","\r"),'',$string)));
-
 	}
 	
 	public static function indent($string) {

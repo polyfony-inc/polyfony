@@ -1,29 +1,72 @@
 <div class="jumbotron" style="padding:45px;">
 	<h1>Database</h1>
 	<p>
-		Retrieve and iterate over records from the database
+		Retrieve and iterate over database records.<br />
+		This example uses the <code>pf\Database</code> abstraction and the <code>pf\Record</code> class.
 	</p>
-	<code>
-		<?php foreach($this->Results as $record): ?>
-			<?php echo $record; ?><br />
-			creation_date = <?php echo $record->get('creation_date'); ?><br />
-			creation_date (raw) = <?php echo $record->get('creation_date',true); ?><br />
-			login = <?php echo $record->get('login'); ?>
-		<?php endforeach; ?>
-	</code>
+	
+	<div class="panel panel-default">
+		<!-- Default panel contents -->
+		<div class="panel-heading">Accounts <span class="badge badge-info"><?php echo count($this->Accounts); ?></span></div>
+		<table class="table">
+			<tr>
+				<th>
+					Login
+				</th>
+				<th>
+					Session expiration (raw)
+				</th>
+				<th>
+					Session expiration
+				</th>
+				<th>
+					Level
+				</th>
+				<th>
+					Last login date
+				</th>
+			</tr>
+			<?php foreach($this->Accounts as $record): ?>
+				<tr>
+					<td>
+						<code>
+							<?php echo $record->get('login'); ?>
+						</code>
+					</td>
+					<td>
+						<code>
+							<?php echo $record->get('session_expiration_date',true); ?>
+						</code>
+					</td>
+					<td>
+						<span class="label label-warning">
+							<?php echo $record->get('session_expiration_date'); ?>
+						</span>
+					</td>
+					<td>
+						<code>
+							<?php echo $record->get('id_level'); ?>
+						</code>
+					</td>
+					<td>
+						<span class="label label-success">
+							<?php echo $record->get('last_login_date'); ?>
+						</span>
+					</td>
+				</tr>
+			<?php endforeach; ?>
+		</table>
+	</div>
 	<p>
-		Retrieve a specific record by its id, alter and save it
+		Update
 	</p>
-	<code>
-		$root_account = new pf\Record('Accounts','1');
-	</code>
+	<?php var_dump($this->UpdateStatus); ?>
 	<p>
-		Create a new record and insert it
+		Create
 	</p>
-	<code>
-		$new_account = new pf\Record('Accounts');<br />
-		$new_account->set('login','test');<br />
-		$new_account->set('password',pf\Security::getPassword('test'));<br />
-		$new_account->save();
-	</code>
+	<?php var_dump($this->CreateStatus); ?>
+	<p>
+		Delete
+	</p>
+	<?php var_dump($this->DeleteStatus); ?>
 </div>
