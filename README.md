@@ -1,9 +1,12 @@
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/713fa5be-b3d6-4a10-b544-90ef45580ec0/big.png)](https://insight.sensiolabs.com/projects/713fa5be-b3d6-4a10-b544-90ef45580ec0)
 
-## Polyfony 2 is a PHP micro framework that brings the cool parts of Symfony in a simpler way
+## Polyfony 2 is a simple and powerful PHP micro-framework.
+
+Compared to major PHP frameworks, Polyfony follows the 80-20 Pareto principle :
+It provides 95% of what we need most of the time, whilst using 5% of ressources, space, configuration files and dependencies required by major frameworks.
 
 Features : routing, bundles, controllers, views, database abstraction, environments, locales, cache, vendor, helpers, authentication, profiler…
-Without pre-compilation, cumbersome cache, dozens configuration files, composer, cli binary or other annoying steps.
+Footprint : 400 Ko of disk space, 650 Ko or RAM.
 
 
 ## Requirements
@@ -104,10 +107,10 @@ $account
 ```
 
 In these files you can declare as many routes as you like. 
-Static routes (not accepting parameters, requirement a perfect URL match) or dynamic routes, accepting parameters, that you can optionally restrict.
-All routes must point to a Bundle and Controller when declared, specific by the `->destination($bundle,$controller[,$action])` method.
+Static routes (not accepting parameters, require a perfect URL match) or dynamic routes, accepting parameters, that you can optionally restrict.
+All routes must point to a Bundle and Controller, specificied by the `->destination($bundle,$controller[,$action])` method.
 
-Static routes point to an action that must be determined in the route, or `indexAction()` will be triggered.
+In the case of static route, you must provide the action in the route.
 Dynamic routes can point to different actions depending on a URL parameter, specified by the `->trigger($url_parameter)` method.
 If no action is provided, indexAction is called, if an action is provided but none match, `defaultAction()` is called.
 A `preAction()` and `postAction()` wrap the action to be called.
@@ -155,7 +158,6 @@ a boolean true (it will match anything but a missing value)
 
 ## Performance
 Polyfony has been designed to be fast, no compromise.
-The whole framework takes less than 400 Kb of disk space (a third of it being comment lines) and runs on 650 Kb of RAM.
 
 ## Security
 The codebase is small, straightforward and abundantly commented. It's audited using SensioInsight, RIPS, and Sonar.
