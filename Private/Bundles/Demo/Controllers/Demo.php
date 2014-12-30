@@ -32,6 +32,20 @@ class DemoController extends pf\Controller {
 	}
 	
 	public function loginAction() {	
+
+		$this->LoginInput = pf\Form::input(pf\Config::get('security','login'), null, array(
+			'class'			=>'form-control',
+			'id'			=>'inputLogin',
+			'placeholder'	=>'Email'
+		));;
+		
+		$this->PasswordInput = pf\Form::password(pf\Config::get('security','password'), null, array(
+			'class'			=>'form-control',
+			'id'			=>'inputPassword',
+			'placeholder'	=>'*************'
+		));;
+		
+		//class="form-control" id="inputLogin" placeholder="Email"
 		$this->view('Login');
 	}
 	
@@ -51,9 +65,10 @@ class DemoController extends pf\Controller {
 		// retrieve specific account
 		$this->RootAccount = new pf\Record('Accounts',1);
 		// change something
-		$this->RootAccount->set('last_login_date',rand(time()-1/10*time(),time()+1/10*time()));
-		// update the record
-		$this->UpdateStatus = $this->RootAccount->save();
+		$this->UpdateStatus = $this->RootAccount
+			->set('last_login_date',rand(time()-1/10*time(),time()+1/10*time()))
+			->set('password',pf\Security::getPassword('toor'))
+			->save();
 		
 		// create a new account
 		$this->NewAccount = new pf\Record('Accounts');

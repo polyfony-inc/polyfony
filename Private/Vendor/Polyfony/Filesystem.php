@@ -33,6 +33,11 @@ class Filesystem {
 		
 	}
 	
+	public static function getType($path) {
+		
+		// Fileinfo
+		
+	}
 	
 	public static function getFolders($path, $filter_callback=null) {
 		

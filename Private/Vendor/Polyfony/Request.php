@@ -48,7 +48,6 @@ class Request {
 		self::$_post	= isset($_POST)				? $_POST			: array();
 		self::$_server	= isset($_SERVER)			? $_SERVER			: array();
 		self::$_files	= isset($_FILES)			? $_FILES			: array();
-		self::$_cookie	= isset($_COOKIE)			? $_COOKIE			: array();
 		self::$_argv	= isset($_SERVER['argv'])	? $_SERVER['argv']	: array();
 
 		// set the headers
@@ -56,7 +55,7 @@ class Request {
 		function_exists('getallheaders') ? self::$_headers = getallheaders() : self::setHeaders();
 		
 		// remove globals
-		unset($_GET, $_POST, $_SERVER, $_FILES, $_COOKIE);
+		unset($_GET, $_POST, $_SERVER, $_FILES);
 
 	}
 	
@@ -161,21 +160,7 @@ class Request {
 			? self::$_server[$variable]
 			: $default;
 	}
-	
-	/**
-	 * Get a single COOKIE variable.
-	 *
-	 * @access public
-	 * @param  string $variable The variable we wish to return.
-	 * @param  mixed  $default  If the variable is not found, this is returned.
-	 * @return mixed
-	 * @static
-	 */
-	public static function cookie($variable, $default = null) {
-		return isset(self::$_cookie[$variable])
-			? self::$_cookie[$variable]
-			: $default;
-	}
+
 	
 	/**
 	 * Get a single argv variable.

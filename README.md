@@ -144,6 +144,27 @@ a boolean true (it will match anything but a missing value)
 
 ### Security
 
+* To secure a page (require a user to be logged in)
+```php
+Security::enforce();
+```
+
+* If you want to require a specific level of account
+```php
+// code soon
+```
+
+* If you want to require a specific module (that can be bypassed by a level optionally)
+```php
+// code soon
+```
+
+* To check for credentials 
+```php
+Security::hasModule($module_name);
+Security::hasLevel($level);
+```
+
 ### Locales
 
 ### Exception

@@ -143,8 +143,8 @@ class Record {
 	
 	private function convert($column, $raw=false) {
 		
-		// if we want the raw result
-		if($raw) {
+		// if we want the raw result ok, but exclude arrays that can never be gotten raw
+		if($raw and strpos($column,'_array') === false) {
 			// return as is
 			return($this->{$column});
 		}
@@ -188,7 +188,7 @@ class Record {
 			// we can update and return the number of affected rows (0 on error, 1 on success)
 			$updated = Database::query()
 				->update($this->_['table'])
-				->set($this->__toArray(false,true))
+				->set($this->__toArray(true,true))
 				->where(array('id'=>$this->_['id']))
 				->execute();
 			// if update went well
@@ -206,7 +206,7 @@ class Record {
 		else {
 			// try to insert it
 			$inserted = Database::query()
-				->insert($this->__toArray(false,true))
+				->insert($this->__toArray(true,true))
 				->into($this->_['table'])
 				->execute();
 			// if insertion succeeded

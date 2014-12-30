@@ -27,8 +27,11 @@ class Locales {
 	
 	private static function detect() {
 		
+		// try to get the language using the cookie
+		self::$_language = Store\Cookie::has(Config::get('locales','cookie')) ? Store\Cookie::get(Config::get('locales','cookie')) : null;
+		
 		// if accept language header is not set
-		self::$_language = Request::header('Accept-Language') ? 
+		self::$_language = (self::$_language === null && Request::header('Accept-Language')) ? 
 			// then we use it
 			substr(Request::header('Accept-Language'),0,2) : 
 			// else we use the default language
@@ -87,6 +90,8 @@ class Locales {
 		
 		// set language if available, or fallback to default
 		self::$_language = in_array($language,Config::get('locales','available')) ? $language : Config::get('locales','default');
+		// memorize the language
+		Store\Cookie::put(Config::get('locales','cookie'),self::$_language);
 		
 	}
 	

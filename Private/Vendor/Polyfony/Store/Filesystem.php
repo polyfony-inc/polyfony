@@ -30,8 +30,8 @@ class Filesystem implements StoreInterface {
 	
 		// already exists and no overwrite
 		if(self::has($variable) && !$overwrite) {
-			// return false
-			return(false);
+			// throw an exception
+			\Polyfony\Exception("{$variable} does not exist in the store.");
 		}
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
@@ -47,8 +47,8 @@ class Filesystem implements StoreInterface {
 		
 		// doesn't exist in the store
 		if(!self::has($variable)) {
-			// return false
-			return(false);	
+			// throw an exception
+			\Polyfony\Exception("{$variable} does not exist in the store.");
 		}
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);

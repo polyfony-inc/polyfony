@@ -38,10 +38,16 @@ class Cookie implements StoreInterface
 	public static function put($variable, $value, $expires = 1314000, $overwrite = false) {
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (self::has($variable) && ! $overwrite) {
-			throw new \Exception("{$variable} already exists in the store.");
+			throw new \Polyfony\Exception("{$variable} already exists in the store.");
 		}
-
-		setcookie($variable, $value, $expires, '/', '.');
+		
+		// encode and compress the value
+		$value = gzcompress(json_encode($value));
+		// actually set the cookie
+		setcookie($variable, $value, $expires, '/');
+		// set it manually into the supergloba
+		$_COOKIE[$variable] = $value;
+		// return its presence
 		return self::has($variable);
 	}
 
@@ -57,10 +63,10 @@ class Cookie implements StoreInterface
 	public static function get($variable) {
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (! self::has($variable)) {
-			throw new \Exception("{$variable} does not exist in the store.");
+			throw new \Polyfony\Exception("{$variable} does not exist in the store.");
 		}
 
-		return $_COOKIE[$variable];
+		return json_decode(gzuncompress($_COOKIE[$variable]));
 	}
 
 	/**
@@ -74,7 +80,7 @@ class Cookie implements StoreInterface
 	public static function remove($variable) {
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (! self::has($variable)) {
-			throw new \Exception("{$variable} does not exist in the store.");
+			throw new \Polyfony\Exception("{$variable} does not exist in the store.");
 		}
 
 		// Remove the cookie by setting its expires in the past
