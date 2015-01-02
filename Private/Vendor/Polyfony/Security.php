@@ -32,13 +32,13 @@ class Security {
 		// if we have a post and posted a login, we log in with it
 		!Request::post(Config::get('security','login')) ?: self::login();
 
-		// if we have the module
+		// if there is a module required and we have it, allow access
 		$module ? self::$_granted = self::hasModule($module) : null;
 
-		// if we have the bypass level
+		// if a level is required and we have it, allow access
 		($level && !self::$_granted)  ? self::$_granted = self::hasLevel($level) : null;
 
-		// and now we check if we have the proper rights
+		// and now we check if we are granted access
 		self::$_granted ?: self::refuse();
 				
 	}
@@ -58,10 +58,25 @@ class Security {
 		$found_accounts ?: 
 			self::refuse('Your session is no longer valid');
 		
+		// rename variable
+		$account = $found_accounts[0];
+
+		// check dynamically generated session key
+
+		// check account expiration
+
+		// update our credentials
+				self::$_credentials = array(
+					'id'		=> $account->get('id'),
+					'login'		=> $account->get('login'),
+					'level'		=> $account->get('id_level'),
+					'modules'	=> $account->get('modules_array')
+				);
 		
-		
-		var_dump($found_accounts);
-		Response::render();
+				self::$_granted = true;
+
+	//	var_dump($found_accounts);
+	//	Response::render();
 		
 	}
 	
