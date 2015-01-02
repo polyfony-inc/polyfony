@@ -110,7 +110,7 @@ class Security {
 			}
 			
 			// if the account has expired
-			if($account->get('account_expiration_date') and time() > $account->get('account_expiration_date',true)) {
+			if($account->get('account_expiration_date') && time() > $account->get('account_expiration_date',true)) {
 				// refuse access
 				self::refuse('Your account was only valid until '.$account->get('account_expiration_date'));	
 			}

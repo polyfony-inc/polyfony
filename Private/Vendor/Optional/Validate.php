@@ -10,7 +10,7 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-namespace Polyfony;
+namespace Optional;
 
 class Validate {
 	/**

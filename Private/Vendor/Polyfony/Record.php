@@ -144,7 +144,7 @@ class Record {
 	private function convert($column, $raw=false) {
 		
 		// if we want the raw result ok, but exclude arrays that can never be gotten raw
-		if($raw and strpos($column,'_array') === false) {
+		if($raw && strpos($column,'_array') === false) {
 			// return as is
 			return($this->{$column});
 		}
