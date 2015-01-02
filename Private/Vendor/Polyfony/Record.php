@@ -211,7 +211,7 @@ class Record {
 				->execute();
 			// if insertion succeeded
 			if($inserted) {
-				// clone ourself
+				// clone ourself (to get our new id)
 				$this->replicate($inserted[0]);	
 				// and return true
 				return(true);

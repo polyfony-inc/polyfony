@@ -166,9 +166,50 @@ Security::hasLevel($level);
 
 ### Notice
 
+You can choose from different types of notice
+```php
+Notice
+// default information notice
+Notice\Danger
+// danger notice
+Notice\Success
+// success notice
+Notice\Warning
+// warning notice
+```
+
+All will be converted to string elegantly in HTML or text depending on the context (CLI, Ajax…) an uses bootstrap classes in HTML.
+
 ### Response
 
 ### Store
+
+The Store interface looks like this :
+```php
+public static function has($variable);
+public static function put($variable, $value, $overwrite);
+public static function get($variable); 
+public static function remove($variable);
+```
+
+You can choose from different storage engine
+```
+Store\Cookie
+// uses a cookie to compress and store the key
+Store\Filesystem
+// uses a file to store the key
+Store\Session
+// uses a PHP session to store the key
+Store\Database
+// uses a database table to store the key
+Store\Request
+// uses a variable to store the key for the time of a query only
+Store\Apc
+// uses apc engine to store the key
+Store\Memcache
+// uses memcache to store the key
+```
+Some of them have little specificities, but all implement the basic interface.
 
 ### Runtime
 
