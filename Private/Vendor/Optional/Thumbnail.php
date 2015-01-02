@@ -19,11 +19,11 @@ class Thumbnail {
 	// handler to the resized image
 	protected	$Sized;
 	// source image dimension
-	protected	$Width;
 	protected	$OriginalWidth;
-	// source image dimension
-	protected	$Height;
 	protected	$OriginalHeight;
+	// source image dimension
+	protected	$Width;
+	protected	$Height;
 	// source image
 	protected	$Source;
 	// destination of thumbnail
@@ -82,7 +82,7 @@ class Thumbnail {
 	// set the size
 	public function size($pixels) {
 		// if the value is acceptable
-		if(is_numeric($pixels) and $pixels >= 16 and $pixels <= 4096) {
+		if(is_numeric($pixels) && $pixels >= 16 && $pixels <= 4096) {
 			// set the limit
 			$this->Maximum = intval($pixels);
 		}
@@ -93,7 +93,7 @@ class Thumbnail {
 	// set the quality
 	public function quality($quality) {
 		// if the value is acceptable
-		if(is_numeric($quality) and $quality >= 10 and $quality <= 100) {
+		if(is_numeric($quality) && $quality >= 10 && $quality <= 100) {
 			// set the quality
 			$this->Quality = intval($quality);
 		}
@@ -125,7 +125,7 @@ class Thumbnail {
 			return(false);
 		}
 		// if the destination is not a folder and already exists
-		if(!is_dir($this->Destination) and file_exists($this->Destination)) {
+		if(!is_dir($this->Destination) && file_exists($this->Destination)) {
 			// throw an exception
 			$this->Error = 'Destination image already exists';	
 			// return false

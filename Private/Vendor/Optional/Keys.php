@@ -20,32 +20,20 @@ class Keys {
 	// generate a key
 	public static function generate($mixed=null) {
 		// create a sha1 signature of the array with a salt
-		$hash = sha1(json_encode(array($mixed,self::$SALT),JSON_NUMERIC_CHECK));
-		// get last 10 and first 10 chars together
-		$partial_hash = substr($hash,-10) . substr($hash,0,10);
-		// convert to uppercase
-		$key = strtoupper($partial_hash);
-		// return that key
-		return($key);
+		$hash = sha1(json_encode(array($mixed,self::$_salt), JSON_NUMERIC_CHECK));
+		// get last 10 and first 10 chars together, convert to uppercase, return the key
+		return(strtoupper(substr($hash, -10) . substr($hash, 0, 10)));
 	}
 
 	// compare a key with a new dynamically generated one
-	public static function compare($key, $mixed) {
+	public static function compare($key=null, $mixed=null) {
 		// if no key is provided
-		if(!$key or strlen($key) != 20) {
+		if(!$key || strlen($key) != 20) {
 			// return false
 			return(false);	
 		}
 		// if keys do match
-		if(self::generate($mixed) == $key) {
-			// return false
-			return(true);	
-		}
-		// keys do not match
-		else {
-			// allow access
-			return(false);
-		}
+		return(self::generate($mixed) == $key ?: false);
 	}
 
 }

@@ -106,7 +106,7 @@ class Uploader {
 			return(false);
 		}
 		// if the destination is not a folder and already exists
-		if(!is_dir($this->Destination) and file_exists($this->Destination)) {
+		if(!is_dir($this->Destination) && file_exists($this->Destination)) {
 			// throw an exception
 			$this->Error = 'Destination file already exists';	
 			// return false
@@ -148,7 +148,7 @@ class Uploader {
 		// compute filesize
 		$this->Size = filesize($this->Source);
 		// if a maximum size if set and we exceed it
-		if($this->Limits->Size and $this->Size > $this->Limits->Size) {
+		if($this->Limits->Size && $this->Size > $this->Limits->Size) {
 			// add an error
 			$this->Error = 'File is larger than maximum of '.\Polyfony\Format::size($this->Limits->Size);
 			// return an error
@@ -181,7 +181,7 @@ class Uploader {
 			}
 		}
 		// if type limitations are set and current type is not allowed
-		if(count($this->Limits->Types) and !in_array($this->Type,$this->Limits->Types)) {
+		if(count($this->Limits->Types) && !in_array($this->Type,$this->Limits->Types)) {
 			// add an error
 			$this->Error = 'This file is not in the list of allowed types : ' . implode(',',$this->Limits->Types);
 			// return an error
