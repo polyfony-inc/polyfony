@@ -37,11 +37,6 @@ pf\Request::get('format');
 pf\Request::post('search');
 ```
 
-* retrieve a cookie
-```php
-pf\Request::cookie('pfLanguage');
-```
-
 * retrieve a request header
 ```php
 pf\Request::header('Accept-Encoding');

@@ -4,6 +4,7 @@
  * @package Polyfony
  * @link https://github.com/SIB-FRANCE/Polyfony
  * @license http://www.gnu.org/licenses/lgpl.txt GNU General Public License
+ * @author Chris Hill, Its been stolen for Polyfony from Chris' very nice MVC framework
  * @note This program is distributed in the hope that it will be useful - WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.

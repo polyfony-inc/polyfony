@@ -35,7 +35,30 @@ class Filesystem {
 	
 	public static function getType($path) {
 		
-		// Fileinfo
+		// get a new fileinfo object
+		$info = new finfo(FILEINFO_MIME);
+		// if the fileinfo failed to instanciate
+		if(!$info) {
+			// return an error
+			return(false);	
+		}
+		// get the mimetype
+		$type = $info->file($path);
+		// if failed to get a type
+		if(!$type) {
+			// return an error
+			return(false);		
+		}
+		// we got a mimetype
+		else {
+			// if it has a ; in it
+			if(strstr($type,';')) {
+				// only keep the first part
+				list($type) = explode(';',$type);
+			}
+		}
+		// return the type
+		return($type);
 		
 	}
 	
