@@ -24,8 +24,6 @@ class Request {
 	private $timeout;
 	private $retry;
 	private $data;
-	private $files;
-	private $headers;
 	private $cookies;
 	private $response;
 	
@@ -38,7 +36,6 @@ class Request {
 		$this->timeout 			= $timeout;
 		$this->retry 			= $retry;
 		$this->data 			= array();
-		$this->headers 			= array();
 		$this->cookies 			= array();
 
 		// response initialization
@@ -73,14 +70,6 @@ class Request {
 	public function attachment($key, $path) {
 		// add to the list of files
 		$this->data['@'.$key] = $path;
-		// return self
-		return($this);
-	}
-
-	// set a header
-	public function header($key, $value) {
-		// set directly a header association
-		$this->headers[$key] = $value;
 		// return self
 		return($this);
 	}

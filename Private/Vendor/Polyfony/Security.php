@@ -33,10 +33,10 @@ class Security {
 		!Request::post(Config::get('security','login')) ?: self::login();
 
 		// if there is a module required and we have it, allow access
-		$module ? self::$_granted = self::hasModule($module) : null;
+		!$module ?: self::$_granted = self::hasModule($module);
 
 		// if a level is required and we have it, allow access
-		($level && !self::$_granted)  ? self::$_granted = self::hasLevel($level) : null;
+		!($level && !self::$_granted) ?: self::$_granted = self::hasLevel($level);
 
 		// and now we check if we are granted access
 		self::$_granted ?: self::refuse();
@@ -186,7 +186,7 @@ class Security {
 	}
 
 	// this will check that the opened session matches the current client's signature
-	private static function match($account) {
+	private static function match(Record $account) {
 		// get the session key existing in the database
 		$existing_key = $account->get('session_key');
 		// generate a new session key for this request

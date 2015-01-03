@@ -76,9 +76,9 @@ class Map {
 	}
 
 	// set as retina
-	public function retina() {
+	public function retina($enable=true) {
 		// assign
-		$this->options['scale'] = 2;
+		$this->options['scale'] = $enable ? 2 : 1;
 		// return self for chaining
 		return($this);
 	}
