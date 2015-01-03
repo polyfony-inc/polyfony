@@ -187,6 +187,8 @@ class Request {
 		$this->response['success'] = $response ? true : false;
 		// if the request failed and we still have some retry
 		if(!$this->response['success'] && $this->retry > 0) {
+			// sleep for a while
+			sleep(2);
 			// decrement
 			$this->retry -= 1;
 			// try again

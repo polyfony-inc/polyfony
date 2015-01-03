@@ -2,11 +2,13 @@
 	<h1>Security</h1>
 	<p>
 		If you see this, <strong>you are authenticated !</strong><br />
-		You are logged is as <code>root</code>, your session will expire on <span class="label label-success"><?php Polyfony\Security::get('login'); ?></span>
+		You are logged is as <code>root</code>, bellow are your credentials
 	</p>
-	<code>
-		login :
-		level :
-		session expiration date :
-	</code>
+	<p>
+		id <code><?php echo $this->Id; ?></code>, level <code><?php echo $this->Level; ?></code>, 
+		login <code><?php echo $this->Login; ?></code>, modules <code><?php echo $this->Modules; ?></code>
+	</p>
+	<p>
+		To close your session, <a href="/demo/secure/exit/">just click here</a>
+	</p>
 </div>

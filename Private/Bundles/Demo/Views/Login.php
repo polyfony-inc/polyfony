@@ -2,6 +2,7 @@
 	<div class="panel panel-default">
 		<div class="panel-heading">Login</div>
 		<div class="panel-body">
+			<?php echo $this->Notice; ?>
 			<form action="/demo/secure/" method="post">
 				<div class="form-group">
 					<label for="inputLogin">Login</label>

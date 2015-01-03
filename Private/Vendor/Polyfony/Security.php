@@ -21,7 +21,7 @@ class Security {
 	
 	// default is not granted
 	protected static $_granted = false;
-	protected static $_credentials = array();
+	protected static $_account = null;
 	
 	// main authentication method that will authenticated and optionnaly apply a module/level rule
 	public static function enforce($module=null, $level=null) {
@@ -43,40 +43,51 @@ class Security {
 				
 	}
 	
+	// authenticate then close the session
+	public static function disconnect() {
+
+		// first authenticate
+		self::enforce();
+
+		// then close the session
+		self::$_account
+			->set('session_key','')
+			->set('session_expiration_date','')
+			->save();
+
+		// and remove the cookie and redirect to the login page
+		self::refuse('You have successfully closed your session', 403, true);
+
+	}
+
 	// internal authentication method that will grant access based on an existing session
 	private static function authenticate() {
-		
+
 		// search for an account with that session key
-		$found_accounts = Database::query()->select()->from('Accounts')
-			->where(array(
-				'session_key'=>Store\Cookie::get(Config::get('security','cookie'))
-			))
+		$found_accounts = Database::query()
+			->select()->from('Accounts')
+			->where(array('session_key'=>Store\Cookie::get(Config::get('security','cookie'))))
 			->whereHigherThan('session_expiration_date',time())
 			->execute();
-			
-		// if no matching session is found we remove the cookie
-		$found_accounts ?: 
-			self::refuse('Your session is no longer valid');
 		
-		// rename variable
-		$account = $found_accounts[0];
+		// rename variable for clarity
+		$account = isset($found_accounts[0]) ? $found_accounts[0] : false;
 
-		// check dynamically generated session key
+		// if no matching session is found we remove the cookie
+		$account ?: self::refuse('Your session is no longer valid', 403, true);
+
+		// check if the store session key matches the dynamically generated one
+		self::match($account) ?: self::refuse('Your signature has changed, please log-in again', 403, true);
 
 		// check account expiration
+		!($account->get('account_expiration_date') && time() > $account->get('account_expiration_date',true)) ?:
+			self::refuse('Your account has expired', 403, true);
 
 		// update our credentials
-				self::$_credentials = array(
-					'id'		=> $account->get('id'),
-					'login'		=> $account->get('login'),
-					'level'		=> $account->get('id_level'),
-					'modules'	=> $account->get('modules_array')
-				);
-		
-				self::$_granted = true;
+		self::$_account = $account;
 
-	//	var_dump($found_accounts);
-	//	Response::render();
+		// set access as granted
+		self::$_granted = true;
 		
 	}
 	
@@ -84,7 +95,9 @@ class Security {
 	private static function login() {
 		
 		// look for users with this login
-		$found_accounts = Database::query()->select()->from('Accounts')
+		$found_accounts = Database::query()
+			->select()
+			->from('Accounts')
 			->where(array(
 				'login'=>Request::post(Config::get('security','login')),
 				'is_enabled'=>'1'
@@ -102,8 +115,8 @@ class Security {
 			) {
 				// extend the lock on the account
 				$account
-					->set('last_failure_date',time())
-					->set('last_failure_agent',Request::server('HTTP_USER_AGENT'))
+					->set('last_failure_date', time())
+					->set('last_failure_agent', Request::server('HTTP_USER_AGENT'))
 					->save();
 				// refuse access
 				self::refuse('Please wait ' . Config::get('security', 'waiting_duration') . ' seconds before trying again');
@@ -140,12 +153,7 @@ class Security {
 					->save();
 
 				// update our credentials
-				self::$_credentials = array(
-					'id'		=> $account->get('id'),
-					'login'		=> $account->get('login'),
-					'level'		=> $account->get('id_level'),
-					'modules'	=> $account->get('modules_array')
-				);
+				self::$_account = $account;
 
 				// allow the basic authentication
 				self::$_granted = true;
@@ -168,11 +176,54 @@ class Security {
 	}
 
 	// internal method to refuse access
-	private static function refuse($message='Forbidden',$code='403') {
+	private static function refuse($message='Forbidden', $code='403', $logout=false, $redirect=true) {
+		// remove any existing session cookie
+		!$logout ?: Store\Cookie::remove(Config::get('security','cookie'));
 		// we will redirect to the login page
-		Response::setRedirect(Config::get('router','login_route'),3);
-		// trhow an exception that by itself will stop the execution with maybe a nice exception handler
+		!$redirect ?: Response::setRedirect(Config::get('router','login_route'), 3);
+		// trhow a polyfony exception that by itself will stop the execution with maybe a nice exception handler
 		Throw new Exception($message,$code);
+	}
+
+	// this will check that the opened session matches the current client's signature
+	private static function match($account) {
+		// get the session key existing in the database
+		$existing_key = $account->get('session_key');
+		// generate a new session key for this request
+		$dynamic_key = self::getSignature($account->get('login').$account->get('password').$account->get('session_expiration_date',true));
+		// return true only if they match
+		return($existing_key == $dynamic_key ? true : false);
+
+	}
+
+	// clean the database (called after each successful login)
+	private static function clean() {
+		// clean expired sessions
+		Database::query()->update('Accounts')
+			->set(array(
+				'session_key'				=> null,
+				'session_expiration_date'	=> null
+			))
+			->whereNotNull('session_expiration_date')
+			->whereLowerThan('session_expiration_date',time())
+			->execute();
+		// clean expired accounts
+		Database::query()->update('Accounts')
+			->set(array(
+				'session_key'				=> null,
+				'session_expiration_date'	=> null
+			))
+			->whereNotNull('account_expiration_date')
+			->whereLowerThan('account_expiration_date',time())
+			->execute();
+		// clean disabled accounts
+		Database::query()->update('Accounts')
+			->set(array(
+				'session_key'				=> null,
+				'session_expiration_date'	=> null
+			))
+			->whereNull('is_enabled')
+			->execute();
 	}
 	
 	// internal method for generating unique signatures
@@ -202,7 +253,7 @@ class Security {
 	public static function hasLevel($level=null) {
 	
 		// if we have said level
-		return(self::get('level',100) <= $level ? true : false);
+		return(self::get('id_level',100) <= $level ? true : false);
 		
 	}
 	
@@ -210,15 +261,15 @@ class Security {
 	public static function hasModule($module=null) {
 		
 		// if module is in our credentials
-		return(in_array($module,self::get('modules',array())) ?: false);
+		return(in_array($module,self::get('modules_array',array())) ?: false);
 		
 	}
 	
 	// get a specific credential
 	public static function get($credential,$default=null) {
-		
+
 		// return said credential or default
-		return(isset(self::$_credentials[$credential]) ? self::$_credentials[$credential] : $default);
+		return(self::$_account->get($credential) ? self::$_account->get($credential) : $default);
 		
 	}
 	

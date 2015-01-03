@@ -33,12 +33,17 @@ class DemoController extends pf\Controller {
 	
 	public function loginAction() {	
 
+		// add a notice
+		$this->Notice = new pf\Notice('only one account exists by default : root/toor','Notice :');
+
+		// build input field
 		$this->LoginInput = pf\Form::input(pf\Config::get('security','login'), null, array(
 			'class'			=>'form-control',
 			'id'			=>'inputLogin',
 			'placeholder'	=>'Email'
 		));;
 		
+		// build input field
 		$this->PasswordInput = pf\Form::password(pf\Config::get('security','password'), null, array(
 			'class'			=>'form-control',
 			'id'			=>'inputPassword',
@@ -50,8 +55,19 @@ class DemoController extends pf\Controller {
 	}
 	
 	public function secureAction() {	
+
+		// if the « something » parameter from the route is « exit », close our session
+		!pf\Request::get('something') == 'exit' ?: pf\Security::disconnect();
+
 		// enforce security for this action
 		pf\Security::enforce();
+
+		// grab some informations
+		$this->Id 		= pf\Security::get('id');
+		$this->Login 	= pf\Security::get('login');
+		$this->Level 	= pf\Security::get('id_level');
+		$this->Modules 	= implode(', ',pf\Security::get('modules_array'));
+
 		// normal view
 		$this->view('Secure');
 	}

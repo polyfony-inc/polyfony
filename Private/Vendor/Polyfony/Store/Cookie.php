@@ -82,9 +82,8 @@ class Cookie implements StoreInterface
 		if (! self::has($variable)) {
 			throw new \Polyfony\Exception("{$variable} does not exist in the store.");
 		}
-
 		// Remove the cookie by setting its expires in the past
-		setcookie($variable, '', (time() - 3600));
+		setcookie($variable, '', time() - 3600, '/');
 	}
 }
 

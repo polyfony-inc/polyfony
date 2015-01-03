@@ -101,21 +101,6 @@ class Map {
 		return(trim($url,'&'));
 	}
 
-	// return the image file
-	public function image() {
-		// new http request
-		$request = new \Optional\Request();
-		// configure the request
-		$success = $request->url($this->url())->get();
-		// if the request succeeded
-		if($success) {
-			// return the image
-			return($request->getBody());
-		}
-		// the request failed
-		else { return(false); }
-	}
-
 }
 
 ?>
