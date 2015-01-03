@@ -1,6 +1,7 @@
 <?php
 /**
  * PHP Version 5
+ * Google Static Map images helper
  * @package Polyfony
  * @link https://github.com/SIB-FRANCE/Polyfony
  * @license http://www.gnu.org/licenses/lgpl.txt GNU General Public License
@@ -14,30 +15,105 @@ namespace Google;
 class Map {
 
 	// the map api url
-	private static $_api_url = 'https://maps.googleapis.com/maps/api/staticmap?center=Brooklyn+Bridge,New+York,NY&zoom=13&size=600x300&maptype=roadmap&markers=color:blue%7Clabel:S%7C40.702147,-74.015794&markers=color:green%7Clabel:G%7C40.711614,-74.012318&markers=color:red%7Clabel:C%7C40.718217,-73.998284';
+	private static $_api_url = 'https://maps.googleapis.com/maps/api/staticmap';
+
+	// the options, url and markers
+	private $options;
+	private $markers;
+	private $url;
+
+	// main constructor
+	public function __construct($type = 'roadmap', $size = 600, $zoom = 6 , $latitude = 46.8, $longitude = 1.7) {
+		// initialize
+		$this->url = self::$_api_url;
+		$this->options = array();
+		$this->markers = array();
+		// set default
+		$this->zoom($zoom);
+		$this->size($size, $size);
+		$this->type($type);
+		$this->center($latitude, $longitude);
+	}
+
+	// set the desired size
+	public function size($width, $height) {
+		// assign
+		$this->options['size'] = $width . 'x' . $height;
+		// return self for chaining
+		return($this);
+	}
 
 	// set the center position
 	public function center($latitude, $longitude) {
-
+		// assign
+		$this->options['center'] = $latitude . ',' . $longitude;
+		// return self for chaining
+		return($this);
 	}
 
 	// set a marker
-	public function marker($latitude, $longitude) {
-
+	public function marker($latitude, $longitude, $color='grey') {
+		// assign
+		$this->markers[] = $latitude . ',' . $longitude;
+		// return self for chaining
+		return($this);
 	}
 
-	public function zoom($level) {
+	// set the zoom level
+	public function zoom($zoom) {
+		// assign
+		$this->options['zoom'] = intval($zoom);
+		// return self for chaining
+		return($this);
+	}
 
+	// set the map type
+	public function type($type) {
+		// assign
+		$this->options['maptype'] = $type;
+		// return self for chaining
+		return($this);
+	}
+
+	// set as retina
+	public function retina() {
+		// assign
+		$this->options['scale'] = 2;
+		// return self for chaining
+		return($this);
 	}
 
 	// return the image url
 	public function url() {
-
+		// prepare the url
+		$url = $this->url . '?';
+		// for each option
+		foreach($this->options as $key => $value) {
+			// append it
+			$url .= urlencode($key) . '=' . urlencode($value) . '&';
+		}
+		// if markers
+		if($this->markers) {
+			// implode them
+			$url .= '&markers=' . urlencode(implode('|',$this->markers));
+		}
+		// return the url
+		return(trim($url,'&'));
 	}
 
 	// return the image file
 	public function image() {
-
+		// new http request
+		$request = new \Optional\Request();
+		// configure the request
+		$success = $request->url($this->url())->get();
+		// if the request succeeded
+		if($success) {
+			// return the image
+			return($request->getBody());
+		}
+		// the request failed
+		else { return(false); }
 	}
 
 }

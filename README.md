@@ -168,17 +168,22 @@ Security::hasLevel($level);
 
 You can choose from different types of notice
 ```php
-Notice
+Notice($message,$title=null)
 // default information notice
-Notice\Danger
+Notice\Danger($message,$title=null)
 // danger notice
-Notice\Success
+Notice\Success($message,$title=null)
 // success notice
-Notice\Warning
+Notice\Warning($message,$title=null)
 // warning notice
 ```
+All will be converted to string elegantly in HTML or text depending on the context (CLI, Ajax…) and it uses bootstrap-friendly classes.
 
-All will be converted to string elegantly in HTML or text depending on the context (CLI, Ajax…) an uses bootstrap classes in HTML.
+Manually getting back notice text
+```php
+$notice->getMessage($html_safe=true)
+$notice->getTitle($html_safe=true)
+```
 
 ### Response
 
@@ -186,10 +191,10 @@ All will be converted to string elegantly in HTML or text depending on the conte
 
 The Store interface looks like this :
 ```php
-public static function has($variable);
-public static function put($variable, $value, $overwrite);
-public static function get($variable); 
-public static function remove($variable);
+Store\Engine::has($variable);
+Store\Engine::put($variable, $value, $overwrite);
+Store\Engine::get($variable); 
+Store\Engine::remove($variable);
 ```
 
 You can choose from different storage engine
@@ -212,6 +217,71 @@ Store\Memcache
 Some of them have little specificities, but all implement the basic interface.
 
 ### Runtime
+
+### Optional\
+
+#### Optional\Thumbnail
+
+#### Optional\Uploader
+
+#### Optional\Request
+
+This class provides a simple interface to build HTTP Requests
+
+```php
+$this->Request = new \Optional\Request();
+$this->Success = $this->Request
+	->url('https://maps.googleapis.com/maps/api/geocode/json')
+	->data('address','Paris')
+	->get();
+
+var_dump($this->Success);
+var_dump($this->Request->getHeader('Content-Type'));
+var_dump($this->Request->getBody());
+
+```
+Responses of type application/json will be decoded to array, response of type application/xml will be decoded to SimpleXML object.
+
+#### Google\Position
+
+* Geocoding
+
+```php
+\Google\Position::address('Paris')
+```
+
+* Reverse geocoding
+
+```php
+\Google\Position::reverse(48.856614,2.3522219)
+```
+
+#### Google\Photo
+
+* Retrieve a photo from streetview
+```php
+$photo = new \Google\Photo();
+$image_url = $photo
+//	->position($lat,$lnt)
+	->address('Some normal address')
+	->size(500,500)
+	->url();
+```
+
+#### Google\Map
+
+* Retrieve a static map with a marker
+```php
+$map = new \Google\Map();
+$image_url = $map
+	->center($lat,$lng);
+	->zoom(7)
+	->retina()
+	->marker($lat,$lng)
+	->size(600x600)
+	->url();
+```
+
 
 ## Performance
 Polyfony has been designed to be fast, no compromise.

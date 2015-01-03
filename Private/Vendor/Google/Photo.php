@@ -1,6 +1,7 @@
 <?php
 /**
  * PHP Version 5
+ * Google Streetview image helper
  * @package Polyfony
  * @link https://github.com/SIB-FRANCE/Polyfony
  * @license http://www.gnu.org/licenses/lgpl.txt GNU General Public License
@@ -14,28 +15,73 @@ namespace Google;
 class Photo {
 	
 	// api url
-	private static $_api_url = 'https://maps.googleapis.com/maps/api/streetview?size=400x400&location=40.720032,-73.988354&fov=90&heading=235&pitch=10';
+	private static $_api_url = 'https://maps.googleapis.com/maps/api/streetview';
+
+	// options
+	private $url;
+	private $options;
+
+	// constructor
+	public function __construct($size = 600, $fov = 90, $pitch = 10) {
+		$this->url = self::$_api_url;
+		$this->options = array(
+			'fov'	=>$fov,
+			'pitch'	=>$pitch
+		);
+	}
+
+	// set the desired size
+	public function size($width, $height) {
+		// assign
+		$this->options['size'] = $width . 'x' . $height;
+		// return self for chaining
+		return($this);
+	}
 
 	// set the position
 	public function position($latitude, $longitude) {
-
+		// assign
+		$this->options['location'] = $latitude . ',' . $longitude;
+		// return self for chaining
+		return($this);
 	}
 
 	// set the street view photo given the address
-	public function address($address, $zip_code ,$city) {
-
+	public function address($address, $zip_code=null ,$city=null) {
 		// assemble the address portions if any
-
+		$address = trim($address . ' ' . $zip_code . ' ' .$city);
+		// if a position is found
+		$this->options['location'] = $address;
+		// return self for chaining
+		return($this);
 	}
 
 	// get the url of the photo
 	public function url() {
-
+		// prepare the url
+		$url = $this->url . '?';
+		// for each option
+		foreach($this->options as $key => $value) {
+			// append it
+			$url .= urlencode($key) . '=' . urlencode($value) . '&';
+		}
+		// return the url
+		return(trim($url,'&'));
 	}
 
 	// get the map image file
 	public function image() {
-
+		// new http request
+		$request = new \Optional\Request();
+		// configure the request
+		$success = $request->url($this->url())->get();
+		// if the request succeeded
+		if($success) {
+			// return the image
+			return($request->getBody());
+		}
+		// the request failed
+		else { var_dump($request);return(false); }
 	}
 
 }
