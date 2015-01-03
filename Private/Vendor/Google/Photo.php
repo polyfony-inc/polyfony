@@ -25,6 +25,7 @@ class Photo {
 	public function __construct($size = 600, $fov = 90, $pitch = 10) {
 		$this->url = self::$_api_url;
 		$this->options = array(
+			'size'	=>$size . 'x' . $size,
 			'fov'	=>$fov,
 			'pitch'	=>$pitch
 		);
