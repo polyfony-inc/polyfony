@@ -15,16 +15,17 @@ class Runtime {
 	
 	protected static $_runtimes;
 	
-	public static function set($bundle,$key,$value=null) {
+	public static function set($bundle, $key, $value=null) {
 		
 		// if only bundle + one parameters set the whole bundle, else set a key of the bundle
 		$value !== null ? self::$_runtimes[$bundle][$key] = $value : self::$_runtimes[$bundle] = $key;
 		
 	}
 	
-	public static function get($bundle,$key=null) {
-	
-
+	public static function get($bundle, $key=null) {
+		
+		// return the whol bundle or a subset
+		return($key ? self::$_runtimes[$bundle][$key] : self::$_runtimes[$bundle]);
 	
 	}
 	

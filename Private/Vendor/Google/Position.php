@@ -19,7 +19,7 @@ class Position {
 	// return a GPS position given an address
 	public static function address($address) {
 		// new http request
-		$request = new \Optional\Request();
+		$request = new \Polyfony\HttpRequest();
 		// configure the request
 		$success = $request->url(self::$_api_url)->data('address', $address)->get();
 		// if the request succeeded
@@ -49,7 +49,7 @@ class Position {
 	// return an address given a GPS position
 	public static function reverse($latitude, $longitude) {
 		// new http request
-		$request = new \Optional\Request();
+		$request = new \Polyfony\HttpRequest();
 		// configure the request
 		$success = $request
 			->url(self::$_api_url)

@@ -11,9 +11,9 @@
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-namespace Optional;
+namespace Polyfony;
 
-class Request {
+class HttpRequest {
 
 	// curl instance
 	private $curl;
@@ -69,7 +69,7 @@ class Request {
 	// set a file to be posted
 	public function attachment($key, $path) {
 		// add to the list of files
-		$this->data['@'.$key] = $path;
+		$this->data[$key] = '@'.$path;
 		// return self
 		return($this);
 	}
@@ -153,7 +153,7 @@ class Request {
 		// bugfix for expectation failed errors
 		curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Expect:'));
 		// impersonate the current user agent
-		curl_setopt($this->curl, CURLOPT_USERAGENT, \Polyfony\Request::server('HTTP_USER_AGENT'));
+		curl_setopt($this->curl, CURLOPT_USERAGENT, Request::server('HTTP_USER_AGENT'));
 		// set the url
 		curl_setopt($this->curl, CURLOPT_URL, $this->url);
 		// set the timeout for this request

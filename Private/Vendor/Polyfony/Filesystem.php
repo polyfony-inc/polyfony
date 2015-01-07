@@ -15,25 +15,62 @@ namespace Polyfony;
 class Filesystem {
 	
 	public static function isDirectory($path) {
-		
 		return(is_dir($path));
-		
 	}
-	
-	public static function exists($path) {
-		
-		return(file_exists($path));
-		
+
+	public static function isFile($path) {
+		return(is_file($path));
+	}
+
+	public static function isSymbolic($path) {
+		return(is_link($path));
 	}
 	
 	public static function isNormalName($string) {
-		
-		// true if not starting with a dot, false otherwise
 		return((substr($string,0,1) != '.' ) ? true : false);
-		
+	}
+
+	public static function exists($path) {
+		return(file_exists($path));
 	}
 	
-	public static function getType($path) {
+	public static function ls($path, $filter=null) {
+
+	}
+
+	public static function symlink() {
+
+	}
+
+	public static function mkdir() {
+
+	}
+	
+	public static function remove() {
+
+	}
+
+	public static function chmod() {
+
+	}
+
+	public static function chown() {
+
+	}
+
+	public static function touch() {
+
+	}
+
+	public static function copy() {
+
+	}
+
+	public static function info() {
+
+	}
+	
+	public static function type($path) {
 		
 		// get a new fileinfo object
 		$info = new finfo(FILEINFO_MIME);
@@ -62,14 +99,6 @@ class Filesystem {
 		
 	}
 	
-	public static function getFolders($path, $filter_callback=null) {
-		
-	}
-	
-	
-	public static function getFiles($path ,$filter_callback=null) {
-		
-	}
 	
 }
 

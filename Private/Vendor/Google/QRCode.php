@@ -14,7 +14,18 @@ namespace Google;
 class QRCode {
 	
 	// api url
-	private static $_api_url = 'https://chart.googleapis.com/chart?cht=qr&chs=<width>x<height>&chl=<data>';
+	private static $_api_url = 'https://chart.googleapis.com/chart?';
+
+	// generate a new QRCode
+	public static function url($data, $size=200) {
+
+		return(self::$_api_url . "cht=qr&chs={$size}x{$size}&chld=M|0&chl=" . urlencode(json_encode($data)));
+
+	}
+
+	public static function decode() {
+
+	}
 
 }
 

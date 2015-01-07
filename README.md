@@ -37,6 +37,11 @@ pf\Request::get('format');
 pf\Request::post('search');
 ```
 
+* Retrieve a file
+```php
+pf\Request::files('attachment_document');
+```
+
 * retrieve a request header
 ```php
 pf\Request::header('Accept-Encoding');
@@ -144,17 +149,12 @@ a boolean true (it will match anything but a missing value)
 Security::enforce();
 ```
 
-* If you want to require a specific level of account
-```php
-// code soon
-```
-
 * If you want to require a specific module (that can be bypassed by a level optionally)
 ```php
-// code soon
+Security::enforce('MOD_NAME', $bypass_level);
 ```
 
-* To check for credentials 
+* To check manually for credentials 
 ```php
 Security::hasModule($module_name);
 Security::hasLevel($level);
@@ -162,7 +162,35 @@ Security::hasLevel($level);
 
 ### Locales
 
+Locales are stored in csv files (tab + double-quotes), stored in each bundle in the `Bundles/MyBundle/Locales/` folder.
+The files are parsed the first time to ask for a locale. The language is automatically detected using the browser's language, you can set it manually.
+
+* Retrieve a locale in the current language (auto-detection)
+
+```php
+Locale::get($key);
+```
+
+* Retrieve a local in a different languague
+
+```php
+Locale::get($key, $language);
+```
+
+* Set the language (it is memorized in a cookie)
+
+```php
+Locales::setLanguague($language);
+```
+
 ### Exception
+
+Polyfony\Exception are routed to a route named « exception » if any, otherwise exception are thrown normally.
+The status code is 500 by default, you can specify any HTTP status code.
+
+```php
+Throw new Polyfony\Exception($error_message, $http_status_code);
+```
 
 ### Notice
 
@@ -218,26 +246,66 @@ Some of them have little specificities, but all implement the basic interface.
 
 ### Runtime
 
-### Optional\
+* Store some bundle specific data in Bundles/MyBundle/Loader/Runtime.php (ex. static list choices, etc.)
 
-#### Optional\Thumbnail
+```php
+Runtime::set($bundle_name, $key, $value);
+```
 
-#### Optional\Uploader
+* Retrieve values (whole bundle, or a subset)
 
-#### Optional\Request
+```php
+Runtime::get($bundle_name);
+Runtime::get($bundle_name, $key);
+```
+
+### Thumbnail
+
+```php
+$this->Thumbnail = new Polyfony\Thumbnail();
+$this->Status = $this->Thumbnail
+	->source("../private/data/storage/photos/original/{$id}")
+	->destination("../private/data/storage/photos/400/{$id}")
+	->size(400)
+	->quality(90)
+	->execute();
+```
+```php
+boolean $this->Status
+```
+
+### Uploader
+
+```php
+$this->Uploader = new Polyfony\Uploader();
+$this->Status = $this->Uploader
+	->source(Request::files('estimate_file'))
+	->destination('../private/data/storage/estimates/')
+	->limitTypes(array('application/pdf'))
+	->limitSize(1024*1024*2)
+	->execute();
+```
+```php
+ boolean $this->Status
+ array $this->Uploader->info()
+ string $this->Uploader->error()
+ ```
+
+### HttpRequest
 
 This class provides a simple interface to build HTTP Requests
 
 ```php
-$this->Request = new \Optional\Request();
+$this->Request = new Polyfony\HttpRequest();
 $this->Success = $this->Request
 	->url('https://maps.googleapis.com/maps/api/geocode/json')
 	->data('address','Paris')
 	->get();
-
-var_dump($this->Success);
-var_dump($this->Request->getHeader('Content-Type'));
-var_dump($this->Request->getBody());
+```
+```php
+boolean $this->Success)
+string $this->Request->getHeader('Content-Type')
+mixed $this->Request->getBody()
 
 ```
 Responses of type application/json will be decoded to array, response of type application/xml will be decoded to SimpleXML object.
@@ -282,6 +350,13 @@ $image_url = $map
 	->url();
 ```
 
+#### Google\QRCode
+
+* Generate a QRCode url
+
+```php
+Google\QRCode::url($data, $size)
+```
 
 ## Performance
 Polyfony has been designed to be fast, no compromise.

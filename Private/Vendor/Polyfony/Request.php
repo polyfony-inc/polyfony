@@ -147,6 +147,21 @@ class Request {
 	}
 
 	/**
+	 * Get a single FILES variable.
+	 *
+	 * @access public
+	 * @param  string $variable The variable we wish to return.
+	 * @param  mixed  $default  If the variable is not found, this is returned.
+	 * @return mixed
+	 * @static
+	 */
+	public static function files($variable, $default = null) {
+		return isset(self::$_files[$variable])
+			? self::$_files[$variable]
+			: $default;
+	}
+
+	/**
 	 * Get a single SERVER variable.
 	 *
 	 * @access public
