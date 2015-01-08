@@ -34,7 +34,33 @@ class Filesystem {
 		return(file_exists($path));
 	}
 	
-	public static function ls($path, $filter=null) {
+	public static function list($path, $filter=null) {
+
+		// prepare the results
+		$filtered = array();
+
+		// clean the path and add a trailing slash
+		$path = trim($path, '/') . '/';
+
+		// scan the folder
+		$files_and_folders = self::exists && self::isDirectory($path) ? scandir($path) : array();
+
+		// for each found result
+		foreach($files_and_folders as $file_or_folder) {
+
+			// apply the filters
+			// … some code
+
+			// build the fullpath
+			$full_path = $path . $file_or_folder;
+
+			// add the file or folder if it passed the filter
+			$filtered[$full_path] = $file_or_folder;
+
+		}
+
+		// return the filetered content
+		return($filtered);
 
 	}
 
