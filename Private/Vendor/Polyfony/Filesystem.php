@@ -34,7 +34,7 @@ class Filesystem {
 		return(file_exists($path));
 	}
 	
-	public static function list($path, $filter=null) {
+	public static function ls($path, $filters=null) {
 
 		// prepare the results
 		$filtered = array();

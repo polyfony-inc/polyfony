@@ -21,7 +21,7 @@ class Distance {
 
 	}
 
-	public static function betweenOffline($array $points) {
+	public static function betweenOffline(array $points) {
 
 	}
 
