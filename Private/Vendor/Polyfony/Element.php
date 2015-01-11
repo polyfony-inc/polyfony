@@ -33,8 +33,12 @@ class Element {
 		$this->content .= Format::htmlSafe($text);
 	}
 
-	public function setHTML($html) {
+	public function setHtml($html) {
 		$this->content = $html;
+	}
+
+	public function appendHtml($html) {
+		$this->content .= $html;
 	}
 
 	public function set($attribute, $value) {
@@ -47,6 +51,10 @@ class Element {
 
 	public function adopt(Element $child) {
 		$this->content .= $child;
+	}
+
+	public function adoptBefore(Element $child) {
+		$this->content = $child . $this->content;
 	}
 
 	public function __toString() {
