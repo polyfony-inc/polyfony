@@ -70,7 +70,6 @@ class Element {
 		// any normal attribute
 		else {
 			// if the value is an array we assemble its content or we set directly
-			var_dump($attribute);
 			$this->attributes[$attribute] = is_array($value) ? implode(' ', $value) : $value;
 		}
 	}

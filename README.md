@@ -318,9 +318,8 @@ Responses of type application/json will be decoded to array, response of type ap
 echo new Polyfony\Element(
 	'img',
 	array(
-		'src'=>'/img/demo.png',
-		'alt'=>'test'
-	));
+		'src'=>'/img/demo.png'
+	))->set('alt','test');
 
 // <img src="/img/demo.png" alt="test" />
 
@@ -329,7 +328,7 @@ echo new Polyfony\Element(
 	array(
 		'text'=>'Assurément, les affaires humaines ne méritent pas le grand sérieux',
 	));
-	
+
 // <quote>Assurément, les affaires humaines ne méritent pas le grand sérieux</quote>
 ```
 
