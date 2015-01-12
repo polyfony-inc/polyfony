@@ -15,50 +15,85 @@ namespace Polyfony;
  
 class Element {
 
+	// declare auto closing tags
+	private static $_auto = array('input','img','hr','br','meta','link');
+
+	// internal of the DOM element
 	private $type;
 	private $attributes;
 	private $content;
 
-	public function __construct($type='div', $options=array()) {
-		$this->type 		= $type;
-		$this->attributes 	= $options;
+	// main constructor
+	public function __construct($type='div', $options=null) {
+		// initialize variables
 		$this->content 		= '';
+		$this->type 		= $type;
+		$this->attributes 	= array();
+		// set the options if any
+		!$options ?: $this->set($options);
 	}
 
-	public function setText($text) {
-		$this->content = Format::htmlSafe($text);
+	// set the text in the tag
+	public function setText($text, $append=true) {
+		// append by default or replace text
+		$this->content = $append ? $this->content . Format::htmlSafe($text) : Format::htmlSafe($text);
 	}
 
-	public function appendText($text) {
-		$this->content .= Format::htmlSafe($text);
+	// set the html in the tag
+	public function setHtml($html, $append=true) {
+		// append by default or replace html
+		$this->content = $append ? $this->content . $html : $html;
 	}
 
-	public function setHtml($html) {
-		$this->content = $html;
+	// set everything, mostly attribute but also content
+	public function set($attribute, $value=null) {
+		// array is passed
+		if(is_array($attribute)) {
+			// for each associative value in the array
+			foreach($attribute as $single_attribute => $single_value) {
+				// recurse with a single pair or attribute/value
+				$this->set($single_attribute, $single_value);
+			}
+			// stop
+			return;
+		}
+		// specific case of text
+		if($attribute == 'text') {
+			// use the setter
+			$this->setText($value);
+		}
+		// specific case of html
+		elseif($attribute == 'html') {
+			// use the setter
+			$this->setHtml($value);
+		}
+		// any normal attribute
+		else {
+			// if the value is an array we assemble its content or we set directly
+			var_dump($attribute);
+			$this->attributes[$attribute] = is_array($value) ? implode(' ', $value) : $value;
+		}
 	}
 
-	public function appendHtml($html) {
-		$this->content .= $html;
+	// adopt an element of the same kind
+	public function adopt(Element $child, $before=false) {
+		// adopt, or adopt before
+		$this->content = $before ? $child . $this->content : $this->content . $child;
 	}
 
-	public function set($attribute, $value) {
-		$this->attributes[$attribute] = $value;
-	}
-
-	public function get($attribute) {
-		return(isset($this->attributes[$attribute] ? $this->attributes[$attribute] : null));
-	}
-
-	public function adopt(Element $child) {
-		$this->content .= $child;
-	}
-
-	public function adoptBefore(Element $child) {
-		$this->content = $child . $this->content;
-	}
-
+	// convert our object to an actual html tag
 	public function __toString() {
-		// magic goes here
+		// first tag
+		$html_element = '<' . $this->type;
+		// for each attribute
+		foreach($this->attributes as $attribute => $value) {
+			// append it
+			$html_element .= ' '.$attribute . '="' . $value . '" ';
+		}
+		// close the tag
+		$html_element .= in_array($this->type, self::$_auto) ? ' />' : ">{$this->content}</{$this->type}>";
+		// return the html element
+		return($html_element);
 	}
 
 

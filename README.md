@@ -310,6 +310,29 @@ mixed $this->Request->getBody()
 ```
 Responses of type application/json will be decoded to array, response of type application/xml will be decoded to SimpleXML object.
 
+### Element
+
+* Create an HTML tag (similar to mootools' Element)
+
+```php
+echo new Polyfony\Element(
+	'img',
+	array(
+		'src'=>'/img/demo.png',
+		'alt'=>'test'
+	));
+
+// <img src="/img/demo.png" alt="test" />
+
+echo new Polyfony\Element(
+	'quote',
+	array(
+		'text'=>'Assurément, les affaires humaines ne méritent pas le grand sérieux',
+	));
+	
+// <quote>Assurément, les affaires humaines ne méritent pas le grand sérieux</quote>
+```
+
 #### Google\Position
 
 * Geocoding
