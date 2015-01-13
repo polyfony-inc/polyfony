@@ -32,7 +32,7 @@ class Element {
 		// set the options if any
 		!$options ?: $this->set($options);
 	}
-/*
+
 	// set the text in the tag
 	public function setText($text, $append=true) {
 		// append by default or replace text
@@ -45,64 +45,6 @@ class Element {
 	public function setHtml($html, $append=true) {
 		// append by default or replace html
 		$this->content = $append ? $this->content . $html : $html;
-		// return self
-		return($this);
-	}
-*/
-
-	// set the text in the tag
-	public function setText($text, $mode=0) {
-
-		switch(strtolower($mode)){
-
-			// insert text before previous content
-			case 1:
-			case 'i':
-			case 'b':
-				$this->content = Format::htmlSafe($text) . $this->content;
-				break;
-
-			// replace or set text
-			case 2:
-			case 's':
-				$this->content = Format::htmlSafe($text);
-				break;
-
-			// append by default
-			case 0:
-			case 'a':
-			default:
-				$this->content = $this->content . Format::htmlSafe($text);
-		}
-
-		// return self
-		return($this);
-	}
-
-	// set the html in the tag
-	public function setHtml($html, $mode=0) {
-
-		switch(strtolower($mode)){
-
-			// insert html before previous content
-			case 1:
-			case 'i':
-			case 'b':
-				$this->content = $html . $this->content;
-				break;
-
-			// replace or set html
-			case 2:
-			case 's':
-				$this->content = $html;
-				break;
-
-			// append by default
-			case 0:
-			case 'a':
-			default:
-				$this->content = $this->content . $html;
-		}
 		// return self
 		return($this);
 	}
@@ -140,17 +82,10 @@ class Element {
 
 	// adopt an element of the same kind
 	public function adopt($child, $before=false) {
-
-		if ($child instanceof Element) {
-			// adopt, or adopt before
-			$this->content = $before ? $child . $this->content : $this->content . $child;
-			// return self
-			return($this);
-
-		} else {
-			// those actions being incompatible we throw an exception
-			Throw new Exception("Polyfony Element : cant adopt a non Polyfony\Elelement  : (".gettype($child).") {$child}","997");
-		}
+		// adopt, or adopt before
+		$this->content = $before ? $child . $this->content : $this->content . $child;
+		// return self
+		return($this);
 	}
 
 	// convert our object to an actual html tag
