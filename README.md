@@ -23,38 +23,38 @@ url.rewrite-once = ("^(?!/Assets/).*" => "/?")
 
 ## Quick tour
 You can read this quick tour, or just browse the `../Private/Bundles/Demo/` code.
-
+The code bellow assumes that your are using the `Polyfony` namespace in your controller.
 
 ### Request
 * Retrieve an url parameter
 ```php
 // get a parameter named format from the url
-pf\Request::get('format');
+Request::get('format');
 ```
 
 * Retrieve a posted field named `search`
 ```php
-pf\Request::post('search');
+Request::post('search');
 ```
 
 * Retrieve a file
 ```php
-pf\Request::files('attachment_document');
+Request::files('attachment_document');
 ```
 
 * retrieve a request header
 ```php
-pf\Request::header('Accept-Encoding');
+Request::header('Accept-Encoding');
 ```
 
 * check if the method is post
 ```php
-pf\Request::isPost();
+Request::isPost();
 ```
 
 * check if the request is done using ajax
 ```php
-pf\Request::isAjax();
+Request::isAjax();
 ```
 
 
@@ -63,7 +63,7 @@ pf\Request::isAjax();
 * Retrieve the login and id of 5 accounts with level 1 that logged in, in the last 24h
 ```php
 // demo query
-$this->Accounts = pf\Database::query()
+$this->Accounts = Database::query()
 	->select(array('login','id'))
 	->from('Accounts')
 	->where(array(
@@ -76,26 +76,26 @@ $this->Accounts = pf\Database::query()
 
 * Retrieve a single record by its ID
 ```php
-$root_account = new pf\Record('Accounts',1);
+$root_account = new Record('Accounts',1);
 echo $root_account;
 ```
 
 * Retrieve a single record by its ID and generate an input to change a property
 ```php
-$root_account = new pf\Record('Accounts',1);
+$root_account = new Record('Accounts',1);
 echo $root_account->input('login');
 // <input type="text" name="Accounts[login]" value="root" />
 ```
 
 * Create a record, populate and insert it
 ```php
-$account = new pf\Record('Accounts');
+$account = new Record('Accounts');
 $account
 	->set('login','test')
 	->set('id_level','1')
 	->set('last_login_date','18/04/1995')
 	->set('modules_array',array('MOD_BOOKS','MOD_USERS','MOD_EXAMPLE'))
-	->set('password',pf\Security::getPassword('test'))
+	->set('password',Security::getPassword('test'))
 	->save();
 ```
 
@@ -118,7 +118,7 @@ A `preAction()` and `postAction()` wrap the action to be called.
 * This static route will match /about-us/ and call `../Private/Bundles/Pages/Controllers/Static.php->aboutUsAction();`
 
 ```php
-Polyfony\Router::addRoute('about-us')
+Router::addRoute('about-us')
 	->url('/about-us/')
 	->destination('Pages','Static','aboutUs');
 ```
@@ -126,7 +126,7 @@ Polyfony\Router::addRoute('about-us')
 * This dynamic route will match /admin/{edit,update,delete,create}/ and /admin/
 It will call `../Private/Bundles/Admin/Controllers/Main.php->{edit,update,delete,create,index}Action();`
 ```php
-Polyfony\Router::addRoute('admin')
+Router::addRoute('admin')
 	->url('/admin/:action/:id/')
 	->destination('Admin','Main')
 	->restrict(array(
@@ -185,11 +185,11 @@ Locales::setLanguague($language);
 
 ### Exception
 
-Polyfony\Exception are routed to a route named « exception » if any, otherwise exception are thrown normally.
+Exception are routed to a route named « exception » if any, otherwise exception are thrown normally.
 The status code is 500 by default, you can specify any HTTP status code.
 
 ```php
-Throw new Polyfony\Exception($error_message, $http_status_code);
+Throw new Exception($error_message, $http_status_code);
 ```
 
 ### Notice
@@ -262,7 +262,7 @@ Runtime::get($bundle_name, $key);
 ### Thumbnail
 
 ```php
-$this->Thumbnail = new Polyfony\Thumbnail();
+$this->Thumbnail = new Thumbnail();
 $this->Status = $this->Thumbnail
 	->source("../private/data/storage/photos/original/{$id}")
 	->destination("../private/data/storage/photos/400/{$id}")
@@ -277,7 +277,7 @@ boolean $this->Status
 ### Uploader
 
 ```php
-$this->Uploader = new Polyfony\Uploader();
+$this->Uploader = new Uploader();
 $this->Status = $this->Uploader
 	->source(Request::files('estimate_file'))
 	->destination('../private/data/storage/estimates/')
@@ -296,38 +296,58 @@ $this->Status = $this->Uploader
 This class provides a simple interface to build HTTP Requests
 
 ```php
-$this->Request = new Polyfony\HttpRequest();
+$this->Request = new HttpRequest();
 $this->Success = $this->Request
 	->url('https://maps.googleapis.com/maps/api/geocode/json')
 	->data('address','Paris')
 	->get();
 ```
 ```php
-boolean $this->Success)
+boolean $this->Success
 string $this->Request->getHeader('Content-Type')
 mixed $this->Request->getBody()
 
 ```
 Responses of type application/json will be decoded to array, response of type application/xml will be decoded to SimpleXML object.
 
+### Mail
+
+* Mail are very simple to use and build over PHPMailer
+
+```php
+$this->Mail = new Mail();
+$this->Status = $this->Mail
+	->to($email [, $name=null])
+	->cc($email [, $name=null])
+	->bcc($email [, $name=null])
+	->format($format[html,text])
+	->attachments($path)
+	->from($email, $name)
+	->subject($subject)
+	->body($body)
+	->send($save=true)
+```
+
+```php
+boolean $this->Status
+```
+
+* Mail with a template
+
+```php
+
+```
+
 ### Element
 
 * Create an HTML tag (similar to mootools' Element)
 
 ```php
-echo new Polyfony\Element(
-	'img',
-	array(
-		'src'=>'/img/demo.png'
-	))->set('alt','test');
+echo new Element('img',array('src'=>'/img/demo.png'))->set('alt','test');
 
 // <img src="/img/demo.png" alt="test" />
 
-echo new Polyfony\Element(
-	'quote',
-	array(
-		'text'=>'Assurément, les affaires humaines ne méritent pas le grand sérieux',
-	));
+echo new Element('quote',array('text'=>'Assurément, les affaires humaines ne méritent pas le grand sérieux'));
 
 // <quote>Assurément, les affaires humaines ne méritent pas le grand sérieux</quote>
 ```
