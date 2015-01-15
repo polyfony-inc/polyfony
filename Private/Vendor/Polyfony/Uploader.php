@@ -119,7 +119,7 @@ class Uploader {
 			// get the last element wich is the file name
 			$this->Name = $exploded[count($exploded)-1];
 			// set the directory as being the path minus the name
-			$this->Destination = str_replace($this->Name,'',$path);
+			$this->Destination = str_replace($this->Name,'',$this->Destination);
 		}
 		// the destination if a folder without name
 		elseif(is_dir($this->Destination)) {
