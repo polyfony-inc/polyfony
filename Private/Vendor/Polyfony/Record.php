@@ -131,7 +131,7 @@ class Record {
 	// magic
 	public function __toString() {
 		// a string to sybolize this record
-		return("Polyfony\Record:{$this->_['table']}:{$this->_['id']}");
+		return($this->_['id'] ? $this->_['id'] : 0);
 	}
 	
 	private function alter($column) {
