@@ -49,6 +49,14 @@ class Element {
 		return($this);
 	}
 
+	// set the value of a tag
+	public function setValue($value) {
+		// append by default or replace html
+		$this->attributes['value'] = Format::htmlSafe($value);
+		// return self
+		return($this);
+	}
+
 	// set everything, mostly attribute but also content
 	public function set($attribute, $value=null) {
 		// array is passed
@@ -70,6 +78,11 @@ class Element {
 		elseif($attribute == 'html') {
 			// use the setter
 			$this->setHtml($value);
+		}
+		// specific case of value
+		elseif($attribute == 'value') {
+			// use the setter
+			$this->setValue($value);
 		}
 		// any normal attribute
 		else {
@@ -95,7 +108,7 @@ class Element {
 		// for each attribute
 		foreach($this->attributes as $attribute => $value) {
 			// append it
-			$html_element .= ' '.$attribute . '="' . $value . '" ';
+			$html_element .= ' '.$attribute . '="' . $value . '"';
 		}
 		// close the tag
 		$html_element .= in_array($this->type, self::$_auto) ? ' />' : ">{$this->content}</{$this->type}>";

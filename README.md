@@ -82,7 +82,7 @@ $account = new Record('Accounts',1);
 * Retrieve a single record by its ID and generate an input to change a property
 ```php
 $account = new Record('Accounts',1);
-echo $account->Input('login');
+echo $account->input('login');
 // <input type="text" name="Accounts[login]" value="root" />
 ```
 
@@ -138,8 +138,6 @@ You can restrict parameters further, you can pass :
 an array of allowed value (it will also match no value)
 a regex (it will also match no value)
 a boolean true (it will match anything but a missing value)
-
-### Form
 
 ### Security
 
@@ -218,46 +216,50 @@ The response if preconfigured according to the Config.ini
 You can alter the response type and parameters at runtime, ex.
 
 ```php
-
-
-
 // to redirect
 Response::setRedirect($url [, $after_seconds=0])
-
+```
+```php
 // to change the charset
 Response::setCharset('utf-8')
-
+```
+```php
 // to output a file inline
 Response::setType('file')
 Response::setContent($file_path)
 Response::render()
-
+```
+```php
 // to download a file
 Response::setType('file')
 Response::setContent($file_path)
 Response::download('Myfilename.ext')
-
+```
+```php
 // to change the status code (to 400 Bad Request for example)
 Response::setStatus(400)
-
+```
+```php
 // to output plaintext
 Response::setType('text')
-
+```
+```php
 // to output json
 Response::setType('json')
 Response::setContent(array('example'))
 Response::render()
-
+```
+```php
 // to add css files
-Response:setAssets('css','//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css')
-
+Response::setAssets('css','//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css')
+```
+```php
 // to add js files
 Response::setAssets('js','/Assets/js/myfile.js')
-
+```
+```php
 // to add a meta tag
 Response::setMetas('google-site-verification', 'google-is-watching-you')
-
-
 ```
 
 ### Store
@@ -405,6 +407,12 @@ The template uses variables named `__{$variable}__` ex:
 $mail->set('message','My example')
 ```
 
+```html
+<body>
+	<div>My example</div>
+</body>
+```
+
 If the mail format is html, your value will be escaped automatically
 
 ### Element
@@ -426,51 +434,55 @@ echo new Element('quote',array('text'=>'AssurÃ©ment, les affaires humaines ne mÃ
 Form helper allow you to build and preset form elements, ex.
 
 ```php
-echo Form\Input($name[, $value=null [, $options=array()]]);
+echo Form::input($name[, $value=null [, $options=array()]]);
 ```
 
-Shortcuts are available from Record object, ex.
+This will build a two element select (with the class `form-control`), and preset Peach.
+
+```php
+echo Form::select('sample', array( 0 => 'Apple', 1 => 'Peach' ), 1, array('class'=>'form-control'));
+```
+
+This will build a select element with optgroups.
+Note that optgroup are replaced by a matching locale (if any), and values are also replaced by matching locale (if any).
+
+```php
+echo Form::select('sample', array(
+	'food'=>array(
+		0 => 'Banana',
+		1 => 'Houmus',
+		2 => 'Mango'
+	),
+	'not_food'=>array(
+		3 => 'Dog',
+		4 => 'Cow',
+		5 => 'Lizard'
+	)
+))
+```
+
+Shortcuts are available from `Record` object, ex.
 
 ```php
 // retrieve an account from its id
 $record = new Record('Accounts',1);
 $record->set('login', 'mylogin@example.com')
 
-echo $record->Input(array('data-validators'=>'required'));
-// <input type="text" name="Accounts[login" value="mylogin@example.com" data-validators="required"/>
+echo $record->input(array('data-validators'=>'required'));
+// <input type="text" name="Accounts[login]" value="mylogin@example.com" data-validators="required"/>
 ```
 
-Form elements general syntax is : `$name, $value, array of options`. When you get a form element from a `Record`, the $name and $values are set automatically, only `(array) $options` is available.
+List of available elements :
+* input
+* hidden
+* password
+* submit
+* select
+* textarea
+* radio
+* checkbox
 
-### Form\Input
-
-```php
-
-```
-
-### Form\Select
-
-```php
-
-```
-
-### Form\Textarea
-
-```php
-
-```
-
-### Form\Checkbox
-
-```php
-
-```
-
-### Form\Radio
-
-```php
-
-```
+Form elements general syntax is : `$name, $value, $options` when you get a form element from a `Record`, the `$name` and `$value` are set automatically, only `$options` are available. The select elements is slighly different : `$name, $list, $value, $options`
 
 
 #### Google\Position
