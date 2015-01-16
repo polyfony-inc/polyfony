@@ -171,6 +171,17 @@ class DemoController extends pf\Controller {
 		pf\Response::render();
 
 	}
+
+	public function xmlAction() {
+
+		pf\Response::setType('json');
+		pf\Response::setContent(array(
+			'edible'=>array('Hoummus','Mango','Peach','Banana'),
+			'not_edible'=>array('Dog','Cow','Rabbit','Lizard')
+		));
+		pf\Response::render();
+
+	}
 	
 
 }

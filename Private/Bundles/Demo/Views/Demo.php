@@ -9,5 +9,6 @@
 	<a class="btn btn-warning btn-md" href="/demo/response/" role="button"/>Response object</a> 
 	<a class="btn btn-warning btn-md" href="/demo/request/" role="button"/>Request object</a> 
 	<a class="btn btn-warning btn-md" href="/demo/exception/" role="button"/>Exception</a> 
-	<a class="btn btn-warning btn-md" href="/demo/json/" role="button"/>Json</a> 
+	<a class="btn btn-warning btn-md" href="/demo/json/" role="button"/>JSON</a> 
+	<a class="btn btn-warning btn-md" href="/demo/xml/" role="button"/>XML</a> 
 </div>
