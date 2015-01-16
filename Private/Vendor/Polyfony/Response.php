@@ -226,8 +226,16 @@ class Response {
 	// set raw content
 	public static function setContent($content, $replace=false) {
 		
-		// replace content or append to already existing
-		self::$_content = $replace ? $content : self::$_content . $content;
+		// if the content is an array
+		if(is_array($content)) {
+			// replace direclty without consideration for the replace parameter
+			self::$_content = $content;
+		}
+		// content is a string type
+		else {
+			// replace content or append to already existing
+			self::$_content = $replace ? $content : self::$_content . $content;
+		}
 
 	}
 
@@ -288,8 +296,16 @@ class Response {
 		// base headers
 		$headers = array();
 		
+		// in case we are outputing anything but html
+		if(!in_array(self::$_type, array('html','html-page'))) {
+			// remove any already buffered data
+			self::clean();
+		}
+
 		// case of html page
 		if(self::$_type == 'html-page') {
+			// add the profiler
+			self::$_content .= Config::get('profiler', 'enable_stack', true) ? Profiler::getHtml() : '';
 			// wrap in the body
 			self::$_content = '</head><body>' . self::$_content . '</body></html>';
 			// preprend metas
@@ -303,7 +319,18 @@ class Response {
 			<html xmlns="http://www.w3.org/1999/xhtml"><head>
 			<meta http-equiv="content-type" content="text/html; charset='.self::$_charset.'" />' . self::$_content;
 		}
-		
+		// elseif the type is json
+		elseif(self::$_type == 'json') {
+			// add the profiler if required
+			self::$_content = array_merge(self::$_content, Config::get('profiler', 'enable_stack', true) ? Profiler::getArray() : array());
+			// encode the content to json
+			self::$_content = json_encode(self::$_content);
+		}
+		// elseif the type is xml
+		elseif(self::$_type == 'xml') {
+
+		}
+
 		// if the type is not a file
 		if(self::$_type != 'file') {
 			// indent
@@ -351,10 +378,17 @@ class Response {
 		
 	}	
 
+	public static function clean() {
+
+		// clean the reponse
+		return(ob_get_clean());
+
+	}
+
 	public static function render() {
 
 		// if no content is set yet we garbage collect
-		self::$_content = self::$_content ?: ob_get_clean();
+		self::$_content = self::$_content ?: self::clean();
 
 		// output status
 		header(self::$_status);

@@ -53,7 +53,7 @@ class Profiler {
 		self::$_stack[] = array(
 			'name'	=> $name,
 			'time'	=> round(microtime(true) - self::$_startTime,4),
-			'memory'=> round(memory_get_usage()/1000,0)
+			'memory'=> memory_get_usage()
 		);
 	}
 	
@@ -64,6 +64,37 @@ class Profiler {
 			'memory'=> self::$_totalMemory,
 			'stack'	=> self::$_stack
 		);
+	}
+
+	public static function getArray() {
+		// return stacked data
+		return array('Profiler' => self::$_stack);
+	}
+
+	public static function getHtml() {
+		// prepare a container
+		$stack 		= new Element('ul', array('class'=>'list-group','style'=>'float: left; margin: 15px;'));
+		// prepare a title
+		$marker 	= new Element('li', array('text' => 'Profiler', 'class' => 'list-group-item disabled'));
+		// add the title
+		$stack->adopt($marker);
+		// for each element in the stack
+		foreach(self::$_stack as $marker_data) {
+			// prepare the name
+			$marker 	= new Element('li', 	array('text' => $marker_data['name'], 'class' => 'list-group-item'));
+			// prepare the time
+			$time 		= new Element('span', 	array('text' => $marker_data['time'] . ' s', 'class'=>'label label-primary'));
+			// prepare the memory
+			$memory 	= new Element('span', 	array('text' => Format::size($marker_data['memory']), 'class'=>'label label-default'));
+			// adopt the time
+			$marker->setText(' ')->adopt($time)->setText(' ');
+			// adopt the memory
+			$marker->adopt($memory);
+			// adopt the whole marker
+			$stack->adopt($marker);
+		}
+		// return the formatted stack
+		return($stack);
 	}
 	
 }

@@ -160,6 +160,17 @@ class DemoController extends pf\Controller {
 		Throw new pf\Exception('This is a custom exception with proper status code',502);
 		
 	}
+
+	public function jsonAction() {
+
+		pf\Response::setType('json');
+		pf\Response::setContent(array(
+			'edible'=>array('Hoummus','Mango','Peach','Banana'),
+			'not_edible'=>array('Dog','Cow','Rabbit','Lizard')
+		));
+		pf\Response::render();
+
+	}
 	
 
 }
