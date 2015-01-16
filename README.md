@@ -82,7 +82,7 @@ $account = new Record('Accounts',1);
 * Retrieve a single record by its ID and generate an input to change a property
 ```php
 $account = new Record('Accounts',1);
-echo $account->input('login');
+echo $account->Input('login');
 // <input type="text" name="Accounts[login]" value="root" />
 ```
 
@@ -213,6 +213,52 @@ $notice->getTitle($html_safe=true)
 ```
 
 ### Response
+
+The response if preconfigured according to the Config.ini
+You can alter the response type and parameters at runtime, ex.
+
+```php
+
+
+
+// to redirect
+Response::setRedirect($url [, $after_seconds=0])
+
+// to change the charset
+Response::setCharset('utf-8')
+
+// to output a file inline
+Response::setType('file')
+Response::setContent($file_path)
+Response::render()
+
+// to download a file
+Response::setType('file')
+Response::setContent($file_path)
+Response::download('Myfilename.ext')
+
+// to change the status code (to 400 Bad Request for example)
+Response::setStatus(400)
+
+// to output plaintext
+Response::setType('text')
+
+// to output json
+Response::setType('json')
+Response::setContent(array('example'))
+Response::render()
+
+// to add css files
+Response:setAssets('css','//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css')
+
+// to add js files
+Response::setAssets('js','/Assets/js/myfile.js')
+
+// to add a meta tag
+Response::setMetas('google-site-verification', 'google-is-watching-you')
+
+
+```
 
 ### Store
 
@@ -347,7 +393,19 @@ $status = $this->Mail
 	->send($save=true)
 ```
 
-The template uses variables named `__{$variable}__`
+The template uses variables named `__{$variable}__` ex:
+
+```html
+<body>
+	<div>__message__</div>
+</body>
+```
+
+```
+$mail->set('message','My example')
+```
+
+If the mail format is html, your value will be escaped automatically
 
 ### Element
 
@@ -362,6 +420,58 @@ echo new Element('quote',array('text'=>'Assurément, les affaires humaines ne m�
 
 // <quote>Assurément, les affaires humaines ne méritent pas le grand sérieux</quote>
 ```
+
+### Form
+
+Form helper allow you to build and preset form elements, ex.
+
+```php
+echo Form\Input($name[, $value=null [, $options=array()]]);
+```
+
+Shortcuts are available from Record object, ex.
+
+```php
+// retrieve an account from its id
+$record = new Record('Accounts',1);
+$record->set('login', 'mylogin@example.com')
+
+echo $record->Input(array('data-validators'=>'required'));
+// <input type="text" name="Accounts[login" value="mylogin@example.com" data-validators="required"/>
+```
+
+Form elements general syntax is : `$name, $value, array of options`. When you get a form element from a `Record`, the $name and $values are set automatically, only `(array) $options` is available.
+
+### Form\Input
+
+```php
+
+```
+
+### Form\Select
+
+```php
+
+```
+
+### Form\Textarea
+
+```php
+
+```
+
+### Form\Checkbox
+
+```php
+
+```
+
+### Form\Radio
+
+```php
+
+```
+
 
 #### Google\Position
 

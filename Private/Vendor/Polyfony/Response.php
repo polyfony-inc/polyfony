@@ -62,7 +62,7 @@ class Response {
 			'Content-Language'	=> Locales::getLanguage()
 		));
 		
-		// set defautl charset
+		// set default charset
 		self::setCharset(Config::get('response','default_charset'));
 		
 		// set the default type
