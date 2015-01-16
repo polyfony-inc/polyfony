@@ -468,7 +468,7 @@ Shortcuts are available from `Record` object, ex.
 $record = new Record('Accounts',1);
 $record->set('login', 'mylogin@example.com')
 
-echo $record->input(array('data-validators'=>'required'));
+echo $record->input('login', array('data-validators'=>'required'));
 // <input type="text" name="Accounts[login]" value="mylogin@example.com" data-validators="required"/>
 ```
 

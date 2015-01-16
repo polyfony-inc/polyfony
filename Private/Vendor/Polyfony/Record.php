@@ -78,28 +78,49 @@ class Record {
 		return(isset($this->{$column}) ? $this->convert($column, $raw) : null);
 	}
 	
+	private function field($column) {
+		return("{$this->_['table']}[$column]");
+	}
+
 	public function input($column, $options=array()) {
-		return(Form::input("{$this->_['table']}[$column]", $this->get($column), $options));
+		return(Form::input(
+			$this->field($column), 
+			$this->get($column), 
+			$options
+		));
 	}
 	
 	public function password($column, $options=array()) {
-		return(Form::password("{$this->_['table']}[$column]", $this->get($column), $options));
+		return(Form::password(
+			$this->field($column), 
+			$this->get($column), 
+			$options
+		));
 	}
 	
 	public function textarea($column, $list=array(), $options=array()) {
-		return(Form::textarea("{$this->_['table']}[$column]", $this->get($column), $options));
+		return(Form::textarea(
+			$this->field($column), 
+			$this->get($column), 
+			$options
+		));
 	}
 	
 	public function select($column, $list=array(), $options=array()) {
-		return(Form::select("{$this->_['table']}[$column]", $list, $this->get($column), $options));
+		return(Form::select(
+			$this->field($column), 
+			$list, 
+			$this->get($column), 
+			$options
+		));
 	}
 	
 	public function checkbox($column, $options=array()) {
-		return(Form::checkbox("{$this->_['table']}[$column][]", $this->get($column), $options));
-	}
-	
-	public function radio($column, $options=array()) {
-		return(Form::checkbox("{$this->_['table']}[$column][]", $this->get($column), $options));
+		return(Form::checkbox(
+			$this->field($column), 
+			$this->get($column), 
+			$options
+		));
 	}
 	
 	public function set($column, $value) {
