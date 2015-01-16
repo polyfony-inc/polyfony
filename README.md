@@ -321,7 +321,7 @@ $this->Status = $this->Mail
 	->cc($email [, $name=null])
 	->bcc($email [, $name=null])
 	->format($format[html,text])
-	->attachments($path)
+	->file($path)
 	->from($email, $name)
 	->subject($subject)
 	->body($body)
@@ -332,11 +332,22 @@ $this->Status = $this->Mail
 boolean $this->Status
 ```
 
-* Mail with a template
+* Mail with a template using smtp
 
 ```php
-
+$this->Mail = new Mail();
+$this->Status = $this->Mail
+	->smtp($host, $user, $pass)
+	->to('text@email.com', 'Name')
+	->format('text')
+	->subject($subject)
+	->template($path)
+	->set($key1, $value2)
+	->set($key1, $value2)
+	->send($save=true)
 ```
+
+The template uses variables named `__{$variable}__`
 
 ### Element
 

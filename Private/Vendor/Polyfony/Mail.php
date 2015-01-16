@@ -44,14 +44,25 @@ class Mail {
 		);
 		$this->smtp 		= array(
 			'host'	=> Config::get('mail', 'smtp_host'),
-			'user'	=> Config::get('mail', 'smtp_user')
+			'user'	=> Config::get('mail', 'smtp_user'),
 			'pass'	=> Config::get('mail', 'smtp_pass')
-		)
+		);
 	}
 
 	public function format($format) {
 		// set the correct format
 		$this->format = $format == 'html' ? 'html' : 'text';
+		// return self
+		return($this);
+	}
+
+	public function smtp($host='', $user='', $pass='') {
+		// change the smtp configuration
+		$this->smtp = array(
+			'host'	=> $host,
+			'user'	=> $user,
+			'pass'	=> $pass
+		);
 		// return self
 		return($this);
 	}
@@ -66,7 +77,7 @@ class Mail {
 
 	public function to($mail, $name=null) {
 		// array of recipients provided
-		is_array($mail) {
+		if(is_array($mail)) {
 			// for each recipients
 			foreach($mail as $individual_mail) {
 				// if we have only an email, set the name to null
@@ -86,7 +97,7 @@ class Mail {
 
 	public function cc($mail, $name=null) {
 		// array of recipients provided
-		is_array($mail) {
+		if(is_array($mail)) {
 			// for each recipients
 			foreach($mail as $individual_mail) {
 				// if we have only an email, set the name to null
@@ -106,7 +117,7 @@ class Mail {
 
 	public function bcc($mail, $name=null) {
 		// array of recipients provided
-		is_array($mail) {
+		if(is_array($mail)) {
 			// for each recipients
 			foreach($mail as $individual_mail) {
 				// if we have only an email, set the name to null
@@ -124,9 +135,9 @@ class Mail {
 		return($this);
 	}
 
-	public function file($file_path, $file_name=null) {
+	public function file($file_path, $file_name='') {
 		// array of recipients provided
-		is_array($file_path) {
+		if(is_array($file_path)) {
 			// for each recipients
 			foreach($file_path as $individual_path) {
 				// if we have only an email, set the name to null
@@ -137,8 +148,16 @@ class Mail {
 		}
 		// single recipient provided
 		else {
-			// push to the table
-			$this->file($file_path, $file_name);
+			// if the file exists
+			if(Filesystem::exists($file_path)) {
+				// push to the table
+				$this->files[$file_path] = $file_name;
+			}
+			// file does not exist
+			else {
+				// throw an exeption
+				Throw new Exception('Mail->file() the attachment file does not exist');
+			}
 		}
 		// return self
 		return($this);
@@ -148,7 +167,7 @@ class Mail {
 		// if the template file exists
 		if(Filesystem::exists($template_path)) {
 			// set the path
-			$this->tempalte = $template_path;
+			$this->template = $template_path;
 		}
 		// template file does not exist
 		else {
@@ -185,10 +204,10 @@ class Mail {
 		return(isset($this->mailer) ? $this->mailer->ErrorInfo : '');
 	}
 
-	public function send($save=true) {
+	public function send($save=false) {
 		
 		// instanciate a new phpmail object (allowing exception to be thrown)
-		$this->mailer = new PHPMailer(true);
+		$this->mailer = new \PHPMailer\PHPMailer(true);
 
 		// configure the mailer from hard config
 		$this->mailer->CharSet 		= Config::get('mail', 'default_charset');
@@ -251,7 +270,7 @@ class Mail {
 			$is_sent = (bool) $this->mailer->Send();
 		}
 		// catch any exception
-		catch $exception {
+		catch (Exception $exception) {
 			// set an error
 			$this->error = $exception->getMessage();
 			// don't use it, but return false
