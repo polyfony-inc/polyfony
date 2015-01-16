@@ -30,6 +30,9 @@ class Config {
 			parse_ini_file("../Private/Config/" . self::$_environment . ".ini", true)
 		);
 		
+		// set the proper timezone
+		!self::get('polyfony', 'timezone') ?: date_default_timezone_set(self::get('polyfony', 'timezone'));
+
 	}
 	
 	private static function detectFromCLI() {

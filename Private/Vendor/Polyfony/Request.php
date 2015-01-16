@@ -50,10 +50,9 @@ class Request {
 		self::$_files	= isset($_FILES)			? $_FILES			: array();
 		self::$_argv	= isset($_SERVER['argv'])	? $_SERVER['argv']	: array();
 
-		// set the headers
-		// if using a FPM fix
+		// set the headers with a  FPM fix
 		function_exists('getallheaders') ? self::$_headers = getallheaders() : self::setHeaders();
-		
+
 		// remove globals
 		unset($_GET, $_POST, $_SERVER, $_FILES);
 

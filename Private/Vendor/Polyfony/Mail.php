@@ -16,7 +16,7 @@ class Mail {
 
 	private $from;
 	private $recipients;
-	private $attachments;
+	private $files;
 	private $template;
 	private $body;
 	private $subject;
@@ -31,8 +31,8 @@ class Mail {
 		$this->body 		= '';
 		$this->subject 		= '';
 		$this->mailer 		= null;
+		$this->files 		= array();
 		$this->variables 	= array();
-		$this->attachments 	= array();
 		$this->recipients 	= array(
 			'to'	=> array(),
 			'cc'	=> array(),
@@ -47,58 +47,161 @@ class Mail {
 			'user'	=> Config::get('mail', 'smtp_user')
 			'pass'	=> Config::get('mail', 'smtp_pass')
 		)
-		
-		// retrieve from the database if id exists
 	}
 
 	public function format($format) {
-		// html or text
+		// set the correct format
+		$this->format = $format == 'html' ? 'html' : 'text';
+		// return self
+		return($this);
+	}
+
+	public function from($mail, $name) {
+		// change the sender name and email
+		$this->from['mail'] = $mail;
+		$this->from['name'] = $name;
+		// return self
+		return($this);
 	}
 
 	public function to($mail, $name=null) {
-
+		// array of recipients provided
+		is_array($mail) {
+			// for each recipients
+			foreach($mail as $individual_mail) {
+				// if we have only an email, set the name to null
+				list($individual_mail, $individual_name) = is_array($individual_mail) ? $individual_mail : array($individual_mail, null);
+				// recurse
+				$this->to($individual_mail, $individual_name);
+			}
+		}
+		// single recipient provided
+		else {
+			// push to the table
+			$this->recipients['to'][$mail] = $name;
+		}
+		// return self
+		return($this);
 	}
 
 	public function cc($mail, $name=null) {
-
+		// array of recipients provided
+		is_array($mail) {
+			// for each recipients
+			foreach($mail as $individual_mail) {
+				// if we have only an email, set the name to null
+				list($individual_mail, $individual_name) = is_array($individual_mail) ? $individual_mail : array($individual_mail, null);
+				// recurse
+				$this->cc($individual_mail, $individual_name);
+			}
+		}
+		// single recipient provided
+		else {
+			// push to the table
+			$this->recipients['cc'][$mail] = $name;
+		}
+		// return self
+		return($this);
 	}
 
 	public function bcc($mail, $name=null) {
-
+		// array of recipients provided
+		is_array($mail) {
+			// for each recipients
+			foreach($mail as $individual_mail) {
+				// if we have only an email, set the name to null
+				list($individual_mail, $individual_name) = is_array($individual_mail) ? $individual_mail : array($individual_mail, null);
+				// recurse
+				$this->bcc($individual_mail, $individual_name);
+			}
+		}
+		// single recipient provided
+		else {
+			// push to the table
+			$this->recipients['bcc'][$mail] = $name;
+		}
+		// return self
+		return($this);
 	}
 
 	public function file($file_path, $file_name=null) {
-
+		// array of recipients provided
+		is_array($file_path) {
+			// for each recipients
+			foreach($file_path as $individual_path) {
+				// if we have only an email, set the name to null
+				list($individual_path, $individual_name) = is_array($individual_path) ? $individual_path : array($individual_path, null);
+				// recurse
+				$this->file($individual_path, $individual_path);
+			}
+		}
+		// single recipient provided
+		else {
+			// push to the table
+			$this->file($file_path, $file_name);
+		}
+		// return self
+		return($this);
 	}
 
 	public function template($template_path) {
-
+		// if the template file exists
+		if(Filesystem::exists($template_path)) {
+			// set the path
+			$this->tempalte = $template_path;
+		}
+		// template file does not exist
+		else {
+			// throw an exeption
+			Throw new Exception('Mail->template() the template file does not exist');
+		}
+		// return self
+		return($this);
 	}
 
-	public function set($variable, $value=null) {
-
+	public function set($key, $value='') {
+		// directly set the asociative key/value
+		$this->variables[$key] = $value;
+		// return self
+		return($this);
 	}
 
 	public function body($body, $replace=false) {
-
+		// replace or append
+		$this->body = $replace ? $body : $this->body . $body;
+		// return self
+		return($this);
 	}
 
 	public function subject($subject, $replace=false) {
+		// replace or append
+		$this->subject = $replace ? $subject : $this->subject . $subject;
+		// return self
+		return($this);
+	}
 
+	public function error() {
+		// return the textual representation for the last error
+		return(isset($this->mailer) ? $this->mailer->ErrorInfo : '');
 	}
 
 	public function send($save=true) {
 		
-		// instanciate a new phpmail object
-		$this->mailer = new PHPMailer();
+		// instanciate a new phpmail object (allowing exception to be thrown)
+		$this->mailer = new PHPMailer(true);
 
 		// configure the mailer from hard config
 		$this->mailer->CharSet 		= Config::get('mail', 'default_charset');
-
 		// configure the mailer from instance config
 		$this->mailer->From 		= $this->from['mail'];
 		$this->mailer->FromName 	= $this->from['name'];
 		$this->mailer->Subject 		= $this->subject;
+		// change the mailer engine if necessary
+		$this->mailer->Mailer 	= $this->smtp['host'] ? 'smtp' : 'mail';
+		$this->mailer->SMTPAuth = $this->smtp['user'] ? true : false;
+		$this->mailer->Host 	= $this->smtp['host'];
+		$this->mailer->Username = $this->smtp['user'];
+		$this->mailer->Password = $this->smtp['pass'];
 
 		// set the format of the mail
 		$this->mailer->isHTML($this->format == 'html' ? true : false);
@@ -118,40 +221,41 @@ class Mail {
 			// add to the mailer
 			$this->mailer->addBCC($mail, $name);
 		}
+		// for each attachment
+		foreach($this->files as $path => $name) {
+			// add to the mailer
+			$this->mailer->addAttachment($path, $name);
+		}
 
 		// if a template exists, use it
 		if($this->template) {
-			// if the template exists
-			if(Filesystem::exists($this->template)) {
-				// replace the body with the template
-				$this->body = file_get_contents($this->template);
-				// for each variables available
-				foreach($this->variables as $key => $value) {
-					// clean the value from html entities if using html mail format
-					$value = $this->format == 'html' ? Format::htmlSafe($value) : $value;
-					// replace in the body
-					$this->body = str_replace("__{$key}__", $value, $this->body);
-				}
-			}
-			// the specified template is missing
-			else {
-				// throw an exception
-				Throw new Exception('Mail->send() the template file is missing');
+			// replace the body with the template
+			$this->body = file_get_contents($this->template);
+			// for each variables available
+			foreach($this->variables as $key => $value) {
+				// clean the value from html entities if using html mail format
+				$value = $this->format == 'html' ? Format::htmlSafe($value) : $value;
+				// replace in the body
+				$this->body = str_replace("__{$key}__", $value, $this->body);
 			}
 		}
 
 		// set the body in the mailer
 		$this->mailer->Body = $this->body;
 
-		// if a smtp host is set, use it
-		if($this->smtp['host']) {
-			// change the mailer
-			$this->mailer->Mailer 	= 'smtp';
-			$this->mailer->SMTPAuth = $this->smtp['user'] && $this->smtp['pass'] ? true : false;
-			$this->mailer->Host 	= $this->smtp['host'];
-			$this->mailer->Username = $this->smtp['user'];
-			$this->mailer->Password = $this->smtp['pass'];
+		// default status is false
+		$is_sent = null;
 
+		// try sending
+		try {
+			$is_sent = (bool) $this->mailer->Send();
+		}
+		// catch any exception
+		catch $exception {
+			// set an error
+			$this->error = $exception->getMessage();
+			// don't use it, but return false
+			$is_sent = false;
 		}
 
 		// if we want to save the email to the database
@@ -159,13 +263,25 @@ class Mail {
 			// insert pretty much as is
 			Database::query()
 				->insert(array(
-
+					'is_sent' 			=> $is_sent,
+					'creation_date' 	=> time(),
+					'sending_date' 		=> $is_sent ? time() : null,
+					'format'			=> $this->format,
+					'from_mail'			=> $this->from['mail'],
+					'from_name'			=> $this->from['name'],
+					'body'				=> $this->body,
+					'subject'			=> $this->subject,
+					'to_array'			=> $this->recipients['to'],
+					'cc_array'			=> $this->recipients['cc'],
+					'bcc_array'			=> $this->recipients['bcc'],
+					'files_array'		=> $this->files
 				))
 				->into('Mails')
 				->execute();
 		}
 
-		// if the actual sending succeeded
+		// return the sending status
+		return($is_sent);
 
 	}
 
