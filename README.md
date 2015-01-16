@@ -63,7 +63,7 @@ Request::isAjax();
 * Retrieve the login and id of 5 accounts with level 1 that logged in, in the last 24h
 ```php
 // demo query
-$this->Accounts = Database::query()
+$accounts = Database::query()
 	->select(array('login','id'))
 	->from('Accounts')
 	->where(array(
@@ -76,14 +76,13 @@ $this->Accounts = Database::query()
 
 * Retrieve a single record by its ID
 ```php
-$root_account = new Record('Accounts',1);
-echo $root_account;
+$account = new Record('Accounts',1);
 ```
 
 * Retrieve a single record by its ID and generate an input to change a property
 ```php
-$root_account = new Record('Accounts',1);
-echo $root_account->input('login');
+$account = new Record('Accounts',1);
+echo $account->input('login');
 // <input type="text" name="Accounts[login]" value="root" />
 ```
 
@@ -91,11 +90,11 @@ echo $root_account->input('login');
 ```php
 $account = new Record('Accounts');
 $account
-	->set('login','test')
-	->set('id_level','1')
-	->set('last_login_date','18/04/1995')
-	->set('modules_array',array('MOD_BOOKS','MOD_USERS','MOD_EXAMPLE'))
-	->set('password',Security::getPassword('test'))
+	->set('login', 'test')
+	->set('id_level', '1')
+	->set('last_login_date', '18/04/1995')
+	->set('modules_array', array('MOD_BOOKS', 'MOD_USERS', 'MOD_EXAMPLE'))
+	->set('password', Security::getPassword('test'))
 	->save();
 ```
 
@@ -262,8 +261,8 @@ Runtime::get($bundle_name, $key);
 ### Thumbnail
 
 ```php
-$this->Thumbnail = new Thumbnail();
-$this->Status = $this->Thumbnail
+$thumbnail = new Thumbnail();
+$status = $thumbnail
 	->source("../private/data/storage/photos/original/{$id}")
 	->destination("../private/data/storage/photos/400/{$id}")
 	->size(400)
@@ -271,14 +270,14 @@ $this->Status = $this->Thumbnail
 	->execute();
 ```
 ```php
-boolean $this->Status
+boolean $status
 ```
 
 ### Uploader
 
 ```php
-$this->Uploader = new Uploader();
-$this->Status = $this->Uploader
+$uploader = new Uploader();
+$status = $uploader
 	->source(Request::files('estimate_file'))
 	->destination('../private/data/storage/estimates/')
 	->limitTypes(array('application/pdf'))
@@ -286,9 +285,9 @@ $this->Status = $this->Uploader
 	->execute();
 ```
 ```php
- boolean $this->Status
- array $this->Uploader->info()
- string $this->Uploader->error()
+ boolean $status
+ array $uploader->info()
+ string $uploader->error()
  ```
 
 ### HttpRequest
@@ -296,16 +295,16 @@ $this->Status = $this->Uploader
 This class provides a simple interface to build HTTP Requests
 
 ```php
-$this->Request = new HttpRequest();
-$this->Success = $this->Request
+$request = new HttpRequest();
+$status = $this->Request
 	->url('https://maps.googleapis.com/maps/api/geocode/json')
 	->data('address','Paris')
 	->get();
 ```
 ```php
-boolean $this->Success
-string $this->Request->getHeader('Content-Type')
-mixed $this->Request->getBody()
+boolean $status
+string $request->getHeader('Content-Type')
+mixed $request->getBody()
 
 ```
 Responses of type application/json will be decoded to array, response of type application/xml will be decoded to SimpleXML object.
@@ -315,8 +314,8 @@ Responses of type application/json will be decoded to array, response of type ap
 * Mail are very simple to use and build over PHPMailer
 
 ```php
-$this->Mail = new Mail();
-$this->Status = $this->Mail
+$mail = new Mail();
+$status = $mail
 	->to($email [, $name=null])
 	->cc($email [, $name=null])
 	->bcc($email [, $name=null])
@@ -329,14 +328,15 @@ $this->Status = $this->Mail
 ```
 
 ```php
-boolean $this->Status
+boolean $status
+string $mail->error()
 ```
 
 * Mail with a template using smtp
 
 ```php
-$this->Mail = new Mail();
-$this->Status = $this->Mail
+$mail = new Mail();
+$status = $this->Mail
 	->smtp($host, $user, $pass)
 	->to('text@email.com', 'Name')
 	->format('text')
@@ -382,7 +382,7 @@ echo new Element('quote',array('text'=>'AssurÃ©ment, les affaires humaines ne mÃ
 * Retrieve a photo from streetview
 ```php
 $photo = new \Google\Photo();
-$image_url = $photo
+$photo_url = $photo
 //	->position($lat,$lnt)
 	->address('Some normal address')
 	->size(500,500)
@@ -394,7 +394,7 @@ $image_url = $photo
 * Retrieve a static map with a marker
 ```php
 $map = new \Google\Map();
-$image_url = $map
+$map_url = $map
 	->center($lat,$lng);
 	->zoom(7)
 	->retina()
