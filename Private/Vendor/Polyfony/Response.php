@@ -232,7 +232,7 @@ class Response {
 	// return current content
 	private static function getContent() {
 		
-		// return as is
+		// if response type is file, get the content of the file from the path, else return the normal content
 		return(self::$_type == 'file' ? file_get_contents(self::$_content) : self::$_content);
 		
 	}
@@ -330,7 +330,7 @@ class Response {
 			// memory usage	
 			$headers['X-Memory-Usage'] = Format::size($profiler['memory']);
 			// execution time
-			$headers['X-Execution-Time'] = round($profiler['time']*1000) . ' ms';
+			$headers['X-Execution-Time'] = round($profiler['time'] * 1000) . ' ms';
 		}
 		// set some headers
 		self::setHeaders($headers);
@@ -384,7 +384,7 @@ class Response {
 					self::$_headers,
 					base64_encode(self::$_content)
 				), 
-				// replace already existing cache file
+				// replace any already existing cache file
 				true, 
 				// set the cache for some time
 				self::$_outputCache

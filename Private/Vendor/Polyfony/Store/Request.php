@@ -1,6 +1,4 @@
 <?php
-namespace Polyfony\Store;
-
 /**
  * Stores data for a single request, which does not persist.
  *
@@ -9,8 +7,10 @@ namespace Polyfony\Store;
  * @author    Christopher Hill <cjhill@gmail.com>
  * @package   MVC
  */
-class Request implements StoreInterface
-{
+
+namespace Polyfony\Store;
+
+class Request implements StoreInterface {
 	/**
 	 * A store for all the variables set.
 	 *
@@ -18,7 +18,7 @@ class Request implements StoreInterface
 	 * @var    array
 	 * @static
 	 */
-	public static $store;
+	public static $_store;
 
 	/**
 	 * Check whether the variable exists in the store.
@@ -29,7 +29,7 @@ class Request implements StoreInterface
 	 * @static
 	 */
 	public static function has($variable) {
-		return isset(self::$store[$variable]);
+		return isset(self::$_store[$variable]);
 	}
 
 	/**
@@ -49,7 +49,7 @@ class Request implements StoreInterface
 			throw new \Exception("{$variable} already exists in the store.");
 		}
 
-		self::$store[$variable] = $value;
+		self::$_store[$variable] = $value;
 		return self::has($variable);
 	}
 
@@ -68,7 +68,7 @@ class Request implements StoreInterface
 			throw new \Exception("{$variable} does not exist in the store.");
 		}
 
-		return self::$store[$variable];
+		return self::$_store[$variable];
 	}
 
 	/**
@@ -87,7 +87,7 @@ class Request implements StoreInterface
 		}
 
 		// Unset the variable
-		unset(self::$store[$variable]);
+		unset(self::$_store[$variable]);
 
 		// Was it removed
 		return ! self::has($variable);

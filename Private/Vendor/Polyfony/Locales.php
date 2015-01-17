@@ -90,8 +90,8 @@ class Locales {
 		
 		// set language if available, or fallback to default
 		self::$_language = in_array($language,Config::get('locales','available')) ? $language : Config::get('locales','default');
-		// memorize the language
-		Store\Cookie::put(Config::get('locales','cookie'),self::$_language);
+		// memorize the language for a month
+		Store\Cookie::put(Config::get('locales','cookie'), self::$_language, true, 24 * 30);
 		
 	}
 	

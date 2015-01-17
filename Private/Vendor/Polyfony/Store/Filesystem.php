@@ -1,6 +1,7 @@
 <?php
 /**
  * PHP Version 5
+ * Store variables or documents in the filesystem until manually removed
  * @package Polyfony
  * @link https://github.com/SIB-FRANCE/Polyfony
  * @license http://www.gnu.org/licenses/lgpl.txt GNU General Public License

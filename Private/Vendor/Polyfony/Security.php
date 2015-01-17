@@ -138,7 +138,7 @@ class Security {
 				$session_signature = self::getSignature($account->get('login').$account->get('password').$session_expiration);
 
 				// store a cookie with our current session key in it
-				$cookie_creation = Store\Cookie::put(Config::get('security','cookie'), $session_signature, $session_expiration, true);
+				$cookie_creation = Store\Cookie::put(Config::get('security','cookie'), $session_signature, true, Config::get('security', 'session_duration'));
 				
 				// if the cookie creation failed
 				$cookie_creation ?: self::refuse('You must accept cookies to log in');

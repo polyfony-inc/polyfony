@@ -1,6 +1,4 @@
 <?php
-namespace Polyfony\Store;
-
 /**
  * Stores data within the users own cookie store.
  *
@@ -9,8 +7,10 @@ namespace Polyfony\Store;
  * @author    Christopher Hill <cjhill@gmail.com>
  * @package   MVC
  */
-class Cookie implements StoreInterface
-{
+
+namespace Polyfony\Store;
+
+class Cookie implements StoreInterface {
 	/**
 	 * Check whether the variable exists in the store.
 	 *
@@ -35,16 +35,17 @@ class Cookie implements StoreInterface
 	 * @throws Exception          If the variable already exists when we try not to overwrite it.
 	 * @static
 	 */
-	public static function put($variable, $value, $expires = 1314000, $overwrite = false) {
+	public static function put($variable, $value, $overwrite = false, $lifetime = null) {
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (self::has($variable) && ! $overwrite) {
 			throw new \Polyfony\Exception("{$variable} already exists in the store.");
 		}
-		
+		// if a lifetime is set convert it to seconds in the future, or use a default of 24 hours
+		$lifetime = $lifetime ? time() + $lifetime * 3600 : 24 * 3600;
 		// encode and compress the value
 		$value = gzcompress(json_encode($value));
 		// actually set the cookie
-		setcookie($variable, $value, $expires, '/');
+		setcookie($variable, $value, $lifetime, '/');
 		// set it manually into the supergloba
 		$_COOKIE[$variable] = $value;
 		// return its presence

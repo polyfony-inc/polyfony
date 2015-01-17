@@ -1,6 +1,4 @@
 <?php
-namespace Polyfony\Store;
-
 /**
  * Stores data within Memcache.
  *
@@ -9,8 +7,10 @@ namespace Polyfony\Store;
  * @author    Christopher Hill <cjhill@gmail.com>
  * @package   MVC
  */
-class Memcache implements StoreInterface
-{
+
+namespace Polyfony\Store;
+
+class Memcache implements StoreInterface {
 	/**
 	 * The reference to the Memcache server.
 	 *

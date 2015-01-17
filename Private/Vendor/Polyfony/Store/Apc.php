@@ -1,16 +1,16 @@
 <?php
-namespace Polyfony\Store;
-
 /**
- * Stores data within APC.
- *
+ * Stores data within APC for a specified duration of forever.
+ * 
  * @copyright Copyright (c) 2012-2013 Christopher Hill
  * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author    Christopher Hill <cjhill@gmail.com>
  * @package   MVC
  */
-class Apc implements StoreInterface
-{
+
+namespace Polyfony\Store;
+
+class Apc implements StoreInterface {
 	/**
 	 * Check whether the variable exists in the store.
 	 *
@@ -30,18 +30,20 @@ class Apc implements StoreInterface
 	 * @param  string  $variable  The name of the variable to store.
 	 * @param  mixed   $value     The data we wish to store.
 	 * @param  boolean $overwrite Whether we are allowed to overwrite the variable.
+	 * @param  integer $lifetime  Lifetime of the stored element in hours
 	 * @return boolean            If we managed to store the variable.
 	 * @throws Exception          If the variable already exists when we try not to overwrite it.
 	 * @static
 	 */
-	public static function put($variable, $value, $overwrite = false) {
+	public static function put($variable, $value, $overwrite = false, $lifetime = null) {
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (self::has($variable) && ! $overwrite) {
 			throw new \Exception("{$variable} already exists in the store.");
 		}
-
+		// if a lifetime is provided convert it to seconds for the APC engine
+		$lifetime = $lifetime ? $lifetime * 3600 : null;
 		// use apc_store() instead of apc_add() as add does not overwrite data
-		apc_store($variable, $value);
+		apc_store($variable, $value, $lifetime);
 		return self::has($variable);
 	}
 
