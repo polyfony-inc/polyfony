@@ -43,8 +43,21 @@ class Request {
 		// with post, if any
 		self::$_signature = self::isPost() ? sha1(self::$_url.json_encode($_POST)) : sha1(self::$_url);
 
+		// set globals
+		self::$_get		= isset($_GET)				? $_GET				: array();
+		self::$_post	= isset($_POST)				? $_POST			: array();
+		self::$_server	= isset($_SERVER)			? $_SERVER			: array();
+		self::$_files	= isset($_FILES)			? $_FILES			: array();
+		self::$_argv	= isset($_SERVER['argv'])	? $_SERVER['argv']	: array();
+
+		// set the headers with a  FPM fix
+		function_exists('getallheaders') ? self::$_headers = getallheaders() : self::setHeaders();
+
+		// remove globals
+		unset($_GET, $_POST, $_SERVER, $_FILES);
+
 		// if the cache has this request signature in store
-		if(Cache::has(self::getSignature())) {
+		if(Cache::has(self::getSignature()) && self::header('Cache-Control') != 'max-age=0') {
 			// get the body and headers from the cache
 			list($headers, $body) = Cache::get(self::getSignature());
 			// stop the profiler
@@ -63,19 +76,6 @@ class Request {
 			// output the content and stop here
 			die(base64_decode($body));
 		}
-
-		// set globals
-		self::$_get		= isset($_GET)				? $_GET				: array();
-		self::$_post	= isset($_POST)				? $_POST			: array();
-		self::$_server	= isset($_SERVER)			? $_SERVER			: array();
-		self::$_files	= isset($_FILES)			? $_FILES			: array();
-		self::$_argv	= isset($_SERVER['argv'])	? $_SERVER['argv']	: array();
-
-		// set the headers with a  FPM fix
-		function_exists('getallheaders') ? self::$_headers = getallheaders() : self::setHeaders();
-
-		// remove globals
-		unset($_GET, $_POST, $_SERVER, $_FILES);
 
 	}
 	
