@@ -87,7 +87,9 @@ $account = new Record('Accounts',1);
 ```php
 $account = new Record('Accounts',1);
 echo $account->input('login');
-// <input type="text" name="Accounts[login]" value="root" />
+```
+```html
+<input type="text" name="Accounts[login]" value="root" />
 ```
 
 * Create a record, populate and insert it
@@ -240,14 +242,10 @@ Throw new Exception($error_message, $http_status_code);
 
 You can choose from different types of notice
 ```php
-Notice($message,$title=null)
-// default information notice
-Notice\Danger($message,$title=null)
-// danger notice
-Notice\Success($message,$title=null)
-// success notice
-Notice\Warning($message,$title=null)
-// warning notice
+Notice($message, $title=null)
+Notice\Danger($message, $title=null)
+Notice\Success($message, $title=null)
+Notice\Warning($message, $title=null)
 ```
 All will be converted to string elegantly in HTML or text depending on the context (CLI, Ajax…) and it uses bootstrap-friendly classes.
 
@@ -262,56 +260,67 @@ $notice->getTitle($html_safe=true)
 The response if preconfigured according to the Config.ini
 You can alter the response type and parameters at runtime, ex.
 
+* To redirect
 ```php
-// to redirect
 Response::setRedirect($url [, $after_seconds=0])
 ```
+
+* to change the charset
 ```php
-// to change the charset
 Response::setCharset('utf-8')
 ```
+
+* to output a file inline
 ```php
-// to output a file inline
 Response::setType('file')
 Response::setContent($file_path)
 Response::render()
 ```
+
+* to download a file
 ```php
-// to download a file
 Response::setType('file')
 Response::setContent($file_path)
 Response::download('Myfilename.ext')
 ```
+
+* to change the status code (to 400 Bad Request for example)
+Doing that will prevent the response from being cached. Only 200 status can be cached.
 ```php
-// to change the status code (to 400 Bad Request for example)
 Response::setStatus(400)
 ```
+
+* to output plaintext
 ```php
-// to output plaintext
 Response::setType('text')
 ```
+
+* to output json
 ```php
-// to output json
 Response::setType('json')
 Response::setContent(array('example'))
 Response::render()
 ```
+
+* to add css files
 ```php
-// to add css files
 Response::setAssets('css','//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css')
 ```
+
+* to add js files
 ```php
-// to add js files
 Response::setAssets('js','/Assets/js/myfile.js')
 ```
+
+* to add a meta tag
 ```php
-// to add a meta tag
 Response::setMetas('google-site-verification', 'google-is-watching-you')
 ```
 
-* To cache the result of a reponse (all output type will be cached except `file`) for 24 hours
+* To cache the result of a reponse (all output type will be cached except `file`)
+Note that cache has to be enabled in your ini configuration, posted `Request` are not cached, errors `Response` neither.
 ```php
-Response::enableOutputCache(24);
+Response::enableOutputCache($hours);
 ```
 
 A cache hit will always use less than 400 Ko of RAM and execute much faster, bellow 1 ms on any decent server
@@ -357,24 +366,18 @@ Store\Engine::get($variable);
 Store\Engine::remove($variable);
 ```
 
-You can choose from different storage engine
+You can choose from different storage engines
 ```
 Store\Cookie
-// uses a cookie to compress and store the key
 Store\Filesystem
-// uses a file to store the key
 Store\Session
-// uses a PHP session to store the key
 Store\Database
-// uses a database table to store the key
-Store\Request
-// uses a variable to store the key for the time of a query only
 Store\Apc
-// uses apc engine to store the key
 Store\Memcache
-// uses memcache to store the key
+Store\Request
 ```
-Some of them have little specificities, but all implement the basic interface.
+The last on stores your key-value only for the time of the current request.
+Some of those engines have more capabilities than others, but all implement the basic interface.
 
 ### Runtime
 
@@ -505,14 +508,25 @@ If the mail format is html, your value will be escaped automatically
 * Create an HTML tag (similar to mootools' Element)
 
 ```php
-echo new Element('img',array('src'=>'/img/demo.png'))->set('alt','test');
-
-// <img src="/img/demo.png" alt="test" />
-
-echo new Element('quote',array('text'=>'Assurément, les affaires humaines ne méritent pas le grand sérieux'));
-
-// <quote>Assurément, les affaires humaines ne méritent pas le grand sérieux</quote>
+$image = new Element('img',array('src'=>'/img/demo.png'))->set('alt','test');
+echo $image;
 ```
+```html
+<img src="/img/demo.png" alt="test" />
+```
+
+* Create an HTML element with an opening a closing tag
+`text` will escape html 
+
+```php
+$quote = new Element('quote',array('text'=>'Assurément, les affaires humaines ne méritent pas le grand sérieux'));
+$quote->adopt($image);
+```
+```html
+<quote>Assurément, les affaires humaines ne méritent pas le grand sérieux<img src="/img/demo.png" alt="test" /></quote>
+```
+
+Setting `value` will escape its html, along with setting `text`.
 
 ### Form
 
@@ -548,13 +562,15 @@ echo Form::select('sample', array(
 
 Shortcuts are available from `Record` object, ex.
 
+* retrieve an account from its id
 ```php
-// retrieve an account from its id
 $record = new Record('Accounts',1);
 $record->set('login', 'mylogin@example.com')
 
 echo $record->input('login', array('data-validators'=>'required'));
-// <input type="text" name="Accounts[login]" value="mylogin@example.com" data-validators="required"/>
+```
+```html
+<input type="text" name="Accounts[login]" value="mylogin@example.com" data-validators="required"/>
 ```
 
 List of available elements :
@@ -604,9 +620,9 @@ $map = new \Google\Map();
 $map_url = $map
 	->center($lat,$lng);
 	->zoom(7)
-	->retina()
+	->retina(true)
 	->marker($lat,$lng)
-	->size(600x600)
+	->size(600,600)
 	->url();
 ```
 
