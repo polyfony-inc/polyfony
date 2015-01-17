@@ -52,10 +52,10 @@ class Cache {
 		$variable = \Polyfony\Format::fsSafe($variable);
 		// store it
 		file_put_contents(self::$_root . $variable, json_encode($value));
-		// compute the expiration time
-		$expire = $lifetime ? time() + $lifetime : time() * 365 * 24 * 3600;
+		// compute the expiration time or set to a year by default
+		$lifetime = $lifetime ? time() + $lifetime : time() + 365 * 24 * 3600;
 		// alter the modification time
-		touch(self::$_root . $variable, $expire);
+		touch(self::$_root . $variable, $lifetime);
 		// return status
 		return(self::has($variable));
 		

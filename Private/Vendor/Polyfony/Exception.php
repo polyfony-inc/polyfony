@@ -72,6 +72,9 @@ class Exception extends \Exception {
 		$this->cleanStack = '<pre class="xdebug-var-dump">';
 		// for each call
 		foreach($this->getTrace() as $index => $call) {
+			// in case the stack element is not from an object
+			$call['class'] = isset($call['class']) ? $call['class'] : '';
+			$call['type'] = isset($call['type']) ? $call['type'] : '';
 			// format a clean call
 			$this->cleanStack .= "{$index} <b>{$call['class']}</b>{$call['type']}{$call['function']} ";
 			$this->cleanStack .= "<span class=\"label label-default\">@line {$call['line']}</span> in <small>{$call['file']}</small><br />";
