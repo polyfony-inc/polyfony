@@ -2,7 +2,7 @@
 	<h1>Request</h1>
 	<p>
 		Posting some things and getting them back<br />
-		This example uses the <code>pf\Request</code> abstraction, the <code>pf\Form</code> helper and the <code>pf\Notice</code> object.
+		This example uses the <code>Request</code> abstraction, the <code>Form</code> helper and the <code>Notice</code> object.
 	</p>
 	
 	<form action="" method="post">

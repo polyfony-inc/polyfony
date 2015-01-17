@@ -2,7 +2,7 @@
 	<h1>Locales</h1>
 	<p>
 		The translation file is a CSV (use as many as you like), using tabs and double-quotes.<br />
-		This example uses the <code>pf\Locales</code> class.
+		This example uses the <code>Locales</code> class.
 	</p>
 	<code>
 		../Private/Bundles/Demo/Locales/example.csv
@@ -12,19 +12,19 @@
 		<span class="label label-info"><?php echo Polyfony\Locales::get('house'); ?></span>
 	</p>
 	<code>
-		echo Polyfony\Locales::get('house');
+		echo Locales::get('house');
 	</code>
 	<p>
 		Force another language temporarily 
 		<span class="label label-info"><?php echo Polyfony\Locales::get('house','fr'); ?></span>
 	</p>
 	<code>
-		echo Polyfony\Locales::get('house','fr');
+		echo Locales::get('house','fr');
 	</code>
 	<p>
 		Switch to another language for this session
 	</p>
 	<code>
-		Polyfony\Locales::setLanguage('fr');
+		Locales::setLanguage('fr');
 	</code>
 </div>

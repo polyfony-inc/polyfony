@@ -2,7 +2,7 @@
 	<h1>Database</h1>
 	<p>
 		Retrieve and iterate over database records.<br />
-		This example uses the <code>pf\Database</code> abstraction and the <code>pf\Record</code> class.
+		This example uses the <code>Database</code> abstraction and the <code>Record</code> class.
 	</p>
 	
 	<div class="panel panel-default">
