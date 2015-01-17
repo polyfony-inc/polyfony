@@ -226,6 +226,12 @@ class Uploader {
 		));
 	}
 	
+	// retrieve only the file name
+	public function name() {
+		// return the name
+		return($this->Name);
+	}
+
 	// retrieve only the error
 	public function error() {
 		// return the error

@@ -412,8 +412,8 @@ boolean $status
 
 ### Uploader
 
-`Uploader` will generate a unique name for your file if only provide a destination folder.
-You can get the generated name this the `info()` method
+`Uploader` will generate a unique name for your file if you only provided a destination folder.
+You can get the generated name using the `name()` method, `info()` will also give you lots of informations about your uploaded file, including its size, mimetype, etc.
 
 ```php
 $uploader = new Uploader();
@@ -428,6 +428,7 @@ $status = $uploader
  boolean $status
  array $uploader->info()
  string $uploader->error()
+ string $uploader->name()
  ```
 
 ### HttpRequest
