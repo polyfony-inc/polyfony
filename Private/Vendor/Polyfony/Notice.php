@@ -21,7 +21,7 @@ class Notice {
 	
 	const TYPE = 'info';
 	
-	public function __construct($message,$title=null) {
+	public function __construct($message, $title=null) {
 		// pass the message
 		$this->message = Format::htmlSafe($message);
 		// pass the title (if any)

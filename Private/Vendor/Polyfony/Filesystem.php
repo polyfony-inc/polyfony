@@ -72,8 +72,17 @@ class Filesystem {
 
 	}
 	
-	public static function remove() {
-
+	public static function remove($path) {
+		// if path exists and is a file
+		if(self::exists($path) && self::isFile($path)) {
+			// remove the file and return the result of that action
+			return(unlink($path));
+		}
+		// invalid path
+		else {
+			// return false
+			return(false);
+		}
 	}
 
 	public static function chmod() {

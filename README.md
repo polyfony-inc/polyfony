@@ -8,7 +8,7 @@ Compared to major PHP frameworks, Polyfony covers 95% of what we need most of th
 routing, bundles, controllers, views, database abstraction, environments, locales, cache, vendor, helpers, authentication, profiler…
 
 #### Footprint (of an Hello World)
-* 500 Ko of disk space (35% of comment lines)
+* 400 Ko of disk space (35% of comment lines)
 * 750 Ko of RAM (or 350 Ko from the cache)
 
 
