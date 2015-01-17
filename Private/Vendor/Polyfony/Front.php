@@ -33,9 +33,6 @@ class Front {
 		
 		// marker
 		Profiler::setMarker('init_config');
-		
-		// start the cache
-		Cache::init();
 
 		// marker
 		Profiler::setMarker('init_cache');

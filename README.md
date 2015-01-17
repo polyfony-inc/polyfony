@@ -5,8 +5,12 @@
 Compared to major PHP frameworks, Polyfony follows the 80-20 Pareto principle :
 It provides 95% of what we need most of the time, whilst using 5% of ressources, space, configuration files and dependencies required by major frameworks.
 
-Features : routing, bundles, controllers, views, database abstraction, environments, locales, cache, vendor, helpers, authentication, profiler…
-Footprint : 400 Ko of disk space, 650 Ko or RAM.
+#### Features
+routing, bundles, controllers, views, database abstraction, environments, locales, cache, vendor, helpers, authentication, profiler…
+
+#### Footprint (of an Hello World)
+* 500 Ko of disk space (35% of comment lines)
+* 750 Ko of RAM (or 350 Ko from the cache)
 
 
 ## Requirements
@@ -139,6 +143,37 @@ an array of allowed value (it will also match no value)
 a regex (it will also match no value)
 a boolean true (it will match anything but a missing value)
 
+### Environments
+
+By default the `../Private/Config/Config.ini` file is loaded.
+
+If you access the framework using the port defined in 
+```
+[polyfony]
+dev_port = 8080
+```
+Then the framework will overrides Config.ini values with those of :
+```
+../Private/Config/Dev.ini
+```
+Or, if you are not running the development port :
+```
+`../Private/Config/Prod.ini
+```
+
+* To retrieve configurations values (from the environment specific ini file)
+```php
+Config::get('group', 'key')
+```
+
+Having specific ini configuration files for development and production allows your to :
+* set an bypass email to redirect all email sent in development environment
+* enable compression, obfuscation and cache only in production
+* enable code indentation in development
+* show the profiler stack in development
+* use different database configuration in development or production
+* etc.
+
 ### Security
 
 * To secure a page (require a user to be logged in)
@@ -156,6 +191,18 @@ Security::enforce('MOD_NAME', $bypass_level);
 Security::hasModule($module_name);
 Security::hasLevel($level);
 ```
+
+### Profiler
+
+Set markers arounds heavy code blocks to estimate the time and memory impact of that bloc.
+```php
+Profiler::setMarker('begining_of_a_heavy_operation');
+Profiler::setMarker('end_of_heavy_opeartion')
+```
+
+If the Config::get('profiler', 'enable_stack') if set to true,
+the stack of markers will be added at the bottom an html `Response` as a nice ul/li lists, or merged into a json `Response`
+
 
 ### Locales
 
@@ -261,6 +308,44 @@ Response::setAssets('js','/Assets/js/myfile.js')
 // to add a meta tag
 Response::setMetas('google-site-verification', 'google-is-watching-you')
 ```
+
+* To cache the result of a reponse (all output type will be cached except `file`) for 24 hours
+```php
+Response::enableOutputCache(24);
+```
+
+A cache hit will always use less than 400 Ko of RAM and execute much faster, bellow 1 ms on any decent server
+
+* The `Response` provides some headers by default
+
+```
+< HTTP/1.1 200 OK
+< X-Powered-By: Polyfony
+< Server: Undisclosed
+< Content-Language: fr
+< Content-type: text/html; charset=utf-8
+< Content-Encoding: gzip
+< Content-Length: 667
+< X-Memory-Usage: 832 Ko
+< X-Execution-Time: 21 ms
+```
+
+The example bellow shows the same Hello World `Response` as above, but from the cache
+
+```
+< HTTP/1.1 200 OK
+< X-Powered-By: Polyfony
+< Server: Undisclosed
+< Content-Language: fr
+< Content-type: text/html; charset=utf-8
+< Content-Encoding: gzip
+< Content-Length: 667
+< X-Memory-Usage: 389 Ko
+< X-Execution-Time: 1 ms
+< X-From-Cache: hit
+< X-Cached-On: Sat, 17 Jan 2015 00:51:38 +0100
+< X-Cached-Until: Sun, 18 Jan 2015 00:51:38 +0100
+``
 
 ### Store
 

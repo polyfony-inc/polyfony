@@ -123,9 +123,8 @@ class Loader {
                 $fileName = str_replace($this->_namespaceSeparator, DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
             }
             $fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . $this->_fileExtension;
-            // fix so that namespaces starting with Bundle\ will point to the bundle folder
+            // fix so that namespaces starting with Bundle\ will point to the bundle folder (specific to polyfony2)
 			$fileName = (strpos($fileName,'Bundles') === 0) ? "../$fileName" : $fileName;
-			file_put_contents('/tmp/loader'.rand(999,99999999).'.txt',($this->_includePath !== null ? $this->_includePath . DIRECTORY_SEPARATOR : '') . $fileName);
             require ($this->_includePath !== null ? $this->_includePath . DIRECTORY_SEPARATOR : '') . $fileName;
         }
     }

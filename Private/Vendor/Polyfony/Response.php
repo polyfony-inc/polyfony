@@ -32,12 +32,33 @@ class Response {
 	protected static $_length;			// length of the content
 	protected static $_checksum;		// checksum of the content
 
+	// list of http status codes and messages
+	protected static $_codes = array(
+			// 100 status range
+			'100'=>'Continue', '101'=>'Switching Protocols', '102'=>'Processing',
+			// 200 status range
+			'200'=>'OK', '201'=>'Created', '202'=>'Accepted', '203'=>'Non-Authoritative Information', '204'=>'No Content',
+			'205'=>'Reset Content', '206'=>'Partial Content', '207'=>'Multi-Status', '208'=>'Already Reported', '226'=>'IM Used',
+			// 300 status range
+			'300'=>'Multiple Choices', '301'=>'Moved Permanently', '302'=>'Found', '303'=>'See Other', '304'=>'Not Modified',
+			'305'=>'Use Proxy', '306'=>'Switch Proxy', '307'=>'Temporary Redirect', '308'=>'Permanent Redirect',
+			// 400 status range
+			'400'=>'Bad Request', '401'=>'Unauthorized', '402'=>'Payment Required', '403'=>'Forbidden', '404'=>'Not Found',
+			'405'=>'Method Not Allowed', '406'=>'Not Acceptable', '407'=>'Proxy Authentication Required',
+			'408'=>'Request Timeout', '409'=>'Conflict', '410'=>'Gone', '411'=>'Length Required', '412'=>'Precondition Failed',
+			'413'=>'Request Entity Too Large', '414'=>'Request-URI Too Long', '415'=>'Unsupported Media Type',
+			'416'=>'Requested Range Not Satisfiable', '417'=>'Expectation Failed', '418'=>'I\'m a teapot',
+			// 500 status range
+			'500'=>'Internal Server Error', '501'=>'Not Implemented', '502'=>'Bad Gateway', '503'=>'Service Unavailable',
+			'504'=>'Gateway Timeout', '505'=>'HTTP Version Not Supported', '506'=>'Variant Also Negotiates', 
+			'507'=>'Insufficient Storage', '508'=>'Loop Detected', '509'=>'Bandwidth Limit Exceeded',
+		);
+
 	// init the response
 	public static function init() {
 	
 		// start the output buffer
 		ob_start();
-		
 		// set default assets
 		self::$_assets = array(
 			// as empty arrays
@@ -48,47 +69,45 @@ class Response {
 		self::$_headers = array();
 		// set default metas
 		self::$_metas = array();
-		
 		// default is to allow browser cache
 		self::$_browserCache = true;
-		
-		// set the default status
+		// default is to disable the output cache (0 hour of cache)
+		self::$_outputCache = 0;
+		// set the default status as ok
 		self::setStatus(200);
-		
 		// set default language
 		self::setHeaders(array(
 			'X-Powered-By'		=> 'Polyfony',
 			'Server'			=> 'Undisclosed',
 			'Content-Language'	=> Locales::getLanguage()
 		));
-		
 		// set default charset
-		self::setCharset(Config::get('response','default_charset'));
-		
+		self::setCharset(Config::get('response', 'default_charset'));
 		// set the default type
-		self::setType(Config::get('response','default_type'));
+		self::setType(Config::get('response', 'default_type'));
 		
 	}
 	
 	public static function disableBrowserCache() {
-		
+		// disable the browser's cache
 		self::$_browserCache = false;
-			
+	}
+
+	public static function enableOutputCache($hours = 24) {
+		// enable the generated output to be cached for some time
+		self::$_outputCache = round($hours * 3600);
 	}
 	
 	public static function setCharset($charset) {
-	
+		// set the charset in meta tags and http headers
 		self::$_charset = $charset;
-		
 	}
 	
-	public static function setRedirect($url,$delay=0) {
-		
+	public static function setRedirect($url, $delay=0) {
 		// set the redirect header
 		self::setHeaders(array(
 			'Refresh' => "{$delay};url=$url"
-		));
-			
+		));	
 	}
 
 	public static function setAssets($type,$assets) {
@@ -123,7 +142,6 @@ class Response {
 			// update the current type
 			self::$_type = $type;
 		}
-		
 		// list of available types
 		$types = array(
 			'html-page'	=>'text/html',
@@ -136,7 +154,6 @@ class Response {
 			'css'		=>'text/css',
 			'text'		=>'text/plain'
 		);
-		
 		// add the header
 		self::setHeaders(array(
 			'Content-type'=> $types[$type] . '; charset='.self::$_charset
@@ -147,79 +164,8 @@ class Response {
 	// register a status header for that response
 	public static function setStatus($code) {
 	
-		// declare all the status
-		$status = array(
-			// 100 status range
-			'100'=>'Continue',
-			'101'=>'Switching Protocols',
-			'102'=>'Processing',
-			
-			// 200 status range
-			'200'=>'OK',
-			'201'=>'Created',
-			'202'=>'Accepted',
-			'203'=>'Non-Authoritative Information',
-			'204'=>'No Content',
-			'205'=>'Reset Content',
-			'206'=>'Partial Content',
-			'207'=>'Multi-Status',
-			'208'=>'Already Reported',
-			'226'=>'IM Used',
-			
-			// 300 status range
-			'300'=>'Multiple Choices',
-			'301'=>'Moved Permanently',
-			'302'=>'Found',
-			'303'=>'See Other',
-			'304'=>'Not Modified',
-			'305'=>'Use Proxy',
-			'306'=>'Switch Proxy',
-			'307'=>'Temporary Redirect',
-			'308'=>'Permanent Redirect',
-			
-			// 400 status range
-			'400'=>'Bad Request',
-			'401'=>'Unauthorized',
-			'402'=>'Payment Required',
-			'403'=>'Forbidden',
-			'404'=>'Not Found',
-			'405'=>'Method Not Allowed',
-			'406'=>'Not Acceptable',
-			'407'=>'Proxy Authentication Required',
-			'408'=>'Request Timeout',
-			'409'=>'Conflict',
-			'410'=>'Gone',
-			'411'=>'Length Required',
-			'412'=>'Precondition Failed',
-			'413'=>'Request Entity Too Large',
-			'414'=>'Request-URI Too Long',
-			'415'=>'Unsupported Media Type',
-			'416'=>'Requested Range Not Satisfiable',
-			'417'=>'Expectation Failed',
-			'418'=>'I\'m a teapot',
-			
-			// 500 status range
-			'500'=>'Internal Server Error',
-			'501'=>'Not Implemented',
-			'502'=>'Bad Gateway',
-			'503'=>'Service Unavailable',
-			'504'=>'Gateway Timeout',
-			'505'=>'HTTP Version Not Supported',
-			'506'=>'Variant Also Negotiates',
-			'507'=>'Insufficient Storage',
-			'508'=>'Loop Detected',
-			'509'=>'Bandwidth Limit Exceeded',
-		);
-		
-		// if the status does not exist
-		if(!array_key_exists($code,$status)) {
-			// don't go further if the code is not supported
-			return;	
-		}
-		// get the current protocol
-		$protocol = Request::server('SERVER_PROTOCOL','HTTP/1.1');
-		// set the actual status
-		self::$_status = "{$protocol} $code {$status[$code]}";
+		// set the actual status or 500 if incorrect
+		self::$_status = in_array($code, array_keys(self::$_codes)) ? $code : 500;
 		
 	}
 
@@ -297,7 +243,7 @@ class Response {
 		$headers = array();
 		
 		// in case we are outputing anything but html
-		if(!in_array(self::$_type, array('html','html-page'))) {
+		if(!in_array(self::$_type, array('html', 'html-page'))) {
 			// remove any already buffered data
 			self::clean();
 		}
@@ -317,7 +263,7 @@ class Response {
 			// add metas and style up top
 			self::$_content = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 			<html xmlns="http://www.w3.org/1999/xhtml"><head>
-			<meta http-equiv="content-type" content="text/html; charset='.self::$_charset.'" />' . self::$_content;
+			<meta http-equiv="content-type" content="text/html; charset=' . self::$_charset . '" />' . self::$_content;
 		}
 		// elseif the type is json
 		elseif(self::$_type == 'json') {
@@ -330,38 +276,51 @@ class Response {
 		elseif(self::$_type == 'xml') {
 
 		}
+		// elseif the type is csv
+		elseif(self::$_type == 'csv') {
+
+		}
+		// elseif the type is plain text
+		elseif(self::$_type == 'text') {
+			// if the content is of type array, var_export it
+			self::$_content = is_array(self::$_content) ? var_export(self::$_content, true) : self::$_content;
+		}
+		// elseif the type is file
+		elseif(self::$_type == 'file') {
+			// detect the mimetype to set the proper header
+			$headers['Content-Type'] = Filesystem::type(self::$_content);
+			// detect the modification time of the file
+			self::$_modification = filemtime(self::$_content);
+		}
 
 		// if the type is not a file
 		if(self::$_type != 'file') {
-			// indent
-			self::$_content = Config::get('response','indent') ? Format::indent(self::$_content) : self::$_content;
 			// obfuscate
-			self::$_content = Config::get('response','obfuscate') ? Format::obfuscate(self::$_content) : self::$_content;
-		}
-		
-		// if the type is not a file and we are allowed to compress
-		if(self::$_type != 'file' && Config::get('response','compress')) {
-			// compress
-			self::$_content = gzencode(self::$_content);
-			// add header
-			$headers['Content-Encoding'] = 'gzip';
+			self::$_content = Config::get('response', 'obfuscate') ? Format::obfuscate(self::$_content) : self::$_content;
+			// if compression is allowed
+			if(Config::get('response', 'compress')) {
+				// compress
+				self::$_content = gzencode(self::$_content);
+				// add header
+				$headers['Content-Encoding'] = 'gzip';
+			}
 		}
 
 		// if checksum is enabled
-		if(Config::get('response','checksum')) {
+		if(Config::get('response', 'checksum')) {
 			// generate that checksum
 			$headers['Content-MD5'] = self::$_type == 'file' ? md5_file(self::$_content) : md5(self::$_content);
 		}
-		// the content length
-		$headers['Content-length'] = self::$_type == 'file' ? filesize(self::$_content) : strlen(self::$_content);
+		// the content length (after any compression or obfuscation occured)
+		$headers['Content-Length'] = self::$_type == 'file' ? filesize(self::$_content) : strlen(self::$_content);
 		// if we have a modification date
 		if(self::$_modification) {
 			// output the proper modification date
-			$headers['Last-Modified'] = date('r',self::$_modification);
+			$headers['Last-Modified'] = date('r', self::$_modification);
 		}
-		// if cache is disabled -> specify Cache-control headers
-		if(!self::$_browserCache) {
-			// output specific headers
+		// if cache is disabled or we are output an error
+		if(!self::$_browserCache || self::$_status != 200) {
+			// output specific headers to disable browser cache
 			$headers['Cache-Control'] = 'must-revalidate, post-check=0, pre-check=0';	
 		}
 		// if the profiler is enabled
@@ -379,56 +338,69 @@ class Response {
 	}	
 
 	public static function clean() {
-
 		// clean the reponse
 		return(ob_get_clean());
-
 	}
 
 	public static function render() {
 
 		// if no content is set yet we garbage collect
 		self::$_content = self::$_content ?: self::clean();
-
-		// output status
-		header(self::$_status);
-		
+		// set the current protocol of fallback to HTTP 1.1 and set the status code plus message
+		header(Request::server('SERVER_PROTOCOL', 'HTTP/1.1') . ' ' . self::$_status . ' ' . self::$_codes[self::$_status]);
 		// stop the profiler
 		Profiler::stop();
-		
 		// format the content
 		self::formatContent();
-		
 		// for each header
 		foreach(self::$_headers as $header_key => $header_value) {
 			// output the header
 			header("{$header_key}: {$header_value}");		
 		}
-		
 		// if the type is file output from the file indicated as content else just output
 		echo self::getContent();
-		
 		// if cache is enabled and page is cachable
 		self::cache();
-		
 		// it ends here
 		exit;
 		
 	}
 	
-	public static function cache() {
-		
-		// if status is 200
-		
-
-		// save contents
-		
-		// save headers
-		
+	private static function cache() {
+		// if cache is enabled, no errors, cache time is set, response is not a file, method is not post
+		if(Config::get('response', 'cache') && self::$_status == '200' && 
+			self::$_outputCache && self::$_type != 'file' && !Request::isPost()) {
+			// add a from cache header
+			self::setHeaders(array(
+				'X-From-Cache'		=> 'hit',
+				'X-Cached-On'		=> date('r'),
+				'X-Cached-Until'	=> date('r', time() + self::$_outputCache)
+			));
+			// store the content and the header of this response
+			Cache::put(
+				// with the key being a signature of that request
+				Request::getSignature(), 
+				array(
+					self::$_headers,
+					base64_encode(self::$_content)
+				), 
+				// replace already existing cache file
+				true, 
+				// set the cache for some time
+				self::$_outputCache
+			);
+		}
 	}
 	
-	public static function download($file_name) {
-		
+	public static function download($file_name, $force=false) {
+		// set download headers
+		self::setHeaders(array(
+			'Content-Type'			=> $force ? 'application/octet-stream' : self::$_headers['Content-Type'],
+			'Content-Description'	=>'File Transfer',
+			'Content-Disposition'	=>'attachment; filename="' . Format::fsSafe($file_name) . '"'
+		));
+		// render
+		self::render();
 	}
 
 }

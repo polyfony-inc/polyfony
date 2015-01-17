@@ -13,15 +13,12 @@ namespace Polyfony\Store;
 
 class Filesystem implements StoreInterface {
 
-	// where to store
-	protected static $_root = '../Private/Storage/Store/';
-
 	public static function has($variable) {
 		
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
 		// if it exists
-		return(file_exists(self::$_root . $variable));
+		return(file_exists(\Polyfony\Config::get('store', 'path') . $variable));
 		
 	}
 	
@@ -31,12 +28,12 @@ class Filesystem implements StoreInterface {
 		// already exists and no overwrite
 		if(self::has($variable) && !$overwrite) {
 			// throw an exception
-			\Polyfony\Exception("{$variable} does not exist in the store.");
+			\Polyfony\Exception("{$variable} already exists in the store.");
 		}
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
 		// store it
-		file_put_contents(self::$_root . $variable, serialize($value));
+		file_put_contents(\Polyfony\Config::get('store', 'path') . $variable, serialize($value));
 		// return status
 		return(self::has($variable));
 		
@@ -53,7 +50,7 @@ class Filesystem implements StoreInterface {
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
 		// return it
-		return(unserialize(file_get_contents(self::$_root . $variable)));
+		return(unserialize(file_get_contents(\Polyfony\Config::get('store', 'path') . $variable)));
 		
 	}
 	
@@ -68,7 +65,7 @@ class Filesystem implements StoreInterface {
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
 		// return it
-		unlink(self::$_root . $variable);
+		unlink(\Polyfony\Config::get('store', 'path') . $variable);
 		// return opposite of presence of the object
 		return(!self::has($variable));
 		

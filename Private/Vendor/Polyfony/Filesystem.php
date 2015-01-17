@@ -99,7 +99,7 @@ class Filesystem {
 	public static function type($path) {
 		
 		// get a new fileinfo object
-		$info = new finfo(FILEINFO_MIME);
+		$info = new \finfo(FILEINFO_MIME);
 		// if the fileinfo failed to instanciate
 		if(!$info) {
 			// return an error

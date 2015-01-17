@@ -26,7 +26,7 @@ class Request {
 	private static $_signature;
 	
 	public static function init() {
-		
+
 		// set proper context
 		// depending if we are in command line
 		self::$_context = isset($_SERVER['argv'][0]) ? 'CLI' : 'HTTP';
@@ -42,6 +42,27 @@ class Request {
 		// set the request signature
 		// with post, if any
 		self::$_signature = self::isPost() ? sha1(self::$_url.json_encode($_POST)) : sha1(self::$_url);
+
+		// if the cache has this request signature in store
+		if(Cache::has(self::getSignature())) {
+			// get the body and headers from the cache
+			list($headers, $body) = Cache::get(self::getSignature());
+			// stop the profiler
+			Profiler::stop();
+			// get the profiler data
+			$profiler = Profiler::getData();
+			// memory usage	
+			$headers['X-Memory-Usage'] = Format::size($profiler['memory']);
+			// execution time
+			$headers['X-Execution-Time'] = round($profiler['time'] * 1000) . ' ms';
+			// for each header associated with the cached request
+			foreach($headers as $header => $value) {
+				// output that header
+				header("{$header}: {$value}");
+			}
+			// output the content and stop here
+			die(base64_decode($body));
+		}
 
 		// set globals
 		self::$_get		= isset($_GET)				? $_GET				: array();

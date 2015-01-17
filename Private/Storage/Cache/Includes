@@ -1,1 +1,1 @@
-a:3:{s:6:"routes";a:2:{i:0;s:40:"../Private/Bundles/Demo/Loader/Route.php";i:1;s:41:"../Private/Bundles/Tools/Loader/Route.php";}s:8:"runtimes";a:0:{}s:7:"bundles";a:2:{i:0;s:4:"Demo";i:1;s:5:"Tools";}}
+{"routes":["..\/Private\/Bundles\/Demo\/Loader\/Route.php","..\/Private\/Bundles\/Tools\/Loader\/Route.php"],"runtimes":[],"bundles":["Demo","Tools"]}
