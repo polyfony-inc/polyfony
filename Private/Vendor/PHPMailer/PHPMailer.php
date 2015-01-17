@@ -229,7 +229,6 @@ class PHPMailer
     /**
      * The default SMTP server port.
      * @type integer
-     * @TODO Why is this needed when the SMTP class takes care of it?
      */
     public $Port = 25;
 
@@ -344,7 +343,6 @@ class PHPMailer
     /**
      * Storage for addresses when SingleTo is enabled.
      * @type array
-     * @TODO This should really not be public
      */
     public $SingleToArray = array();
 
@@ -1937,9 +1935,8 @@ class PHPMailer
                 if (!defined('PKCS7_TEXT')) {
                     throw new \Polyfony\Exception($this->lang('signing') . ' OpenSSL extension missing.');
                 }
-                // @TODO would be nice to use php://temp streams here, but need to wrap for PHP < 5.1
                 $file = tempnam(sys_get_temp_dir(), 'mail');
-                file_put_contents($file, $body); // @TODO check this worked
+                file_put_contents($file, $body);
                 $signed = tempnam(sys_get_temp_dir(), 'signed');
                 if (@openssl_pkcs7_sign(
                     $file,
@@ -3156,7 +3153,6 @@ class PHPMailer
      * NOTE: will not work with arrays, there are no arrays to set/reset
      * @throws \Polyfony\Exception
      * @return boolean
-     * @TODO Should this not be using __set() magic function?
      */
     public function set($name, $value = '')
     {

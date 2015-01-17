@@ -2,8 +2,7 @@
 
 ## Polyfony 2 is a simple and powerful PHP micro-framework.
 
-Compared to major PHP frameworks, Polyfony follows the 80-20 Pareto principle :
-It provides 95% of what we need most of the time, whilst using 5% of ressources, space, configuration files and dependencies required by major frameworks.
+Compared to major PHP frameworks, Polyfony covers 95% of what we need most of the time, whilst using 5% of ressources, space, configuration files and dependencies required by major frameworks.
 
 #### Features
 routing, bundles, controllers, views, database abstraction, environments, locales, cache, vendor, helpers, authentication, profiler…

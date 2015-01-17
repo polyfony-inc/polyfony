@@ -143,7 +143,7 @@ class Mail {
 				// if we have only an email, set the name to null
 				list($individual_path, $individual_name) = is_array($individual_path) ? $individual_path : array($individual_path, null);
 				// recurse
-				$this->file($individual_path, $individual_path);
+				$this->file($individual_path, $individual_name);
 			}
 		}
 		// single recipient provided
