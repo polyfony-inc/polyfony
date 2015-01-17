@@ -8,4 +8,5 @@
 		<a class="btn btn-warning btn-lg" href="/tools/purgeCache/" role="button">Purge cache</a> 
 		<a class="btn btn-warning btn-lg" href="/tools/checkConfiguration/" role="button">Check configuration</a>
 	</p>
+	<?php echo isset($this->notice) ? $this->notice : ''; ?>
 </div>

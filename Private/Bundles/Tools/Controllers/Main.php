@@ -22,6 +22,12 @@ class MainController extends Pf\Controller {
 	
 	public function generateSymlinksAction() {
 
+		// add a success notice
+		$this->notice = new Pf\Notice\Success('Symlinks have been created', 'Success!');
+
+		// view the main index
+		$this->view('Index');
+
 	}
 
 	public function generateBundleAction() {
@@ -56,13 +62,13 @@ class MainController extends Pf\Controller {
 
 
 				// set a notice according to the status
-				$this->Notice = new Pf\Notice\Success('Files have been generated', 'Success!');
+				$this->notice = new Pf\Notice\Success('Files have been generated', 'Success!');
 
 			}
 			// parameters are missing
 			else {
 				// show a notice
-				$this->Notice = new Pf\Notice\Danger('Parameters are missing', 'Error!');
+				$this->notice = new Pf\Notice\Danger('Parameters are missing', 'Error!');
 			}
 		}
 
@@ -74,17 +80,27 @@ class MainController extends Pf\Controller {
 	// purge cached elements
 	public function purgeCacheAction() {
 
+		// has error
+		$has_error = false;
 		// for each file in the cache folder
-		foreach(Pf\Filesystem::ls('../Private/Store/Cache/') as $full_path => $name) {
+		foreach(Pf\Filesystem::ls('../Private/Storage/Cache/') as $full_path => $name) {
 			// if the file is normal
-			if(Pf\Filesystem::ifFile($full_path)) {
+			if(Pf\Filesystem::isFile($full_path) && Pf\Filesystem::isNormalName($full_path)) {
 				// remove that file
-				Pf\Filesystem::remove($full_path);
+				if(!Pf\Filesystem::remove($full_path)) {
+					// set the error marker
+					$has_error = true;
+				}
 			}
 		}
 
-		// redirect to the tools home page
-		Pf\Response::setRedirect('/tools/');
+		// set a notice depending on the presence of errors
+		$this->notice = $has_error ? 
+			new Pf\Notice\Danger('Cache directory has not been emptied', 'Error!') :
+			new Pf\Notice\Success('Cache directory has been emptied', 'Success!');
+
+		// view the index
+		$this->view('Index');
 
 	}
 
@@ -93,6 +109,12 @@ class MainController extends Pf\Controller {
 
 		// check for the presence of certain critical configuration parameters
 		// ---
+
+		// add a success notice
+		$this->notice = new Pf\Notice\Danger('Your configuration contains warnings or errors', 'Error!');
+
+		// view the index
+		$this->view('Index');
 
 	}
 

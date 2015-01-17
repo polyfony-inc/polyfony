@@ -254,6 +254,15 @@ $notice->getMessage($html_safe=true)
 $notice->getTitle($html_safe=true)
 ```
 
+Typical example
+
+```php
+// set a notice depending on the presence of errors
+$this->notice = $has_error ? 
+	new Pf\Notice\Danger('Cache directory has not been emptied', 'Error!') :
+	new Pf\Notice\Success('Cache directory has been emptied', 'Success!');
+```
+
 ### Response
 
 The response if preconfigured according to the Config.ini

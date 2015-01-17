@@ -13,7 +13,7 @@
 				CRUD Generator
 			</div>
 			<div class="panel-body">
-				<?php echo isset($this->Notice) ? $this->Notice : ''; ?>
+				<?php echo isset($this->notice) ? $this->notice : ''; ?>
 				<div class="form-group">
 					<label>Destination bundle</label>
 					<?php echo $this->bundleInput; ?>

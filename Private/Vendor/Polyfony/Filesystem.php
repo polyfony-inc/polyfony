@@ -35,7 +35,6 @@ class Filesystem {
 	}
 	
 	public static function ls($path, $filters=null) {
-
 		// prepare the results
 		$filtered = array();
 
@@ -43,7 +42,7 @@ class Filesystem {
 		$path = trim($path, '/') . '/';
 
 		// scan the folder
-		$files_and_folders = self::exists && self::isDirectory($path) ? scandir($path) : array();
+		$files_and_folders = self::exists($path) && self::isDirectory($path) ? scandir($path) : array();
 
 		// for each found result
 		foreach($files_and_folders as $file_or_folder) {
