@@ -201,37 +201,37 @@ Profiler::setMarker('begining_of_a_heavy_operation');
 Profiler::setMarker('end_of_heavy_opeartion')
 ```
 
-If the Config::get('profiler', 'enable_stack') if set to true,
+If the `Config::get('profiler', 'enable_stack')` if set to true,
 the stack of markers will be added at the bottom an html `Response` as a nice ul/li lists, or merged into a json `Response`
 
 
 ### Locales
 
 Locales are stored in csv files (tab + double-quotes), stored in each bundle in the `Bundles/MyBundle/Locales/` folder.
-The files are parsed the first time to ask for a locale. The language is automatically detected using the browser's language, you can set it manually.
+The files are parsed the first time you ask for a locale. The language is automatically detected using the browser's language, you can set it manually.
 
 * Retrieve a locale in the current language (auto-detection)
 
 ```php
-Locale::get($key);
+Locales::get($key)
 ```
 
-* Retrieve a local in a different languague
+* Retrieve a locale in a different languague
 
 ```php
-Locale::get($key, $language);
+Locales::get($key, $language)
 ```
 
-* Set the language (it is memorized in a cookie)
+* Set the language (it is memorized in a cookie for a month)
 
 ```php
-Locales::setLanguague($language);
+Locales::setLanguague($language)
 ```
 
 ### Exception
 
 Exception are routed to a route named « exception » if any, otherwise exception are thrown normally.
-The status code is 500 by default, you can specify any HTTP status code.
+The status code is 500 by default, you can specify any HTTP status code. The cache is disabled by such a status code.
 
 ```php
 Throw new Exception($error_message, $http_status_code);
@@ -239,7 +239,7 @@ Throw new Exception($error_message, $http_status_code);
 
 ### Notice
 
-You can choose from different types of notice
+You can use from different types of notice elements to suit your needs
 ```php
 Notice($message, $title=null)
 Notice\Danger($message, $title=null)
@@ -280,7 +280,7 @@ Response::render()
 ```php
 Response::setType('file')
 Response::setContent($file_path)
-Response::download('Myfilename.ext')
+Response::download('Myfilename.ext'[, $force_download=false])
 ```
 
 * to change the status code (to 400 Bad Request for example)
@@ -322,7 +322,7 @@ Note that cache has to be enabled in your ini configuration, posted `Request` ar
 Response::enableOutputCache($hours);
 ```
 
-A cache hit will always use less than 400 Ko of RAM and execute much faster, bellow 1 ms on any decent server
+A cache hit will always use less than 400 Ko of RAM and execute much faster, under a millisecond on any decent server
 
 * The `Response` provides some headers by default
 
@@ -360,7 +360,7 @@ The example bellow shows the same Hello World `Response` as above, but from the 
 The Store interface looks like this :
 ```php
 Store\Engine::has($variable);
-Store\Engine::put($variable, $value, $overwrite);
+Store\Engine::put($variable, $value [, $overwrite = false]);
 Store\Engine::get($variable); 
 Store\Engine::remove($variable);
 ```
@@ -376,7 +376,7 @@ Store\Memcache
 Store\Request
 ```
 The last on stores your key-value only for the time of the current request.
-Some of those engines have more capabilities than others, but all implement the basic interface.
+Some of those engines have more capabilities than others, but all implement the basic interface and can store both variables, arrays, or raw data.
 
 ### Runtime
 
@@ -395,11 +395,13 @@ Runtime::get($bundle_name, $key);
 
 ### Thumbnail
 
+`Thumbnails` are generated in JPEG format. The source image can be PNG or JPEG.
+
 ```php
 $thumbnail = new Thumbnail();
 $status = $thumbnail
-	->source("../private/data/storage/photos/original/{$id}")
-	->destination("../private/data/storage/photos/400/{$id}")
+	->source("../private/data/storage/photos/original/photo.jpg")
+	->destination("../private/data/storage/photos/400/photo.jpg")
 	->size(400)
 	->quality(90)
 	->execute();
@@ -409,6 +411,9 @@ boolean $status
 ```
 
 ### Uploader
+
+`Uploader` will generate a unique name for your file if only provide a destination folder.
+You can get the generated name this the `info()` method
 
 ```php
 $uploader = new Uploader();
@@ -543,7 +548,7 @@ $quote->adopt($image);
 <quote>Assurément, les affaires humaines ne méritent pas le grand sérieux<img src="/img/demo.png" alt="test" /></quote>
 ```
 
-Setting `value` will escape its html, along with setting `text`.
+Setting `value` will escape its html so will with setting `text`.
 
 ### Form
 
@@ -565,7 +570,7 @@ Note that optgroup are replaced by a matching locale (if any), and values are al
 ```php
 echo Form::select('sample', array(
 	'food'=>array(
-		0 => 'Banana',
+		0 => 'Cheese',
 		1 => 'Houmus',
 		2 => 'Mango'
 	),
