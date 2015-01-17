@@ -28,8 +28,6 @@ class Profiler {
 	
 		// start time
 		self::$_startTime = microtime(true);
-		// start memory
-		self::$_startMemory = memory_get_usage();
 
 	}
 	

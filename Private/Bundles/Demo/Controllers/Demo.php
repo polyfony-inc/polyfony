@@ -50,7 +50,10 @@ class DemoController extends pf\Controller {
 			'placeholder'	=>'*************'
 		));;
 		
-		//class="form-control" id="inputLogin" placeholder="Email"
+		// cache the page for 24 hours
+		pf\Response::enableOutputCache(24);
+
+		// view
 		$this->view('Login');
 	}
 	

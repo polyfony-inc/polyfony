@@ -318,7 +318,7 @@ class Response {
 			// output the proper modification date
 			$headers['Last-Modified'] = date('r', self::$_modification);
 		}
-		// if cache is disabled or we are output an error
+		// if cache is disabled or we are outputing an error
 		if(!self::$_browserCache || self::$_status != 200) {
 			// output specific headers to disable browser cache
 			$headers['Cache-Control'] = 'must-revalidate, post-check=0, pre-check=0';	
