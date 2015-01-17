@@ -67,7 +67,7 @@ class HttpRequest {
 	}
 
 	// set a file to be posted
-	public function attachment($key, $path) {
+	public function file($key, $path) {
 		// add to the list of files
 		$this->data[$key] = '@'.$path;
 		// return self
@@ -94,6 +94,14 @@ class HttpRequest {
 	public function timeout($seconds) {
 		// set the timeout
 		$this->timeout = intval($seconds);
+		// return self
+		return($this);
+	}
+
+	// set the retry count
+	public function timeout($times) {
+		// set the timeout
+		$this->retry = intval($times);
 		// return self
 		return($this);
 	}

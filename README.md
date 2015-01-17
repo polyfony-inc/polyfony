@@ -353,7 +353,7 @@ The example bellow shows the same Hello World `Response` as above, but from the 
 < X-From-Cache: hit
 < X-Cached-On: Sat, 17 Jan 2015 00:51:38 +0100
 < X-Cached-Until: Sun, 18 Jan 2015 00:51:38 +0100
-``
+```
 
 ### Store
 
@@ -433,9 +433,16 @@ This class provides a simple interface to build HTTP Requests
 $request = new HttpRequest();
 $status = $this->Request
 	->url('https://maps.googleapis.com/maps/api/geocode/json')
+	->timeout(15)
+	->retry(2)
 	->data('address','Paris')
 	->get();
 ```
+
+This example will tro access `https://maps.googleapis.com/maps/api/geocode/json?address=Paris`, 
+waiting 15 seconds for a response, retrying 2 times if doesn't get a 200 status code.
+The default waiting is 60 seconds, and retry is 3 times.
+
 ```php
 boolean $status
 string $request->getHeader('Content-Type')
@@ -443,6 +450,17 @@ mixed $request->getBody()
 
 ```
 Responses of type application/json will be decoded to array, response of type application/xml will be decoded to SimpleXML object.
+
+* Attaching a file 
+```php
+$request->file($field_name, $path);
+```
+
+* Sending a cookie
+```php
+$request->cookie($key, $value)
+```
+
 
 ### Mail
 
@@ -490,7 +508,7 @@ The template uses variables named `__{$variable}__` ex:
 </body>
 ```
 
-```
+```php
 $mail->set('message','My example')
 ```
 
