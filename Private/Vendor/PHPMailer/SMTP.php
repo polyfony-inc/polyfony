@@ -19,7 +19,7 @@
 
 /**
  * PHPMailer RFC821 SMTP email transport class.
- * Implements RFC 821 SMTP commands and provides some utility methods for sending mail to an SMTP server.
+ * Implements RFC 821 SMTP commands && provides some utility methods for sending mail to an SMTP server.
  * @package PHPMailer
  * @author Chris Ryan <unknown@example.com>
  * @author Marcus Bointon <phpmailer@synchromedia.co.uk>
@@ -64,12 +64,12 @@ class SMTP
     const DEBUG_CLIENT = 1;
 
     /**
-     * Debug level to show client -> server and server -> client messages
+     * Debug level to show client -> server && server -> client messages
      */
     const DEBUG_SERVER = 2;
 
     /**
-     * Debug level to show connection status, client -> server and server -> client messages
+     * Debug level to show connection status, client -> server && server -> client messages
      */
     const DEBUG_CONNECTION = 3;
 
@@ -107,7 +107,7 @@ class SMTP
      * Options:
      * * self::DEBUG_OFF (`0`) No debug output, default
      * * self::DEBUG_CLIENT (`1`) Client commands
-     * * self::DEBUG_SERVER (`2`) Client commands and server responses
+     * * self::DEBUG_SERVER (`2`) Client commands && server responses
      * * self::DEBUG_CONNECTION (`3`) As DEBUG_SERVER plus connection status
      * * self::DEBUG_LOWLEVEL (`4`) Low-level data output, all messages
      * @type integer
@@ -121,7 +121,7 @@ class SMTP
      * * `html` Output escaped, line breaks converted to `<br>`, appropriate for browser output
      * * `error_log` Output to error log as configured in php.ini
      *
-     * Alternatively, you can provide a callable expecting two params: a message string and the debug level:
+     * Alternatively, you can provide a callable expecting two params: a message string && the debug level:
      * <code>
      * $smtp->Debugoutput = function($str, $level) {echo "debug level $level; message: $str";};
      * </code>
@@ -222,7 +222,7 @@ class SMTP
 
     /**
      * Connect to an SMTP server.
-     * @param string $host SMTP server IP or host name
+     * @param string $host SMTP server IP || host name
      * @param integer $port The port number to connect to
      * @param integer $timeout How long to wait for the connection to open
      * @param array $options An array of options for stream_context_create()
@@ -233,7 +233,7 @@ class SMTP
     {
         static $streamok;
         //This is enabled by default since 5.0.0 but some providers disable it
-        //Check this once and cache the result
+        //Check this once && cache the result
         if (is_null($streamok)) {
             $streamok = function_exists('stream_socket_client');
         }
@@ -359,7 +359,7 @@ class SMTP
                 if (!$this->sendCommand('AUTH', 'AUTH PLAIN', 334)) {
                     return false;
                 }
-                // Send encoded username and password
+                // Send encoded username && password
                 if (!$this->sendCommand(
                     'User & Password',
                     base64_encode("\0" . $username . "\0" . $password),
@@ -508,7 +508,7 @@ class SMTP
     }
 
     /**
-     * Close the socket and clean up the state of the class.
+     * Close the socket && clean up the state of the class.
      * Don't use this function without first trying to use QUIT.
      * @see quit()
      * @access public
@@ -519,7 +519,7 @@ class SMTP
         $this->error = array();
         $this->helo_rply = null;
         if (is_resource($this->smtp_conn)) {
-            // close the connection and cleanup
+            // close the connection && cleanup
             fclose($this->smtp_conn);
             $this->smtp_conn = null; //Makes for cleaner serialization
             $this->edebug('Connection: closed', self::DEBUG_CONNECTION);
@@ -528,11 +528,11 @@ class SMTP
 
     /**
      * Send an SMTP DATA command.
-     * Issues a data command and sends the msg_data to the server,
+     * Issues a data command && sends the msg_data to the server,
      * finializing the mail transaction. $msg_data is the message
      * that is to be send with the headers. Each header needs to be
      * on a single line followed by a <CRLF> with the message headers
-     * and the message body being separated by and additional <CRLF>.
+     * && the message body being separated by && additional <CRLF>.
      * Implements rfc 821: DATA <CRLF>
      * @param string $msg_data Message data to send
      * @access public
@@ -547,15 +547,15 @@ class SMTP
          * According to rfc821 we should not send more than 1000 characters on a single line (including the CRLF)
          * so we will break the data up into lines by \r and/or \n then if needed we will break each of those into
          * smaller lines to fit within the limit.
-         * We will also look for lines that start with a '.' and prepend an additional '.'.
+         * We will also look for lines that start with a '.' && prepend an additional '.'.
          * NOTE: this does not count towards line-length limit.
          */
 
         // Normalize line breaks before exploding
         $lines = explode("\n", str_replace(array("\r\n", "\r"), "\n", $msg_data));
 
-        /* To distinguish between a complete RFC822 message and a plain message body, we check if the first field
-         * of the first line (':' separated) does not contain a space then it _should_ be a header and we will
+        /* To distinguish between a complete RFC822 message && a plain message body, we check if the first field
+         * of the first line (':' separated) does not contain a space then it _should_ be a header && we will
          * process all lines before a blank line as headers.
          */
 
@@ -567,7 +567,7 @@ class SMTP
 
         foreach ($lines as $line) {
             $lines_out = array();
-            if ($in_headers and $line == '') {
+            if ($in_headers && $line == '') {
                 $in_headers = false;
             }
             // ok we need to break this line up into several smaller lines
@@ -576,7 +576,7 @@ class SMTP
                 //Working backwards, try to find a space within the last MAX_LINE_LENGTH chars of the line to break on
                 //so as to avoid breaking in the middle of a word
                 $pos = strrpos(substr($line, 0, self::MAX_LINE_LENGTH), ' ');
-                if (!$pos) { //Deliberately matches both false and 0
+                if (!$pos) { //Deliberately matches both false && 0
                     //No nice break found, add a hard break
                     $pos = self::MAX_LINE_LENGTH - 1;
                     $lines_out[] = substr($line, 0, $pos);
@@ -599,7 +599,7 @@ class SMTP
             // Send the lines to the server
             foreach ($lines_out as $line_out) {
                 //RFC2821 section 4.5.2
-                if (!empty($line_out) and $line_out[0] == '.') {
+                if (!empty($line_out) && $line_out[0] == '.') {
                     $line_out = '.' . $line_out;
                 }
                 $this->client_send($line_out . self::CRLF);
@@ -611,23 +611,23 @@ class SMTP
     }
 
     /**
-     * Send an SMTP HELO or EHLO command.
+     * Send an SMTP HELO || EHLO command.
      * Used to identify the sending server to the receiving server.
-     * This makes sure that client and server are in a known state.
+     * This makes sure that client && server are in a known state.
      * Implements RFC 821: HELO <SP> <domain> <CRLF>
-     * and RFC 2821 EHLO.
-     * @param string $host The host name or IP to connect to
+     * && RFC 2821 EHLO.
+     * @param string $host The host name || IP to connect to
      * @access public
      * @return boolean
      */
     public function hello($host = '')
     {
         // Try extended hello first (RFC 2821)
-        return (boolean)($this->sendHello('EHLO', $host) or $this->sendHello('HELO', $host));
+        return (boolean)($this->sendHello('EHLO', $host) || $this->sendHello('HELO', $host));
     }
 
     /**
-     * Send an SMTP HELO or EHLO command.
+     * Send an SMTP HELO || EHLO command.
      * Low-level implementation used by hello()
      * @see hello()
      * @param string $hello The HELO string
@@ -645,8 +645,8 @@ class SMTP
     /**
      * Send an SMTP MAIL command.
      * Starts a mail transaction from the email address specified in
-     * $from. Returns true if successful or false otherwise. If True
-     * the mail transaction is started and then one or more recipient
+     * $from. Returns true if successful || false otherwise. If True
+     * the mail transaction is started && then one || more recipient
      * commands may be called followed by a data command.
      * Implements rfc 821: MAIL <SP> FROM:<reverse-path> <CRLF>
      * @param string $from Source address of this message
@@ -665,7 +665,7 @@ class SMTP
 
     /**
      * Send an SMTP QUIT command.
-     * Closes the socket if there is no error or the $close_on_error argument is true.
+     * Closes the socket if there is no error || the $close_on_error argument is true.
      * Implements from rfc 821: QUIT <CRLF>
      * @param boolean $close_on_error Should the connection close if an error occurs?
      * @access public
@@ -675,7 +675,7 @@ class SMTP
     {
         $noerror = $this->sendCommand('QUIT', 'QUIT', 221);
         $err = $this->error; //Save any error
-        if ($noerror or $close_on_error) {
+        if ($noerror || $close_on_error) {
             $this->close();
             $this->error = $err; //Restore any error from the quit command
         }
@@ -713,10 +713,10 @@ class SMTP
     }
 
     /**
-     * Send a command to an SMTP server and check its return code.
+     * Send a command to an SMTP server && check its return code.
      * @param string $command       The command name - not sent to the server
      * @param string $commandstring The actual command to send
-     * @param integer|array $expect     One or more expected integer success codes
+     * @param integer|array $expect     One || more expected integer success codes
      * @access protected
      * @return boolean True on success.
      */
@@ -755,11 +755,11 @@ class SMTP
     /**
      * Send an SMTP SAML command.
      * Starts a mail transaction from the email address specified in $from.
-     * Returns true if successful or false otherwise. If True
-     * the mail transaction is started and then one or more recipient
+     * Returns true if successful || false otherwise. If True
+     * the mail transaction is started && then one || more recipient
      * commands may be called followed by a data command. This command
      * will send the message to the users terminal if they are logged
-     * in and send them an email.
+     * in && send them an email.
      * Implements rfc 821: SAML <SP> FROM:<reverse-path> <CRLF>
      * @param string $from The address the message is from
      * @access public
@@ -796,7 +796,7 @@ class SMTP
      * Send an SMTP TURN command.
      * This is an optional command for SMTP that this class does not support.
      * This method is here to make the RFC821 Definition complete for this class
-     * and _may_ be implemented in future
+     * && _may_ be implemented in future
      * Implements from rfc 821: TURN <CRLF>
      * @access public
      * @return boolean
@@ -814,7 +814,7 @@ class SMTP
      * Send raw data to the server.
      * @param string $data The data to send
      * @access public
-     * @return integer|boolean The number of bytes sent to the server or false on error
+     * @return integer|boolean The number of bytes sent to the server || false on error
      */
     public function client_send($data)
     {
@@ -844,7 +844,7 @@ class SMTP
 
     /**
      * Read the SMTP server's response.
-     * Either before eof or socket timeout occurs on the operation.
+     * Either before eof || socket timeout occurs on the operation.
      * With SMTP we can tell if we have more lines to read if the
      * 4th character is '-' symbol. If it is a space then we don't
      * need to read anything else.
@@ -870,10 +870,10 @@ class SMTP
             $data .= $str;
             $this->edebug("SMTP -> get_lines(): \$data is \"$data\"", self::DEBUG_LOWLEVEL);
             // If 4th character is a space, we are done reading, break the loop, micro-optimisation over strlen
-            if ((isset($str[3]) and $str[3] == ' ')) {
+            if ((isset($str[3]) && $str[3] == ' ')) {
                 break;
             }
-            // Timed-out? Log and break
+            // Timed-out? Log && break
             $info = stream_get_meta_data($this->smtp_conn);
             if ($info['timed_out']) {
                 $this->edebug(
@@ -883,7 +883,7 @@ class SMTP
                 break;
             }
             // Now check if reads took too long
-            if ($endtime and time() > $endtime) {
+            if ($endtime && time() > $endtime) {
                 $this->edebug(
                     'SMTP -> get_lines(): timelimit reached ('.
                     $this->Timelimit . ' sec)',
@@ -896,7 +896,7 @@ class SMTP
     }
 
     /**
-     * Enable or disable VERP address generation.
+     * Enable || disable VERP address generation.
      * @param boolean $enabled
      */
     public function setVerp($enabled = false)
