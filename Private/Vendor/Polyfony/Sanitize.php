@@ -14,47 +14,32 @@
 namespace Polyfony;
 
 class Sanitize {
-	
-	// will clean the value of anything but 0-9
+
+
+	// will clean the value of anything but 0-9 and minus
 	// preserve sign
 	// return integer
 	public static function integer($value) {
 
-		$dotPos = strrpos($value, '.');
-
-		$commaPos = strrpos($value, ',');
-
-		$sep =	(($dotPos > $commaPos) && $dotPos) ? $dotPos : 
-				((($commaPos > $dotPos) && $commaPos) ? $commaPos : false);
-		
-		if (!$sep) {
-			return intval(preg_replace("/[^0-9\-]/", "", $value));
-		}
-
-		return intval(preg_replace("/[^0-9\-]/", "", substr($value, 0, $sep)));
+		if(strrpos($value, '.')) {
+			$value = str_replace(',', '' , $value);
+		} else if(strrpos($value, ',')) {
+			$value = str_replace('.', '' , $value);
+		} 
+		return(intval(preg_replace("/[^0-9.\-]/", "", str_replace(',', '.' , $value))));
 	}
 	
-	// will clean the value of anything but 0-9
-	// wil preserve decimal part
-	// will preserve sign
+	// will clean the value of anything but 0-9\.-
+	// preserve sign
 	// return float
 	public static function float($value) {
 
-		$dotPos = strrpos($value, '.');
-
-		$commaPos = strrpos($value, ',');
-
-		$sep =	(($dotPos > $commaPos) && $dotPos) ? $dotPos : 
-				((($commaPos > $dotPos) && $commaPos) ? $commaPos : false);
-		
-			if (!$sep) {
-				return floatval(preg_replace("/[^0-9\-]/", "", $value));
-			}
-
-		return floatval(
-					preg_replace("/[^0-9\-]/", "", substr($value, 0, $sep)) . '.' .
-					preg_replace("/[^0-9]/", "", substr($value, $sep+1, strlen($value)))
-		);
+		if(strrpos($value, '.')) {
+			$value = str_replace(',', '' , $value);
+		} else if(strrpos($value, ',')) {
+			$value = str_replace('.', '' , $value);
+		} 
+		return(floatval(preg_replace("/[^0-9.\-]/", "", str_replace(',', '.' , $value))));
 	}
 	
 	// will clean from special characters
