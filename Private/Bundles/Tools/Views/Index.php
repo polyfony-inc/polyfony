@@ -9,4 +9,5 @@
 		<a class="btn btn-warning btn-lg" href="/tools/checkConfiguration/" role="button">Check configuration</a>
 	</p>
 	<?php echo isset($this->notice) ? $this->notice : ''; ?>
+	<?php echo isset($this->errors) ? $this->errors : ''; ?>
 </div>

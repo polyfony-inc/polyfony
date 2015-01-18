@@ -190,6 +190,11 @@ class Response {
 		return(self::$_type);
 	}
 
+	public static function getCharset() {
+		// the current charset
+		return(self::$_charset);
+	}
+
 	// format an return metas
 	private static function prependMetas() {
 		// de-deuplicate js files
@@ -271,14 +276,6 @@ class Response {
 			self::$_content = array_merge(self::$_content, Config::get('profiler', 'enable_stack', true) ? Profiler::getArray() : array());
 			// encode the content to json
 			self::$_content = json_encode(self::$_content);
-		}
-		// elseif the type is xml
-		elseif(self::$_type == 'xml') {
-
-		}
-		// elseif the type is csv
-		elseif(self::$_type == 'csv') {
-
 		}
 		// elseif the type is plain text
 		elseif(self::$_type == 'text') {

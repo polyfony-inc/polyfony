@@ -107,11 +107,24 @@ class MainController extends Pf\Controller {
 	// check the configuration of the framework, to see if everything is ok
 	public function checkConfigurationAction() {
 
-		// check for the presence of certain critical configuration parameters
-		// ---
+		// list of errors 
+		$this->errors = new Pf\Element('ul', array('class'=>'list-group'));
 
-		// add a success notice
-		$this->notice = new Pf\Notice\Danger('Your configuration contains warnings or errors', 'Error!');
+		// check that the security salt has been changed
+		if(Pf\Config::get('security', 'salt') == '0X6B2HS71JQNWDH68700QKPWANY') {
+			// add a notice
+			$this->errors->adopt(new Pf\Element('li',array('class'=>'list-group-item','text'=>'You should change the [security] salt in Config.ini')));
+		}
+
+		// check that the keys salt has been changed
+		if(Pf\Config::get('keys', 'salt') == 'VF6RV2087B0D6GJ*Tg6!Smx-2dS') {
+			// add a notice
+			$this->errors->adopt(new Pf\Element('li',array('class'=>'list-group-item','text'=>'You should change the [keys] salt in Config.ini')));
+		}
+
+		$this->notice = $this->errors ? 
+			new Pf\Notice\Danger('Your configuration contains warnings or errors', 'Error!') :
+			new Pf\Notice\Success('Your configuration seems to be OK', 'Success!');
 
 		// view the index
 		$this->view('Index');

@@ -41,15 +41,13 @@ class Exception extends \Exception {
 	
 	public static function catchException($exception) {
 	
-		// if the router has an exception route, and wants to output html we catch and route to it
+		// if the router has an exception route
 		if(Router::hasRoute('exception')) {
-			// set the proper header in the response
-			Response::setStatus($exception->getCode() != 0 ? $exception->getCode() : 500);
-			// disable browser cache
-			Response::disableBrowserCache();
+			// change the status code of the response
+			Response::setStatus($exception->getCode() ? $exception->getCode() : 500);
 			// store the exception so that the error controller can format it later on
 			Store\Request::put('exception', $exception, true);
-			// dispatch to the exception controller
+			// dispatch to the exception route
 			Router::forward(Router::getRoute('exception'));
 			// render the response
 			Response::render();
@@ -97,7 +95,7 @@ class Exception extends \Exception {
 	public function __toString() {
 		
 		// if the output type different from html
-		return(in_array(Response::getType(),array('html','html-page')) ? $this->__toHtml() : $this->__toText());
+		return(in_array(Response::getType(), array('html','html-page')) ? $this->__toHtml() : $this->__toText());
 		
 	}
 	

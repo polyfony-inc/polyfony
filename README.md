@@ -29,18 +29,17 @@ You can read this quick tour, or just browse the `../Private/Bundles/Demo/` code
 The code bellow assumes that your are using the `Polyfony` namespace in your controller.
 
 ### Request
-* Retrieve an url parameter
+* retrieve an url parameter
 ```php
-// get a parameter named format from the url
 Request::get('format');
 ```
 
-* Retrieve a posted field named `search`
+* retrieve a posted field named `search`
 ```php
 Request::post('search');
 ```
 
-* Retrieve a file
+* retrieve a file
 ```php
 Request::files('attachment_document');
 ```
@@ -617,6 +616,19 @@ List of available elements :
 
 Form elements general syntax is : `$name, $value, $options` when you get a form element from a `Record`, the `$name` and `$value` are set automatically, only `$options` are available. The select elements is slighly different : `$name, $list, $value, $options`
 
+### Filesystem
+
+The filesystem class allows you to manipulate directories and files easily.
+Most methods have a `chroot` option that will force all operations to appen in the `../Private/Storage/Data/` directory. 
+You can define a different storage directory in your `Config.ini` under `[polyfony]` and `data_path`.
+
+```php
+Filesystem::mkdir('/my-directory/', '0777', true);
+Filesystem::mkdir('../../../../my-directory/', '0777', true);
+```
+* Both commands will create `../Private/Storage/Data/my-directory/`
+
+If you want to operate outside of the Data storage folder, ommit the chroot parameter or set it to false. 
 
 #### Google\Position
 

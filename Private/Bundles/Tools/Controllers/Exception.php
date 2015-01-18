@@ -10,11 +10,11 @@ class ExceptionController extends Polyfony\Controller {
 	public function exceptionAction() {
 		
 		// error occured while requesting something else than html
-		if(!in_array(pf\Response::getType(),array('html','html-page'))) {
-			// change the type
-			pf\Response::setType('json');
+		if(!in_array(pf\Response::getType(), array('html','html-page'))) {
+			// change the type to plaintext
+			pf\Response::setType('text');
 			// set the stack a string
-			pf\Response::setContent(pf\Store\Request::get('exception')->getTraceAsString());
+			pf\Response::setContent((string) pf\Store\Request::get('exception'));
 			// render as is
 			pf\Response::render();
 		}
