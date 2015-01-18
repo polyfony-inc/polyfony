@@ -129,7 +129,7 @@ class Request {
 	 * @return mixed
 	 * @static
 	 */
-	public static function header($variable=null,$default=null) {
+	public static function header($variable=null, $default=null) {
 		return isset(self::$_headers[$variable])
 			? self::$_headers[$variable]
 			: $default;

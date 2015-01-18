@@ -546,8 +546,7 @@ echo $image;
 <img src="/img/demo.png" alt="test" />
 ```
 
-* Create an HTML element with an opening a closing tag
-`text` will escape html 
+* Create an HTML element with an opening and a closing tag 
 
 ```php
 $quote = new Element('quote',array('text'=>'Assurément, les affaires humaines ne méritent pas le grand sérieux'));
@@ -588,8 +587,23 @@ echo Form::select('sample', array(
 		4 => 'Cow',
 		5 => 'Lizard'
 	)
-))
+), 3)
 ```
+```html
+<select name="sample">
+	<optgroup label="food">
+		<option value="0">Cheese</option>
+		<option value="1">Houmus</option>
+		<option value="2">Mango</option>
+	</optgroup>
+	<optgroup label="not_food">
+		<option value="3" selected="selected">Dog</option>
+		<option value="4">Cow</option>
+		<option value="5">Lizard</option>
+	</optgroup>
+</select>
+```
+
 
 Shortcuts are available from `Record` object, ex.
 

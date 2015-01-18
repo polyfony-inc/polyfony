@@ -85,7 +85,7 @@ class MainController extends Pf\Controller {
 		// for each file in the cache folder
 		foreach(Pf\Filesystem::ls('../Private/Storage/Cache/') as $full_path => $name) {
 			// if the file is normal
-			if(Pf\Filesystem::isFile($full_path) && Pf\Filesystem::isNormalName($full_path)) {
+			if(Pf\Filesystem::isFile($full_path) && Pf\Filesystem::isNormalName($name)) {
 				// remove that file
 				if(!Pf\Filesystem::remove($full_path)) {
 					// set the error marker
