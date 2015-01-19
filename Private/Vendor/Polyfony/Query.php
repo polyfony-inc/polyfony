@@ -48,6 +48,8 @@ class Query {
 		$this->Prepared		= null;
 		// set the status of the query
 		$this->Success		= false;
+		// set the option to return all results, not only the first
+		$this->First 		= false;
 		// set the result as being empty for no
 		$this->Result		= null;
 		// set the array of results as being empty too
@@ -56,7 +58,7 @@ class Query {
 		$this->Action		= null;
 		// set the unique hash of the query for caching purpose
 		$this->Hash			= null;
-		// set the maximum age allowed from the cache (in hour), 6h would use caches 6h old at maximum, 0 uses cache since table was not updated
+		// set the maximum age allowed from the cache (in hour)
 		$this->Lag			= null;
 		// initialize attributes
 		$this->Table		= null;
@@ -696,6 +698,14 @@ class Query {
 		return($this);
 	}
 
+	// return only the first result
+	public function first() {
+		// return only the first record
+		$this->First = true;
+		// return self query
+		return($this);
+	}
+
 	// execute the query
 	public function execute() {
 		// if the action is missing
@@ -881,27 +891,13 @@ class Query {
 				->execute()
 			);
 		}
+		// if we want the first result only from a select query
+		if($this->First && $this->Action == 'SELECT' && $this->Success && is_array($this->Result)) {
+			// return the first result
+			return($this->Result[0]);
+		}
 		// return the results
 		return($this->Result);
-	}
-	
-	public function first() {
-
-		// execute the query normally
-		$this->execute();
-
-		// if the action is not a select
-
-			// throw an exception
-
-		// if the result is an array
-
-			// return the first result of the array
-
-		// otherwise
-
-			// return false
-
 	}
 
 	// convert the value depending on the column name
