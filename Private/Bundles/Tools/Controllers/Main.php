@@ -19,6 +19,17 @@ class MainController extends Pf\Controller {
 		$this->view('Index');
 		
 	}
+
+	// cleanup the framework before a commit
+	public function commitAction() {
+
+		// vacuum the database
+		$this->vacuumDatabaseAction();
+
+		// purge the main cache
+		$this->purgeCacheAction();
+
+	}
 	
 	public function generateSymlinksAction() {
 
@@ -105,7 +116,7 @@ class MainController extends Pf\Controller {
 		// has error
 		$has_error = false;
 		// for each file in the cache folder
-		foreach(Pf\Filesystem::ls('../Private/Storage/Cache/') as $full_path => $name) {
+		foreach(Pf\Filesystem::ls(Pf\Config::get('cache', 'path')) as $full_path => $name) {
 			// if the file is normal
 			if(Pf\Filesystem::isFile($full_path) && Pf\Filesystem::isNormalName($name)) {
 				// remove that file
@@ -123,6 +134,37 @@ class MainController extends Pf\Controller {
 
 		// view the index
 		$this->view('Index');
+
+	}
+
+	// clean the database
+	public function vacuumDatabaseAction() {
+
+		// close all sessions
+		Pf\Database::query()
+			->update('Accounts')
+			->set(array(
+				'session_expiration_date'	=>null,
+				'session_key'				=>null,
+				'last_login_origin'			=>null,
+				'last_login_agent'			=>null,
+				'last_login_date'			=>null,
+				'last_failure_origin'		=>null,
+				'last_failure_agent'		=>null,
+				'last_failure_date'			=>null,
+			))->execute();
+
+		// remove all logs
+		Pf\Database::query()->delete()->from('Logs')->execute();
+
+		// remove all emails
+		Pf\Database::query()->delete()->from('Mails')->execute();
+
+		// remove all Store\Database record
+		Pf\Database::query()->delete()->from('Store')->execute();
+
+		// vacuum the database
+		Pf\Database::query()->query('vacuum')->execute();
 
 	}
 

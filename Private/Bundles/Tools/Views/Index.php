@@ -6,6 +6,7 @@
 		<a class="btn btn-warning btn-lg" href="/tools/generateSymlinks/" role="button">Generate assets symlinks</a> 
 		<a class="btn btn-warning btn-lg" href="/tools/generateBundle/" role="button">Generate CRUD bundle</a> 
 		<a class="btn btn-warning btn-lg" href="/tools/purgeCache/" role="button">Purge cache</a> 
+		<a class="btn btn-warning btn-lg" href="/tools/vacuumDatabase/" role="button">Vacuum database</a> 
 		<a class="btn btn-warning btn-lg" href="/tools/checkConfiguration/" role="button">Check configuration</a>
 	</p>
 	<?php echo isset($this->notice) ? $this->notice : ''; ?>
