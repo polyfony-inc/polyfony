@@ -47,9 +47,13 @@ class Sanitize {
 		
 	}
 	
-	// will only allow numbers, + and ()
-	public static function phone() {
-		
+	// will only allow numbers and + 
+	// fields are dash separated 
+	public static function phone($value) {
+		$value = str_replace(array(" ", ".", "ext", "extension", "x", "/", ".","(",")"), "-", $value);
+		$value = str_replace(array("---","--"), "-", $value);
+		$value = substr($value, 0, 1) != "-" ? $value : substr($value,1);
+		return (preg_replace("/[^0-9+\-]/", "", $value));	
 	}
 
 
