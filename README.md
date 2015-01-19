@@ -169,7 +169,6 @@ Config::get('group', 'key')
 Having specific ini configuration files for development and production allows your to :
 * set an bypass email to redirect all email sent in development environment
 * enable compression, obfuscation and cache only in production
-* enable code indentation in development
 * show the profiler stack in development
 * use different database configuration in development or production
 * etc.

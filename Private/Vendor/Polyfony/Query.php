@@ -870,12 +870,12 @@ class Query {
 			// we must notify the cache of the new modification date for this table
 			$this->updateOutdated();
 		}
+		*/
 		// if action succeeded and has some kind of useful result (SELECT or SELECT via a QUERY) and has a table set
 		if(($this->Action == 'SELECT' || ($this->Action == 'QUERY' && substr($this->Query,0,6) == 'SELECT')) && $this->Table && $this->Success) {
 			// place result in cache
 			$this->putInCache();
 		}
-		*/
 		// if action was UPDATE or DELETE or one of those via QUERY
 		if(in_array($this->Action,array('UPDATE','DELETE')) || ($this->Action == 'QUERY' && in_array(substr($this->Query,0,6),array('UPDATE','DELETE')) && $this->Table)) {
 			// return the number of affected rows

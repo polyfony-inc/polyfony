@@ -122,6 +122,12 @@ class MainController extends Pf\Controller {
 			$this->errors->adopt(new Pf\Element('li',array('class'=>'list-group-item','text'=>'You should change the [keys] salt in Config.ini')));
 		}
 
+		// check if the database is writable
+		if(!is_writable(Pf\Config::get('database', 'database'))) {
+			// add a notice
+			$this->errors->adopt(new Pf\Element('li',array('class'=>'list-group-item','text'=>'The database is not writable')));
+		}
+
 		$this->notice = $this->errors ? 
 			new Pf\Notice\Danger('Your configuration contains warnings or errors', 'Error!') :
 			new Pf\Notice\Success('Your configuration seems to be OK', 'Success!');

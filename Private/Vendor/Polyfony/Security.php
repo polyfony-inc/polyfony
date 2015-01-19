@@ -256,7 +256,7 @@ class Security {
 	public static function hasLevel($level=null) {
 	
 		// if we have said level
-		return(self::get('id_level',100) <= $level ? true : false);
+		return(self::get('id_level', 100) <= $level ? true : false);
 		
 	}
 	
@@ -264,15 +264,15 @@ class Security {
 	public static function hasModule($module=null) {
 		
 		// if module is in our credentials
-		return(in_array($module,self::get('modules_array',array())) ?: false);
+		return(in_array($module, self::get('modules_array', array())) ?: false);
 		
 	}
 	
 	// get a specific credential
-	public static function get($credential,$default=null) {
+	public static function get($credential, $default=null) {
 
 		// return said credential or default
-		return(self::$_account->get($credential) ? self::$_account->get($credential) : $default);
+		return(self::$_account->get($credential) ?: $default);
 		
 	}
 	
