@@ -55,8 +55,14 @@ class Security {
 			->set('session_expiration_date','')
 			->save();
 
-		// and remove the cookie and redirect to the login page
-		self::refuse('You have successfully closed your session', 403, true);
+		// remove the cookie
+		Store\Cookie::remove(Config::get('security', 'cookie'));
+
+		// and redirect to the exit route or fallback to the login route
+		Response::setRedirect(Config::get('router', 'exit_route') ?: Config::get('router', 'login_route'));
+
+		// render the response
+		Response::render();
 
 	}
 
@@ -64,14 +70,13 @@ class Security {
 	private static function authenticate() {
 
 		// search for an account with that session key
-		$found_accounts = Database::query()
-			->select()->from('Accounts')
+		$account = Database::query()
+			->select()
+			->first()
+			->from('Accounts')
 			->where(array('session_key'=>Store\Cookie::get(Config::get('security','cookie'))))
-			->whereHigherThan('session_expiration_date',time())
+			->whereHigherThan('session_expiration_date', time())
 			->execute();
-		
-		// rename variable for clarity
-		$account = isset($found_accounts[0]) ? $found_accounts[0] : false;
 
 		// if no matching session is found we remove the cookie
 		$account ?: self::refuse('Your session is no longer valid', 403, true);
@@ -80,7 +85,7 @@ class Security {
 		self::match($account) ?: self::refuse('Your signature has changed, please log-in again', 403, true);
 
 		// check account expiration
-		!($account->get('account_expiration_date') && time() > $account->get('account_expiration_date',true)) ?:
+		!($account->get('account_expiration_date') && time() > $account->get('account_expiration_date', true)) ?:
 			self::refuse('Your account has expired', 403, true);
 
 		// update our credentials
@@ -95,16 +100,14 @@ class Security {
 	private static function login() {
 		
 		// look for users with this login
-		$found_accounts = Database::query()
+		$account = Database::query()
 			->select()
+			->first()
 			->from('Accounts')
 			->where(array(
 				'login'=>Request::post(Config::get('security','login')),
 				'is_enabled'=>'1'
 			))->execute();
-		
-		// simplify the variables names
-		$account = $found_accounts ? $found_accounts[0] : null;
 		
 		// user is found
 		if($account) {
@@ -138,7 +141,7 @@ class Security {
 				$session_signature = self::getSignature($account->get('login').$account->get('password').$session_expiration);
 
 				// store a cookie with our current session key in it
-				$cookie_creation = Store\Cookie::put(Config::get('security','cookie'), $session_signature, true, Config::get('security', 'session_duration'));
+				$cookie_creation = Store\Cookie::put(Config::get('security', 'cookie'), $session_signature, true, Config::get('security', 'session_duration'));
 				
 				// if the cookie creation failed
 				$cookie_creation ?: self::refuse('You must accept cookies to log in');
@@ -182,7 +185,7 @@ class Security {
 		// we will redirect to the login page
 		!$redirect ?: Response::setRedirect(Config::get('router','login_route'), 3);
 		// trhow a polyfony exception that by itself will stop the execution with maybe a nice exception handler
-		Throw new Exception($message,$code);
+		Throw new Exception($message, $code);
 	}
 
 	// this will check that the opened session matches the current client's signature

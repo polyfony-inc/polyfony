@@ -859,6 +859,7 @@ class Query {
 			// and pass it some arguments
 			array(trim($this->Table,"'\"`"))
 		);
+		/*
 		// if action was a pathtru and starts with UPDATE, INSERT or DELETE and Table was set and it succeeded
 		if($this->Action == 'QUERY' && in_array(substr($this->Query,0,6),array('INSERT','UPDATE','DELETE')) && $this->Table && $this->Success) {
 			// we must notify the cache that this table has changed to prevent giving outdated cached data later on
@@ -874,6 +875,7 @@ class Query {
 			// place result in cache
 			$this->putInCache();
 		}
+		*/
 		// if action was UPDATE or DELETE or one of those via QUERY
 		if(in_array($this->Action,array('UPDATE','DELETE')) || ($this->Action == 'QUERY' && in_array(substr($this->Query,0,6),array('UPDATE','DELETE')) && $this->Table)) {
 			// return the number of affected rows
@@ -892,9 +894,9 @@ class Query {
 			);
 		}
 		// if we want the first result only from a select query
-		if($this->First && $this->Action == 'SELECT' && $this->Success && is_array($this->Result)) {
-			// return the first result
-			return($this->Result[0]);
+		if($this->First && $this->Action == 'SELECT' && isset($this->Result[0])) {
+			// return only the first result
+			$this->Result = $this->Result[0];
 		}
 		// return the results
 		return($this->Result);
