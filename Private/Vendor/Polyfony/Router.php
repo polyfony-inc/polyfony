@@ -204,18 +204,17 @@ class Router {
 	public static function reverse($route_name, $parameters = array()) {
 		// Does the route actually exist?
 		if (!isset(self::$_routes[$route_name])) {
-			throw new Exception("Router::reverse() The route {$route_name} does not exist");
+			// we cannot reverse a route that does not exist
+			throw new Exception("Router::reverse() The route [{$route_name}] does not exist");
 		}
-
 		// Create a container for the URL
 		$url = self::$_routes[$route_name]->url;
-
 		// And replace the variables in the
 		foreach ($parameters as $variable => $value) {
 			$url = str_replace(":{$variable}", urlencode($value), $url);
 		}
-
-		return ($url);
+		// return the reversed url
+		return $url;
 	}
 	
 	public static function forward(Route $route) {
@@ -229,14 +228,14 @@ class Router {
 		// if script is missing and it's not the error script
 		if(!file_exists($script)) {
 			// new polyfony exception
-			Throw new Exception("Dispatcher::forward() : Missing controller file [{$script}]",500);	
+			Throw new Exception("Dispatcher::forward() : Missing controller file [{$script}]", 500);	
 		}
 		// include the controller's file
 		require_once($script);
 		// if class is missing from the controller and not in error route
 		if(!class_exists($class,false)) {
 			// new polyfony exception
-			Throw new Exception("Dispatcher::forward() : Missing controller class [{$class}] in [{$script}]",500);	
+			Throw new Exception("Dispatcher::forward() : Missing controller class [{$class}] in [{$script}]", 500);	
 		}
 		// update the current route
 		self::$_match = $route;

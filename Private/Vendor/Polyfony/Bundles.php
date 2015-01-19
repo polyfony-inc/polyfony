@@ -79,18 +79,22 @@ class Bundles {
 	// get assets for a bundle
 	public static function getAssets($bundle) {
 		
+		// empty list of assets
 		$assets_types = array();
-		
-		foreach(scandir("../Private/Bundles/{$bundle}/Assets/") as $asset_type) {
-			
-			if(is_dir("../Private/Bundles/{$bundle}/Assets/{$asset_type}")) {
-			
-			//	$assets_types[] = "../Private/Bundles/{$bundle}/Assets/{$asset_type}/";
-			
+		// set the assets folder
+		$assets_folder = "../Private/Bundles/{$bundle}/Assets/";
+		// if the assets folder exists
+		if(Filesystem::exists($assets_folder) && Filesystem::isDirectory($assets_folder)) {
+			// for each subfolder in the assets folder
+			foreach(Filesystem::ls($assets_folder) as $asset_path => $asset_type) {
+				// if it actually is a subfolder				
+				if(Filesystem::isDirectory($asset_path) && Filesystem::isNormalName($asset_type)) {
+					// spool it with a trailing slash
+					$assets_types[$asset_type] = $asset_path;
+				}
 			}
-			
 		}
-		
+		// return the list of available assets folders
 		return($assets_types);
 		
 	}
@@ -109,7 +113,7 @@ class Bundles {
 				// if the file is a normal one
 				if(Filesystem::isNormalName($locales_file)) {
 					// push it into the array of locales
-					$locales[] = $locales_path . $locales_file;
+					$locales[] = $locales_path . $locales_file ;
 				}
 			}
 		}

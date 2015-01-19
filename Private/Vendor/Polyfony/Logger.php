@@ -54,8 +54,8 @@ class Logger {
 				self::toDatabase($level, $message);
 			}
 
-			// an email reporting address is set and level is critical
-			if(Config::get('logger', 'mail') && $level == 3) {
+			// an email reporting address is set and level is above 2
+			if(Config::get('logger', 'mail') && $level > 2) {
 				// send an email notice
 				self::toMail($level, $message);
 			}

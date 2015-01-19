@@ -118,11 +118,6 @@ class Locales {
 		
 	}
 	
-	public static function set($key,$value) {
-		
-	}
-	
-	
 }
 
 ?>

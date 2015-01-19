@@ -22,6 +22,26 @@ class MainController extends Pf\Controller {
 	
 	public function generateSymlinksAction() {
 
+		// has error
+		$has_error = false;
+		// for each bundle
+		foreach(Pf\Bundles::getAvailable() as $bundle_name) {
+			// get assets for that bundle
+			foreach(Pf\Bundles::getAssets($bundle_name) as $assets_type => $assets_path) {
+				// set the root path
+				$assets_root_path = "./Assets/{$assets_type}/";
+				// create the public root path
+				Pf\Filesystem::mkdir($assets_root_path) ?: $has_error = true;
+				// set the symlink 
+				$assets_symbolic_path = $assets_root_path . $bundle_name;
+				// if the symlink does not already exists
+				if(!is_link($assets_symbolic_path)) {
+					// create the symlink
+					Pf\Filesystem::symlink($assets_path, $assets_symbolic_path) ?: $has_error = true;
+				}
+			}
+		}
+	
 		// add a success notice
 		$this->notice = new Pf\Notice\Success('Symlinks have been created', 'Success!');
 
@@ -58,8 +78,8 @@ class MainController extends Pf\Controller {
 			// if both parameters are set
 			if(Pf\Request::post('bundle') && Pf\Request::post('table')) {
 
-
-
+				// some generation code goes here
+				// ----
 
 				// set a notice according to the status
 				$this->notice = new Pf\Notice\Success('Files have been generated', 'Success!');

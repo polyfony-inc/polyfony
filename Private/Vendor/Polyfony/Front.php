@@ -34,9 +34,6 @@ class Front {
 		// marker
 		Profiler::setMarker('init_config');
 
-		// marker
-		Profiler::setMarker('init_cache');
-
 		// prepare a response with defaults parameters
 		Response::init();
 		

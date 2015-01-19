@@ -40,10 +40,12 @@ class Database {
 
 		// try to connect
 		self::$_handle = new \PDO($pdo, Config::get('database', 'username'), Config::get('database', 'password'));
-		/*
+
 		// check if connection the connexion failed
-		!self::$_handle ? Throw new \Exception('Database::connect() : Failed to connect');
-		*/
+		if(!self::$_handle) {
+			// throw an exception if it failed
+			Throw new Exception('Database::connect() : Failed to connect', 500);
+		}
 	}
 	
 	public static function query() {

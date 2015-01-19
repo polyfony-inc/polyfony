@@ -47,7 +47,7 @@ class Thumbnail {
 		// set default quality
 		$this->Quality = 100;
 		// set allowed types
-		$this->Allowed = array('image/jpeg','image/png');
+		$this->Allowed = array('image/jpeg', 'image/png');
 		// default output type
 		$this->Output = 'image/jpeg';
 	}
@@ -99,6 +99,25 @@ class Thumbnail {
 		}
 		// return self
 		return($this);
+	}
+
+	// retieve informations about all that hapened
+	public function infos() {
+		// return an array
+		return(array(
+			'error'			=>\Polyfony\Locales::get($this->Error),
+			'source'		=>$this->Source,
+			'destination'	=>$this->Destination,
+			'name'			=>$this->Name,
+			'width'			=>$this->Width,
+			'height'		=>$this->Height
+		));
+	}
+	
+	// retrieve only the error
+	public function error() {
+		// return the error
+		return(\Polyfony\Locales::get($this->Error));
 	}
 	
 	// actually generated the thumbnail
@@ -230,16 +249,10 @@ class Thumbnail {
 		$this->Sized = ImageCreateTrueColor($this->Width,$this->Height);
 		// resize and inject into the canvas
 		imagecopyresampled(
-			$this->Sized,
-			$this->Image,
-			0,
-			0,
-			0,
-			0,
-			$this->Width,
-			$this->Height,
-			$this->OriginalWidth,
-			$this->OriginalHeight
+			$this->Sized, $this->Image,
+			0, 0, 0, 0,
+			$this->Width, $this->Height,
+			$this->OriginalWidth, $this->OriginalHeight
 		);
 		// destroy the source handler
 		imagedestroy($this->Image);
@@ -309,26 +322,7 @@ class Thumbnail {
 			return(false);	
 		}
 	}
-	
-	// retieve informations about all that hapened
-	public function infos() {
-		// return an array
-		return(array(
-			'error'			=>\Polyfony\Locales::get($this->Error),
-			'source'		=>$this->Source,
-			'destination'	=>$this->Destination,
-			'name'			=>$this->Name,
-			'width'			=>$this->Width,
-			'height'		=>$this->Height
-		));
-	}
-	
-	// retrieve only the error
-	public function error() {
-		// return the error
-		return(\Polyfony\Locales::get($this->Error));
-	}
-	
+
 }
 
 ?>

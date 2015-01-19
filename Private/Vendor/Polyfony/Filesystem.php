@@ -88,9 +88,12 @@ class Filesystem {
 
 			// apply the filters
 			// … some code
+
 			// build the fullpath
 			$full_path = $path . $file_or_folder;
-			// add the file or folder if it passed the filter
+			// if it is a folder we add a trailing slash
+			!self::isDirectory($full_path) ?: $full_path .= '/';
+			// add the file or folder if it has passed the filter(s)
 			$filtered[$full_path] = $file_or_folder;
 
 		}
