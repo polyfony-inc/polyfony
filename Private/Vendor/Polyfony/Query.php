@@ -885,6 +885,25 @@ class Query {
 		return($this->Result);
 	}
 	
+	public function first() {
+
+		// execute the query normally
+		$this->execute();
+
+		// if the action is not a select
+
+			// throw an exception
+
+		// if the result is an array
+
+			// return the first result of the array
+
+		// otherwise
+
+			// return false
+
+	}
+
 	// convert the value depending on the column name
 	public static function convert($column,$value) {
 		// if we find a file keyword
@@ -930,7 +949,7 @@ class Query {
 		// return the value
 		return($value);
 	}
-	
+
 	private function putInCache() {
 
 	}

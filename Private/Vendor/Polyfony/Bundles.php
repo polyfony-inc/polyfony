@@ -21,7 +21,7 @@ class Bundles {
 	public static function init() {
 
 		// if cache is enabled and in prod load the cache, else parse bundles
-		(Cache::has('Includes') and Config::isProd()) ? self::loadCachedDependencies() : self::loadDependencies();
+		Cache::has('Includes') && Config::isProd() ? self::loadCachedDependencies() : self::loadDependencies();
 		
 		// include what has been found
 		self::includeLoaders();
@@ -52,9 +52,9 @@ class Bundles {
 				// runtime file
 				$bundle_runtime = "../Private/Bundles/{$bundle}/Loader/Runtime.php";
 				// if a route file exists
-				file_exists($bundle_routes) ? self::$_routes[] = $bundle_routes : '';
+				!file_exists($bundle_routes) ?: self::$_routes[] = $bundle_routes;
 				// if a runtime file exists
-				file_exists($bundle_runtime) ? self::$_runtimes[] = $bundle_runtime : '';
+				!file_exists($bundle_runtime) ?: self::$_runtimes[] = $bundle_runtime;
 			}
 		}
 		// save in the cache (overwrite)
@@ -85,7 +85,7 @@ class Bundles {
 			
 			if(is_dir("../Private/Bundles/{$bundle}/Assets/{$asset_type}")) {
 			
-			//	$assets_types[] = "../Private/Bundles/{$bundle}/Assets/{$asset_type}/";
+			//	$assets_types[] = "../Private/Bundles/{$bundle}/Assets/{$asset_type}/";
 			
 			}
 			

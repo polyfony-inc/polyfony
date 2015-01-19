@@ -95,7 +95,8 @@ class Exception extends \Exception {
 	public function __toString() {
 		
 		// if the output type different from html
-		return(in_array(Response::getType(), array('html','html-page')) ? $this->__toHtml() : $this->__toText());
+		return(in_array(Response::getType(), array('html','html-page')) ? 
+			$this->__toHtml() : $this->__toText());
 		
 	}
 	
