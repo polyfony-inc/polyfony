@@ -1,3 +1,5 @@
-Caches/*
-*.css
-*.js
+Public/Assets/*
+Private/Storage/Cache/*
+Private/Storage/Data/*
+Private/Storage/Logs/*
+Private/Storage/Store/*
