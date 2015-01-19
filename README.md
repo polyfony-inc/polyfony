@@ -691,6 +691,75 @@ $map_url = $map
 Google\QRCode::url($data, $size)
 ```
 
+## Database structure
+
+The framework can work without any database. 
+You just loose `Security`, the `Mail` storage feature, the `Store\Database` engine and the `Logger`'s file feature.
+
+* Bellow is the SQL statement used to create the database. The framework has been extensively tested with SQlite but should work with MySQL as well. SQlite generally is more that sufficient and a DBMS would be overkill.
+
+```sql
+
+CREATE TABLE "Accounts" (
+  "id" integer NULL PRIMARY KEY AUTOINCREMENT,
+  "id_level" numeric NULL,
+  "is_enabled" numeric NULL,
+  "creation_date" numeric NULL,
+  "login" text NULL,
+  "password" text NULL,
+  "modules_array" text NULL,
+  "account_expiration_date" numeric NULL,
+  "session_expiration_date" numeric NULL,
+  "session_key" text NULL,
+  "last_login_origin" text NULL,
+  "last_login_agent" text NULL,
+  "last_login_date" numeric NULL,
+  "last_failure_origin" numeric NULL,
+  "last_failure_agent" numeric NULL,
+  "last_failure_date" numeric NULL
+);
+
+CREATE TABLE "Logs" (
+  "id" integer NULL PRIMARY KEY AUTOINCREMENT,
+  "id_account" integer NULL,
+  "id_level" integer NULL,
+  "creation_date" numeric NULL,
+  "bundle" text NULL,
+  "controller" text NULL,
+  "method" text NULL,
+  "post_array" text NULL,
+  "cookies_array" text NULL,
+  "request_origin" text NULL,
+  "request_method" text NULL,
+  "request_uri" text NULL,
+  "message" text NULL,
+  FOREIGN KEY ("id_account") REFERENCES "Accounts" ("id") ON DELETE RESTRICT ON UPDATE NO ACTION
+);
+
+CREATE TABLE "Mails" (
+  "id" integer NULL PRIMARY KEY AUTOINCREMENT,
+  "is_sent" numeric NULL,
+  "creation_date" numeric NULL,
+  "sending_date" numeric NULL,
+  "format" text NULL,
+  "from_mail" text NULL,
+  "from_name" text NULL,
+  "body" text NULL,
+  "subject" text NULL,
+  "bcc_array" text NULL,
+  "cc_array" text NULL,
+  "to_array" text NULL,
+  "files_array" text NULL
+);
+
+CREATE TABLE "Store" (
+  "id" text NULL,
+  "key" text NULL,
+  "content" blob NULL
+);
+
+```
+
 ## Performance
 Polyfony has been designed to be fast, no compromise.
 
