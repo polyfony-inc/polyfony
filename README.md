@@ -96,7 +96,9 @@ $account = new Record('Accounts');
 $account
 	->set('login', 'test')
 	->set('id_level', '1')
+	// magic column name ending with _date will be translated to a timestamp automatically
 	->set('last_login_date', '18/04/1995')
+	// magic column name ending with _array will be translated to a JSON string automatically
 	->set('modules_array', array('MOD_BOOKS', 'MOD_USERS', 'MOD_EXAMPLE'))
 	->set('password', Security::getPassword('test'))
 	->save();
