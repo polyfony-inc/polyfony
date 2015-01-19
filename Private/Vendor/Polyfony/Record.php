@@ -43,15 +43,16 @@ class Record {
 				$conditions = array('id'=>$conditions);	
 			}
 			// grab that object from the database
-			$records = Database::query()
+			$record = Database::query()
 				->select()
+				->first()
 				->from($this->_['table'])
 				->where($conditions)
 				->execute();
 			// if the record is found
-			if($records) {
+			if($record) {
 				// clone the found record
-				$this->replicate($records[0]);
+				$this->replicate($record);
 				// return self
 				return($this);	
 			}

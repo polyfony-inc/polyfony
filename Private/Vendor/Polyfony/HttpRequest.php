@@ -252,7 +252,7 @@ class HttpRequest {
 	// get directly the type of the response
 	public function getType() {
 		// return the content type of the reponse or null
-		return($this->getHeader('Content-Type') ? $this->getHeader('Content-Type') : null);
+		return($this->getHeader('Content-Type') ?: null);
 	}
 
 	// get the status of the response

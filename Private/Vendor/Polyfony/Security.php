@@ -100,15 +100,12 @@ class Security {
 	private static function login() {
 		
 		// look for users with this login
-		$account = Database::query()
-			->select()
-			->first()
-			->from('Accounts')
-			->where(array(
-				'login'=>Request::post(Config::get('security','login')),
-				'is_enabled'=>'1'
-			))->execute();
-		
+		$account = new Record('Accounts', array(
+				'login'		=> Request::post(Config::get('security', 'login')),
+				'is_enabled'=> 1
+			)
+		);
+
 		// user is found
 		if($account) {
 			// if the account has been forced by the same ip recently
@@ -138,10 +135,16 @@ class Security {
 				$session_expiration = time() + ( Config::get('security', 'session_duration') * 3600 );
 				
 				// generate a session key with its expiration, the login, the password, the ip, the user agent
-				$session_signature = self::getSignature($account->get('login').$account->get('password').$session_expiration);
+				$session_signature = self::getSignature(
+					$account->get('login') . $account->get('password') . $session_expiration);
 
 				// store a cookie with our current session key in it
-				$cookie_creation = Store\Cookie::put(Config::get('security', 'cookie'), $session_signature, true, Config::get('security', 'session_duration'));
+				$cookie_creation = Store\Cookie::put(
+					Config::get('security', 'cookie'), 
+					$session_signature, 
+					true, 
+					Config::get('security', 'session_duration')
+				);
 				
 				// if the cookie creation failed
 				$cookie_creation ?: self::refuse('You must accept cookies to log in');
@@ -193,12 +196,15 @@ class Security {
 		// get the session key existing in the database
 		$existing_key = $account->get('session_key');
 		// generate a new session key for this request
-		$dynamic_key = self::getSignature($account->get('login').$account->get('password').$account->get('session_expiration_date',true));
+		$dynamic_key = self::getSignature(
+			$account->get('login') . $account->get('password') . 
+			$account->get('session_expiration_date', true)
+		);
 		// return true only if they match
 		return($existing_key == $dynamic_key ? true : false);
 
 	}
-
+	/*
 	// clean the database (called after each successful login)
 	private static function clean() {
 		// clean expired sessions
@@ -228,7 +234,7 @@ class Security {
 			->whereNull('is_enabled')
 			->execute();
 	}
-	
+	*/
 	// internal method for generating unique signatures
 	private static function getSignature($mixed) {
 	
@@ -237,7 +243,8 @@ class Security {
 		
 		// compute a hash with (the provided string + salt + user agent + remote ip)
 		return(hash(Config::get('security','algo'), 
-			Request::server('HTTP_USER_AGENT') . Request::server('REMOTE_ADDR') . Config::get('security','salt') . $string
+			Request::server('HTTP_USER_AGENT') . Request::server('REMOTE_ADDR') . 
+			Config::get('security','salt') . $string
 		));
 		
 	}

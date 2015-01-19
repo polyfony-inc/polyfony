@@ -822,6 +822,7 @@ class Query {
 			// assemble the limit options to the query
 			$this->Query .= " LIMIT {$this->Limit[0]},{$this->Limit[1]}";
 		}
+		/*
 		// if cache is enabled and query is a SELECT or a passtrhu starting with SELECT
 		if(false && ( $this->Action == 'SELECT' || ($this->Action == 'QUERY' && substr($this->Query,0,6) == 'SELECT'))) {
 			// check if it exists in cache
@@ -832,6 +833,7 @@ class Query {
 				return($cached);	
 			}
 		}
+		*/
 		// prepare the statement
 		$this->Prepared = \Polyfony\Database::handle()->prepare($this->Query);
 		// if prepare failed
@@ -870,12 +872,12 @@ class Query {
 			// we must notify the cache of the new modification date for this table
 			$this->updateOutdated();
 		}
-		*/
 		// if action succeeded and has some kind of useful result (SELECT or SELECT via a QUERY) and has a table set
 		if(($this->Action == 'SELECT' || ($this->Action == 'QUERY' && substr($this->Query,0,6) == 'SELECT')) && $this->Table && $this->Success) {
 			// place result in cache
 			$this->putInCache();
 		}
+		*/
 		// if action was UPDATE or DELETE or one of those via QUERY
 		if(in_array($this->Action,array('UPDATE','DELETE')) || ($this->Action == 'QUERY' && in_array(substr($this->Query,0,6),array('UPDATE','DELETE')) && $this->Table)) {
 			// return the number of affected rows
@@ -947,7 +949,7 @@ class Query {
 		// return the value
 		return($value);
 	}
-
+	/*
 	private function putInCache() {
 
 	}
@@ -955,7 +957,7 @@ class Query {
 	private function updateOutdated() {
 		
 	}
-
+	*/
 	// secure a column name and get a placeholder for that column
     private function secure($column) {
         // apply the secure regex for the column name
