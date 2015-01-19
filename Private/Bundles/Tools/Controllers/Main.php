@@ -42,8 +42,10 @@ class MainController extends Pf\Controller {
 			}
 		}
 	
-		// add a success notice
-		$this->notice = new Pf\Notice\Success('Symlinks have been created', 'Success!');
+		// set a notice depending on the presence of errors
+		$this->notice = $has_error ? 
+			new Pf\Notice\Danger('Please check the permissions and folder structure', 'Error!') :
+			new Pf\Notice\Success('Symlinks have been created', 'Success!');
 
 		// view the main index
 		$this->view('Index');
