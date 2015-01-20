@@ -145,17 +145,12 @@ class Query {
 		if(is_array($columns_and_values)) {
 			// for each provided strict condition
 			foreach($columns_and_values as $column => $value) {
-				// if the column name not numeric
-				if(!is_numeric($column)) {
-					// secure the column name
-					list($column, $placeholder) = $this->secure($column);
-					// save the condition
-					$this->Updates[] = "{$column} = :{$placeholder}";
-					// save the value (converted if necessary)
-					$this->Values[":{$placeholder}"] = $this->convert($column,$value);
-				}
-				// column name in a number
-				else { Throw new Exception('Query->update() : Column name cannot be a number'); }
+				// secure the column name
+				list($column, $placeholder) = $this->secure($column);
+				// save the condition
+				$this->Updates[] = "{$column} = :{$placeholder}";
+				// save the value (converted if necessary)
+				$this->Values[":{$placeholder}"] = $this->convert($column,$value);
 			}
 		}
 		// return self to the next method
@@ -166,11 +161,8 @@ class Query {
 	public function update($table) {
 		// set the main action
 		$this->action('UPDATE');
-		// if the table is a string and is not empty
-		if(is_string($table) && !empty($table)) {
-			// set the destination table
-			list($this->Table) = $this->secure($table);
-		}
+		// set the destination table
+		list($this->Table) = $this->secure($table);
 		// return self to the next method
 		return $this;
 	}
@@ -183,15 +175,12 @@ class Query {
 		if(is_array($columns_and_values)) {
 			// for each column and value
 			foreach($columns_and_values as $column => $value) {
-				// if the column is not numeric
-				if(!is_numeric($column)) {
-					// secure the column name
-					list($column) = $this->secure($column);
-					// push the column
-					$this->Inserts[] = $column;
-					// check for automatic conversion and push in place
-					$this->Values[] = $this->convert($column, $value);
-				}
+				// secure the column name
+				list($column) = $this->secure($column);
+				// push the column
+				$this->Inserts[] = $column;
+				// check for automatic conversion and push in place
+				$this->Values[] = $this->convert($column, $value);
 			}
 		}
 		// return self to the next method
@@ -252,11 +241,8 @@ class Query {
 	
 	// add into for inserts
 	public function into($table) {
-		// if $table is set
-		if(is_string($table) && $table) {
-			// set the table
-			list($this->Table) = $this->secure($table);
-		}
+		// set the table
+		list($this->Table) = $this->secure($table);
 		// return self to the next method
 		return $this;
 	}
@@ -469,16 +455,8 @@ class Query {
 		if(is_array($columns_and_direction)) {
 			// for each given parameter
 			foreach($columns_and_direction as $column => $direction) {
-				// if the column is numeric
-				if(is_numeric($column)) {
-					// skip it as a wrong parameter has been provided
-					continue;	
-				}
-				// if the direction is not valid
-				if($direction != 'ASC' && $direction != 'DESC') {
-					// skip it as a wrong parameter has been provided	
-					continue;
-				}
+				// if the direction is not valid force ASC
+				$direction == 'ASC' || $direction == 'DESC' ?: $direction = 'ASC';
 				// secure the column name
 				list($column) = $this->secure($column);
 				// push it

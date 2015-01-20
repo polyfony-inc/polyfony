@@ -509,7 +509,7 @@ $request->cookie($key, $value)
 
 ### Mail
 
-* Mail are very simple to use and build over PHPMailer
+* Mail are very simple to use and built over PHPMailer
 
 ```php
 $mail = new Mail();
