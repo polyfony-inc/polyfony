@@ -17,7 +17,7 @@ class Database {
 	// no database connection at first
 	protected static $_handle = null;
 	
-	
+	// connect to the database
 	public static function connect() {
 	
 		// depending on the driver
@@ -28,7 +28,8 @@ class Database {
 			break;
 			
 			case 'mysql':
-				$pdo = 'mysql:dbname=' . Config::get('database', 'database') . ';host=' . Config::get('database', 'hostname');
+				$pdo = 'mysql:dbname=' . Config::get('database', 'database') . 
+				';host=' . Config::get('database', 'hostname');
 			break;
 			
 			default:
@@ -39,7 +40,11 @@ class Database {
 		}
 
 		// try to connect
-		self::$_handle = new \PDO($pdo, Config::get('database', 'username'), Config::get('database', 'password'));
+		self::$_handle = new \PDO(
+			$pdo, 
+			Config::get('database', 'username') ?: null, 
+			Config::get('database', 'password') ?: null
+		);
 
 		// check if connection the connexion failed
 		if(!self::$_handle) {
@@ -48,6 +53,7 @@ class Database {
 		}
 	}
 	
+	// instanciate a new query object
 	public static function query() {
 		
 		// if no connection to the database is ready
