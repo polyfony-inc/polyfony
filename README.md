@@ -109,6 +109,31 @@ $account
 	->save();
 ```
 
+* List of search parameters
+
+```php
+->where()				// == $value
+->whereNot()			// <> $value
+->whereBetween()		// BETWEEN $min_value AND $max_value
+->whereMatch()			// MATCH column AGAINST $value
+->whereContains()		// % $value %
+->whereEndWith()		// % $value
+->whereStartsWith() 	// $value %
+->whereNotEmpty() 		// <> '' and NOT NULL
+->whereEmpty() 			// '' or NULL
+->whereNotNull() 		// NOT NULL
+->whereNull() 			// NULL
+```
+
+* List of options
+
+```php
+->orderBy()				// associative array ('column'=>'ASC')
+->limitTo()				// $start, $end
+->groupBy()				// ?
+->first()				// return a the first record instead of an array of records
+```
+
 ### Router
 
 * Each bundle has a file to place your routes
@@ -649,7 +674,7 @@ Filesystem::mkdir('../../../../my-directory/', '0777');
 ```
 * Both commands will create `../Private/Storage/Data/my-directory/`
 
-If you want to operate outside of the Data storage folder, set the last parameter, which is a chroot bypass, to true. The following example will break out of the chroot.
+If you want to operate outside of the Data storage folder, set the last parameter, which is a chroot bypass, to true. The following example will break out of the chroot. Or simply disable the chroot option in the `Config.ini`
 
 ```php
 Filesystem::get('/tmp/somefile.raw', true);

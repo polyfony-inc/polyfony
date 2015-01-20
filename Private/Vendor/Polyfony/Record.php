@@ -71,7 +71,7 @@ class Record {
 		foreach(get_object_vars($clone) as $attribute => $value) {
 			// clone that attribute
 			$this->{$attribute} = $value;
-		}	
+		}
 	}
 	
 	public function get($column, $raw=false) {
@@ -215,37 +215,30 @@ class Record {
 			// we can update and return the number of affected rows (0 on error, 1 on success)
 			$updated = Database::query()
 				->update($this->_['table'])
-				->set($this->__toArray(true,true))
+				->set($this->__toArray(true, true))
 				->where(array('id'=>$this->_['id']))
 				->execute();
 			// if update went well
-			if($updated) {
-				// return true
-				return(true);
-			}
-			// update failed
-			else {
-				// return false
-				return(false);
-			}
+			return $updated ? true : false;
 		}
 		// this is a new record
 		else {
 			// try to insert it
 			$inserted = Database::query()
-				->insert($this->__toArray(true,true))
+				->insert($this->__toArray(true, true))
 				->into($this->_['table'])
 				->execute();
-			// if insertion succeeded
+			// if insertion succeeded clone ourselves and return true
 			if($inserted) {
-				// clone ourself (to get our new id)
-				$this->replicate($inserted[0]);	
-				// and return true
-				return(true);
+				// replicate
+				$this->replicate($inserted);
+				// return success
+				return true;
 			}
+			// didnt insert
 			else {
-				// return false
-				return(false);	
+				// failure feedback
+				return false;
 			}
 		}
 		
@@ -253,7 +246,6 @@ class Record {
 	
 	// delete
 	public function delete() {
-		
 		// if id or table if missing
 		if(!$this->_['table'] || !$this->_['id']) {
 			// throw an exception
@@ -266,15 +258,7 @@ class Record {
 			->where(array('id'=>$this->_['id']))
 			->execute();
 		// if it went well
-		if($deleted) {
-			// return true
-			return(true);
-		}
-		// not deleted
-		else {
-			// return false
-			return(false);
-		}
+		return $deleted ? true : false;
 	}
 	
 }

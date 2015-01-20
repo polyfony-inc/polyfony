@@ -31,7 +31,7 @@ class Accounts {
 		return(\Polyfony\Database::query()
 			->select()
 			->from('Accounts')
-			->whereNull('is_enabled')
+			->where(array('is_enabled'=>'0'))
 			->execute()
 		);
 	}
@@ -40,7 +40,7 @@ class Accounts {
 		return(\Polyfony\Database::query()
 			->select()
 			->from('Accounts')
-			->whereNotNull('last_failure_date')
+			->whereNotEmpty('last_failure_date')
 			->addAnd()
 			->whereHigherThan('last_failure_date',time()-$what_recent_means)
 			->execute()

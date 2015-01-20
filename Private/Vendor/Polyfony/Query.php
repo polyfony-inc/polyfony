@@ -23,7 +23,6 @@ class Query {
 	protected	$Array;
 	protected	$Action;
 	protected	$Hash;
-	protected	$Lag;
 	
 	// attributes to build a query
 	protected	$Table;
@@ -58,8 +57,7 @@ class Query {
 		$this->Action		= null;
 		// set the unique hash of the query for caching purpose
 		$this->Hash			= null;
-		// set the maximum age allowed from the cache (in hour)
-		$this->Lag			= null;
+
 		// initialize attributes
 		$this->Table		= null;
 		$this->Operator		= 'AND';
@@ -72,24 +70,11 @@ class Query {
 		$this->Limit		= array();
 		
 	}
-
-	// on garbage collection	
-	public function __destruct() {
-
-	}
 	
 	// passrthu a query with values if needed
 	public function query($query, $values=null, $table=null) {
-		// if no principal action is set yet
-		if(!$this->Action) {
-			// set the main action
-			$this->Action = 'QUERY';
-		}
-		// an action has already been set, this is impossible
-		else {
-			// those actions being incompatible we throw an exception
-			Throw new Exception("Query->select() : An incompatible action already exists : {$this->Action}");
-		}
+		// set the main action
+		$this->action('QUERY');
 		// set the table
 		$this->Table = $table;
 		// set the query
@@ -125,21 +110,13 @@ class Query {
 			$this->Table = trim($this->Table, '\'/"`');
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	
 	// first main method
 	public function select($array=null) {
-		// if no principal action is set yet
-		if(!$this->Action) {
-			// set the main action
-			$this->Action = 'SELECT';
-		}
-		// an action has already been set, this is impossible
-		else {
-			// those actions being incompatible we throw an exception
-			Throw new Exception("Query->select() : An incompatible action already exists : {$this->Action}");
-		}
+		// set the main action
+		$this->action('SELECT');
 		// if the argument passed is an array of columns
 		if(is_array($array)) {
 			// for each column
@@ -159,7 +136,7 @@ class Query {
 			}	
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	
 	// alias of update
@@ -178,49 +155,30 @@ class Query {
 					$this->Values[":{$placeholder}"] = $this->convert($column,$value);
 				}
 				// column name in a number
-				else {
-					// throw an exception
-					Throw new Exception('Query->update() : Column name cannot be a number');
-				}
+				else { Throw new Exception('Query->update() : Column name cannot be a number'); }
 			}
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	
 	// second main method
 	public function update($table) {
-		// if no principal action is set yet
-		if(!$this->Action) {
-			// set the main action
-			$this->Action = 'UPDATE';
-		}
-		// an action has already been set, this is impossible
-		else {
-			// those actions being incompatible we throw an exception
-			Throw new Exception("Query->update() : An incompatible action already exists : {$this->Action}");
-		}
+		// set the main action
+		$this->action('UPDATE');
 		// if the table is a string and is not empty
 		if(is_string($table) && !empty($table)) {
 			// set the destination table
 			list($this->Table) = $this->secure($table);
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	
 	// insert data
 	public function insert($columns_and_values) {
-		// if no principal action is set yet
-		if(!$this->Action) {
-			// set the main action
-			$this->Action = 'INSERT';
-		}
-		// an action has already been set, this is impossible
-		else {
-			// those actions being incompatible we throw an exception
-			Throw new Exception("Query->insert() : An incompatible action already exists : {$this->Action}");
-		}
+		// set the main action
+		$this->action('INSERT');
 		// check if we have an array
 		if(is_array($columns_and_values)) {
 			// for each column and value
@@ -237,48 +195,27 @@ class Query {
 			}
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	
 	// delete data from a table
 	public function delete() {
-		// if no principal action is set yet
-		if(!$this->Action) {
-			// set the main action
-			$this->Action = 'DELETE';
-		}
-		// an action has already been set, this is impossible
-		else {
-			// those actions being incompatible we throw an exception
-			Throw new Exception("Query->delete() : An incompatible action already exists : {$this->Action}");
-		}
+		// set the main action
+		$this->action('DELETE');
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	
 	// select the table
 	public function from($table) {
-		// if the table is in string format
-		if(is_string($table)) {
-			// set the table
-			list($this->Table) = $this->secure($table);	
-		}
-		// wrong type
-		else {
-			// those actions being incompatible we throw an exception
-			Throw new Exception("Query->from() : Wrong parameter type, string expected");
-		}
+		// set the table
+		list($this->Table) = $this->secure($table);	
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	
 	// select another table to join on (implicit INNER JOIN)
 	public function join($table, $match, $against) {
-		// if table_and_id is an array
-		if(!is_string($table) || !$table || !is_string($match) || !$match || !is_string($against) || !$against) {
-			// those actions being incompatible we throw an exception
-			Throw new Exception("Query->join() : Wrong parameter");
-		}
 		// secure parameters
 		list($table) 	= $this->secure($table);
 		list($match) 	= $this->secure($match);
@@ -286,16 +223,11 @@ class Query {
 		// push the join condition
 		$this->Joins[] = "JOIN {$table} ON {$match} = {$against}";
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 
 	// select another table to join on (LEFT JOIN)
 	public function leftJoin($table, $match, $against) {
-		// if table_and_id is an array
-		if(!is_string($table) || !$table || !is_string($match) || !$match || !is_string($against) || !$against) {
-			// those actions being incompatible we throw an exception
-			Throw new Exception("Query->join() : Wrong parameter");
-		}
 		// secure parameters
 		list($table) 	= $this->secure($table);
 		list($match) 	= $this->secure($match);
@@ -303,16 +235,11 @@ class Query {
 		// push the join condition
 		$this->Joins[] = "LEFT JOIN {$table} ON {$match} = {$against}";
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 
 	// select another table to join on (RIGHT JOIN)
 	public function rightJoin($table, $match, $against) {
-		// if table_and_id is an array
-		if(!is_string($table) || !$table || !is_string($match) || !$match || !is_string($against) || !$against) {
-			// those actions being incompatible we throw an exception
-			Throw new Exception("Query->join() : Wrong parameter");
-		}
 		// secure parameters
 		list($table) 	= $this->secure($table);
 		list($match) 	= $this->secure($match);
@@ -320,7 +247,7 @@ class Query {
 		// push the join condition
 		$this->Joins[] = "RIGHT JOIN {$table} ON {$match} = {$against}";
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	
 	// add into for inserts
@@ -331,21 +258,21 @@ class Query {
 			list($this->Table) = $this->secure($table);
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	
 	public function addAnd() {
 		// set the AND
 		$this->Operator = 'AND';
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	
 	public function addOr() {
 		// set the OR
 		$this->Operator = 'OR';		
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	
 	// add a condition
@@ -354,24 +281,16 @@ class Query {
 		if(is_array($conditions)) {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
-				// if the column name not numeric
-				if(!is_numeric($column)) {
-					// secure the column name
-					list($column, $placeholder) = $this->secure($column);
-					// save the condition
-					$this->Conditions[] = "{$this->Operator} ( {$column} = :{$placeholder} )";
-					// save the value
-					$this->Values[":{$placeholder}"] = $value;
-				}
-				// column name in a number
-				else {
-					// throw an exception
-					Throw new Exception('Query->where() : Column name cannot be a number');
-				}
+				// secure the column name
+				list($column, $placeholder) = $this->secure($column);
+				// save the condition
+				$this->Conditions[] = "{$this->Operator} ( {$column} = :{$placeholder} )";
+				// save the value
+				$this->Values[":{$placeholder}"] = $value;
 			}
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 
 	// add a condition
@@ -380,24 +299,16 @@ class Query {
 		if(is_array($conditions)) {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
-				// if the column name not numeric
-				if(!is_numeric($column)) {
-					// secure the column name
-					list($column, $placeholder) = $this->secure($column);
-					// save the condition
-					$this->Conditions[] = "{$this->Operator} ( {$column} <> :{$placeholder} )";
-					// save the value
-					$this->Values[":{$placeholder}"] = $value;
-				}
-				// column name in a number
-				else {
-					// throw an exception
-					Throw new Exception('Query->whereNot() : Column name cannot be a number');
-				}
+				// secure the column name
+				list($column, $placeholder) = $this->secure($column);
+				// save the condition
+				$this->Conditions[] = "{$this->Operator} ( {$column} <> :{$placeholder} )";
+				// save the value
+				$this->Values[":{$placeholder}"] = $value;
 			}
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	
 	// shortcuts
@@ -406,244 +317,151 @@ class Query {
 		if(is_array($conditions)) {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
-				// if the column name not numeric
-				if(!is_numeric($column)) {
-					// secure the column name
-					list($column, $placeholder) = $this->secure($column);
-					// save the condition
-					$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
-					// save the value
-					$this->Values[":{$placeholder}"] = "{$value}%";
-				}
-				// column name in a number
-				else {
-					// throw an exception
-					Throw new Exception('Query->whereStartsWith() : Column name cannot be a number');
-				}
+				// secure the column name
+				list($column, $placeholder) = $this->secure($column);
+				// save the condition
+				$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
+				// save the value
+				$this->Values[":{$placeholder}"] = "{$value}%";
 			}
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	public function whereEndsWith($conditions) {
 		// if provided conditions are an array
 		if(is_array($conditions)) {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
-				// if the column name not numeric
-				if(!is_numeric($column)) {
-					// secure the column name
-					list($column, $placeholder) = $this->secure($column);
-					// save the condition
-					$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
-					// save the value
-					$this->Values[":{$placeholder}"] = "%$value";
-				}
-				// column name in a number
-				else {
-					// throw an exception
-					Throw new Exception('Query->whereEndsWith() : Column name cannot be a number');
-				}
+				// secure the column name
+				list($column, $placeholder) = $this->secure($column);
+				// save the condition
+				$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
+				// save the value
+				$this->Values[":{$placeholder}"] = "%$value";
 			}
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	public function whereContains($conditions) {
 		// if provided conditions are an array
 		if(is_array($conditions)) {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
-				// if the column name not numeric
-				if(!is_numeric($column)) {
-					// secure the column name
-					list($column, $placeholder) = $this->secure($column);
-					// save the condition
-					$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
-					// save the value
-					$this->Values[":{$placeholder}"] = "%{$value}%";
-				}
-				// column name in a number
-				else {
-					// throw an exception
-					Throw new Exception('Query->whereContains() : Column name cannot be a number');
-				}
+				// secure the column name
+				list($column, $placeholder) = $this->secure($column);
+				// save the condition
+				$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
+				// save the value
+				$this->Values[":{$placeholder}"] = "%{$value}%";
 			}
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	public function whereMatch($conditions) {	
 		// if provided conditions are an array
 		if(is_array($conditions)) {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
-				// if the column name not numeric
-				if(!is_numeric($column)) {
-					// secure the column name
-					list($column, $placeholder) = $this->secure($column);
-					// save the condition
-					$this->Conditions[] = "{$this->Operator} ( {$column} MATCH :{$placeholder} )";
-					// save the value
-					$this->Values[":{$placeholder}"] = $value;
-				}
-				// column name in a number
-				else {
-					// throw an exception
-					Throw new Exception('Query->whereMatch() : Column name cannot be a number');
-				}
+				// secure the column name
+				list($column, $placeholder) = $this->secure($column);
+				// save the condition
+				$this->Conditions[] = "{$this->Operator} ( {$column} MATCH :{$placeholder} )";
+				// save the value
+				$this->Values[":{$placeholder}"] = $value;
 			}
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	public function whereHigherThan($conditions) {
 		// if provided conditions are an array
 		if(is_array($conditions)) {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
-				// if the column name not numeric
-				if(!is_numeric($column)) {
-					// secure the column name
-					list($column, $placeholder) = $this->secure($column);
-					// save the condition
-					$this->Conditions[] = "{$this->Operator} ( {$column} > :{$placeholder} )";
-					// save the value
-					$this->Values[":{$placeholder}"] = $value;
-				}
-				// column name in a number
-				else {
-					// throw an exception
-					Throw new Exception('Query->whereHigherThan() : Column name cannot be a number');
-				}
+				// secure the column name
+				list($column, $placeholder) = $this->secure($column);
+				// save the condition
+				$this->Conditions[] = "{$this->Operator} ( {$column} > :{$placeholder} )";
+				// save the value
+				$this->Values[":{$placeholder}"] = $value;
 			}
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	public function whereLowerThan($conditions) {
 		// if provided conditions are an array
 		if(is_array($conditions)) {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
-				// if the column name not numeric
-				if(!is_numeric($column)) {
-					// secure the column name
-					list($column, $placeholder) = $this->secure($column);
-					// save the condition
-					$this->Conditions[] = "{$this->Operator} ( {$column} < :{$placeholder} )";
-					// save the value
-					$this->Values[":{$placeholder}"] = $value;
-				}
-				// column name in a number
-				else {
-					// throw an exception
-					Throw new Exception('Query->whereLowerThan() : Column name cannot be a number');
-				}
-			}
-		}
-		// return self to the next method
-		return($this);
-	}
-	public function whereBetween($column, $lower, $higher) {
-		// if column is set
-		if($column and !is_numeric($column)) {
-			// if lower or higher is numeric
-			if(is_numeric($lower) && is_numeric($higher)) {
 				// secure the column name
 				list($column, $placeholder) = $this->secure($column);
 				// save the condition
-				$this->Conditions[] = "{$this->Operator} ( {$column} BETWEEN = :min_{$placeholder} AND :max_{$placeholder} )";
-				// add the min value
-				$this->Values[":min_{$placeholder}"] = $lower;
-				// add the max value
-				$this->Values[":max_{$placeholder}"] = $higher;
+				$this->Conditions[] = "{$this->Operator} ( {$column} < :{$placeholder} )";
+				// save the value
+				$this->Values[":{$placeholder}"] = $value;
 			}
-			// min and max are not numeric
-			else {
-				// throw an exception
-			Throw new Exception('Query->whereBetween() : Min or max values must be numbers');	
-			}
-		}
-		// column is incorrect
-		else {
-			// throw an exception
-			Throw new Exception('Query->whereBetween() : Column name is invalid');
 		}
 		// return self to the next method
-		return($this);
+		return $this;
+	}
+	public function whereBetween($column, $lower, $higher) {
+		// if lower or higher is numeric
+		if(is_numeric($lower) && is_numeric($higher)) {
+			// secure the column name
+			list($column, $placeholder) = $this->secure($column);
+			// save the condition
+			$this->Conditions[] = "{$this->Operator} ( {$column} BETWEEN = :min_{$placeholder} AND :max_{$placeholder} )";
+			// add the min value
+			$this->Values[":min_{$placeholder}"] = $lower;
+			// add the max value
+			$this->Values[":max_{$placeholder}"] = $higher;
+		}
+		// min and max are not numeric
+		else { Throw new Exception('Query->whereBetween() : Min or max values must be numbers'); }
+		// return self to the next method
+		return $this;
+	}
+	public function whereEmpty($column) {
+		// secure the column name
+		list($column, $placeholder) = $this->secure($column);
+		// save the condition
+		$this->Conditions[] = "{$this->Operator} ( {$column} == :empty_{$placeholder} OR {$column} IS NULL )";
+		// add the empty value
+		$this->Values[":empty_{$placeholder}"] = '';
+		// return self to the next method
+		return $this;
+	}
+	public function whereNotEmpty($column) {
+		// secure the column name
+		list($column, $placeholder) = $this->secure($column);
+		// save the condition
+		$this->Conditions[] = "{$this->Operator} ( {$column} <> :empty_{$placeholder} AND {$column} IS NOT NULL )";
+		// add the empty value
+		$this->Values[":empty_{$placeholder}"] = '';
+		// return self to the next method
+		return $this;
 	}
 	public function whereNull($column) {
-		// if column is set
-		if($column && !is_numeric($column)) {
-			// secure the column name
-			list($column, $placeholder) = $this->secure($column);
-			// save the condition
-			$this->Conditions[] = "{$this->Operator} ( {$column} IS NULL OR {$column} = :empty_{$placeholder} OR {$column} = 0 )";
-			// add the empty value
-			$this->Values[":empty_{$placeholder}"] = '';
-		}
-		// column is incorrect
-		else {
-			// throw an exception
-			Throw new Exception('Query->whereNull() : Column name is invalid');
-		}
+		// secure the column name
+		list($column, $placeholder) = $this->secure($column);
+		// save the condition
+		$this->Conditions[] = "{$this->Operator} ( {$column} IS NULL )";
+		// add the empty value
+		$this->Values[":empty_{$placeholder}"] = '';
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	public function whereNotNull($column) {
-		// if column is set
-		if($column && !is_numeric($column)) {
-			// secure the column name
-			list($column) = $this->secure($column);
-			// save the condition
-			$this->Conditions[] = "{$this->Operator} ( length({$column}) > 0  )";
-		}
-		// column is incorrect
-		else {
-			// throw an exception
-			Throw new Exception('Query->whereNotNull() : Column name is invalid');
-		}
+		// secure the column name
+		list($column) = $this->secure($column);
+		// save the condition
+		$this->Conditions[] = "{$this->Operator} ( {$column} IS NOT NULL )";
 		// return self to the next method
-		return($this);
-	}
-	public function whereTrue($column) {
-		// if column is set
-		if($column && !is_numeric($column)) {
-			// secure the column name
-			list($column) = $this->secure($column);
-			// save the condition
-			$this->Conditions[] = "{$this->Operator} ( {$column} = 1 OR {$column} = :{$column} )";
-			// save the value
-			$this->Values[":{$column}"] = 'true';
-		}
-		// column is incorrect
-		else {
-			// throw an exception
-			Throw new Exception('Query->whereTrue() : Column name is invalid');
-		}
-		// return self to the next method
-		return($this);
-	}
-	public function whereFalse($column) {
-		// if column is set
-		if($column && !is_numeric($column)) {
-			// secure the column name
-			list($column, $placeholder) = $this->secure($column);
-			// save the condition
-			$this->Conditions[] = "{$this->Operator} ( {$column} IS NULL OR {$column} = 0 OR {$column} = :{$placeholder} OR {$column} = :empty_{$placeholder} )";
-			// save the value
-			$this->Values[":{$placeholder}"] = 'false';
-			// save the value
-			$this->Values[":empty_{$placeholder}"] = '';
-		}
-		// column is incorrect
-		else {
-			// throw an exception
-			Throw new Exception('Query->whereTrue() : Column name is invalid');
-		}
-		// return self to the next method
-		return($this);
+		return $this;
 	}
 	// add an order clause
 	public function orderBy($columns_and_direction) {
@@ -668,7 +486,7 @@ class Query {
 			}
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	
 	// add a group clause
@@ -684,7 +502,7 @@ class Query {
 			}
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 	
 	// add a limit clause
@@ -695,7 +513,7 @@ class Query {
 			$this->Limit = array($from, $until);
 		}
 		// return self to the next method
-		return($this);
+		return $this;
 	}
 
 	// return only the first result
@@ -703,16 +521,13 @@ class Query {
 		// return only the first record
 		$this->First = true;
 		// return self query
-		return($this);
+		return $this;
 	}
 
 	// execute the query
 	public function execute() {
 		// if the action is missing
-		if(!$this->Action) {
-			// thow an exception
-			Throw new Exception('Query->execute() : Missing action');	
-		}
+		if(!$this->Action) { Throw new Exception('Query->execute() : Missing action'); }
 		// if action anything but query
 		if($this->Action != 'QUERY') {
 			// set the first keyword
@@ -721,15 +536,9 @@ class Query {
 		// if action is insert
 		if($this->Action == 'INSERT') {
 			// if the table is missing
-			if(!$this->Table) {
-				// throw an exception
-				Throw new Exception('Query->execute() : Missing INTO');
-			}
+			if(!$this->Table) { Throw new Exception('Query->execute() : Missing INTO'); }
 			// if missing values
-			if(!$this->Values || !count($this->Values)) {
-				// throw an exception
-				Throw new Exception('Query->execute() : Missing VALUES');	
-			}
+			if(!$this->Values || !count($this->Values)) { Throw new Exception('Query->execute() : Missing VALUES');}
 			// set destination and columns
 			$this->Query .= " INTO $this->Table ( " . implode(', ', $this->Inserts) . " )";
 			// set the placeholders
@@ -738,29 +547,14 @@ class Query {
 		// if action is select
 		if($this->Action == 'SELECT') {
 			// if the table is missing
-			if(!$this->Table) {
-				// throw an exception
-				Throw new Exception('Query->execute() : Missing FROM');	
-			}
+			if(!$this->Table) { Throw new Exception('Query->execute() : Missing FROM'); }
 			// if columns are set for selection
-			if(count($this->Selects)) {
-				// assemble all the columns
-				$this->Query .= ' ' . implode(', ', $this->Selects).' ';
-			}
-			// no specific column set for selection
-			else {
-				// select everything
-				$this->Query .= ' * ';
-			}
-			
+			$this->Query .= count($this->Selects) ? ' ' . implode(', ', $this->Selects) . ' ' : ' * ';
 		}
 		// if the action is delete
 		if($this->Action == 'DELETE') {
 			// if the table is missing
-			if(!$this->Table) {
-				// throw an exception
-				Throw new Exception('Query->execute() : Missing table to delete from');	
-			}
+			if(!$this->Table) { Throw new Exception('Query->execute() : Missing table to delete from'); }
 			// set the query
 			$this->Query = 'DELETE ';
 		}
@@ -772,15 +566,9 @@ class Query {
 		// if action is an update
 		if($this->Action == 'UPDATE') {
 			// if the table is missing
-			if(!$this->Table) {
-				// throw an exception
-				Throw new Exception('Query->execute() : No table to update');	
-			}
+			if(!$this->Table) { Throw new Exception('Query->execute() : No table to update'); }
 			// if there is nothing to update
-			if(!count($this->Updates)) {
-				// throw an exception
-				Throw new Exception('Query->execute() : No columns to update');	
-			}
+			if(!count($this->Updates)) { Throw new Exception('Query->execute() : No columns to update'); }
 			// assemble the updates
 			$this->Updates = implode(', ', $this->Updates);
 			// prepare the update query
@@ -822,18 +610,6 @@ class Query {
 			// assemble the limit options to the query
 			$this->Query .= " LIMIT {$this->Limit[0]},{$this->Limit[1]}";
 		}
-		/*
-		// if cache is enabled and query is a SELECT or a passtrhu starting with SELECT
-		if(false && ( $this->Action == 'SELECT' || ($this->Action == 'QUERY' && substr($this->Query,0,6) == 'SELECT'))) {
-			// check if it exists in cache
-			$cached = $this->isInCache();
-			// if cache provided actual result
-			if($cached !== null) {
-				// return the cached data
-				return($cached);	
-			}
-		}
-		*/
 		// prepare the statement
 		$this->Prepared = \Polyfony\Database::handle()->prepare($this->Query);
 		// if prepare failed
@@ -861,23 +637,6 @@ class Query {
 			// and pass it some arguments
 			array(trim($this->Table,"'\"`"))
 		);
-		/*
-		// if action was a pathtru and starts with UPDATE, INSERT or DELETE and Table was set and it succeeded
-		if($this->Action == 'QUERY' && in_array(substr($this->Query,0,6),array('INSERT','UPDATE','DELETE')) && $this->Table && $this->Success) {
-			// we must notify the cache that this table has changed to prevent giving outdated cached data later on
-			$this->updateOutdated();
-		}
-		// if action was DELETE or UPDATE or INSERT and succeeded, it altered a table state
-		if(($this->Action == 'UPDATE' || $this->Action == 'DELETE' || $this->Action == 'INSERT') && $this->Success) {
-			// we must notify the cache of the new modification date for this table
-			$this->updateOutdated();
-		}
-		// if action succeeded and has some kind of useful result (SELECT or SELECT via a QUERY) and has a table set
-		if(($this->Action == 'SELECT' || ($this->Action == 'QUERY' && substr($this->Query,0,6) == 'SELECT')) && $this->Table && $this->Success) {
-			// place result in cache
-			$this->putInCache();
-		}
-		*/
 		// if action was UPDATE or DELETE or one of those via QUERY
 		if(in_array($this->Action,array('UPDATE','DELETE')) || ($this->Action == 'QUERY' && in_array(substr($this->Query,0,6),array('UPDATE','DELETE')) && $this->Table)) {
 			// return the number of affected rows
@@ -888,12 +647,7 @@ class Query {
 			// instanciate a new query
 			$this->Result = new Query();
 			// get the newly inserted element from its id
-			return($this->Result
-				->select()
-				->from($this->Table)
-				->where(array('id'=>\Polyfony\Database::handle()->lastInsertId()))
-				->execute()
-			);
+			return(new Record($this->Table, \Polyfony\Database::handle()->lastInsertId()));
 		}
 		// if we want the first result only from a select query
 		if($this->First && $this->Action == 'SELECT' && isset($this->Result[0])) {
@@ -905,31 +659,26 @@ class Query {
 	}
 
 	// convert the value depending on the column name
-	public static function convert($column,$value) {
-		// if we find a file keyword
-		if(strpos($column,'_file') !== false) {
-			// store that file and replace it by a json value in the database
-			// array(path=>null,size=>null,mime=>null)
-		}
+	public static function convert($column, $value) {
 		// if we find a serialization keyword
-		elseif(strpos($column,'_array') !== false) {
-			// encode the content as JSON
+		if(strpos($column,'_array') !== false) {
+			// encode the content as JSON, being it array, null, false, whatever
 			$value = json_encode($value);
 		}
-		// if we are dealing with a date
-		elseif(strpos($column,'_date') !== false) {
+		// if we are dealing with a date and the value is not strictly null
+		elseif(strpos($column,'_date') !== false && $value !== null) {
 			// if the date is formated with two slashs
-			if(substr_count($value,'/') == 2) {
+			if(substr_count($value, '/') == 2) {
 				// set the separator
 				$separator = '/';
 			}
 			// if the date is formated with two dots
-			elseif(substr_count($value,'.') == 2) {
+			elseif(substr_count($value, '.') == 2) {
 				// set the separator
 				$separator = '.';
 			}
 			// if the date is formated with two -
-			elseif(substr_count($value,'-') == 2) {
+			elseif(substr_count($value, '-') == 2) {
 				// set the separator
 				$separator = '-';
 			}
@@ -942,30 +691,38 @@ class Query {
 			if(isset($separator)) {
 				// explode the date's elements
 				list($day,$month,$year) = explode($separator,$value);
-				// create a timestamp
+				// create a timestamp early in the morning
 				$value = mktime(0,0,1,$month,$day,$year);
 			}
 		}
 		// return the value
 		return($value);
 	}
-	/*
-	private function putInCache() {
 
-	}
-
-	private function updateOutdated() {
-		
-	}
-	*/
 	// secure a column name and get a placeholder for that column
-    private function secure($column) {
+    private function secure($column = null) {
+    	// if the column name is missing of numerical
+    	if(!$column || is_numeric($column)) {
+    		// prevent from going further
+    		Throw new Exception('Query->secure() Column name cannot be empty or a numeric value');
+    	}
         // apply the secure regex for the column name
         $column = preg_replace('/[^a-zA-Z0-9_\.]/', '', $column);    
         // apply the alias regex for the placeholder
         $placeholder = str_replace('.', '_', strtolower($column)); 
         // return cleaned column
         return(array($column, $placeholder));
+    }
+
+    // set the action internally
+    private function action($action_name) {
+    	// if no principal action is set yet
+		if(!$this->Action) {
+			// set the main action
+			$this->Action = $action_name;
+		}
+		// an action has already been set, this is impossible
+		else { Throw new Exception("Query->action() : An incompatible action already exists : {$this->Action}"); }
     }
 	
 }

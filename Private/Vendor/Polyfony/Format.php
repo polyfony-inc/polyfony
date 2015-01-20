@@ -72,8 +72,8 @@ class Format {
 		) {
 			// format the phone number by blocks of two numbers
 			return(
-				substr($phone, 0, 2).' '.substr($phone, 2, 2).' '.
-				substr($phone, 4, 2).' ' .substr($phone, 6, 2).' '.substr($phone, 8, 2));
+				substr($phone, 0, 2) . ' ' . substr($phone, 2, 2) . ' ' .
+				substr($phone, 4, 2) . ' ' . substr($phone, 6, 2) . ' ' . substr($phone, 8, 2));
 		}
 		// the phone is in international format
 		else {
@@ -110,7 +110,7 @@ class Format {
 		);
 	}
 	
-	
+	// will wrap a portion of text in another
 	public static function wrap($text, $phrase, $wrapper = '<strong class="highlight">\\1</strong>') {
 		if(empty($text)) {
 			return '';
@@ -120,7 +120,7 @@ class Format {
 		}
 		if(is_array($phrase)) {
 			foreach ($phrase as $word) {
-				$pattern[] = '/('.preg_quote($word, '/').')/i';
+				$pattern[] = '/(' . preg_quote($word, '/') . ')/i';
 				$replacement[] = $wrapper;
 			}
 		}
@@ -135,7 +135,31 @@ class Format {
 	public static function obfuscate($string) {
 		// remove all formatting symbols and double spaces	
 		return(str_replace('  ', ' ', str_replace(array("\t", "\n", "\r"), '', $string)));
-	}	
+	}
+
+	// will clean the value of anything but 0-9 and minus preserve sign return integer
+	public static function integer($value) {
+		if(strrpos($value, '.')) {
+			$value = str_replace(',', '' , $value);
+		}
+		elseif(strrpos($value, ',')) {
+			$value = str_replace('.', '' , $value);
+		} 
+		return(intval(preg_replace('/[^0-9.\-]/', '', str_replace(',', '.' , $value))));
+	}
+	
+	// will clean the value of anything but 0-9\.- preserve sign return float
+	public static function float($value, $precision = 2) {
+		if(strrpos($value, '.')) {
+			$value = str_replace(',', '' , $value);
+		}
+		elseif(strrpos($value, ',')) {
+			$value = str_replace('.', '' , $value);
+		} 
+		return(floatval(
+			round(preg_replace('/[^0-9.\-]/', '', str_replace(',', '.' , $value)), $precision)
+		));
+	}
 	
 }
 
