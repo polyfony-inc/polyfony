@@ -15,13 +15,10 @@ namespace Polyfony;
 class Filesystem {
 	
 	// this will restrict a path to the data storage folder
-	public static function chroot($path='/') {
+	public static function chroot($path='/', $override = false) {
 
 		// if chrooting is enabled in the configuration
-		if(Config::get('filesystem', 'chroot')) {
-
-			// regex to replace multiple dots
-			// DO NOT USE STR_REPLACE, USE A REGEX /!\ IMPORTANT SECURITY WARNING
+		if(Config::get('filesystem', 'chroot') && !$override) {
 
 			// if the path already has the proper (ch)root
 			if(strpos($path, Config::get('filesystem', 'data_path')) === 0) {
@@ -42,30 +39,39 @@ class Filesystem {
 
 	}
 
-	public static function isDirectory($path) {
+	public static function isDirectory($path, $override_chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
-		$path = self::chroot($path);
+		$path = self::chroot($path, $override_chroot);
 		// check if the path is a directory
 		return(is_dir($path));
 
 	}
 
-	public static function isFile($path) {
+	public static function isFile($path, $override_chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
-		$path = self::chroot($path);
+		$path = self::chroot($path, $override_chroot);
 		// check if the path is a file
 		return(is_file($path));
 
 	}
 
-	public static function isSymbolic($path) {
+	public static function isSymbolic($path, $override_chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
-		$path = self::chroot($path);
+		$path = self::chroot($path, $override_chroot);
 		// check if it is symbolic
 		return(is_link($path));
+
+	}
+
+	public static function isWritable($path, $override_chroot = false) {
+
+		// if chroot is enabled, restrict the path to the chroot
+		$path = self::chroot($path, $override_chroot);
+		// check if it is writable
+		return(is_writable($path));
 
 	}
 	
@@ -77,16 +83,16 @@ class Filesystem {
 	public static function exists($path, $chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
-		$path = self::chroot($path);
+		$path = self::chroot($path, $override_chroot);
 		// check for the existence
 		return(file_exists($path));
 
 	}
 	
-	public static function ls($path, $filters=null) {
+	public static function ls($path, $filters=null, $override_chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
-		$path = self::chroot($path);
+		$path = self::chroot($path, $override_chroot);
 		// prepare the results
 		$filtered = array();
 		// clean the path and add a trailing slash
@@ -112,20 +118,20 @@ class Filesystem {
 
 	}
 
-	public static function symlink($existing_file, $link) {
+	public static function symlink($existing_file, $link, $override_chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
-		$existing_file = self::chroot($path);
-		$link = self::chroot($link);
+		$existing_file = self::chroot($path, $override_chroot);
+		$link = self::chroot($link, $override_chroot);
 		// return false if the target does not exist
 		return(self::exists($existing_file) ? symlink($existing_file, $link) : false);
 
 	}
 
-	public static function mkdir($path, $mask = 0777) {
+	public static function mkdir($path, $mask = 0777, $override_chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
-		$path = self::chroot($path);
+		$path = self::chroot($path, $override_chroot);
 		// if the file already exists
 		if(self::exists($path) && self::isDirectory($path)) {
 			// we also return true
@@ -136,10 +142,10 @@ class Filesystem {
 
 	}
 	
-	public static function remove($path) {
+	public static function remove($path, $override_chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
-		$path = self::chroot($path);
+		$path = self::chroot($path, $override_chroot);
 		// if path exists and is a file
 		if(self::exists($path) && self::isFile($path)) {
 			// remove the file and return the result of that action
@@ -153,54 +159,56 @@ class Filesystem {
 
 	}
 
-	public static function get($path) {
+	public static function get($path, $override_chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
-		$path = self::chroot($path);
-		// if the file exists
+		$path = self::chroot($path, $override_chroot);
+		// if the file or folder exists
 		if(self::exists($path) && self::isFile($path)) {
-			// remove the file and return the result of that action
+			// get its content
 			return(file_get_contents($path));
+		}
+		// file or folder does not exist
+		else { 
+			// no content to return
+			return false;
 		}
 
 	}
 
-	public static function chmod($path, $mask) {
+	public static function chmod($path, $mask, $override_chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
-		$path = self::chroot($path);
+		$path = self::chroot($path, $override_chroot);
 
 	}
 
-	public static function chown($path, $user, $group) {
+	public static function chown($path, $user, $group, $override_chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
-		$path = self::chroot($path);
+		$path = self::chroot($path, $override_chroot);
 
 	}
 
-	public static function touch($path, $timestamp=null) {
+	public static function touch($path, $timestamp=null, $override_chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
-		$path = self::chroot($path);
+		$path = self::chroot($path, $override_chroot);
 
 	}
 
-	public static function copy($source_path, $destination_path) {
+	public static function copy($source_path, $destination_path, $override_chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
-		$source_path = self::chroot($source_path);
-		$destination_path = self::chroot($destination_path);
+		$source_path = self::chroot($source_path, $override_chroot);
+		$destination_path = self::chroot($destination_path, $override_chroot);
 
 	}
 
-	public static function info($path) {
+	public static function info($path, $override_chroot = false) {
 
-		/*
-		 *
-		 * NO CHROOT YET SINCE IT IS USED INTERNALLY
-		 *
-		 */
+		// if chroot is enabled, restrict the path to the chroot
+		$path = self::chroot($path, $override_chroot);
 
 		// if path exists and is a file
 		if(self::exists($path) && self::isFile($path)) {
@@ -221,14 +229,10 @@ class Filesystem {
 
 	}
 	
-	public static function type($path) {
+	public static function type($path, $override_chroot = false) {
 		
-		/*
-		 *
-		 * NO CHROOT YET SINCE IT IS USED INTERNALLY
-		 *
-		 */
-		
+		// if chroot is enabled, restrict the path to the chroot
+		$path = self::chroot($path, $override_chroot);
 		// get a new fileinfo object
 		$info = new \finfo(FILEINFO_MIME);
 		// if the fileinfo failed to instanciate

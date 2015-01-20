@@ -28,8 +28,6 @@ class Uploader {
 	protected	$Limits;
 	// list of errors
 	protected	$Error;
-	// file info object
-	protected	$Info;
 	
 	// constructor
 	public function __construct() {
@@ -39,18 +37,18 @@ class Uploader {
 		$this->Limits->Types = array();
 	}
 
-	// set the source file path
-	public function source($path) {
-		// set the source
-		$this->Source = $path;
+	// set the source file path, disable chroot before of the tmp folder
+	public function source($path, $override_chroot = true) {
+		// if chroot is enabled, restrict the path to the chroot
+		$this->Source = Filesystem::chroot($path, $override_chroot);
 		// return self
 		return($this);
 	}
 	
 	// set the destination
-	public function destination($path) {
+	public function destination($path, $override_chroot = false) {
 		// set the path
-		$this->Destination = $path;
+		$this->Destination = Filesystem::chroot($path, $override_chroot);
 		// return self
 		return($this);
 	}
@@ -154,31 +152,14 @@ class Uploader {
 			// return an error
 			return(false);
 		}
-		// get a new fileinfo object
-		$this->Info = new finfo(FILEINFO_MIME);
-		// if the fileinfo failed to instanciate
-		if(!$this->Info) {
-			// add an error
-			$this->Error = 'Failed to instanciate fileinfo object';
-			// return an error
-			return(false);	
-		}
-		// get the mimetype
-		$this->Type = $this->Info->file($this->Source);
+		// get the type of the uploaded document
+		$this->Type = Filesystem::type($this->Source, true);
 		// if failed to get a type
 		if(!$this->Type) {
 			// add an error
 			$this->Error = 'Failed to get mimetype';
 			// return an error
 			return(false);		
-		}
-		// we got a mimetype
-		else {
-			// if it has a ; in it
-			if(strstr($this->Type,';')) {
-				// only keep the first part
-				list($this->Type) = explode(';',$this->Type);
-			}
 		}
 		// if type limitations are set and current type is not allowed
 		if(count($this->Limits->Types) && !in_array($this->Type,$this->Limits->Types)) {

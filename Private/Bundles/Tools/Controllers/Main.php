@@ -42,11 +42,11 @@ class MainController extends Pf\Controller {
 				// set the root path
 				$assets_root_path = "./Assets/{$assets_type}/";
 				// create the public root path
-				Pf\Filesystem::mkdir($assets_root_path) ?: $has_error = true;
+				Pf\Filesystem::mkdir($assets_root_path, true) ?: $has_error = true;
 				// set the symlink 
 				$assets_symbolic_path = $assets_root_path . $bundle_name;
 				// if the symlink does not already exists
-				if(!is_link($assets_symbolic_path)) {
+				if(!Pf\Filesystem::isSymbolic($assets_symbolic_path, true)) {
 					// create the symlink
 					Pf\Filesystem::symlink($assets_path, $assets_symbolic_path) ?: $has_error = true;
 				}

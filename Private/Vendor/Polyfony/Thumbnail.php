@@ -53,17 +53,17 @@ class Thumbnail {
 	}
 	
 	// set the source image path
-	public function source($path) {
-		// set the source image
-		$this->Source = $path;
+	public function source($path, $override_chroot = false) {
+		// if chroot is enabled, restrict the path to the chroot
+		$this->Source = Filesystem::chroot($path, $override_chroot);
 		// return self
 		return($this);
 	}
 	
 	// set the destination of the thumbnail
-	public function destination($path) {
-		// set the destination image
-		$this->Destination = $path;
+	public function destination($path, $override_chroot = false) {
+		// if chroot is enabled, restrict the path to the chroot
+		$this->Destination = Filesystem::chroot($path, $override_chroot);
 		// return self
 		return($this);
 	}
@@ -71,7 +71,7 @@ class Thumbnail {
 	// set the output type
 	public function type($mimetype) {
 		// if the type is correct
-		if(in_array($mimetype,$this->Allowed)) {
+		if(in_array($mimetype, $this->Allowed)) {
 			// set the type
 			$this->Output = $mimetype;
 		}
@@ -185,17 +185,8 @@ class Thumbnail {
 		}
 		// compute filesize
 		$this->Size = filesize($this->Source);
-		// get a new fileinfo object
-		$this->Info = new finfo(FILEINFO_MIME);
-		// if the fileinfo failed to instanciate
-		if(!$this->Info) {
-			// add an error
-			$this->Error = 'Failed to instanciate fileinfo object';
-			// return an error
-			return(false);	
-		}
-		// get the mimetype
-		$this->Type = $this->Info->file($this->Source);
+		// get the type of the source image
+		$this->Type = Filesystem::type($this->Source, true);
 		// if failed to get a type
 		if(!$this->Type) {
 			// add an error
@@ -203,16 +194,8 @@ class Thumbnail {
 			// return an error
 			return(false);		
 		}
-		// we got a mimetype
-		else {
-			// if it has a ; in it
-			if(strstr($this->Type,';')) {
-				// only keep the first part
-				list($this->Type) = explode(';',$this->Type);
-			}
-		}
 		// if the source type is not allowed
-		if(!in_array($this->Type,$this->Allowed)) {
+		if(!in_array($this->Type, $this->Allowed)) {
 			// add an error
 			$this->Error = 'This image is not in the list of allowed formats : ' . implode(',',$this->Allowed);
 			// return an error
