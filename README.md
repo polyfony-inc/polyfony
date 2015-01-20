@@ -59,6 +59,11 @@ Request::isPost();
 Request::isAjax();
 ```
 
+* check if the request is done using SSL
+```php
+Request::isSecure();
+```
+
 
 ### Database
 
@@ -634,16 +639,22 @@ Form elements general syntax is : `$name, $value, $options` when you get a form 
 ### Filesystem
 
 The filesystem class allows you to manipulate directories and files easily.
-Most methods have a `chroot` option that will force all operations to appen in the `../Private/Storage/Data/` directory. 
-You can define a different storage directory in your `Config.ini` under `[polyfony]` and `data_path`.
+It is recommanded that you store all data in `../Privata/Storage/Data/` wich is configured by default in `Config.ini` under `[filesystem]`.
+You can force all operation to occur inside of this path by setting chroot option to true under `[filesystem]`.
+
 
 ```php
-Filesystem::mkdir('/my-directory/', '0777', true);
-Filesystem::mkdir('../../../../my-directory/', '0777', true);
+Filesystem::mkdir('/my-directory/', '0777');
+Filesystem::mkdir('../../../../my-directory/', '0777');
 ```
 * Both commands will create `../Private/Storage/Data/my-directory/`
 
-If you want to operate outside of the Data storage folder, ommit the chroot parameter or set it to false. 
+If you want to operate outside of the Data storage folder, set the last parameter, which is a chroot bypass, to true. The following example will break out of the chroot.
+
+```php
+Filesystem::get('/tmp/somefile.raw', true);
+```
+
 
 #### Google\Position
 
