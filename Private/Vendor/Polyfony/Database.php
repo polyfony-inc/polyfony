@@ -15,21 +15,46 @@ class Database {
 	
 	
 	// no database connection at first
-	protected static $_handle = null;
-	
+	private static $_handle = null;
+	// no database configuration at first
+	private static $_config = null;
+
+	// configure the database
+	public static function configure($driver, $database, $hostname=null, $username=null, $password=null) {
+
+		// alter the configuration
+		self::$_config = array(
+			'driver'	=> $driver,
+			'database'	=> $database,
+			'hostname'	=> $hostname,
+			'username'	=> $username,
+			'password'	=> $password,
+		);
+
+	}
+
 	// connect to the database
 	public static function connect() {
 	
+		// if no configuration has been set, configure with the Config.ini
+		self::$_config ?: self::configure(
+			Config::get('database','driver'),
+			Config::get('database', 'database'),
+			Config::get('database', 'hostname'),
+			Config::get('database', 'username'),
+			Config::get('database', 'password')
+		);
+
 		// depending on the driver
-		switch(Config::get('database','driver')) {
+		switch(self::$_config['driver']) {
 			
 			case 'sqlite':
-				$pdo = 'sqlite:' . Config::get('database', 'database');
+				$pdo = 'sqlite:' . self::$_config['database'];
 			break;
 			
 			case 'mysql':
-				$pdo = 'mysql:dbname=' . Config::get('database', 'database') . 
-				';host=' . Config::get('database', 'hostname');
+				$pdo = 'mysql:dbname=' . self::$_config['database'] . 
+				';host=' . self::$_config['hostname'];
 			break;
 			
 			default:
@@ -42,8 +67,8 @@ class Database {
 		// try to connect
 		self::$_handle = new \PDO(
 			$pdo, 
-			Config::get('database', 'username') ?: null, 
-			Config::get('database', 'password') ?: null
+			self::$_config['username'] ?: null, 
+			self::$_config['password'] ?: null
 		);
 
 		// check if connection the connexion failed

@@ -80,7 +80,7 @@ class Filesystem {
 		return((substr($string,0,1) != '.' ) ? true : false);
 	}
 
-	public static function exists($path, $chroot = false) {
+	public static function exists($path, $override_chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
