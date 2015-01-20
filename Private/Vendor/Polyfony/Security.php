@@ -74,7 +74,7 @@ class Security {
 			->select()
 			->first()
 			->from('Accounts')
-			->where(array('session_key'=>Store\Cookie::get(Config::get('security','cookie'))))
+			->where(array('session_key'=>Store\Cookie::get(Config::get('security', 'cookie'))))
 			->whereHigherThan('session_expiration_date', time())
 			->execute();
 

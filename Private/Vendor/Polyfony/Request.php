@@ -23,24 +23,24 @@ class Request {
 	private static $_headers;
 	private static $_context;
 	private static $_method;
+	private static $_protocol;
 	private static $_signature;
 	
 	public static function init() {
 
-		// set proper context
-		// depending if we are in command line
+		// set proper context depending if we are in command line
 		self::$_context = isset($_SERVER['argv'][0]) ? 'CLI' : 'HTTP';
 		
-		// set current URL
-		// depending on the context
+		// set current URL depending on the context
 		self::$_url = self::$_context == 'CLI' ? $_SERVER['argv'][2] : $_SERVER['REQUEST_URI'];
 		
-		// set the request method
-		// depending if post method is properly set
+		// set the request method depending if post method is properly set
 		self::$_method = $_SERVER['REQUEST_METHOD'] === 'POST' ? 'post' : 'get';
 
-		// set the request signature
-		// with post, if any
+		// set the request protocol
+		self::$_protocol = stripos($_SERVER['SERVER_PROTOCOL'], 'https') === true ? 'https' : 'http';
+
+		// set the request signature with post, if any
 		self::$_signature = self::isPost() ? sha1(self::$_url.json_encode($_POST)) : sha1(self::$_url);
 
 		// set globals
@@ -98,6 +98,13 @@ class Request {
 		// return current signature
 		return(self::$_signature);
 		
+	}
+
+	public static function getProtocol() {
+
+		// return current protocol
+		return(self::$_protocol);
+
 	}
 	
 	private static function setHeaders() {
@@ -235,6 +242,20 @@ class Request {
 		
 		// if method is post return true
 		return(self::$_method == 'post' ? true : false);
+		
+	}
+
+	/**
+	 * Check if the request is secured.
+	 *
+	 * @access public
+	 * @return boolean
+	 * @static
+	 */
+	public static function isSecure() {
+		
+		// if method is post return true
+		return(self::$_protocol == 'https' ? true : false);
 		
 	}	
 	

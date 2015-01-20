@@ -201,18 +201,21 @@ class Router {
 	 * @throws \Exception           If the route does not exist.
 	 * @static
 	 */
-	public static function reverse($route_name, $parameters = array()) {
+	public static function reverse($route_name, $parameters = array(), $absolute = false) {
 		// Does the route actually exist?
-		if (!isset(self::$_routes[$route_name])) {
+		if(!isset(self::$_routes[$route_name])) {
 			// we cannot reverse a route that does not exist
 			throw new Exception("Router::reverse() The route [{$route_name}] does not exist");
 		}
 		// Create a container for the URL
 		$url = self::$_routes[$route_name]->url;
-		// And replace the variables in the
-		foreach ($parameters as $variable => $value) {
+		// for each provided parameter
+		foreach($parameters as $variable => $value) {
+			// replace it in the url
 			$url = str_replace(":{$variable}", urlencode($value), $url);
 		}
+		// if we want an absolute url, prefix with the domain
+		!$absolute ?: $url = Request::getProtocol() . '://' . Config::get('router', 'domain') . $url;
 		// return the reversed url
 		return $url;
 	}

@@ -14,8 +14,11 @@ class DemoController extends pf\Controller {
 		// get the currently browsed tab or null if none
 		// this doesn't sounds safe, using a get parameter, right ?
 		// actually it is, since the route won't match types that are not in that route's restrictions
-		$this->CurrentTab = Polyfony\Request::get('type',null);
-		
+		$this->CurrentTab = Polyfony\Request::get('type', null);
+
+		// generate an asbolute url from a route
+		$this->Url = Pf\Router::reverse('demo', array('type'=>'json'));
+
 		// share a header
 		$this->view('Header');
 		
