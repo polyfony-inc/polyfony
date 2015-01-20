@@ -237,14 +237,11 @@ class Security {
 	*/
 	// internal method for generating unique signatures
 	private static function getSignature($mixed) {
-	
-		// if the provided data is not a string we encode it to a string
-		$string = !is_string($mixed) ? json_encode($mixed) : $mixed;
 		
 		// compute a hash with (the provided string + salt + user agent + remote ip)
 		return(hash(Config::get('security','algo'), 
 			Request::server('HTTP_USER_AGENT') . Request::server('REMOTE_ADDR') . 
-			Config::get('security','salt') . $string
+			Config::get('security','salt') . is_string($mixed) ? $mixed : json_encode($mixed)
 		));
 		
 	}
