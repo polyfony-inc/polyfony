@@ -17,43 +17,53 @@ class Filesystem {
 	// this will restrict a path to the data storage folder
 	public static function chroot($path='/') {
 
-		// if the path already has the proper (ch)root
-		if(strpos($path, Config::get('polyfony', 'data_path')) === 0) {
-			// remove the root, remove double dots
-			$path = str_replace(array(Config::get('polyfony', 'data_path'), '..'), '', $path);
-			// re-add the root
-			return(Config::get('polyfony', 'data_path') . trim($path, '/') . '/');
+		// if chrooting is enabled in the configuration
+		if(Config::get('filesystem', 'chroot')) {
+
+			// regex to replace multiple dots
+			// DO NOT USE STR_REPLACE, USE A REGEX /!\ IMPORTANT SECURITY WARNING
+
+			// if the path already has the proper (ch)root
+			if(strpos($path, Config::get('filesystem', 'data_path')) === 0) {
+				// remove the root, remove double dots
+				$path = str_replace(array(Config::get('filesystem', 'data_path'), '..'), '', $path);
+				// re-add the root
+				return(Config::get('filesystem', 'data_path') . trim($path, '/') . '/');
+			}
+			// the path doesn't start with the (ch)root
+			else {
+				// remove all double dots and add the root path
+				return(Config::get('filesystem', 'data_path') . trim(str_replace('..','',$path), '/') . '/');
+			}
+
 		}
-		// the path doesn't start with the (ch)root
-		else {
-			// remove all double dots and add the root path
-			return(Config::get('polyfony', 'data_path') . trim(str_replace('..','',$path), '/') . '/');
-		}
+		// return the path (altered or not)
+		return($path);
 
 	}
 
-	public static function isDirectory($path, $chroot = false) {
+	public static function isDirectory($path) {
 
-		// if chroot is enabled, restrict the path to the data storage path
-		$path = $chroot ? self::chroot($path) : $path;
+		// if chroot is enabled, restrict the path to the chroot
+		$path = self::chroot($path);
 		// check if the path is a directory
 		return(is_dir($path));
 
 	}
 
-	public static function isFile($path, $chroot = false) {
+	public static function isFile($path) {
 
-		// if chroot is enabled, restrict the path to the data storage path
-		$path = $chroot ? self::chroot($path) : $path;
+		// if chroot is enabled, restrict the path to the chroot
+		$path = self::chroot($path);
 		// check if the path is a file
 		return(is_file($path));
 
 	}
 
-	public static function isSymbolic($path, $chroot = false) {
+	public static function isSymbolic($path) {
 
-		// if chroot is enabled, restrict the path to the data storage path
-		$path = $chroot ? self::chroot($path) : $path;
+		// if chroot is enabled, restrict the path to the chroot
+		$path = self::chroot($path);
 		// check if it is symbolic
 		return(is_link($path));
 
@@ -66,17 +76,17 @@ class Filesystem {
 
 	public static function exists($path, $chroot = false) {
 
-		// if chroot is enabled, restrict the path to the data storage path
-		$path = $chroot ? self::chroot($path) : $path;
+		// if chroot is enabled, restrict the path to the chroot
+		$path = self::chroot($path);
 		// check for the existence
 		return(file_exists($path));
 
 	}
 	
-	public static function ls($path, $filters=null, $chroot = false) {
+	public static function ls($path, $filters=null) {
 
-		// if chroot is enabled, restrict the path to the data storage path
-		$path = $chroot ? self::chroot($path) : $path;
+		// if chroot is enabled, restrict the path to the chroot
+		$path = self::chroot($path);
 		// prepare the results
 		$filtered = array();
 		// clean the path and add a trailing slash
@@ -102,21 +112,20 @@ class Filesystem {
 
 	}
 
-	public static function symlink($existing_file, $link, $chroot = false) {
+	public static function symlink($existing_file, $link) {
 
-		// if chroot is enabled, restrict the path to the data storage path
-		$existing_file = $chroot ? self::chroot($existing_file) : $existing_file;
-		// if chroot is enabled, restrict the path to the data storage path
-		$link = $chroot ? self::chroot($link) : $link;
+		// if chroot is enabled, restrict the path to the chroot
+		$existing_file = self::chroot($path);
+		$link = self::chroot($link);
 		// return false if the target does not exist
 		return(self::exists($existing_file) ? symlink($existing_file, $link) : false);
 
 	}
 
-	public static function mkdir($path, $mask = 0777, $chroot = false) {
+	public static function mkdir($path, $mask = 0777) {
 
-		// if chroot is enabled, restrict the path to the data storage path
-		$path = $chroot ? self::chroot($path) : $path;
+		// if chroot is enabled, restrict the path to the chroot
+		$path = self::chroot($path);
 		// if the file already exists
 		if(self::exists($path) && self::isDirectory($path)) {
 			// we also return true
@@ -127,10 +136,10 @@ class Filesystem {
 
 	}
 	
-	public static function remove($path, $chroot = false) {
+	public static function remove($path) {
 
-		// if chroot is enabled, restrict the path to the data storage path
-		$path = $chroot ? self::chroot($path) : $path;
+		// if chroot is enabled, restrict the path to the chroot
+		$path = self::chroot($path);
 		// if path exists and is a file
 		if(self::exists($path) && self::isFile($path)) {
 			// remove the file and return the result of that action
@@ -144,10 +153,10 @@ class Filesystem {
 
 	}
 
-	public static function get($path, $chroot = false) {
+	public static function get($path) {
 
-		// if chroot is enabled, restrict the path to the data storage path
-		$path = $chroot ? self::chroot($path) : $path;
+		// if chroot is enabled, restrict the path to the chroot
+		$path = self::chroot($path);
 		// if the file exists
 		if(self::exists($path) && self::isFile($path)) {
 			// remove the file and return the result of that action
@@ -156,23 +165,42 @@ class Filesystem {
 
 	}
 
-	public static function chmod($path, $mask, $chroot = false) {
+	public static function chmod($path, $mask) {
+
+		// if chroot is enabled, restrict the path to the chroot
+		$path = self::chroot($path);
 
 	}
 
-	public static function chown($path, $user, $group, $chroot = false) {
+	public static function chown($path, $user, $group) {
+
+		// if chroot is enabled, restrict the path to the chroot
+		$path = self::chroot($path);
 
 	}
 
-	public static function touch($path, $timestamp=null, $chroot = false) {
+	public static function touch($path, $timestamp=null) {
+
+		// if chroot is enabled, restrict the path to the chroot
+		$path = self::chroot($path);
 
 	}
 
-	public static function copy($source_path, $destination_path, $chroot = false) {
+	public static function copy($source_path, $destination_path) {
+
+		// if chroot is enabled, restrict the path to the chroot
+		$source_path = self::chroot($source_path);
+		$destination_path = self::chroot($destination_path);
 
 	}
 
 	public static function info($path) {
+
+		/*
+		 *
+		 * NO CHROOT YET SINCE IT IS USED INTERNALLY
+		 *
+		 */
 
 		// if path exists and is a file
 		if(self::exists($path) && self::isFile($path)) {
@@ -194,6 +222,12 @@ class Filesystem {
 	}
 	
 	public static function type($path) {
+		
+		/*
+		 *
+		 * NO CHROOT YET SINCE IT IS USED INTERNALLY
+		 *
+		 */
 		
 		// get a new fileinfo object
 		$info = new \finfo(FILEINFO_MIME);
