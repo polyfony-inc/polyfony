@@ -13,15 +13,12 @@ namespace Polyfony;
 
 class Cache {
 
-	// hardcoded because we need the path very early to check is the request is cached, at the time Config is not available yet
-	private static $_root = '../Private/Storage/Cache/';
-
 	public static function has($variable) {
 		
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
 		// set the variable path
-		$path = self::$_root . $variable;
+		$path = Config::get('cache', 'path') . $variable;
 		// if the file exists 
 		if(file_exists($path)) {
 			// if it expired
@@ -51,11 +48,11 @@ class Cache {
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
 		// store it
-		file_put_contents(self::$_root . $variable, json_encode($value));
+		file_put_contents(Config::get('cache', 'path') . $variable, json_encode($value));
 		// compute the expiration time or set to a year by default
 		$lifetime = $lifetime ? time() + $lifetime : time() + 365 * 24 * 3600;
 		// alter the modification time
-		touch(self::$_root . $variable, $lifetime);
+		touch(Config::get('cache', 'path') . $variable, $lifetime);
 		// return status
 		return(self::has($variable));
 		
@@ -72,7 +69,7 @@ class Cache {
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
 		// return it
-		return(json_decode(file_get_contents(self::$_root . $variable), true));
+		return(json_decode(file_get_contents(Config::get('cache', 'path') . $variable), true));
 		
 	}
 	
@@ -87,7 +84,7 @@ class Cache {
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
 		// return it
-		unlink(self::$_root . $variable);
+		unlink(Config::get('cache', 'path') . $variable);
 		// return opposite of presence of the object
 		return(!self::has($variable));
 		

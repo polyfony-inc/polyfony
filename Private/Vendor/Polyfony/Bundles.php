@@ -21,7 +21,7 @@ class Bundles {
 	public static function init() {
 
 		// if cache is enabled and in prod load the cache, else parse bundles
-		Cache::has('Includes') && Config::isProd() ? self::loadCachedDependencies() : self::loadDependencies();
+		Config::isProd() && Cache::has('Includes') ? self::loadCachedDependencies() : self::loadDependencies();
 		
 		// include what has been found
 		self::includeLoaders();

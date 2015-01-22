@@ -56,7 +56,9 @@ class Response {
 
 	// init the response
 	public static function init() {
-	
+		
+		// check if we can render a response from the cache
+		self::isCached() == false ?: self::renderFromCache();
 		// start the output buffer
 		ob_start();
 		// set default assets
@@ -87,7 +89,23 @@ class Response {
 		self::setType(Config::get('response', 'default_type'));
 		
 	}
+
+	private static function isCached() {
+		// the cache has this request signature in store, cache is enabled, and browser allows cache
+		return(
+			Config::get('response', 'cache') && Cache::has(Request::getSignature()) && 
+			Request::header('Cache-Control') != 'max-age=0' ? true : false
+		);
+	}
 	
+	private static function isCachable() {
+		// response is cachable, cache time is set, status is 200, type is not file,  method is get
+		return(
+			Config::get('response', 'cache') && self::$_status == '200' && 
+			self::$_outputCache && self::$_type != 'file' && !Request::isPost()
+		);
+	}
+
 	public static function disableBrowserCache() {
 		// disable the browser's cache
 		self::$_browserCache = false;
@@ -241,6 +259,33 @@ class Response {
 		return(self::$_type == 'file' ? file_get_contents(self::$_content) : self::$_content);
 		
 	}
+
+	private static function renderFromCache() {
+
+		// get the body and headers from the cache
+		list($headers, $body) = Cache::get(Request::getSignature());
+		// stop the profiler
+		Profiler::stop();
+		// get the profiler data
+		$profiler = Profiler::getData();
+		// if the profiler is enabled
+		if(Config::get('profiler', 'enable')) {
+			// memory usage	
+			$headers['X-Memory-Usage'] = Format::size($profiler['memory']);
+			// execution time
+			$headers['X-Execution-Time'] = round($profiler['time'] * 1000) . ' ms';
+		}
+		// tell that we are from the cache
+		$headers['X-Polyfony-Cache'] = 'hit';
+		// for each header associated with the cached request
+		foreach($headers as $header => $value) {
+			// output that header
+			header("{$header}: {$value}");
+		}
+		// output the content and stop here
+		die(base64_decode($body));
+
+	}
 	
 	private static function formatContent() {
 		
@@ -325,9 +370,18 @@ class Response {
 			// get the profiler data
 			$profiler = Profiler::getData();
 			// memory usage	
-			$headers['X-Memory-Usage'] = Format::size($profiler['memory']);
+			$headers['X-Memory-Usage'] 		= Format::size($profiler['memory']);
 			// execution time
-			$headers['X-Execution-Time'] = round($profiler['time'] * 1000) . ' ms';
+			$headers['X-Execution-Time'] 	= round($profiler['time'] * 1000) . ' ms';
+		}
+		// if the request is cachable
+		if(self::isCachable()) {
+			// add the caching time
+			$headers['Date'] 	= date('r');
+			// add the caching until (so that the browser too can cache)
+			$headers['Expires'] = date('r', time() + self::$_outputCache);
+			// tell that we are not from the cache
+			$headers['X-Polyfony-Cache'] = 'miss';
 		}
 		// set some headers
 		self::setHeaders($headers);
@@ -357,36 +411,26 @@ class Response {
 		// if the type is file output from the file indicated as content else just output
 		echo self::getContent();
 		// if cache is enabled and page is cachable
-		self::cache();
+		self::isCachable() == false ?: self::cache(); 
 		// it ends here
 		exit;
 		
 	}
 	
 	private static function cache() {
-		// if cache is enabled, no errors, cache time is set, response is not a file, method is not post
-		if(Config::get('response', 'cache') && self::$_status == '200' && 
-			self::$_outputCache && self::$_type != 'file' && !Request::isPost()) {
-			// add a from cache header
-			self::setHeaders(array(
-				'X-From-Cache'		=> 'hit',
-				'X-Cached-On'		=> date('r'),
-				'X-Cached-Until'	=> date('r', time() + self::$_outputCache)
-			));
-			// store the content and the header of this response
-			Cache::put(
-				// with the key being a signature of that request
-				Request::getSignature(), 
-				array(
-					self::$_headers,
-					base64_encode(self::$_content)
-				), 
-				// replace any already existing cache file
-				true, 
-				// set the cache for some time
-				self::$_outputCache
-			);
-		}
+		// store the content and the header of this response
+		Cache::put(
+			// with the key being a signature of that request
+			Request::getSignature(), 
+			array(
+				self::$_headers,
+				base64_encode(self::$_content)
+			), 
+			// replace any already existing cache file
+			true, 
+			// set the cache for some time
+			self::$_outputCache
+		);
 	}
 	
 	public static function download($file_name, $force=false) {

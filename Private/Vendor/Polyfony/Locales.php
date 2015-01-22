@@ -21,7 +21,7 @@ class Locales {
 		// if the language is not set already we detect it
 		self::$_language !== null ?: self::detect();		
 		// load from the cache if available
-		(Cache::has('Locales') && Config::isProd()) ? self::$_locales = Cache::get('Locales') : self::load();
+		Config::isProd() && Cache::has('Locales') ? self::$_locales = Cache::get('Locales') : self::load();
 		
 	}
 	

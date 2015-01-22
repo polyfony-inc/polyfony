@@ -28,14 +28,14 @@ class Front {
 		// detect env and load .ini files accordingly
 		Config::init();
 		
-		// start the exeption catcher (quite late, but we gotta know if config has use_strict)
-		Exception::init();
-		
 		// marker
 		Profiler::setMarker('init_config');
 
-		// prepare a response with defaults parameters
+		// init the response so that is can render a cached one
 		Response::init();
+
+		// start the exeption catcher (quite late, but we gotta know if config has use_strict)
+		Exception::init();
 		
 		// marker
 		Profiler::setMarker('init_response');

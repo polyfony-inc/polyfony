@@ -56,27 +56,6 @@ class Request {
 		// remove globals
 		unset($_GET, $_POST, $_SERVER, $_FILES);
 
-		// if the cache has this request signature in store
-		if(Cache::has(self::getSignature()) && self::header('Cache-Control') != 'max-age=0') {
-			// get the body and headers from the cache
-			list($headers, $body) = Cache::get(self::getSignature());
-			// stop the profiler
-			Profiler::stop();
-			// get the profiler data
-			$profiler = Profiler::getData();
-			// memory usage	
-			$headers['X-Memory-Usage'] = Format::size($profiler['memory']);
-			// execution time
-			$headers['X-Execution-Time'] = round($profiler['time'] * 1000) . ' ms';
-			// for each header associated with the cached request
-			foreach($headers as $header => $value) {
-				// output that header
-				header("{$header}: {$value}");
-			}
-			// output the content and stop here
-			die(base64_decode($body));
-		}
-
 	}
 	
 	public static function getContext() {
