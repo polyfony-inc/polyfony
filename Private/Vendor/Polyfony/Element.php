@@ -16,7 +16,7 @@ namespace Polyfony;
 class Element {
 
 	// declare auto closing tags
-	private static $_auto = array('input','img','hr','br','meta','link');
+	private static $_auto = array('input', 'img', 'hr', 'br', 'meta', 'link');
 
 	// internal of the DOM element
 	private $type;

@@ -78,6 +78,10 @@ class Controller {
 		return(Router::reverse($route, $parameters));
 		
 	}
+
+	final public function link() {
+		
+	}
 	
 	// get an empty query
 	final public function query() {

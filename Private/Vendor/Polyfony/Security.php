@@ -204,37 +204,7 @@ class Security {
 		return($existing_key == $dynamic_key ? true : false);
 
 	}
-	/*
-	// clean the database (called after each successful login)
-	private static function clean() {
-		// clean expired sessions
-		Database::query()->update('Accounts')
-			->set(array(
-				'session_key'				=> null,
-				'session_expiration_date'	=> null
-			))
-			->whereNotNull('session_expiration_date')
-			->whereLowerThan('session_expiration_date',time())
-			->execute();
-		// clean expired accounts
-		Database::query()->update('Accounts')
-			->set(array(
-				'session_key'				=> null,
-				'session_expiration_date'	=> null
-			))
-			->whereNotNull('account_expiration_date')
-			->whereLowerThan('account_expiration_date',time())
-			->execute();
-		// clean disabled accounts
-		Database::query()->update('Accounts')
-			->set(array(
-				'session_key'				=> null,
-				'session_expiration_date'	=> null
-			))
-			->whereNull('is_enabled')
-			->execute();
-	}
-	*/
+	
 	// internal method for generating unique signatures
 	private static function getSignature($mixed) {
 		

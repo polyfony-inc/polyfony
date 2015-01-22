@@ -92,6 +92,9 @@ class Database {
 	// give the handle to any object that requires it
 	public static function handle() {
 		
+		// if no connection to the database is ready
+		self::$_handle ?: self::connect();
+		
 		// return the handle
 		return(self::$_handle);
 		

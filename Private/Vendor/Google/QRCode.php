@@ -19,11 +19,8 @@ class QRCode {
 	// generate a new QRCode
 	public static function url($data, $size=200) {
 
+		// format the qrcode url
 		return(self::$_api_url . "cht=qr&chs={$size}x{$size}&chld=M|0&chl=" . urlencode(json_encode($data)));
-
-	}
-
-	public static function decode() {
 
 	}
 

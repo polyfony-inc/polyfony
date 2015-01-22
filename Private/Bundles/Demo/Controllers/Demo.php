@@ -6,7 +6,7 @@ use Polyfony as pf;
 class DemoController extends pf\Controller {
 
 	public function preAction() {
-		
+
 		// set some common metas and assets
 		pf\Response::setMetas(array('title'=>'Bundles/Demo'));
 		pf\Response::setAssets('css','//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css');
@@ -134,13 +134,14 @@ class DemoController extends pf\Controller {
 		// set manual header
 		pf\Response::setHeaders(array('X-Knock-Knock'=>'Who\'s there ?'));
 		// simply import the view
-		$this->view('Response');		
+		$this->view('Response');
 	}
 	
 	public function requestAction() {
 		
 		// check if something has been posted
-		$this->Feedback = pf\Request::isPost() ? new pf\Notice\Success('You posted : '. pf\Request::post('test'),'Congrats!') : null;
+		$this->Feedback = pf\Request::isPost() ? 
+			new pf\Notice\Success('You posted : '. pf\Request::post('test'), 'Congrats!') : null;
 		
 		// create a new input, using posted data if available
 		$this->InputExample = pf\Form::input(

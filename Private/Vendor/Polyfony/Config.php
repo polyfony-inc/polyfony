@@ -49,10 +49,10 @@ class Config {
 
 	}
 	
-	public static function set($group,$key,$value=null) {
+	public static function set($group, $key, $value=null) {
 		
-		// set the proper value
-		self::$_config[$group][$key] = $value;
+		// if only group + one parameters, set the whole group, else set a key of the group
+		$value !== null ? self::$_config[$group][$key] = $value : self::$_config[$group] = $key;
 		
 	}
 	
