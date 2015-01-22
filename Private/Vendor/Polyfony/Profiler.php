@@ -31,7 +31,7 @@ class Profiler {
 
 	}
 	
-	public static function stop() {
+	private static function stop() {
 		
 		// add end marker
 		self::setMarker('end');
@@ -56,6 +56,8 @@ class Profiler {
 	}
 	
 	public static function getData() {
+		// stop the profiler
+		self::stop();
 		// return stacked data
 		return array(
 			'time'	=> self::$_totalTime,

@@ -79,9 +79,10 @@ class Response {
 		self::setStatus(200);
 		// set default language
 		self::setHeaders(array(
-			'X-Powered-By'		=> 'Polyfony',
-			'Server'			=> 'Undisclosed',
-			'Content-Language'	=> Locales::getLanguage()
+			// hide the php version
+			'X-Powered-By'		=> 'PHP',
+			// hide the web server
+			'Server'			=> 'Mind your own business !'
 		));
 		// set default charset
 		self::setCharset(Config::get('response', 'default_charset'));
@@ -260,23 +261,24 @@ class Response {
 		
 	}
 
+	// return the footprint a the response
+	private static function getFootprint() {
+
+		// get the profiler data
+		$profiler = Profiler::getData();
+		// assemble and return memory with time
+		return(round($profiler['time'] * 1000, 1) . ' ms '. Format::size($profiler['memory']));
+
+	}
+
 	private static function renderFromCache() {
 
 		// get the body and headers from the cache
 		list($headers, $body) = Cache::get(Request::getSignature());
-		// stop the profiler
-		Profiler::stop();
-		// get the profiler data
-		$profiler = Profiler::getData();
 		// if the profiler is enabled
-		if(Config::get('profiler', 'enable')) {
-			// memory usage	
-			$headers['X-Memory-Usage'] = Format::size($profiler['memory']);
-			// execution time
-			$headers['X-Execution-Time'] = round($profiler['time'] * 1000) . ' ms';
-		}
+		!Config::get('profiler', 'enable') ?: $headers['X-Cached-Footprint'] = self::getFootprint();
 		// tell that we are from the cache
-		$headers['X-Polyfony-Cache'] = 'hit';
+		$headers['X-Cache'] = 'hit';
 		// for each header associated with the cached request
 		foreach($headers as $header => $value) {
 			// output that header
@@ -367,12 +369,10 @@ class Response {
 		}
 		// if the profiler is enabled
 		if(Config::get('profiler','enable')) {
-			// get the profiler data
-			$profiler = Profiler::getData();
-			// memory usage	
-			$headers['X-Memory-Usage'] 		= Format::size($profiler['memory']);
-			// execution time
-			$headers['X-Execution-Time'] 	= round($profiler['time'] * 1000) . ' ms';
+			// memory usage	and execution time
+			$headers['X-Footprint'] 		= self::getFootprint();
+			// current environment
+			$headers['X-Environment'] 		= Config::isDev() ? 'Development' : 'Production';
 		}
 		// if the request is cachable
 		if(self::isCachable()) {
@@ -381,7 +381,7 @@ class Response {
 			// add the caching until (so that the browser too can cache)
 			$headers['Expires'] = date('r', time() + self::$_outputCache);
 			// tell that we are not from the cache
-			$headers['X-Polyfony-Cache'] = 'miss';
+			$headers['X-Cache'] = 'miss';
 		}
 		// set some headers
 		self::setHeaders($headers);
@@ -399,8 +399,6 @@ class Response {
 		self::$_content = self::$_content ?: self::clean();
 		// set the current protocol of fallback to HTTP 1.1 and set the status code plus message
 		header(Request::server('SERVER_PROTOCOL', 'HTTP/1.1') . ' ' . self::$_status . ' ' . self::$_codes[self::$_status]);
-		// stop the profiler
-		Profiler::stop();
 		// format the content
 		self::formatContent();
 		// for each header

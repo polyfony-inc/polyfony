@@ -62,7 +62,7 @@ class Config {
 		return($key ? self::$_config[$group][$key] : self::$_config[$group]);
 		
 	}
-	
+
 	public static function isDev() {
 		
 		// return boolean
