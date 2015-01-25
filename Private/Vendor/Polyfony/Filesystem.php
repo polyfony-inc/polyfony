@@ -96,7 +96,7 @@ class Filesystem {
 		// clean the path and add a trailing slash
 		$path = trim($path, '/') . '/';
 		// scan the folder
-		$files_and_folders = self::exists($path) && self::isDirectory($path) ? scandir($path) : array();
+		$files_and_folders = scandir($path);
 		// for each found result
 		foreach($files_and_folders as $file_or_folder) {
 			// ignore filesystem internals
@@ -104,7 +104,7 @@ class Filesystem {
 			// build the fullpath
 			$full_path = $path . $file_or_folder;
 			// add a trailing slash if it is a folder
-			$full_path .= self::isDirectory($full_path) ? '/' : '';
+			$full_path .= self::isDirectory($full_path, $override_chroot) ? '/' : '';
 			// add the file or folder if it has passed the filter(s)
 			$filtered[$full_path] = $file_or_folder;
 		}
@@ -116,10 +116,10 @@ class Filesystem {
 	public static function symlink($existing_file, $link, $override_chroot = false) {
 
 		// if chroot is enabled, restrict the path to the chroot
-		$existing_file = self::chroot($path, $override_chroot);
+		$existing_file = self::chroot($existing_file, $override_chroot);
 		$link = self::chroot($link, $override_chroot);
 		// return false if the target does not exist
-		return(self::exists($existing_file) ? symlink($existing_file, $link) : false);
+		return(symlink($existing_file, $link));
 
 	}
 
@@ -128,7 +128,7 @@ class Filesystem {
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
 		// if the file already exists
-		if(self::exists($path) && self::isDirectory($path)) {
+		if(self::exists($path, $override_chroot) && self::isDirectory($path, $override_chroot)) {
 			// we also return true
 			return(true);
 		}
@@ -207,7 +207,7 @@ class Filesystem {
 		return(array(
 			'size'			=> filesize($path),
 			'modification'	=> filemtime($path),
-			'type'			=> self::type($path)
+			'type'			=> self::type($path, $override_chroot)
 		));
 
 	}
