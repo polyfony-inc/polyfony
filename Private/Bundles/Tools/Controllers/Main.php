@@ -39,6 +39,8 @@ class MainController extends Pf\Controller {
 		foreach(Pf\Bundles::getAvailable() as $bundle_name) {
 			// get assets for that bundle
 			foreach(Pf\Bundles::getAssets($bundle_name) as $assets_type => $assets_path) {
+				// get the correct relativeness
+				$assets_path = "../../{$assets_path}";
 				// set the root path
 				$assets_root_path = "./Assets/{$assets_type}/";
 				// create the public root path
