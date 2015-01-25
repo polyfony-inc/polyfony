@@ -64,8 +64,8 @@ class Response {
 		// set default assets
 		self::$_assets = array(
 			// as empty arrays
-			'css'	=>array(),
-			'js'	=>array()
+			'Css'	=>array(),
+			'Js'	=>array()
 		);
 		// set default headers
 		self::$_headers = array();
@@ -129,13 +129,15 @@ class Response {
 		));	
 	}
 
-	public static function setAssets($type,$assets) {
+	public static function setAssets($type, $assets) {
 		// if single element provided
 		$assets = is_array($assets) ? $assets : array($assets);
 		// for each assets to set
 		foreach($assets as $asset) {
+			// convert the case of the type
+			$type = ucfirst(strtolower($type));
 			// if asset is absolute
-			$asset = (substr($asset,0,1) == '/' or substr($asset,0,4) == 'http') ? $asset : "/assets/{$type}/{$asset}";
+			$asset = (substr($asset,0,1) == '/' or substr($asset,0,4) == 'http') ? $asset : "/Assets/{$type}/{$asset}";
 			// push in the list
 			self::$_assets[$type][] = $asset;
 		}
@@ -224,9 +226,9 @@ class Response {
 	// format and return javascripts
 	private static function prependScripts() {
 		// de-deuplicate js files
-		self::$_assets['js'] = array_unique(self::$_assets['js']);
+		self::$_assets['Js'] = array_unique(self::$_assets['Js']);
 		// for each file
-		foreach(self::$_assets['js'] as $file) {
+		foreach(self::$_assets['Js'] as $file) {
 			// add it
 			self::$_content = '<script type="text/javascript" src="'. $file .'"></script>' . self::$_content;
 		}
@@ -235,9 +237,9 @@ class Response {
 	// format an return stylesheets
 	private static function prependStyles() {
 		// de-deuplicate css files
-		self::$_assets['css'] = array_unique(self::$_assets['css']);
+		self::$_assets['Css'] = array_unique(self::$_assets['Css']);
 		// for each file
-		foreach(self::$_assets['css'] as $file) {
+		foreach(self::$_assets['Css'] as $file) {
 			// support media specific CSS
 			$href = is_array($file) ? $file[0] : $file;
 			// default is for all medias
