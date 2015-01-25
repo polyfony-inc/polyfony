@@ -18,7 +18,7 @@ class Keys {
 	public static function generate($mixed=null) {
 		// create a sha1 signature of the array with a salt
 		$hash = hash(
-			Config::get('key', 'algo'),
+			Config::get('keys', 'algo'),
 			json_encode(array($mixed, Config::get('keys', 'salt')), JSON_NUMERIC_CHECK)
 		);
 		// get last 10 and first 10 chars together, convert to uppercase, return the key
