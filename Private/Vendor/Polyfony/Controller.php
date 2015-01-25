@@ -67,20 +67,20 @@ class Controller {
 		$route->action		= $action;
 		
 		// forward to the new route
-		Dispatcher::forward($route);
+		Router::forward($route);
 		
 	}
 	
 	// alias to router / build an url given a route name and its parameters
-	final public function url($route, $parameters=array()) {
+	final public function url($route, $parameters=array(), $absolute=false) {
 		
 		// return the reversed route as an url
 		return(Router::reverse($route, $parameters));
 		
 	}
 
-	final public function link() {
-		
+	final public function link($name, $route, $parameters=array(), $absolute=false) {
+
 	}
 	
 	// get an empty query
@@ -88,14 +88,6 @@ class Controller {
 
 		// return a new query
 		return(Database::query());
-		
-	}
-	
-	// alias to security / check if requirements are met
-	final public function isGranted($module, $level=null) {
-		
-		// ask the pfsecurity for that module and bypass level
-		return(Security::hasModule($module, $level));
 		
 	}
 	

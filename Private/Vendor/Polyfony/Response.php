@@ -189,18 +189,12 @@ class Response {
 	}
 
 	// set raw content
-	public static function setContent($content, $replace=false) {
+	public static function setContent($content) {
 		
-		// if the content is an array
-		if(is_array($content)) {
-			// replace direclty without consideration for the replace parameter
-			self::$_content = $content;
-		}
-		// content is a string type
-		else {
-			// replace content or append to already existing
-			self::$_content = $replace ? $content : self::$_content . $content;
-		}
+		// remove any bufferred output
+		self::clean();
+		// replace direclty
+		self::$_content = $content;
 
 	}
 
@@ -276,7 +270,7 @@ class Response {
 		// get the body and headers from the cache
 		list($headers, $body) = Cache::get(Request::getSignature());
 		// if the profiler is enabled
-		!Config::get('profiler', 'enable') ?: $headers['X-Cached-Footprint'] = self::getFootprint();
+		!Config::get('profiler', 'enable') ?: $headers['X-Cache-Footprint'] = self::getFootprint();
 		// tell that we are from the cache
 		$headers['X-Cache'] = 'hit';
 		// for each header associated with the cached request
@@ -293,13 +287,6 @@ class Response {
 		
 		// base headers
 		$headers = array();
-		
-		// in case we are outputing anything but html
-		if(!in_array(self::$_type, array('html', 'html-page'))) {
-			// remove any already buffered data
-			self::clean();
-		}
-
 		// case of html page
 		if(self::$_type == 'html-page') {
 			// add the profiler
@@ -324,11 +311,6 @@ class Response {
 			// encode the content to json
 			self::$_content = json_encode(self::$_content);
 		}
-		// elseif the type is plain text
-		elseif(self::$_type == 'text') {
-			// if the content is of type array, var_export it
-			self::$_content = is_array(self::$_content) ? var_export(self::$_content, true) : self::$_content;
-		}
 		// elseif the type is file
 		elseif(self::$_type == 'file') {
 			// detect the mimetype to set the proper header
@@ -336,20 +318,18 @@ class Response {
 			// detect the modification time of the file
 			self::$_modification = filemtime(self::$_content);
 		}
-
-		// if the type is not a file
-		if(self::$_type != 'file') {
+		// in case we are outputing html in any form and obfucation is enabled
+		if(Config::get('response', 'obfuscate') && in_array(self::$_type, array('html', 'html-page'))) {
 			// obfuscate
-			self::$_content = Config::get('response', 'obfuscate') ? Format::obfuscate(self::$_content) : self::$_content;
-			// if compression is allowed
-			if(Config::get('response', 'compress')) {
-				// compress
-				self::$_content = gzencode(self::$_content);
-				// add header
-				$headers['Content-Encoding'] = 'gzip';
-			}
+			self::$_content = Format::obfuscate(self::$_content);
 		}
-
+		// if the type is not a file and compression is allowed
+		if(self::$_type != 'file' && Config::get('response', 'compress')) {
+			// compress
+			self::$_content = gzencode(self::$_content);
+			// add header
+			$headers['Content-Encoding'] = 'gzip';
+		}
 		// if checksum is enabled
 		if(Config::get('response', 'checksum')) {
 			// generate that checksum
@@ -372,7 +352,7 @@ class Response {
 			// memory usage	and execution time
 			$headers['X-Footprint'] 		= self::getFootprint();
 			// current environment
-			$headers['X-Environment'] 		= Config::isDev() ? 'Development' : 'Production';
+			$headers['X-Environment'] 		= Config::isDev() ? 'Dev' : 'Prod';
 		}
 		// if the request is cachable
 		if(self::isCachable()) {

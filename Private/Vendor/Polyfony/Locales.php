@@ -105,7 +105,7 @@ class Locales {
 		
 	}
 	
-	public static function get($key,$language=null) {
+	public static function get($key, $language=null) {
 	
 		// if locales are not loaded yet
 		self::$_locales !== null ?: self::init();

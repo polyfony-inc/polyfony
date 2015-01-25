@@ -118,6 +118,8 @@ class Security {
 					->set('last_failure_date', time())
 					->set('last_failure_agent', Request::server('HTTP_USER_AGENT'))
 					->save();
+				// log the action
+				Logger::warning("User {$account->get('login')} is being blocked");
 				// refuse access
 				self::refuse('Please wait ' . Config::get('security', 'waiting_duration') . ' seconds before trying again');
 			}
@@ -163,6 +165,9 @@ class Security {
 
 				// allow the basic authentication
 				self::$_granted = true;
+
+				// log the loggin action
+				Logger::info('User has logged in');
 				
 			}
 			// passwords dont match
@@ -245,8 +250,11 @@ class Security {
 	// get a specific credential
 	public static function get($credential, $default=null) {
 
-		// return said credential or default
-		return(self::$_account->get($credential) ?: $default);
+		// return said credential or default if not authenticated or credential does not exist
+		return(
+			self::$_account && self::$_account->get($credential) ? 
+			self::$_account->get($credential) : $default
+		);
 		
 	}
 	

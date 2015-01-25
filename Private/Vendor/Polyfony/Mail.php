@@ -14,6 +14,7 @@ namespace Polyfony;
  
 class Mail {
 
+	private $title;
 	private $from;
 	private $recipients;
 	private $files;
@@ -22,15 +23,18 @@ class Mail {
 	private $subject;
 	private $variables;
 	private $format;
+	private $charset;
 	private $smtp;
 	private $mailer;
 
 	public function __construct() {
 		// initialize
 		$this->format 		= Config::get('mail', 'format');
+		$this->charset 		= Config::get('mail', 'default_charset');
 		$this->body 		= '';
 		$this->subject 		= '';
 		$this->mailer 		= null;
+		$this->title 		= null;
 		$this->files 		= array();
 		$this->variables 	= array();
 		$this->recipients 	= array(
@@ -52,6 +56,20 @@ class Mail {
 	public function format($format) {
 		// set the correct format
 		$this->format = $format == 'html' ? 'html' : 'text';
+		// return self
+		return($this);
+	}
+
+	public function title($title) {
+		// set the title of the mail
+		$this->title = $title;
+		// return self
+		return($this);
+	}
+
+	public function charset($charset) {
+		// set the charset of the mail
+		$this->charset = $charset;
 		// return self
 		return($this);
 	}
@@ -210,7 +228,7 @@ class Mail {
 		$this->mailer = new \PHPMailer\PHPMailer(true);
 
 		// configure the mailer from hard config
-		$this->mailer->CharSet 		= Config::get('mail', 'default_charset');
+		$this->mailer->CharSet 		= $this->charset;
 		// configure the mailer from instance config
 		$this->mailer->From 		= $this->from['mail'];
 		$this->mailer->FromName 	= $this->from['name'];
@@ -285,6 +303,7 @@ class Mail {
 					'is_sent' 			=> $is_sent,
 					'creation_date' 	=> time(),
 					'sending_date' 		=> $is_sent ? time() : null,
+					'title'				=> $this->title,
 					'format'			=> $this->format,
 					'from_mail'			=> $this->from['mail'],
 					'from_name'			=> $this->from['name'],

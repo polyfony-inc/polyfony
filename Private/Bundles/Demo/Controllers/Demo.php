@@ -59,9 +59,6 @@ class DemoController extends pf\Controller {
 	
 	public function secureAction() {	
 
-		// if the « something » parameter from the route is « exit », close our session
-		!pf\Request::get('something') == 'exit' ?: pf\Security::disconnect();
-
 		// enforce security for this action
 		pf\Security::enforce();
 
@@ -73,6 +70,13 @@ class DemoController extends pf\Controller {
 
 		// normal view
 		$this->view('Secure');
+	}
+
+	public function disconnectAction() {
+
+		// close the opened session
+		pf\Security::disconnect();
+
 	}
 	
 	public function localesAction() {

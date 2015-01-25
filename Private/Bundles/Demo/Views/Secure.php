@@ -9,6 +9,6 @@
 		login <code><?php echo $this->Login; ?></code>, modules <code><?php echo $this->Modules; ?></code>
 	</p>
 	<p>
-		To close your session, <a href="/demo/secure/exit/">just click here</a>
+		To close your session, <a href="/demo/disconnect/">just click here</a>
 	</p>
 </div>

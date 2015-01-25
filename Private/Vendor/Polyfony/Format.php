@@ -46,15 +46,44 @@ class Format {
 	}
 	
 	// relative date
-	public static function date($timestamp) {
-		// date is in the future
-		if($timestamp > time()) {
-
+	public static function date($timestamp, $precision = 0) {
+		// if no timestamp is provided
+		if(!$timestamp) {
+			// there is no conversion to do at all
+			return('');
 		}
-		// date is in the past
-		else {
-
+		// compute the delta between now and then
+		$delta 		= intval($timestamp - time());
+		// use the right keyword for a future or past date
+		$keyword 	= $delta > 0 ? Locales::get('dans _delta_') : Locales::get('il y\'a _delta_');
+		// get the absolute value of the delta
+		$delta 		= abs($delta);
+		// list of deltas by period
+		$deltas[1] = array(60, 'minute');
+		$deltas[2] = array(3600, 'heure');
+		$deltas[3] = array(86400, 'jour');
+		$deltas[4] = array(604800, 'semaine');
+		$deltas[5] = array(2592000, 'mois');
+		$deltas[6] = array(31104000, 'an');
+		// for very short deltas
+		$delta = $delta < 60 ? Locales::get('quelques instants') : $delta;
+		// for each time period available
+		for($i = 6; $i > 0; $i--) {
+			// if if we is the largest period available
+			if($delta >= $deltas[$i][0]) {
+				// compute the remaining time in the current period's unit
+				$delta = round($delta/$deltas[$i][0], $precision);
+				// format the relative date
+				$delta = $delta . ' ' . Locales::get(
+					// add a trailing plural "s"
+					intval($delta) == 1 ? $deltas[$i][1] : rtrim($deltas[$i][1], 's') . 's'
+				);
+				// break out of the loop
+				break;
+			}
 		}
+		// replace from the locale placeholder
+		return(str_replace('_delta_', $delta, $keyword));
 	}
 	
 	// phone number

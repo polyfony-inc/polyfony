@@ -18,20 +18,21 @@ class Config {
 	
 	public static function init() {
 	
-		// load the common configuration file
-		self::$_config = parse_ini_file("../Private/Config/Config.ini", true);
+		// get all configurations available
+		self::$_config = array(
+			'Current'	=> parse_ini_file('../Private/Config/Config.ini', true),
+			'Dev'		=> parse_ini_file('../Private/Config/Dev.ini', true),
+			'Prod'		=> parse_ini_file('../Private/Config/Prod.ini', true)
+		);
 	
 		// depending on the context, detect environment differently
 		Request::getContext() == 'CLI' ? self::detectFromCLI() : self::detectFromHTTP();
 		
-		// load the environment specific configuration
-		self::$_config = array_merge(
-			self::$_config,
-			parse_ini_file("../Private/Config/" . self::$_environment . ".ini", true)
-		);
-		
+		// merge the base configuration with the environment specific one
+		self::merge();
+
 		// set the proper timezone
-		!self::get('polyfony', 'timezone') ?: date_default_timezone_set(self::get('polyfony', 'timezone'));
+		!self::get('config', 'timezone') ?: date_default_timezone_set(self::get('config', 'timezone'));
 
 	}
 	
@@ -44,37 +45,69 @@ class Config {
 	
 	private static function detectFromHTTP() {
 		
-		// if we are running on the development port
-		self::$_environment = Request::server('SERVER_PORT') == Config::get('polyfony','dev_port') ? 'Dev' : 'Prod';	
+		// if the detection method is the port
+		if(self::$_config['Current']['config']['detection_method'] == 'port') {
+			// if we are matching the development port
+			self::$_environment = Request::server('SERVER_PORT') == self::$_config['Dev']['router']['port'] ? 
+				'Dev' : 'Prod';
+		}
+		// else the detection method is the domain
+		elseif(self::$_config['Current']['config']['detection_method'] == 'domain') {
+			// if we are matching the development domain
+			self::$_environment = Request::server('HTTP_HOST') == self::$_config['Dev']['router']['domain'] ? 
+				'Dev' : 'Prod';
+		}
+		// the detection method is unknown
+		else {
+			// throw an exception
+			Throw new \Exception('Config::detectFromHTTP() Environment detection method is unkown');
+		}	
+
+	}
+
+	private static function merge() {
+
+		// if in production a an aggregated cache is already available, load it
+		if(Config::isProd() && Cache::has('Config')) {
+			// load from the cache file
+			self::$_config['Current'] = Cache::get('Config');
+			// stop the function
+			return;
+		}
+		// no cache available or enabled, we have to merge ourselves
+		else {
+			// for each configuration block that is specific
+			foreach(self::$_config[self::$_environment] as $group => $group_config) {
+				// merge the current configuration
+				self::$_config['Current'][$group] = array_merge(
+					self::$_config['Current'][$group],
+					self::$_config[self::$_environment][$group]
+				);
+			}
+			// if we are in production, cache the merged file
+			!Config::isProd() ?: Cache::put('Config', self::$_config['Current'], true);
+		}
 
 	}
 	
 	public static function set($group, $key, $value=null) {
-		
 		// if only group + one parameters, set the whole group, else set a key of the group
-		$value !== null ? self::$_config[$group][$key] = $value : self::$_config[$group] = $key;
-		
+		$value !== null ? self::$_config['Current'][$group][$key] = $value : self::$_config[$group] = $key;
 	}
 	
-	public static function get($group,$key=null) {
-		
+	public static function get($group, $key=null) {
 		// return the proper config
-		return($key ? self::$_config[$group][$key] : self::$_config[$group]);
-		
+		return($key ? self::$_config['Current'][$group][$key] : self::$_config[$group]);
 	}
 
 	public static function isDev() {
-		
 		// return boolean
 		return(self::$_environment == 'Dev' ? true : false);
-			
 	}
 	
 	public static function isProd() {
-		
 		// return boolean
 		return(self::$_environment == 'Prod' ? true : false);
-		
 	}
 	
 }	

@@ -25,7 +25,7 @@ class Exception extends \Exception {
 		set_exception_handler('Polyfony\Exception::catchException');
 
 		// set handler for all non catched PHP errors if Config::get('core','use_strict')	
-		!Config::get('polyfony','use_strict') ?: set_error_handler('Polyfony\Exception::catchErrorException');
+		!Config::get('config','use_strict') ?: set_error_handler('Polyfony\Exception::catchErrorException');
 		
 	}
 	

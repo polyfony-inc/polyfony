@@ -17,6 +17,9 @@
 					Session expiration (raw)
 				</th>
 				<th>
+					Session expiration (relative)
+				</th>
+				<th>
 					Session expiration
 				</th>
 				<th>
@@ -36,6 +39,11 @@
 					<td>
 						<code>
 							<?php echo $record->get('session_expiration_date',true); ?>
+						</code>
+					</td>
+					<td>
+						<code>
+							<?php echo Polyfony\Format::date($record->get('session_expiration_date',true)); ?>
 						</code>
 					</td>
 					<td>
