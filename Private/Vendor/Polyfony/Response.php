@@ -214,6 +214,8 @@ class Response {
 	private static function prependMetas() {
 		// de-deuplicate js files
 		self::$_metas = array_unique(self::$_metas);
+		// return to the original order
+		krsort(self::$_metas);
 		// for each file
 		foreach(self::$_metas as $meta => $value) {
 			// add it
@@ -227,6 +229,8 @@ class Response {
 	private static function prependScripts() {
 		// de-deuplicate js files
 		self::$_assets['Js'] = array_unique(self::$_assets['Js']);
+		// return to the original order
+		krsort(self::$_assets['Js']);
 		// for each file
 		foreach(self::$_assets['Js'] as $file) {
 			// add it
@@ -238,6 +242,8 @@ class Response {
 	private static function prependStyles() {
 		// de-deuplicate css files
 		self::$_assets['Css'] = array_unique(self::$_assets['Css']);
+		// return to the original order
+		krsort(self::$_assets['Css']);
 		// for each file
 		foreach(self::$_assets['Css'] as $file) {
 			// support media specific CSS
