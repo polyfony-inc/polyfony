@@ -22,19 +22,12 @@ class Record {
 		// init the list of altered columns
 		$this->_ = array(
 			// if of the record
-			'id'		=> null,
+			'id'		=> isset($this->id) ? $this->id : null,
 			// table of the record
-			'table'		=> null,
+			'table'		=> $table ?: null,
 			// list of altered columns since the retrieval from the database
 			'altered'	=> array()
 		);
-		
-		// having a table means that we are not the result of a join query
-		$this->_['table'] = $table ? $table : null;
-		
-		// if we have an id available
-		$this->_['id'] = isset($this->id) ? $this->id : null;
-		
 		// if conditions are provided
 		if($conditions !== null) {
 			// if conditions is not an array
