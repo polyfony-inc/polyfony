@@ -15,7 +15,7 @@ class Bundles {
 
 	protected static $_bundles		= array();
 	protected static $_routes		= array();
-	protected static $_runtimes		= array();
+	protected static $_configs		= array();
 
 	// will get the list of bundles and get their routes and runtimes
 	public static function init() {
@@ -35,7 +35,7 @@ class Bundles {
 		// put everything at its rightful place
 		self::$_bundles		= $cache['bundles'];
 		self::$_routes		= $cache['routes'];
-		self::$_runtimes	= $cache['runtimes'];
+		self::$_configs		= $cache['configs'];
 		
 	}
 	
@@ -50,17 +50,17 @@ class Bundles {
 				// route file
 				$bundle_routes = "../Private/Bundles/{$bundle}/Loader/Route.php";
 				// runtime file
-				$bundle_runtime = "../Private/Bundles/{$bundle}/Loader/Runtime.php";
+				$bundle_config = "../Private/Bundles/{$bundle}/Loader/Config.php";
 				// if a route file exists
 				!file_exists($bundle_routes) ?: self::$_routes[] = $bundle_routes;
 				// if a runtime file exists
-				!file_exists($bundle_runtime) ?: self::$_runtimes[] = $bundle_runtime;
+				!file_exists($bundle_config) ?: self::$_configs[] = $bundle_config;
 			}
 		}
 		// save in the cache (overwrite)
 		Cache::put('Includes', array(
 			'routes'	=>self::$_routes,
-			'runtimes'	=>self::$_runtimes,
+			'configs'	=>self::$_configs,
 			'bundles'	=>self::$_bundles
 		), true);
 		
@@ -69,7 +69,7 @@ class Bundles {
 	private static function includeLoaders() {
 		
 		// for each route or runtime filavailablee
-		foreach(array_merge(self::$_routes, self::$_runtimes) as $file) {
+		foreach(array_merge(self::$_routes, self::$_configs) as $file) {
 			// include it
 			include($file);	
 		}
