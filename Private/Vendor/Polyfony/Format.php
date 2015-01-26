@@ -189,6 +189,13 @@ class Format {
 			round(preg_replace('/[^0-9.\-]/', '', str_replace(',', '.' , $value)), $precision)
 		));
 	}
+
+	// convert an array to a csv
+	public static function csv($array, $separator = "\t") {
+
+		// some code goes here
+
+	}
 	
 }
 
