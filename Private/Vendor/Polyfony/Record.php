@@ -18,7 +18,7 @@ class Record {
 	
 	// create a object from scratch, of fetch it in from its table/id
 	public function __construct($table, $conditions=null) {
-		
+
 		// init the list of altered columns
 		$this->_ = array(
 			// if of the record
@@ -58,7 +58,7 @@ class Record {
 			}
 			else {
 				// return false
-				return(false);
+				Throw new Exception('Record->__construct() No matching record in the database', 404);
 			}
 		}
 		// return self

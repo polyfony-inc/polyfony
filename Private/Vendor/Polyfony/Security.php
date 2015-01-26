@@ -100,12 +100,16 @@ class Security {
 	private static function login() {
 		
 		// look for users with this login
-		$account = new Record('Accounts', array(
+		$account = Database::query()
+			->select()
+			->from('Accounts')
+			->where(array(
 				'login'		=> Request::post(Config::get('security', 'login')),
 				'is_enabled'=> 1
-			)
-		);
-
+			))
+			->first()
+			->execute();
+			
 		// user is found
 		if($account) {
 			// if the account has been forced by the same ip recently
