@@ -92,12 +92,12 @@ class Config {
 	
 	public static function set($group, $key, $value=null) {
 		// if only group + one parameters, set the whole group, else set a key of the group
-		$value !== null ? self::$_config['Current'][$group][$key] = $value : self::$_config[$group] = $key;
+		$value !== null ? self::$_config['Current'][$group][$key] = $value : self::$_config['Current'][$group] = $key;
 	}
 	
 	public static function get($group, $key=null) {
 		// return the proper config
-		return($key ? self::$_config['Current'][$group][$key] : self::$_config[$group]);
+		return($key ? self::$_config['Current'][$group][$key] : self::$_config['Current'][$group]);
 	}
 
 	public static function isDev() {

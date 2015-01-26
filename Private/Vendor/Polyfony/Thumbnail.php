@@ -241,47 +241,10 @@ class Thumbnail {
 		imagedestroy($this->Image);
 		// if output is png
 		if($this->Output == 'image/png') {
-			// convert quality
-			if($this->Quality > 90) {
-				// no compression
-				$this->Quality = 0;	
-			}
-			elseif($this->Quality > 80) {
-				// some compression
-				$this->Quality = 1;	
-			}
-			elseif($this->Quality > 70) {
-				// some compression
-				$this->Quality = 2;	
-			}
-			elseif($this->Quality > 60) {
-				// some compression
-				$this->Quality = 3;	
-			}
-			elseif($this->Quality > 50) {
-				// some compression
-				$this->Quality = 4;	
-			}
-			elseif($this->Quality > 40) {
-				// some compression
-				$this->Quality = 5;	
-			}
-			elseif($this->Quality > 30) {
-				// some compression
-				$this->Quality = 6;	
-			}
-			elseif($this->Quality > 20) {
-				// some compression
-				$this->Quality = 7;	
-			}
-			elseif($this->Quality > 10) {
-				// some compression
-				$this->Quality = 8;	
-			}
-			else {
-				// high compression
-				$this->Quality = 9;	
-			}
+			// roof
+			$this->Quality = $this->Quality > 90 ? '90' : $this->Quality;
+			// convert the jpeg quality index to a png quality index
+			$this->Quality = round(abs(-0.1 * $this->Quality + 10));
 			// create png image
 			$status = imagepng($this->Sized,$this->Destination.$this->Name,$this->Quality);
 		}
