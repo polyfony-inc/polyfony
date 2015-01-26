@@ -177,6 +177,8 @@ class Filesystem {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
+		// apply the chmod
+		return(chown($path, $user));
 
 	}
 
