@@ -133,7 +133,7 @@ class Request {
 	 */
 	public static function get($variable, $default = null) {
 		return isset(self::$_get[$variable])
-			? self::$_get[$variable]
+			? urldecode(self::$_get[$variable])
 			: $default;
 	}
 
