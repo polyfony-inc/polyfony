@@ -65,6 +65,8 @@ class Record {
 			// clone that attribute
 			$this->{$attribute} = $value;
 		}
+		// replicate the id if it is available
+		$this->_['id'] = isset($this->id) ? $this->id : $this->_['id'];
 	}
 	
 	public function get($column, $raw=false) {
