@@ -98,14 +98,6 @@ class HttpRequest {
 		return($this);
 	}
 
-	// set the retry count
-	public function timeout($times) {
-		// set the timeout
-		$this->retry = intval($times);
-		// return self
-		return($this);
-	}
-
 	// get shortcut
 	public function get() {
 		// set the method
