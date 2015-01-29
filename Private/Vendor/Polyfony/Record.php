@@ -94,7 +94,7 @@ class Record {
 		));
 	}
 	
-	public function textarea($column, $list=array(), $options=array()) {
+	public function textarea($column, $options=array()) {
 		return(Form::textarea(
 			$this->field($column), 
 			$this->get($column), 
