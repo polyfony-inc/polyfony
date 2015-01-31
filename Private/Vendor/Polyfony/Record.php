@@ -186,7 +186,7 @@ class Record {
 			// if the value is set
 			if(!empty($this->{$column})) {
 				// create the date using raw unix epoch
-				return(date('d/m/y',$this->{$column}));
+				return(date('d/m/Y', $this->{$column}));
 			}
 			// value is empty
 			else {
