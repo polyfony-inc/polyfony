@@ -158,6 +158,9 @@ class Response {
 
 	public static function setType($type) {
 		
+		// remove previously output data on change of type
+		ob_clean();
+
 		// if the type is allowed
 		if(in_array($type,array('html-page','json','file','csv','xml','html','js','css','text'))) {
 			// update the current type
