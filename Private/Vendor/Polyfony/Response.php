@@ -58,7 +58,7 @@ class Response {
 	public static function init() {
 		
 		// check if we can render a response from the cache
-		self::isCached() == false ?: self::renderFromCache();
+		self::isCached() === false ?: self::renderFromCache();
 		// start the output buffer
 		ob_start();
 		// set default assets
@@ -402,7 +402,7 @@ class Response {
 		// if the type is file output from the file indicated as content else just output
 		echo self::getContent();
 		// if cache is enabled and page is cachable
-		self::isCachable() == false ?: self::cache(); 
+		self::isCachable() === false ?: self::cache(); 
 		// it ends here
 		exit;
 		
