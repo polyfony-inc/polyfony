@@ -318,7 +318,9 @@ class Response {
 		// elseif the type is json
 		elseif(self::$_type == 'json') {
 			// add the profiler if required
-			self::$_content = array_merge(self::$_content, Config::get('profiler', 'enable_stack', true) ? Profiler::getArray() : array());
+			self::$_content = Config::get('profiler', 'enable_stack') && is_array(self::$_content) ? 
+				array_merge(self::$_content, Profiler::getArray()) : 
+				self::$_content;
 			// encode the content to json
 			self::$_content = json_encode(self::$_content);
 		}
