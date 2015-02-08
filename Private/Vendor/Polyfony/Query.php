@@ -645,32 +645,32 @@ class Query {
 		}
 		// if we are dealing with a date and the value is not strictly null
 		elseif(strpos($column,'_date') !== false && $value !== null) {
-			// if the date is formated with two slashs
-			if(substr_count($value, '/') == 2) {
-				// set the separator
-				$separator = '/';
+			// if the date has a time with it
+			if(
+				substr_count($value, '/') == 2 && 
+				substr_count($value, ':') == 1  && 
+				substr_count($value, ' ') == 1
+			) {
+				// explode the date's elements
+				list($date, $time) 			= explode(' ', $value);
+				// explode the date's elements
+				list($day, $month, $year) 	= explode('/', $date);
+				// explode the time element
+				list($hour, $minute) 		= explode(':', $time);
+				// create a timestamp early in the morning
+				$value = mktime($hour, $minute, 1, $month, $day, $year);
 			}
-			// if the date is formated with two dots
-			elseif(substr_count($value, '.') == 2) {
-				// set the separator
-				$separator = '.';
+			// if the date is alone
+			elseif(substr_count($value, '/') == 2) {
+				// explode the date's elements
+				list($day, $month, $year) = explode('/', $value);
+				// create a timestamp early in the morning
+				$value = mktime(0, 0, 1, $month, $day, $year);
 			}
-			// if the date is formated with two -
-			elseif(substr_count($value, '-') == 2) {
-				// set the separator
-				$separator = '-';
-			}
-			// separator in unknown, we assume it is already a timestamp
+			// date format in unknown, we assume it is already a timestamp
 			else {
 				// clean it just to make sure
 				$value = preg_replace('/\D/','',$value);
-			}
-			// if we know the separator
-			if(isset($separator)) {
-				// explode the date's elements
-				list($day,$month,$year) = explode($separator,$value);
-				// create a timestamp early in the morning
-				$value = mktime(0,0,1,$month,$day,$year);
 			}
 		}
 		// return the value

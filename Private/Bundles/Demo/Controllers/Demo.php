@@ -44,10 +44,11 @@ class DemoController extends pf\Controller {
 		));;
 		
 		// build input field
-		$this->PasswordInput = pf\Form::password(pf\Config::get('security','password'), null, array(
+		$this->PasswordInput = pf\Form::input(pf\Config::get('security','password'), null, array(
 			'class'			=>'form-control',
 			'id'			=>'inputPassword',
-			'placeholder'	=>'*************'
+			'placeholder'	=>'*************',
+			'type'			=>'password'
 		));;
 		
 		// cache the page for 24 hours

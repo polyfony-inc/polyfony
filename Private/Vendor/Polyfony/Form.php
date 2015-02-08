@@ -30,50 +30,6 @@ class Form {
 		));
 	}
 	
-	public static function password($name, $value='', $attributes=array()) {
-		// format the form element
-		return(new Element(
-			'input', 
-			array_merge(
-				array(
-					'type'	=>'password', 
-					'name'	=>$name, 
-					'value'	=>$value
-				), 
-				$attributes
-			)
-		));
-	}
-	
-	public static function hidden($name, $value='', $attributes=array()) {
-		// format the form element
-		return(new Element(
-			'input', 
-			array_merge(
-				array(
-					'type'	=>'hidden', 
-					'name'	=>$name, 
-					'value'	=>$value
-				), 
-				$attributes
-			)
-		));
-	}
-
-	public static function submit($value='Submit', $attributes=array()) {
-		// format the form element
-		return(new Element(
-			'input', 
-			array_merge(
-				array(
-					'type'	=>'submit', 
-					'value'	=>$value
-				), 
-				$attributes
-			)
-		));
-	}
-	
 	public static function textarea($name, $value='', $attributes=array()) {
 		// format the form element
 		return(new Element(

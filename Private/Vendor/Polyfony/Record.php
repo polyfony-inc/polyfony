@@ -86,14 +86,6 @@ class Record {
 		));
 	}
 	
-	public function password($column, $options=array()) {
-		return(Form::password(
-			$this->field($column), 
-			$this->get($column), 
-			$options
-		));
-	}
-	
 	public function textarea($column, $options=array()) {
 		return(Form::textarea(
 			$this->field($column), 
@@ -163,41 +155,38 @@ class Record {
 		$this->_['altered'] = array_unique($this->_['altered']);
 	}
 	
-	private function convert($column, $raw=false) {
+	private function convert($column, $raw = false) {
 		
 		// if we want the raw result ok, but exclude arrays that can never be gotten raw
-		if($raw && strpos($column,'_array') === false) {
+		if($raw === true && strpos($column,'_array') === false) {
 			// return as is
-			return($this->{$column});
+			return $this->{$column};
 		}
 		// otherwise convert it
 		// if the column contains an array
 		if(strpos($column,'_array') !== false) {
 			// decode the array
-			return(json_decode($this->{$column},true));
+			return json_decode($this->{$column},true);
 		}
 		// if the column contains a size value
 		elseif(strpos($column,'_size') !== false) {
 			// convert to human size
-			return(Format::size($this->{$column}));
+			return Format::size($this->{$column});
+		}
+		// if the column contains a datetime
+		elseif(strpos($column,'_datetime') !== false) {
+			// if the value is set
+			return !empty($this->{$column}) ? date('d/m/Y H:i', $this->{$column}) : '';
 		}
 		// if the column contains a date
 		elseif(strpos($column,'_date') !== false) {
 			// if the value is set
-			if(!empty($this->{$column})) {
-				// create the date using raw unix epoch
-				return(date('d/m/Y', $this->{$column}));
-			}
-			// value is empty
-			else {
-				// return an empty string
-				return('');	
-			}
+			return !empty($this->{$column}) ? date('d/m/Y', $this->{$column}) : '';
 		}
 		// not a magic column
 		else {
 			// return as is
-			return($this->{$column});
+			return $this->{$column};
 		}
 		
 	}
