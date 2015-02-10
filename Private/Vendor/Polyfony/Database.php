@@ -56,6 +56,15 @@ class Database {
 				$pdo = 'mysql:dbname=' . self::$_config['database'] . 
 				';host=' . self::$_config['hostname'];
 			break;
+
+			case 'postgres':
+				$pdo = 'pgsql:dbname=' . self::$_config['database'] . 
+				';host=' . self::$_config['hostname'];
+			break;
+
+			case 'odbc':
+				$pdo = 'odbc:' . self::$_config['database'];
+			break;
 			
 			default:
 				// causes exception
