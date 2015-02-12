@@ -204,7 +204,7 @@ class HttpRequest {
 					// explode the header
 					list($key, $value) = explode(':', $mixed);
 					// set the header
-					$this->response['headers'][$key] = trim($value);
+					$this->response['headers'][strtolower($key)] = trim($value);
 					// remove the original
 					unset($this->response['headers'][$index]);
 				}
@@ -220,11 +220,11 @@ class HttpRequest {
 			// return as is
 			return($this->response['content']);
 		}
-		elseif(stripos($this->getHeader('Content-Type'),'application/json') === 0) {
+		elseif(stripos($this->getHeader('content-type'),'application/json') === 0) {
 			// decode and return 
 			return(json_decode($this->response['content'], true));
 		}
-		elseif(stripos($this->getHeader('Content-Type'),'application/xml') === 0) {
+		elseif(stripos($this->getHeader('content-type'),'application/xml') === 0) {
 			// decode and return 
 			return(new \SimpleXMLElement($this->response['content']));
 		}
