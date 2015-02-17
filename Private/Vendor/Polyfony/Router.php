@@ -212,7 +212,7 @@ class Router {
 		// for each provided parameter
 		foreach($parameters as $variable => $value) {
 			// replace it in the url
-			$url = str_replace(":{$variable}", urlencode($value), $url);
+			$url = str_replace(":{$variable}/", urlencode($value) . '/', $url);
 		}
 		// if we want an absolute url, prefix with the domain
 		!$absolute ?: $url = Request::getProtocol() . '://' . Config::get('router', 'domain') . $url;

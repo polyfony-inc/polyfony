@@ -32,7 +32,7 @@ class Uploader {
 	// constructor
 	public function __construct() {
 		// set the default constraints
-		$this->Limits = new stdClass();
+		$this->Limits = new \stdClass();
 		$this->Limits->Size = null;
 		$this->Limits->Types = array();
 	}

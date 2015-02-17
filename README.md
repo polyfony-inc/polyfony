@@ -12,7 +12,7 @@ routing, bundles, controllers, views, database abstraction, environments, locale
 * ≤ 550 Ko of RAM
 
 ## Requirements
-* PHP >= 5.3 with mbstring and PDO
+* PHP >= 5.3 with mbstring and PDO (fully compatible with PHP7)
 * A rewrite module (mod_rewrite)
 
 ## Installation
@@ -82,12 +82,12 @@ $accounts = Database::query()
 
 * Retrieve a single record by its ID
 ```php
-$account = new Record('Accounts',1);
+$account = new Record('Accounts', 1);
 ```
 
 * Retrieve a single record by its ID and generate an input to change a property
 ```php
-$account = new Record('Accounts',1);
+$account = new Record('Accounts', 1);
 echo $account->input('login');
 ```
 ```html
@@ -137,7 +137,7 @@ $account
 
 * Each bundle has a file to place your routes
 ```php
-../Private/Bundles/{BundleName}/Loader/route.php
+../Private/Bundles/{BundleName}/Loader/Route.php
 ```
 
 In these files you can declare as many routes as you like. 
@@ -177,19 +177,26 @@ a boolean true (it will match anything but a missing value)
 ### Environments
 
 By default the `../Private/Config/Config.ini` file is loaded.
-
-If you access the framework using the port defined in 
+You can use environment specific configuration files by detecting the current domain, or the current port.
 ```
 [polyfony]
-dev_port = 8080
+detection_method = "domain" ; or "port"
 ```
 Then the framework will overrides Config.ini values with those of :
 ```
 ../Private/Config/Dev.ini
+
+[router]
+domain = development.domain.dev
+port = 8080
 ```
 Or, if you are not running the development port :
 ```
-`../Private/Config/Prod.ini
+../Private/Config/Prod.ini
+
+[router]
+domain = production.domain.prod
+port 80
 ```
 
 * To retrieve configurations values (from the environment specific ini file)
@@ -416,19 +423,20 @@ Store\Request
 The last on stores your key-value only for the time of the current request.
 Some of those engines have more capabilities than others, but all implement the basic interface and can store both variables, arrays, or raw data.
 
-### Runtime
+### Bundle configurations
 
-* Store some bundle specific data in Bundles/MyBundle/Loader/Runtime.php (ex. static list choices, etc.)
+* Store some bundle specific data in Bundles/MyBundle/Loader/Config.php (ex. static list choices, etc.)
+* Note that these configurations are merged with Config.php + Dev.ini/Prod.ini so all your configs are available in one place, with one interface : `Config`
 
 ```php
-Runtime::set($bundle_name, $key, $value);
+Config::set($group, $key, $value);
 ```
 
 * Retrieve values (whole bundle, or a subset)
 
 ```php
-Runtime::get($bundle_name);
-Runtime::get($bundle_name, $key);
+Config::get($group);
+Config::get($group, $key);
 ```
 
 ### Thumbnail
@@ -438,8 +446,8 @@ Runtime::get($bundle_name, $key);
 ```php
 $thumbnail = new Thumbnail();
 $status = $thumbnail
-	->source("../private/data/storage/photos/original/photo.jpg")
-	->destination("../private/data/storage/photos/400/photo.jpg")
+	->source("../Private/Storage/Data/Photos/Original/photo.jpg")
+	->destination("../Private/Storage/Data/Photos/400/photo.jpg")
 	->size(400)
 	->quality(90)
 	->execute();
@@ -457,7 +465,7 @@ You can get the generated name using the `name()` method, `info()` will also giv
 $uploader = new Uploader();
 $status = $uploader
 	->source(Request::files('estimate_file'))
-	->destination('../private/data/storage/estimates/')
+	->destination('../Private/Storage/Data/Estimates/')
 	->limitTypes(array('application/pdf'))
 	->limitSize(1024*1024*2)
 	->execute();
@@ -474,11 +482,10 @@ $status = $uploader
 This class provides a simple interface to build HTTP Requests
 
 ```php
-$request = new HttpRequest();
+$request = new HttpRequest([$url, [$method, [$timeout, [$retry]]]]);
 $status = $this->Request
 	->url('https://maps.googleapis.com/maps/api/geocode/json')
 	->timeout(15)
-	->retry(2)
 	->data('address','Paris')
 	->get();
 ```
@@ -650,15 +657,13 @@ echo $record->input('login', array('data-validators'=>'required'));
 
 List of available elements :
 * input
-* hidden
-* password
-* submit
 * select
 * textarea
-* radio
 * checkbox
 
 Form elements general syntax is : `$name, $value, $options` when you get a form element from a `Record`, the `$name` and `$value` are set automatically, only `$options` are available. The select elements is slighly different : `$name, $list, $value, $options`
+
+To obtain, say, a password field, simply add this to your array of attributes : 'type'=>'password'
 
 ### Filesystem
 

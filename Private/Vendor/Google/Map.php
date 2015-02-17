@@ -101,6 +101,12 @@ class Map {
 		return(trim($url,'&'));
 	}
 
+	// magic conversion
+    public function __toString() {
+        // return the generated url
+        return $this->url();
+    }
+
 }
 
 ?>

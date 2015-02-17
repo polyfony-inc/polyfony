@@ -15,27 +15,27 @@ namespace Polyfony;
 class Filesystem {
 	
 	// this will restrict a path to the data storage folder
-	public static function chroot($path='/', $override = false) {
+    public static function chroot($path='/', $override = false) {
 
-		// if chrooting is enabled in the configuration
-		if(Config::get('filesystem', 'chroot') && !$override) {
-			// if the path already has the proper (ch)root
-			if(strpos($path, Config::get('filesystem', 'data_path')) === 0) {
-				// remove the root, remove double dots
-				$path = str_replace(array(Config::get('filesystem', 'data_path'), '..'), '', $path);
-				// re-add the root
-				return(Config::get('filesystem', 'data_path') . trim($path, '/') . '/');
-			}
-			// the path doesn't start with the (ch)root
-			else {
-				// remove all double dots and add the root path
-				return(Config::get('filesystem', 'data_path') . trim(str_replace('..','',$path), '/') . '/');
-			}
-		}
-		// return the path (altered or not)
-		return($path);
+        // if chrooting is enabled in the configuration
+        if(Config::get('filesystem', 'chroot') && !$override) {
+            // if the path already has the proper (ch)root
+            if(strpos($path, Config::get('filesystem', 'data_path')) === 0) {
+                // remove the root, remove double dots
+                $path = str_replace(array(Config::get('filesystem', 'data_path'), '..'), '', $path);
+                // re-add the root
+                return(Config::get('filesystem', 'data_path') . $path);
+            }
+            // the path doesn't start with the (ch)root
+            else {
+                // remove all double dots and add the root path
+                return(Config::get('filesystem', 'data_path') . str_replace('..','',$path));
+            }
+        }
+        // return the path (altered or not)
+        return($path);
 
-	}
+    }
 
 	public static function isDirectory($path, $override_chroot = false) {
 

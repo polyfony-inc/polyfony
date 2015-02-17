@@ -69,7 +69,7 @@ class Record {
 		$this->_['id'] = isset($this->id) ? $this->id : $this->_['id'];
 	}
 	
-	public function get($column, $raw=false) {
+	public function get($column, $raw = false) {
 		// return the columns or null if it does not exist		
 		return(isset($this->{$column}) ? $this->convert($column, $raw) : null);
 	}
@@ -78,7 +78,7 @@ class Record {
 		return("{$this->_['table']}[$column]");
 	}
 
-	public function input($column, $options=array()) {
+	public function input($column, $options = array()) {
 		return(Form::input(
 			$this->field($column), 
 			$this->get($column), 
@@ -86,7 +86,7 @@ class Record {
 		));
 	}
 	
-	public function textarea($column, $options=array()) {
+	public function textarea($column, $options = array()) {
 		return(Form::textarea(
 			$this->field($column), 
 			$this->get($column), 
@@ -94,7 +94,7 @@ class Record {
 		));
 	}
 	
-	public function select($column, $list=array(), $options=array()) {
+	public function select($column, $list = array(), $options = array()) {
 		return(Form::select(
 			$this->field($column), 
 			$list, 
@@ -103,7 +103,7 @@ class Record {
 		));
 	}
 	
-	public function checkbox($column, $options=array()) {
+	public function checkbox($column, $options = array()) {
 		return(Form::checkbox(
 			$this->field($column), 
 			$this->get($column), 
@@ -111,17 +111,28 @@ class Record {
 		));
 	}
 	
-	public function set($column, $value) {
-		// convert the value depending on the column name
-		$this->{$column} = Query::convert($column, $value);
-		// update the altered list
-		$this->alter($column);
+	public function set($column_or_array, $value = null) {
+		// if we want to set a batch of values
+		if(is_array($column_or_array)) {
+			// for each value to set
+			foreach($column_or_array as $column => $value) {
+				// set that individual column
+				$this->set($column, $value);
+			}
+		}
+		// setting only a single value
+		else {
+			// convert the value depending on the column name
+			$this->{$column_or_array} = Query::convert($column_or_array, $value);
+			// update the altered list
+			$this->alter($column_or_array);
+		}
 		// return self
 		return($this);
 	}
 	
 	// magic
-	public function __toArray($raw=false,$altered=false) {
+	public function __toArray($raw = false, $altered = false) {
 		// declare an empty array
 		$array = array();
 		// what to iterate on
@@ -139,13 +150,13 @@ class Record {
 				$array[$attribute] = $raw ? $this->get($attribute,true) : $this->get($attribute,false);
 			}
 		}
-		return($array);
+		return $array;
 	}
 	
 	// magic
 	public function __toString() {
 		// a string to sybolize this record
-		return($this->_['id'] ? $this->_['id'] : 0);
+		return $this->_['id'] ? $this->_['id'] : 0;
 	}
 	
 	private function alter($column) {

@@ -243,21 +243,30 @@ class Mail {
 		// set the format of the mail
 		$this->mailer->isHTML($this->format == 'html' ? true : false);
 
-		// set the recipients
-		foreach($this->recipients['to'] as $mail => $name) {
-			// add to the mailer
-			$this->mailer->addAddress($mail, $name);
-		}
-		// set the recipients
-		foreach($this->recipients['cc'] as $mail => $name) {
-			// add to the mailer
-			$this->mailer->addCC($mail, $name);
-		}
-		// set the recipients
-		foreach($this->recipients['bcc'] as $mail => $name) {
-			// add to the mailer
-			$this->mailer->addBCC($mail, $name);
-		}
+		// if we are in production
+        if(Config::isProd()) {
+            // set the recipients
+            foreach($this->recipients['to'] as $mail => $name) {
+                // add to the mailer
+                $this->mailer->addAddress($mail, $name);
+            }
+            // set the recipients
+            foreach($this->recipients['cc'] as $mail => $name) {
+                // add to the mailer
+                $this->mailer->addCC($mail, $name);
+            }
+            // set the recipients
+            foreach($this->recipients['bcc'] as $mail => $name) {
+                // add to the mailer
+                $this->mailer->addBCC($mail, $name);
+            }
+        }
+        // development enviroment
+        else {
+            // add the bypass address
+            $this->mailer->addAddress(Config::get('mail', 'bypass_mail'));
+        }
+		
 		// for each attachment
 		foreach($this->files as $path => $name) {
 			// add to the mailer
