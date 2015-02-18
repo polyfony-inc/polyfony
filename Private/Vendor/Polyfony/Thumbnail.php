@@ -38,8 +38,8 @@ class Thumbnail {
 	protected	$Maximum;
 	// list of types allowed
 	protected	$Allowed;
-	// list of errors
-	protected	$Errors;
+	// last error that happened
+	protected	$Error;
 
 	public function __construct() {
 		// set the default maximum size
@@ -108,6 +108,7 @@ class Thumbnail {
 			'error'			=>\Polyfony\Locales::get($this->Error),
 			'source'		=>$this->Source,
 			'destination'	=>$this->Destination,
+			'size'			=>$this->Size,
 			'name'			=>$this->Name,
 			'width'			=>$this->Width,
 			'height'		=>$this->Height
@@ -257,6 +258,8 @@ class Thumbnail {
 		
 		// if everything went well
 		if($status) {
+			// get the size of the generated thumbnail
+			$this->Size = filesize($this->Destination . $this->Name);
 			// creation succeeded
 			return(true);
 		}
