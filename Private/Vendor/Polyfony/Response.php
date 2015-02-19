@@ -424,10 +424,9 @@ class Response {
 		);
 	}
 	
-	public static function download($file_name, $force=false) {
+	public static function download($file_name) {
 		// set download headers
 		self::setHeaders(array(
-			'Content-Type'			=> $force ? 'application/octet-stream' : self::$_headers['Content-Type'],
 			'Content-Description'	=>'File Transfer',
 			'Content-Disposition'	=>'attachment; filename="' . Format::fsSafe($file_name) . '"'
 		));

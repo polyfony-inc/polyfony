@@ -29,6 +29,7 @@ class Database {
 			'hostname'	=> $hostname,
 			'username'	=> $username,
 			'password'	=> $password,
+			'quote'		=> ''
 		);
 
 	}
@@ -54,16 +55,19 @@ class Database {
 			
 			case 'mysql':
 				$pdo = 'mysql:dbname=' . self::$_config['database'] . 
-				';host=' . self::$_config['hostname'];
+					';host=' . self::$_config['hostname'];
+				self::$_config['quote'] = '"';
 			break;
 
 			case 'postgres':
 				$pdo = 'pgsql:dbname=' . self::$_config['database'] . 
-				';host=' . self::$_config['hostname'];
+					';host=' . self::$_config['hostname'];
+				self::$_config['quote'] = '"';
 			break;
 
 			case 'odbc':
 				$pdo = 'odbc:' . self::$_config['database'];
+				self::$_config['quote'] = '"';
 			break;
 			
 			default:
@@ -94,7 +98,7 @@ class Database {
 		self::$_handle ?: self::connect();
 		
 		// and return a new query
-		return(new Query());
+		return(new Query( self::$_config['quote'] ));
 		
 	}
 	

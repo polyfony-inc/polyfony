@@ -23,6 +23,7 @@ class Query {
 	protected	$Array;
 	protected	$Action;
 	protected	$Hash;
+	protected	$Quote;
 	
 	// attributes to build a query
 	protected	$Table;
@@ -37,7 +38,7 @@ class Query {
 	protected	$Limit;
 
 	// instanciate a new query
-	public function __construct() {
+	public function __construct($quote = '') {
 
 		// set the query as being empty for now
 		$this->Query		= null;
@@ -57,6 +58,8 @@ class Query {
 		$this->Action		= null;
 		// set the unique hash of the query for caching purpose
 		$this->Hash			= null;
+		// set the quote symbol (if any to use for columns)
+		$this->Quote 		= $quote;
 
 		// initialize attributes
 		$this->Table		= null;
@@ -667,10 +670,10 @@ class Query {
 				// create a timestamp early in the morning
 				$value = mktime(0, 0, 1, $month, $day, $year);
 			}
-			// date format in unknown, we assume it is already a timestamp
-			else {
-				// clean it just to make sure
-				$value = preg_replace('/\D/','',$value);
+			// date format in unknown, and does not look like a timestamp
+			elseif(!is_numeric($value)) {
+				// we can't allow such weird data get into the _date column
+				Throw new Exception('Query->secure() : Wrong data type for magic date field');
 			}
 		}
 		// return the value
@@ -689,7 +692,7 @@ class Query {
         // apply the alias regex for the placeholder
         $placeholder = str_replace('.', '_', strtolower($column)); 
         // return cleaned column
-        return(array($column, $placeholder));
+        return(array($this->Quote . $column . $this->Quote, $placeholder));
     }
 
     // set the action internally
