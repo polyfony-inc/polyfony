@@ -120,7 +120,7 @@ class HttpRequest {
 		// if the method is post
 		if($this->method == 'POST') {
 			// set the post data
-			curl_setopt($this->curl, CURLOPT_POSTFIELDS, $this->data);
+			curl_setopt($this->curl, CURLOPT_POSTFIELDS, http_build_query($this->data));
 			// set the method as being post
 			curl_setopt($this->curl, CURLOPT_POST, 1);
 		}

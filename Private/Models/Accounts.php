@@ -1,22 +1,28 @@
 <?php
 
+namespace Models;
+use Polyfony as pf;
+
 // this is a model class
 // it's a repository for stored SQL queries
 // there should not be any functionnal code or conditions here
 
-
-namespace Bundles\Demo\Model;
-
 class Accounts {
+	
+	// what we mean by recent authentication failure
+	const RECENT_FAILURE = 3600 * 24 * 7;
 
+	// retrieve all accounts
 	public static function all() {
-		return(\Polyfony\Database::query()
+
+		return pf\Database::query()
 			->select()
 			->from('Accounts')
-			->execute()
-		);
+			->execute();
+
 	}
-	
+
+	// that have been created recenlty
 	public static function recentlyCreated($maximum=5) {
 		return(\Polyfony\Database::query()
 			->select()
@@ -27,6 +33,7 @@ class Accounts {
 		);
 	}
 	
+	// that are disabled
 	public static function disabled() {
 		return(\Polyfony\Database::query()
 			->select()
@@ -35,18 +42,21 @@ class Accounts {
 			->execute()
 		);
 	}
-	
-	public static function forcedRecently($what_recent_means=3600) {
-		return(\Polyfony\Database::query()
+
+	// accounts that have had issues login in recently
+	public static function withErrors() {
+
+		return pf\Database::query()
 			->select()
 			->from('Accounts')
 			->whereNotEmpty('last_failure_date')
-			->addAnd()
-			->whereHigherThan('last_failure_date',time()-$what_recent_means)
-			->execute()
-		);
+			->whereHigherThan('last_failure_date', time() - self::RECENT_FAILURE )
+			->limitTo(0, 10)
+			->orderBy(array('last_failure_date'=>'DESC'))
+			->execute();
+
 	}
-	
+
 }
 
 ?>

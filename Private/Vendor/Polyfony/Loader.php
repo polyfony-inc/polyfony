@@ -114,7 +114,10 @@ class Loader {
      * @return void
      */
     public function loadClass($className) {
-        if (null === $this->_namespace || $this->_namespace.$this->_namespaceSeparator === substr($className, 0, strlen($this->_namespace.$this->_namespaceSeparator))) {
+        if (
+            null === $this->_namespace || $this->_namespace.$this->_namespaceSeparator 
+            === substr($className, 0, strlen($this->_namespace.$this->_namespaceSeparator))
+        ) {
             $fileName = '';
             $namespace = '';
             if (false !== ($lastNsPos = strripos($className, $this->_namespaceSeparator))) {
@@ -124,7 +127,8 @@ class Loader {
             }
             $fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . $this->_fileExtension;
             // fix so that namespaces starting with Bundle\ will point to the bundle folder (specific to polyfony2)
-			$fileName = (strpos($fileName,'Bundles') === 0) ? "../$fileName" : $fileName;
+			$fileName = (strpos($fileName,'Bundles') === 0) || (strpos($fileName,'Models') === 0) ? "../$fileName" : $fileName;
+
             require ($this->_includePath !== null ? $this->_includePath . DIRECTORY_SEPARATOR : '') . $fileName;
         }
     }

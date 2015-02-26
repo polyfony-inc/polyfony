@@ -28,7 +28,7 @@ class DemoController extends pf\Controller {
 	
 	public function indexAction() {
 		// view the main demo index
-		$this->view('Demo');	
+		$this->view('Demo');
 	}
 	
 	public function loginAction() {	
@@ -117,10 +117,10 @@ class DemoController extends pf\Controller {
 			->execute();
 		
 		// demo query from a model
-		$this->AnotherList = Bundles\Demo\Model\Accounts::all();
-		$this->AnotherList = Bundles\Demo\Model\Accounts::recentlyCreated();
-		$this->AnotherList = Bundles\Demo\Model\Accounts::disabled();
-		$this->AnotherList = Bundles\Demo\Model\Accounts::forcedRecently();
+		$this->AnotherList = Models\Accounts::all();
+		$this->AnotherList = Models\Accounts::recentlyCreated();
+		$this->AnotherList = Models\Accounts::disabled();
+		$this->AnotherList = Models\Accounts::withErrors();
 		
 		// simple view	
 		$this->view('Database');		
