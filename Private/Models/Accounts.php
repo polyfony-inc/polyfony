@@ -9,8 +9,8 @@ use Polyfony as pf;
 
 class Accounts {
 	
-	// what we mean by recent authentication failure
-	const RECENT_FAILURE = 3600 * 24 * 7;
+	// what we mean by recent authentication failure (3 days)
+	const RECENT_FAILURE = 259200;
 
 	// retrieve all accounts
 	public static function all() {

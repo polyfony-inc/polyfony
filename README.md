@@ -22,6 +22,7 @@ routing, bundles, controllers, views, database abstraction, environments, locale
 ```php
 url.rewrite-once = ("^(?!/Assets/).*" => "/?")
 ```
+* grant write permissions to your webserver/php/hhvm on `/Private/Storage/` and `/Public/Assets/`
 
 ## Quick tour
 You can read this quick tour, or just browse the `../Private/Bundles/Demo/` code.
