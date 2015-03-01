@@ -646,8 +646,8 @@ class Query {
 			// encode the content as JSON, being it array, null, false, whatever
 			$value = json_encode($value);
 		}
-		// if we are dealing with a date and the value is not strictly null
-		elseif(strpos($column,'_date') !== false && $value !== null) {
+		// if we are dealing with a date and the value is not empty or null
+		elseif(strpos($column,'_date') !== false && $value != '') {
 			// if the date has a time with it
 			if(
 				substr_count($value, '/') == 2 && 
