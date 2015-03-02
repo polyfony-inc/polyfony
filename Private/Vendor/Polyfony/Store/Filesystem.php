@@ -2,6 +2,7 @@
 /**
  * PHP Version 5
  * Store variables or documents in the filesystem until manually removed
+ * Files are stored in a two subfolders tree (kinda like squid does it)
  * @package Polyfony
  * @link https://github.com/SIB-FRANCE/Polyfony
  * @license http://www.gnu.org/licenses/lgpl.txt GNU General Public License
@@ -14,12 +15,27 @@ namespace Polyfony\Store;
 
 class Filesystem implements StoreInterface {
 
+	private static function path($variable){
+
+		// compute a hash for that file
+		$hash = md5($variable);
+		// get the two first chars of the checksum
+		list($first_folder, $second_folder) = str_split(substr($hash, 0, 2));
+		// assemble the full path with two subfolders
+		return array(
+			\Polyfony\Config::get('store', 'path') . $first_folder .'/'. $second_folder .'/',
+			$hash
+		);
+
+	}
+
 	public static function has($variable) {
 		
-		// secure the variable name
-		$variable = \Polyfony\Format::fsSafe($variable);
+		// get the path for that variable
+		list($path, $file) = self::path($variable);
+
 		// if it exists
-		return(file_exists(\Polyfony\Config::get('store', 'path') . $variable));
+		return file_exists($path . $file);
 		
 	}
 	
@@ -31,12 +47,23 @@ class Filesystem implements StoreInterface {
 			// throw an exception
 			\Polyfony\Exception("{$variable} already exists in the store.");
 		}
-		// secure the variable name
-		$variable = \Polyfony\Format::fsSafe($variable);
-		// store it
-		file_put_contents(\Polyfony\Config::get('store', 'path') . $variable, serialize($value));
+		
+		// get the path for that variable
+		list($path, $file) = self::path($variable);
+
+		// if the path doesn't exist yet
+		if(!is_dir($path)) {
+
+			// create the directories
+			mkdir($path, 0777, true);
+
+		}
+
+		// store the variable or document
+		file_put_contents($path . $file, serialize($value));
+
 		// return status
-		return(self::has($variable));
+		return self::has($variable);
 		
 	}
 	
@@ -48,10 +75,12 @@ class Filesystem implements StoreInterface {
 			// throw an exception
 			\Polyfony\Exception("{$variable} does not exist in the store.");
 		}
-		// secure the variable name
-		$variable = \Polyfony\Format::fsSafe($variable);
+
+		// get the path for that variable
+		list($path, $file) = self::path($variable);
+
 		// return it
-		return(unserialize(file_get_contents(\Polyfony\Config::get('store', 'path') . $variable)));
+		return unserialize(file_get_contents($path . $file));
 		
 	}
 	
@@ -61,12 +90,14 @@ class Filesystem implements StoreInterface {
 		// doesn't exist in the store
 		if(!self::has($variable)) {
 			// return false
-			return(false);	
+			return false;	
 		}
-		// secure the variable name
-		$variable = \Polyfony\Format::fsSafe($variable);
+
+		// get the path for that variable
+		list($path, $file) = self::path($variable);
+
 		// return it
-		unlink(\Polyfony\Config::get('store', 'path') . $variable);
+		unlink($path . $file);
 		// return opposite of presence of the object
 		return(!self::has($variable));
 		
