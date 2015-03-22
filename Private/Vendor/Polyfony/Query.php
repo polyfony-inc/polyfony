@@ -403,7 +403,7 @@ class Query {
 			// secure the column name
 			list($column, $placeholder) = $this->secure($column);
 			// save the condition
-			$this->Conditions[] = "{$this->Operator} ( {$column} BETWEEN = :min_{$placeholder} AND :max_{$placeholder} )";
+			$this->Conditions[] = "{$this->Operator} ( {$column} BETWEEN :min_{$placeholder} AND :max_{$placeholder} )";
 			// add the min value
 			$this->Values[":min_{$placeholder}"] = $lower;
 			// add the max value
