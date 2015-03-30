@@ -250,6 +250,12 @@ class Security {
 		return(in_array($module, self::get('modules_array', array())) ?: false);
 		
 	}
+
+	// check if the user has been authenticated
+	public static function isAuthenticated() {
+		// return the current status
+		return self::$_granted;
+	}
 	
 	// get a specific credential
 	public static function get($credential, $default=null) {

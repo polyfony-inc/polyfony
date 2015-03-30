@@ -36,10 +36,14 @@ class Controller {
 	}
 	
 	// include a view
-	final public function view($view_name) {
+	final public function view($view_name, $bundle = null) {
 		
+		// set bundle in which the view is
+		$view_bundle = $bundle ? $bundle : Router::getCurrentRoute()->bundle;
+
 		// build the path for that view
-		$view_path = "../Private/Bundles/" . Router::getCurrentRoute()->bundle ."/Views/{$view_name}.php";
+		$view_path = "../Private/Bundles/{$view_bundle}/Views/{$view_name}.php";
+
 		// if the file does not exist
 		if(!file_exists($view_path)) {
 			// throw an exception
@@ -54,7 +58,7 @@ class Controller {
 	}
 	
 	// forward to another controller in the same bundle
-	final public function forward($controller, $action=null) {
+	final public function forward($controller, $action = null) {
 		
 		// add a profiler marker
 		Profiler::setMarker('forward');
@@ -68,26 +72,6 @@ class Controller {
 		
 		// forward to the new route
 		Router::forward($route);
-		
-	}
-	
-	// alias to router / build an url given a route name and its parameters
-	final public function url($route, $parameters=array(), $absolute=false) {
-		
-		// return the reversed route as an url
-		return(Router::reverse($route, $parameters));
-		
-	}
-
-	final public function link($name, $route, $parameters=array(), $absolute=false) {
-
-	}
-	
-	// get an empty query
-	final public function query() {
-
-		// return a new query
-		return(Database::query());
 		
 	}
 	
