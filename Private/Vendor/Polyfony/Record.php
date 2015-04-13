@@ -51,7 +51,7 @@ class Record {
 			}
 			else {
 				// return false
-				Throw new Exception('Record->__construct() No matching record in the database', 404);
+				Throw new Exception("Record->__construct() No matching record in table $table", 404);
 			}
 		}
 		// return self
