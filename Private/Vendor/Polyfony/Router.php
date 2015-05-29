@@ -141,7 +141,7 @@ class Router {
 				// if said parameter is set
 				if(Request::get($parameter)) {
 					// if the restriction is an array of values
-					if(is_array($restriction) and in_array(Request::get($parameter),$restriction)) {
+					if(is_array($restriction) && in_array(Request::get($parameter),$restriction)) {
 						// route matches
 						continue;
 					}
