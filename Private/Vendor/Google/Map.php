@@ -52,9 +52,12 @@ class Map {
 	}
 
 	// set a marker
-	public function marker($latitude, $longitude, $color='grey') {
+	public function marker($latitude, $longitude, $color=null, $label=null) {
+		// build attributes
+		$color = $color ? "color:" . $color  : '';
+		$label = $label ? "label:" . strtoupper(substr($label,0,1)) : '';
 		// assign
-		$this->markers[] = $latitude . ',' . $longitude;
+		$this->markers[] = ($color ? $color . '|' : '') . ($label ? $label . '|' : '') . $latitude . ',' . $longitude;
 		// return self for chaining
 		return($this);
 	}
@@ -87,6 +90,13 @@ class Map {
 	public function url() {
 		// prepare the url
 		$url = $this->url . '?';
+
+		// if markers then unset center and zoom options
+		// Google will do the job
+		if($this->markers){
+			unset($this->options['center']);
+			unset($this->options['zoom']);
+		}
 		// for each option
 		foreach($this->options as $key => $value) {
 			// append it
@@ -94,18 +104,19 @@ class Map {
 		}
 		// if markers
 		if($this->markers) {
-			// implode them
-			$url .= '&markers=' . urlencode(implode('|',$this->markers));
+			foreach($this->markers as $aMarker){
+				$url .= '&markers=' . urlencode($aMarker);
+			}
 		}
 		// return the url
 		return(trim($url,'&'));
 	}
 
 	// magic conversion
-    public function __toString() {
-        // return the generated url
-        return $this->url();
-    }
+	public function __toString() {
+		// return the generated url
+		return $this->url();
+	}
 
 }
 

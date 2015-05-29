@@ -27,15 +27,39 @@ class Locales {
 	
 	private static function detect() {
 		
-		// try to get the language using the cookie
-		self::$_language = Store\Cookie::has(Config::get('locales','cookie')) ? Store\Cookie::get(Config::get('locales','cookie')) : null;
-		
-		// if accept language header is not set
-		self::$_language = (self::$_language === null && Request::header('Accept-Language')) ? 
-			// then we use it
-			substr(Request::header('Accept-Language'),0,2) : 
-			// else we use the default language
-			Config::get('locales','default');
+		// if the store has a language cookie and that language is valid
+		if(
+			// if the store has a language cookie
+			Store\Cookie::has(Config::get('locales','cookie')) && 
+			// if that language is authorized
+			in_array(
+				Store\Cookie::get(Config::get('locales','cookie')), 
+				Config::get('locales', 'available')
+			)
+		) {
+			// use that language
+			self::$_language = Store\Cookie::get(Config::get('locales','cookie'));
+		}
+
+		// if we didn't find the correct language yet but we have something to work with in the headers
+		if(self::$_language === null && Request::header('Accept-Language')) {
+
+			// if the browser language is acceptable
+			$browser_language = substr(Request::header('Accept-Language'), 0, 2);
+
+			// use it or use default instead
+			self::$_language = in_array($browser_language, Config::get('locales', 'available')) ? 
+				$browser_language :
+				Config::get('locales', 'default');
+
+		}
+		// we cannot find anything useful in the headers
+		elseif(self::$_language === null) {
+
+			// use the default language
+			self::$_language = Config::get('locales', 'default');
+
+		}
 
 	}
 	
