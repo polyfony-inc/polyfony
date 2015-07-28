@@ -135,7 +135,7 @@ class Security {
 			}
 
 			// if the password matches
-			if($account->get('password') == self::getPassword(Request::post(Config::get('security', 'password')))) {
+			if($account->get('password') === self::getPassword(Request::post(Config::get('security', 'password')))) {
 
 				// generate the expiration date
 				$session_expiration = time() + ( Config::get('security', 'session_duration') * 3600 );
@@ -210,7 +210,7 @@ class Security {
 			$account->get('session_expiration_date', true)
 		);
 		// return true only if they match
-		return($existing_key == $dynamic_key ? true : false);
+		return($existing_key === $dynamic_key ? true : false);
 
 	}
 	
