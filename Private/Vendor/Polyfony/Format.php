@@ -47,6 +47,7 @@ class Format {
 	
 	// relative date
 	public static function date($timestamp, $precision = 0) {
+
 		// if no timestamp is provided
 		if(!$timestamp) {
 			// there is no conversion to do at all
@@ -54,38 +55,52 @@ class Format {
 		}
 		// compute the delta between now and then
 		$delta 		= intval($timestamp - time());
+		// get the relative duration
+		$duration	= Format::duration(abs($delta));
 		// use the right keyword for a future or past date
 		$keyword 	= $delta > 0 ? Locales::get('dans _delta_') : Locales::get('il y\'a _delta_');
-		// get the absolute value of the delta
-		$delta 		= abs($delta);
+		// replace from the locale placeholder
+		return(str_replace('_delta_', $duration, $keyword));
+
+	}
+	
+	// neutral duration
+	public static function duration($seconds, $precision = 0) {
+
+		// if no timestamp is provided
+		if(!$seconds) {
+			// there is no conversion to do at all
+			return('');
+		}
 		// list of deltas by period
-		$deltas[1] = array(60, 'minute');
-		$deltas[2] = array(3600, 'heure');
-		$deltas[3] = array(86400, 'jour');
-		$deltas[4] = array(604800, 'semaine');
-		$deltas[5] = array(2592000, 'mois');
-		$deltas[6] = array(31104000, 'an');
-		// for very short deltas
-		$delta = $delta < 60 ? Locales::get('quelques instants') : $delta;
+		$deltas[1] = array(60, Locales::get('minute'));
+		$deltas[2] = array(3600, Locales::get('heure'));
+		$deltas[3] = array(86400, Locales::get('jour'));
+		$deltas[4] = array(604800, Locales::get('semaine'));
+		$deltas[5] = array(2592000, Locales::get('mois'));
+		$deltas[6] = array(31104000, Locales::get('an'));
+		// for very short periods
+		$seconds = $seconds < 60 ? Locales::get('quelques instants') : $seconds;
 		// for each time period available
 		for($i = 6; $i > 0; $i--) {
 			// if if we is the largest period available
-			if($delta >= $deltas[$i][0]) {
+			if($seconds >= $deltas[$i][0]) {
 				// compute the remaining time in the current period's unit
-				$delta = round($delta/$deltas[$i][0], $precision);
+				$duration = round($seconds/$deltas[$i][0], $precision);
 				// format the relative date
-				$delta = $delta . ' ' . Locales::get(
+				$duration = $duration . ' ' . Locales::get(
 					// add a trailing plural "s"
-					intval($delta) == 1 ? $deltas[$i][1] : rtrim($deltas[$i][1], 's') . 's'
+					intval($duration) == 1 ? $deltas[$i][1] : rtrim($deltas[$i][1], 's') . 's'
 				);
 				// break out of the loop
 				break;
 			}
 		}
-		// replace from the locale placeholder
-		return(str_replace('_delta_', $delta, $keyword));
+		// return the duration
+		return $duration;
+
 	}
-	
+
 	// phone number
 	public static function phone($phone) {
 		// remove all spaces from the number
@@ -114,13 +129,22 @@ class Format {
 	// classic slug
 	public static function slug($string) {
 		// accentuated characters
-		$with = str_split("àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ _'");
+		$with 		= str_split("àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ");
 		// equivalent characters without accents
-		$without = str_split("aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY---");
+		$without 	= str_split("aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY");
 		// replace accents and lowercase the string
-		$string = strtolower(str_replace($with, $without, $string));
-		// replace all but 0-9 a-z remove doubles and trim the edges
-		return(trim(str_replace('--', '-', preg_replace('#[^a-z0-9\-]#', '-', $string)), '-'));
+		$string 	= strtolower(str_replace($with, $without, $string));
+		// replace all but 0-9 a-z remove triples/doubles and trim the edges
+		return(
+			trim(
+				str_replace(
+					array('---','--'), 
+					'-', 
+					preg_replace('#[^a-z0-9\-]#', '-', $string)
+				), 
+				'-'
+			)
+		);
 	}
 	
 	// create a link
