@@ -13,7 +13,7 @@ namespace Polyfony;
 
 class Record {
 	
-	// storing variable that do not reflect the database table structure
+	// storing variable that does not reflect the database table structure
 	protected $_;
 	
 	// create a object from scratch, of fetch it in from its table/id
