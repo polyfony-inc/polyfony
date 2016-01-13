@@ -126,12 +126,20 @@ class Format {
 		}
 	}
 	
+	// human amount
+	public static function amount($integer, $precision=1) {
+		// declare units
+		$unit = array('','K','M','Md','Bn','Bd');
+		// make human readable
+		return($integer ? trim(round($integer/pow(1000, ($i=floor(log(abs($integer), 1000)))), $precision) . ' ' . $unit[$i]) : 0);
+	}
+
 	// classic slug
 	public static function slug($string) {
 		// accentuated characters
-		$with 		= str_split("àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ");
+		$with = preg_split("//u", "àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ _'", -1, PREG_SPLIT_NO_EMPTY);
 		// equivalent characters without accents
-		$without 	= str_split("aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY");
+		$without = preg_split("//u", "aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY---", -1, PREG_SPLIT_NO_EMPTY);
 		// replace accents and lowercase the string
 		$string 	= strtolower(str_replace($with, $without, $string));
 		// replace all but 0-9 a-z remove triples/doubles and trim the edges
