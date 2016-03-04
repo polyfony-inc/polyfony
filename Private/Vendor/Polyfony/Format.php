@@ -97,7 +97,7 @@ class Format {
 			}
 		}
 		// return the duration
-		return $duration;
+		return isset($duration) ? $duration : $seconds;
 
 	}
 

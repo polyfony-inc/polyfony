@@ -38,7 +38,7 @@ class Request {
 		self::$_method = $_SERVER['REQUEST_METHOD'] === 'POST' ? 'post' : 'get';
 
 		// set the request protocol
-		self::$_protocol = stripos($_SERVER['SERVER_PROTOCOL'], 'https') === true ? 'https' : 'http';
+		self::$_protocol = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off';
 
 		// set the request signature with post, if any
 		self::$_signature = self::isPost() ? sha1(self::$_url.json_encode($_POST)) : sha1(self::$_url);
