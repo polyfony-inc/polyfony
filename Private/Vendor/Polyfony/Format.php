@@ -46,7 +46,7 @@ class Format {
 	}
 	
 	// relative date
-	public static function date($timestamp, $precision = 0) {
+	public static function date($timestamp) {
 
 		// if no timestamp is provided
 		if(!$timestamp) {

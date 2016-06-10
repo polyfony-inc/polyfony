@@ -123,18 +123,27 @@ class Query {
 		// if the argument passed is an array of columns
 		if(is_array($array)) {
 			// for each column
-			foreach($array as $function_or_index => $column) {
+			foreach($array as $function_or_index_or_column => $column) {
 				// secure the column name
-				list($column, $placeholder) = $this->secure($column);
-				// if the key is numeric
-				if(is_numeric($function_or_index)) {
+				list($column, $placeholder) = $this->secure($column, true);
+				// if the key is function_or_index_or_column
+				if(is_numeric($function_or_index_or_column)) {
 					// just select the column
 					$this->Selects[] = $column;
 				}
+				// the key contains a dot, we are trying to create a alias
+				elseif(stripos($function_or_index_or_column, '.') !== false) {
+					// secure the column
+					list($column) = $this->secure($function_or_index_or_column);
+					// select the column and create an alias
+					$this->Selects[] = "{$column} AS {$placeholder}";
+				}
 				// the key is a SQL function
 				else {
+					// secure the function
+					list($function) = $this->secure($function_or_index_or_column);
 					// select the column using a function
-					$this->Selects[] = "{$function_or_index}({$placeholder}) AS {$function_or_index}_{$placeholder}";
+					$this->Selects[] = "{$function}({$placeholder}) AS {$function}_{$placeholder}";
 				}	
 			}	
 		}
@@ -681,14 +690,14 @@ class Query {
 	}
 
 	// secure a column name and get a placeholder for that column
-    private function secure($column = null) {
+    private function secure($column = null, $allow_wildcard = false) {
     	// if the column name is missing of numerical
     	if(!$column || is_numeric($column)) {
     		// prevent from going further
     		Throw new Exception('Query->secure() Column name cannot be empty or a numeric value');
     	}
         // apply the secure regex for the column name
-        $column = preg_replace('/[^a-zA-Z0-9_\.]/', '', $column);    
+        $column = preg_replace(($allow_wildcard ? '/[^a-zA-Z0-9_\.\*]/' : '/[^a-zA-Z0-9_\.]/'), '', $column);    
         // apply the alias regex for the placeholder
         $placeholder = str_replace('.', '_', strtolower($column)); 
         // return cleaned column
@@ -697,8 +706,8 @@ class Query {
 
     // set the action internally
     private function action($action_name) {
-    	// if no principal action is set yet
-		if(!$this->Action) {
+    	// if no principal action is set yet or is the same
+		if(!$this->Action || $action_name == $this->Action) {
 			// set the main action
 			$this->Action = $action_name;
 		}
