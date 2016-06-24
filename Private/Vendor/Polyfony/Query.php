@@ -143,8 +143,9 @@ class Query {
 					// secure the function
 					list($function) = $this->secure($function_or_index_or_column);
 					// select the column using a function
-					$this->Selects[] = "{$function}({$placeholder}) AS {$function}_{$placeholder}";
-				}	
+					$this->Selects[] = "{$function}({$column}) AS {$function}_{$placeholder}";
+				}
+
 			}	
 		}
 		// return self to the next method
@@ -698,8 +699,8 @@ class Query {
     	}
         // apply the secure regex for the column name
         $column = preg_replace(($allow_wildcard ? '/[^a-zA-Z0-9_\.\*]/' : '/[^a-zA-Z0-9_\.]/'), '', $column);    
-        // apply the alias regex for the placeholder
-        $placeholder = str_replace('.', '_', strtolower($column)); 
+        // cleanup the placeholder
+        $placeholder = str_replace(['.', '*'], '_', strtolower($column)); 
         // return cleaned column
         return(array($this->Quote . $column . $this->Quote, $placeholder));
     }
