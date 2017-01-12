@@ -83,12 +83,12 @@ $accounts = Database::query()
 
 * Retrieve a single record by its ID
 ```php
-$account = new Record('Accounts', 1);
+$account = new Models\Accounts(1);
 ```
 
 * Retrieve a single record by its ID and generate an input to change a property
 ```php
-$account = new Record('Accounts', 1);
+$account = new Models\Accounts(1);
 echo $account->input('login');
 ```
 ```html
@@ -97,7 +97,7 @@ echo $account->input('login');
 
 * Create a record, populate and insert it
 ```php
-$account = new Record('Accounts');
+$account = new Accounts();
 $account
 	->set('login', 'test')
 	->set('id_level', '1')
@@ -643,11 +643,11 @@ echo Form::select('sample', array(
 ```
 
 
-Shortcuts are available from `Record` object, ex.
+Shortcuts are available from `Record` object (and objects inheriting Record class), ex.
 
 * retrieve an account from its id
 ```php
-$record = new Record('Accounts',1);
+$record = new Accounts(1);
 $record->set('login', 'mylogin@example.com')
 
 echo $record->input('login', array('data-validators'=>'required'));

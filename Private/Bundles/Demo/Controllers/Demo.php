@@ -22,11 +22,13 @@ class DemoController extends pf\Controller {
 	}
 
 	public function welcomeAction() {
+
 		// view the main index/welcome page
 		$this->view('Index');
 	}
 	
 	public function indexAction() {
+
 		// view the main demo index
 		$this->view('Demo');
 	}
@@ -87,7 +89,7 @@ class DemoController extends pf\Controller {
 	public function databaseAction() {
 		
 		// retrieve specific account
-		$this->RootAccount = new pf\Record('Accounts',1);
+		$this->RootAccount = new Models\Accounts(1);
 		// change something
 		$this->UpdateStatus = $this->RootAccount
 			->set('last_login_date',rand(time()-1/10*time(),time()+1/10*time()))
@@ -95,7 +97,7 @@ class DemoController extends pf\Controller {
 			->save();
 		
 		// create a new account
-		$this->NewAccount = new pf\Record('Accounts');
+		$this->NewAccount = new Models\Accounts();
 		// set something
 		$this->NewAccount
 			->set('login','test')

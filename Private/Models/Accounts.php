@@ -7,10 +7,31 @@ use Polyfony as pf;
 // it's a repository for stored SQL queries
 // there should not be any functionnal code or conditions here
 
-class Accounts {
+class Accounts extends pf\Record {
 	
 	// what we mean by recent authentication failure (3 days)
 	const RECENT_FAILURE = 259200;
+
+	public function hasModule($searched_module) {
+
+		return in_array(
+			$searched_module, 
+			$this->get('modules_arrray')
+		);
+
+	}
+
+	public function enable() {
+
+		$this->set('is_enabled', '1');
+
+	}
+
+	public function disable() {
+
+		$this->set('is_enabled', '0');
+
+	}
 
 	// retrieve all accounts
 	public static function all() {

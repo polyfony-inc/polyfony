@@ -623,10 +623,8 @@ class Query {
 		$this->Result = $this->Prepared->fetchAll(
 			// fetch as an object
 			PDO::FETCH_CLASS,
-			// of this specific class
-			'\Polyfony\Record',
-			// and pass it some arguments
-			array(trim($this->Table,"'\"`"))
+			// of this specific class based on the table name
+			$this->Table ? '\Models\\'.$this->Table : '\Polyfony\Record'
 		);
 		// if action was UPDATE or DELETE or one of those via QUERY
 		if(in_array($this->Action,array('UPDATE','DELETE')) || ($this->Action == 'QUERY' && in_array(substr($this->Query,0,6),array('UPDATE','DELETE')) && $this->Table)) {

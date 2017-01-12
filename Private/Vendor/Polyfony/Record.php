@@ -17,7 +17,18 @@ class Record {
 	protected $_;
 	
 	// create a object from scratch, of fetch it in from its table/id
-	public function __construct($table, $conditions=null) {
+	public function __construct($table=null, $conditions=null) {
+
+		// if this has been inherited in a child class
+		if(get_class($this) != 'Polyfony\Record') {
+
+			// use the table parameter as conditions and ignore the conditions parameter
+			$conditions = $table ?: null;
+
+			// use the class name as table name
+			$table = str_replace('Models\\','',get_class($this));
+
+		}
 
 		// init the list of altered columns
 		$this->_ = array(
@@ -51,7 +62,7 @@ class Record {
 			}
 			else {
 				// return false
-				Throw new Exception("Record->__construct() No matching record in table {$this->_['table']}", 404);
+				Throw new Exception(get_class($this)."->__construct() No matching record in table {$this->_['table']}", 404);
 			}
 		}
 		// return self
@@ -59,7 +70,7 @@ class Record {
 		
 	}
 	
-	private function replicate(Record $clone) {
+	private function replicate($clone) {
 		// for each attribute
 		foreach(get_object_vars($clone) as $attribute => $value) {
 			// clone that attribute
@@ -244,7 +255,7 @@ class Record {
 		// if id or table if missing
 		if(!$this->_['table'] || !$this->_['id']) {
 			// throw an exception
-			Throw new Exception('Record->delete() : cannot delete a record without table and id');
+			Throw new Exception(get_class($this).'->delete() : cannot delete a record without table and id');
 		}
 		// try to delete
 		$deleted = Database::query()
