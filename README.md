@@ -135,6 +135,7 @@ $account
 ```
 
 * Validating data
+
 You can prevent corrupted data from entering the database. To do so, declare a validator for each column that you want to secure.
 The declaration has to me done in the model, with the constant `validators` being an array. 
 The key being the column, the value being an array of authorized values, or a REGEX. Example :
@@ -160,15 +161,14 @@ Models\Accounts extends pf\Records {
 		'is_enabled'=> self::is_enabled // validate 0 or 1
 	];
 
-}
+}```
 
-The validation occurs when ->set() is invoked and will throw exceptions.
-Note that you don't have to include NULL or EMPTY values in your validators to allow them. 
+The validation occurs when `->set()` is invoked and will throw exceptions.
+Note that you don't have to include `NULL` or `EMPTY` values in your validators to allow them. 
 Instead, allow NULL values for that column in the Table configuration of your database engine, 
-the framework will import that information (and cache it, so empty the cache if you change NULL/NOT NULL of certain fields in the database).
+the framework will import that information (and cache it, so empty the cache if you change `NULL`/`NOT NULL` of certain fields in the database).
 
 
-```
 
 ### Router
 
