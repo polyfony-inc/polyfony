@@ -161,7 +161,8 @@ Models\Accounts extends pf\Records {
 		'is_enabled'=> self::is_enabled // validate 0 or 1
 	];
 
-}```
+}
+```
 
 The validation occurs when `->set()` is invoked and will throw exceptions.
 Note that you don't have to include `NULL` or `EMPTY` values in your validators to allow them. 
