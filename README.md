@@ -131,7 +131,43 @@ $account
 ->orderBy()				// associative array ('column'=>'ASC')
 ->limitTo()				// $start, $end
 ->groupBy()				// ?
-->first()				// return a the first record instead of an array of records
+->first()				// return the first record instead of an array of records
+```
+
+* Validating data
+You can prevent corrupted data from entering the database. To do so, declare a validator for each column that you want to secure.
+The declaration has to me done in the model, with the constant `validators` being an array. 
+The key being the column, the value being an array of authorized values, or a REGEX. Example :
+
+```php
+
+Models\Accounts extends pf\Records {
+	
+	const id_level = [
+		0		=>'Admin',
+		5		=>'Privileged User',
+		10		=>'Simple User',
+	];
+
+	const is_enabled = [
+		0	=>'No',
+		1	=>'Yes'
+	];
+
+	const validators = [
+		'login'		=> '/^\S+@\S+\.\S+$/', // validate an email as login
+		'id_level'	=> self::id_level // validate any key from the const id_level
+		'is_enabled'=> self::is_enabled // validate 0 or 1
+	];
+
+}
+
+The validation occurs when ->set() is invoked and will throw exceptions.
+Note that you don't have to include NULL or EMPTY values in your validators to allow them. 
+Instead, allow NULL values for that column in the Table configuration of your database engine, 
+the framework will import that information (and cache it, so empty the cache if you change NULL/NOT NULL of certain fields in the database).
+
+
 ```
 
 ### Router

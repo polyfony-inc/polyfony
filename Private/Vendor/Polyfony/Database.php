@@ -20,7 +20,7 @@ class Database {
 	private static $_config = null;
 
 	// configure the database
-	public static function configure($driver, $database, $hostname=null, $username=null, $password=null) {
+	public static function configure($driver, $database, $hostname=null, $username=null, $password=null, $before=null) {
 
 		// alter the configuration
 		self::$_config = array(
@@ -29,7 +29,14 @@ class Database {
 			'hostname'	=> $hostname,
 			'username'	=> $username,
 			'password'	=> $password,
-			'quote'		=> ''
+			'before'	=> $before,
+			'quote'		=> '',
+			'nulls'		=> [
+				'query'		=>'',
+				'column'	=>'',
+				'true'		=>'',
+				'false'		=>'',
+			]
 		);
 
 	}
@@ -43,7 +50,8 @@ class Database {
 			Config::get('database', 'database'),
 			Config::get('database', 'hostname'),
 			Config::get('database', 'username'),
-			Config::get('database', 'password')
+			Config::get('database', 'password'),
+			Config::get('database', 'before')
 		);
 
 		// depending on the driver
@@ -51,12 +59,24 @@ class Database {
 			
 			case 'sqlite':
 				$pdo = 'sqlite:' . self::$_config['database'];
+				self::$_config['nulls'] = [
+					'query'		=>'PRAGMA table_info( *table* )',
+					'column'	=>'notnull',
+					'true'		=>'0',
+					'false'		=>'1',
+				];
 			break;
 			
 			case 'mysql':
 				$pdo = 'mysql:dbname=' . self::$_config['database'] . 
 					';host=' . self::$_config['hostname'];
 				self::$_config['quote'] = '"';
+				self::$_config['nulls'] = [
+					'query'		=>'DESCRIBE "*table*"',
+					'column'	=>'Null',
+					'true'		=>'YES',
+					'false'		=>'NO',
+				];
 			break;
 
 			case 'postgres':
@@ -89,6 +109,12 @@ class Database {
 			// throw an exception if it failed
 			Throw new Exception('Database::connect() : Failed to connect', 500);
 		}
+
+		// if a before statement has to be executed
+		if(self::$_config['before']) {
+			// execute the before statement
+			self::$_handle->query(self::$_config['before']);
+		}
 	}
 	
 	// instanciate a new query object
@@ -107,10 +133,51 @@ class Database {
 		
 		// if no connection to the database is ready
 		self::$_handle ?: self::connect();
-		
+
 		// return the handle
 		return(self::$_handle);
 		
+	}
+
+	// get the description of a table
+	public static function describe($table) {
+
+		// set the cachefile name
+		$cache_name = ucfirst($table).'Nulls';
+
+		// check if it has been cached already
+		if(Cache::has($cache_name)) {
+
+			// get it from the cache
+			return Cache::get($cache_name);
+
+		}
+		// else it is not available from the cache
+		else {
+
+			// the list of allowed null columns
+			$allowed_nulls = [];
+
+			// query the database
+			foreach(self::query()
+				->query(str_replace('*table*', $table, self::$_config['nulls']['query']))
+				->execute() as $column) {
+
+				// populate the list
+				$allowed_nulls[$column->get('name')] = 
+					self::$_config['nulls']['true'] == $column->get(self::$_config['nulls']['column']) ?
+						true : false;
+
+			}
+
+			// save the results in the cache
+			Cache::put($cache_name, $allowed_nulls);
+
+			// and finaly return the results
+			return $allowed_nulls;
+
+		}
+
 	}
 	
 }	

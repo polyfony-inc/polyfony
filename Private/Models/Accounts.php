@@ -9,6 +9,28 @@ use Polyfony as pf;
 
 class Accounts extends pf\Record {
 	
+	const is_enabled = [
+		0=>'No',
+		1=>'Yes'
+	];
+
+	const id_level = [
+
+		0	=> 'God',
+		1	=> 'Admin',
+		5	=> 'SuperUser',
+		20	=> 'User',
+
+	];
+
+	const validators = [
+
+//		'login'		=>'/^\S+@\S+\.\S+$/', // commented out because the demo uses simply "root" as login
+		'is_enabled'=>self::is_enabled,
+		'id_level'	=>self::id_level
+
+	];
+
 	// what we mean by recent authentication failure (3 days)
 	const RECENT_FAILURE = 259200;
 

@@ -62,6 +62,14 @@ class Map {
 		return($this);
 	}
 
+	// set an option
+	public function option($key, $value) {
+		// assign
+		$this->options[$key] = $value;
+		// return self for chaining
+		return($this);
+	}
+
 	// set the zoom level
 	public function zoom($zoom) {
 		// assign

@@ -16,6 +16,9 @@ class Record {
 	// storing variable that does not reflect the database table structure
 	protected $_;
 	
+	// storing the validators
+	const validators = [];
+
 	// create a object from scratch, of fetch it in from its table/id
 	public function __construct($table=null, $conditions=null) {
 
@@ -133,6 +136,8 @@ class Record {
 		}
 		// setting only a single value
 		else {
+			// validate the attribute
+			$this->validateAttribute($column_or_array, $value);
 			// convert the value depending on the column name
 			$this->{$column_or_array} = Query::convert($column_or_array, $value);
 			// update the altered list
@@ -170,6 +175,33 @@ class Record {
 		return $this->_['id'] ? $this->_['id'] : 0;
 	}
 	
+	private function validateAttribute($column, $value) {
+		// get the allowed null values
+		$allowed_nulls = Database::describe($this->_['table']);
+		// get the class of the object
+		$class_name = get_class($this);
+		// get the validators
+		$validators = $class_name::validators;
+		// get the validator
+		$validator = isset($validators[$column]) ? 
+			$validators[$column] : null;
+		// check if the column exists
+		if(!array_key_exists($column, $allowed_nulls)) {
+			// throw a useful exception
+			Throw new Exception(get_class($this).'->set('.$column.') : column does not exist');
+		}
+		// check if the value is null/empty and that it is not allowed to have such a value
+		if($allowed_nulls[$column] == false && (is_null($value) || $value === '')) {
+			// throw a useful exception
+			Throw new Exception(get_class($this).'->set('.$column.') : cannot be null');
+		}
+		// check if the value is not null and a validator exists
+		if(!is_null($value) && $validator && ((is_string($validator) && !preg_match($validator, $value)) || (is_array($validator) && !in_array($value, array_keys($validator)))) )  {
+			// throw a useful exception
+			Throw new Exception(get_class($this).'->set('.$column.') : does not conform to the REGEX or is not in the allowed array');
+		}
+	}
+
 	private function alter($column) {
 		// push
 		$this->_['altered'][] = $column;
