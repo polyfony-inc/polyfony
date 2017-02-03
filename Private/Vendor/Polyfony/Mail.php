@@ -276,7 +276,7 @@ class Mail {
 		// if a template exists, use it
 		if($this->template) {
 			// replace the body with the template
-			$this->body = file_get_contents($this->template);
+			$this->body = Filesystem::get($this->template);
 			// for each variables available
 			foreach($this->variables as $key => $value) {
 				// clean the value from html entities if using html mail format
