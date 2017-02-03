@@ -196,7 +196,9 @@ class Mail {
 		return($this);
 	}
 
-	public function set($key, $value='') {
+	public function set($key, $value='', $escape_html = true) {
+		// clean the value from html entities if using html mail format and there is no bypass
+		$value = $this->format == 'html' && $escape_html === true ? Format::htmlSafe($value) : $value;
 		// directly set the asociative key/value
 		$this->variables[$key] = $value;
 		// return self
@@ -279,8 +281,6 @@ class Mail {
 			$this->body = Filesystem::get($this->template);
 			// for each variables available
 			foreach($this->variables as $key => $value) {
-				// clean the value from html entities if using html mail format
-				$value = $this->format == 'html' ? Format::htmlSafe($value) : $value;
 				// replace in the body
 				$this->body = str_replace("__{$key}__", $value, $this->body);
 			}
