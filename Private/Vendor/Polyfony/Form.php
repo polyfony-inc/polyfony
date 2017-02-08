@@ -93,7 +93,7 @@ class Form {
 			// if the value is an array (we enter an optgroup)
 			if(is_array($value_or_group)) {
 				// create an optgroup
-				$optgroup = new Element('optgroup', array('label'=> $key_or_group_name));
+				$optgroup = new Element('optgroup', array('label'=> Locales::get($key_or_group_name)));
 				// iterate on the group
 				foreach($value_or_group as $option_key => $option_value) {
 					// define option attributes
