@@ -23,6 +23,8 @@
 Date : <?php echo date('r'); ?> 
 URL : <?php echo pf\Request::getUrl(); ?>
 
+REFERER : <?php echo pf\Request::server('HTTP_REFERER'); ?>
+
 Domain : <?php echo pf\Config::get('router','domain'); ?>
 
 Protocol : <?php echo pf\Request::getProtocol(); ?>
