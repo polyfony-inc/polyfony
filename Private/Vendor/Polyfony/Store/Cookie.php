@@ -61,13 +61,14 @@ class Cookie implements StoreInterface {
 	 * @throws Exception        If the variable does not exist.
 	 * @static
 	 */
-	public static function get($variable) {
+	public static function get($variable, $raw = false) {
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (! self::has($variable)) {
 			throw new \Polyfony\Exception("{$variable} does not exist in the store.");
 		}
 
-		return json_decode(gzuncompress($_COOKIE[$variable]));
+		return $raw ? $_COOKIE[$variable] : json_decode(gzuncompress($_COOKIE[$variable]));
+
 	}
 
 	/**
