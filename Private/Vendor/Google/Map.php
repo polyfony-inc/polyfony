@@ -103,7 +103,6 @@ class Map {
 		// Google will do the job
 		if($this->markers){
 			unset($this->options['center']);
-			unset($this->options['zoom']);
 		}
 		// for each option
 		foreach($this->options as $key => $value) {
