@@ -31,6 +31,14 @@ class Photo {
 		);
 	}
 
+	// set an option
+	public function option($key, $value) {
+		// assign
+		$this->options[$key] = $value;
+		// return self for chaining
+		return($this);
+	}
+
 	// set the desired size
 	public function size($width, $height) {
 		// assign
