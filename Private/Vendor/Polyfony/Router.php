@@ -201,7 +201,7 @@ class Router {
 	 * @throws \Exception           If the route does not exist.
 	 * @static
 	 */
-	public static function reverse($route_name, $parameters = array(), $absolute = false) {
+	public static function reverse($route_name, $parameters = array(), $absolute = false, $force_tls = false) {
 		// Does the route actually exist?
 		if(!isset(self::$_routes[$route_name])) {
 			// we cannot reverse a route that does not exist
@@ -214,8 +214,11 @@ class Router {
 			// replace it in the url
 			$url = str_replace(":{$variable}/", urlencode($value) . '/', $url);
 		}
+		// define the protocol to use (use the current one, or https if it is forced)
+		$protocol = (($force_tls && Config::isProd()) or Request::getProtocol() == 'https')?
+			'https' : 'http';
 		// if we want an absolute url, prefix with the domain
-		!$absolute ?: $url = Request::getProtocol() . '://' . Config::get('router', 'domain') . $url;
+		!$absolute ?: $url = $protocol . '://' . Config::get('router', 'domain') . $url;
 		// return the reversed url
 		return $url;
 	}
