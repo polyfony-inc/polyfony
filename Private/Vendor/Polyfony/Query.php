@@ -62,6 +62,7 @@ class Query {
 		$this->Quote 		= $quote;
 
 		// initialize attributes
+		$this->Object		= null;
 		$this->Table		= null;
 		$this->Operator		= 'AND';
 		$this->Selects		= array();
@@ -216,6 +217,14 @@ class Query {
 		return $this;
 	}
 	
+	// set the type of object that we want to be instanciated
+	public function object($class) {
+		// set the main action
+		$this->Object = $class;
+		// return self to the next method
+		return $this;
+	}
+
 	// select another table to join on (implicit INNER JOIN)
 	public function join($table, $match, $against) {
 		// secure parameters
@@ -619,12 +628,22 @@ class Query {
 			// throw an exception
 			Throw new Exception("Query->execute() : Failed to execute query [{$exception_infos}]");
 		}
+		// if a forced type of object has been defined
+		if($this->Object) {
+			// use the forced type
+			$class = '\Models\\'.$this->Object;
+		}
+		// no forced type
+		else {
+			// use the table name, or generic Record if none available
+			$class = $this->Table ? '\Models\\'.$this->Table : '\Polyfony\Record';
+		}
 		// fetch all results
 		$this->Result = $this->Prepared->fetchAll(
 			// fetch as an object
 			PDO::FETCH_CLASS,
-			// of this specific class based on the table name
-			$this->Table ? '\Models\\'.$this->Table : '\Polyfony\Record'
+			// of this specific class
+			$class
 		);
 		// if action was UPDATE or DELETE or one of those via QUERY
 		if(in_array($this->Action,array('UPDATE','DELETE')) || ($this->Action == 'QUERY' && in_array(substr($this->Query,0,6),array('UPDATE','DELETE')) && $this->Table)) {
@@ -681,7 +700,7 @@ class Query {
 			// date format in unknown, and does not look like a timestamp
 			elseif(!is_numeric($value)) {
 				// we can't allow such weird data get into the _date column
-				Throw new Exception('Query->secure() : Wrong data type for magic date field');
+				Throw new Exception('Query->secure() : Wrong data type for magic date field '.$column);
 			}
 		}
 		// return the value
