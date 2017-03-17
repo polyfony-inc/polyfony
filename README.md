@@ -3,9 +3,13 @@
 ## Polyfony 2 is a simple and powerful PHP micro-framework.
 
 Compared to major PHP frameworks, Polyfony covers 95% of what we need most of the time, whilst using 5% of ressources, space, configuration files and dependencies required by major frameworks.
+Our approach is to allow you to know how everything works by keeping the codebase extremely small. Instead of refering to the documentation, you can look at the source code almost as easily.
+Polyfony is fast by design (≤ 20ms/hit on your average app & server), and can get even faster (1~5ms) using the different caching options.
 
 #### Features
 routing, bundles, controllers, views, database abstraction, environments, locales, cache, vendor, helpers, authentication, profiler…
+
+#### Philosophy
 
 #### Footprint (of an Hello World)
 * ≤ 400 Ko of disk space (35% of comment lines)
@@ -841,7 +845,8 @@ CREATE TABLE "Store" (
 ```
 
 ## Performance
-Polyfony has been designed to be fast, no compromise.
+Polyfony has been designed to be fast, no compromise. 
+If implementating a « convenience » tool/function into the framework was to cost a global 30% bump in execution time, it is either implemented in a more efficient manner, or not implemented at all.
 
 ## Security
 The codebase is small, straightforward and abundantly commented. It's audited using SensioInsight, RIPS, and Sonar.

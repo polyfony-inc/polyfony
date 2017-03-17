@@ -193,6 +193,14 @@ class Response {
 		
 	}
 
+	// get the status header
+	public static function getStatus() {
+	
+		// get the currently set status
+		return self::$_status;
+		
+	}
+
 	// set raw content
 	public static function setContent($content) {
 		
