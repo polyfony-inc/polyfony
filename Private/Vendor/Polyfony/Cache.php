@@ -43,7 +43,7 @@ class Cache {
 		// already exists and no overwrite
 		if(self::has($variable) && !$overwrite) {
 			// throw an exception
-			\Polyfony\Exception("{$variable} already exists in the store.");
+			Throw new \Polyfony\Exception("{$variable} already exists in the store.");
 		}
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
@@ -64,7 +64,7 @@ class Cache {
 		// doesn't exist in the store
 		if(!self::has($variable)) {
 			// throw an exception
-			\Polyfony\Exception("{$variable} does not exist in the store.");
+			Throw new \Polyfony\Exception("{$variable} does not exist in the store.");
 		}
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
