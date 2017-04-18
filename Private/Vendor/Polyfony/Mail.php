@@ -226,6 +226,33 @@ class Mail {
 
 	public function send($save=false) {
 		
+		// --------------------------------------------------------
+		// - depending on the presence of an alternate smtp relay -
+		// --- we may alter the configuration of the SMTP server --
+		// --------------------------------------------------------
+
+		// if we have triggers for an alternate SMTP relay, and and alternative SMTP relay server defined
+		if(
+			Config::get('mail','alternative_triggers') &&
+			Config::get('mail','alternative_smtp_host')
+		) {
+			// for each and EVERY recipients that might receive this email
+			foreach(array_merge($this->recipients['to'], $this->recipients['cc'], $this->recipients['bcc']) as $email) {
+				// for each of the possible triggers
+				foreach(Config::get('mail', 'alternative_triggers') as $needle) {
+					// if there is at least a simple partial case match (insensitive, and no regex allowed)
+					if(stripos($email, $needle) !== 0) {
+						// apply the alternative configuration for this mail object
+						$this->smtp = [
+							'host'	=> Config::get('mail', 'alternative_smtp_host'),
+							'user'	=> Config::get('mail', 'alternative_smtp_user'),
+							'pass'	=> Config::get('mail', 'alternative_smtp_pass')
+						];
+					}
+				}
+			}
+		}
+
 		// instanciate a new phpmail object (allowing exception to be thrown)
 		$this->mailer = new \PHPMailer\PHPMailer(true);
 
