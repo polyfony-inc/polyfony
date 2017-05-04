@@ -27,6 +27,12 @@ REFERER : <?php echo pf\Request::server('HTTP_REFERER'); ?>
 
 Domain : <?php echo pf\Config::get('router','domain'); ?>
 
+Agent : <?php echo pf\Request::server('HTTP_USER_AGENT'); ?>
+
+Method : <?php echo pf\Request::isPost() ? 'POST' : 'GET'; ?>
+
+IP : <?php echo pf\Request::server('REMOTE_ADDR'); ?>
+
 Protocol : <?php echo pf\Request::getProtocol(); ?>
 
 User : <?php echo pf\Security::get('id'); ?>
