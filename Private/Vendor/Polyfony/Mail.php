@@ -237,11 +237,11 @@ class Mail {
 			Config::get('mail','alternative_smtp_host')
 		) {
 			// for each and EVERY recipients that might receive this email
-			foreach(array_merge($this->recipients['to'], $this->recipients['cc'], $this->recipients['bcc']) as $email) {
+			foreach(array_merge($this->recipients['to'], $this->recipients['cc'], $this->recipients['bcc']) as $email => $name) {
 				// for each of the possible triggers
 				foreach(Config::get('mail', 'alternative_triggers') as $needle) {
 					// if there is at least a simple partial case match (insensitive, and no regex allowed)
-					if(stripos($email, $needle) !== 0) {
+					if(stripos($email, $needle) !== false) {
 						// apply the alternative configuration for this mail object
 						$this->smtp = [
 							'host'	=> Config::get('mail', 'alternative_smtp_host'),
