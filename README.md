@@ -4,12 +4,13 @@
 
 Compared to major PHP frameworks, Polyfony covers 95% of what we need most of the time, whilst using 5% of ressources, space, configuration files and dependencies required by major frameworks.
 Our approach is to allow you to know how everything works by keeping the codebase extremely small. Instead of refering to the documentation, you can look at the source code almost as easily.
-Polyfony is fast by design (≤ 20ms/hit on your average app & server), and can get even faster (1~5ms) using the different caching options.
+Polyfony is fast by design (≤ 20ms/hit on your average app & server), and can get even faster (1~5ms) using the different integrated caching options.
 
 #### Features
 routing, bundles, controllers, views, database abstraction, environments, locales, cache, vendor, helpers, authentication, profiler…
 
 #### Philosophy
+Inspired by Symfony and Laravel but tailored to favour an inclination towards extreme simplicity and efficiency
 
 #### Footprint (of an Hello World)
 * ≤ 400 Ko of disk space (35% of comment lines)
