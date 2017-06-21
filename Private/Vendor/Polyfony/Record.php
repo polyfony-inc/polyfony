@@ -34,14 +34,14 @@ class Record {
 		}
 
 		// init the list of altered columns
-		$this->_ = array(
+		$this->_ = [
 			// if of the record
 			'id'		=> isset($this->id) ? $this->id : null,
 			// table of the record
 			'table'		=> $table ?: null,
 			// list of altered columns since the retrieval from the database
-			'altered'	=> array()
-		);
+			'altered'	=> []
+		];
 		// if conditions are provided
 		if($conditions !== null) {
 			// if conditions is not an array
@@ -92,7 +92,7 @@ class Record {
 		return("{$this->_['table']}[$column]");
 	}
 
-	public function input($column, $options = array()) {
+	public function input($column, $options = []) {
 		return(Form::input(
 			$this->field($column), 
 			$this->get($column), 
@@ -100,7 +100,7 @@ class Record {
 		));
 	}
 	
-	public function textarea($column, $options = array()) {
+	public function textarea($column, $options = []) {
 		return(Form::textarea(
 			$this->field($column), 
 			$this->get($column), 
@@ -108,7 +108,7 @@ class Record {
 		));
 	}
 	
-	public function select($column, $list = array(), $options = array()) {
+	public function select($column, $list = [], $options = []) {
 		return(Form::select(
 			$this->field($column), 
 			$list, 
@@ -150,7 +150,7 @@ class Record {
 	// magic
 	public function __toArray($raw = false, $altered = false) {
 		// declare an empty array
-		$array = array();
+		$array = [];
 		// what to iterate on
 		$attributes = $altered ? $this->_['altered'] : array_keys(get_object_vars($this));
 		// for each attribute of this object
@@ -173,6 +173,18 @@ class Record {
 	public function __toString() {
 		// a string to sybolize this record
 		return $this->_['id'] ? $this->_['id'] : 0;
+	}
+
+	// magic
+	public function __clone() {
+		// set all columns as altered
+		$this->_['altered'] = array_keys(get_object_vars($this));
+		// remove the hidden column
+		unset($this->_['altered'][0]);
+		// remove the hidden id, so that the object is recognized as absent from the database
+		$this->_['id'] = null;
+		// remove the id attribute too
+		$this->id = null;
 	}
 	
 	private function validateAttribute($column, $value) {
@@ -254,7 +266,7 @@ class Record {
 			$updated = Database::query()
 				->update($this->_['table'])
 				->set($this->__toArray(true, true))
-				->where(array('id'=>$this->_['id']))
+				->where(['id'=>$this->_['id']])
 				->execute();
 			// if update went well
 			return $updated ? true : false;
@@ -293,7 +305,7 @@ class Record {
 		$deleted = Database::query()
 			->delete()
 			->from($this->_['table'])
-			->where(array('id'=>$this->_['id']))
+			->where(['id'=>$this->_['id']])
 			->execute();
 		// if it went well
 		return $deleted ? true : false;
