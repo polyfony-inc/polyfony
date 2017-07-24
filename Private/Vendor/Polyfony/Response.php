@@ -123,10 +123,20 @@ class Response {
 	}
 	
 	public static function setRedirect($url, $delay=0) {
-		// set the redirect header
-		self::setHeaders(array(
-			'Refresh' => "{$delay};url=$url"
-		));	
+		// if a delay is provided
+		if($delay) {
+			// set the refresh header that support delays, it is not at all understood by Google Bot
+			self::setHeaders(array(
+				'Refresh' => "{$delay};url=$url"
+			));	
+		}
+		// no delay is provided, use location that is understood by Google Bot
+		else {
+			// use standard redirect
+			self::setHeaders(array(
+				'Location' => $url
+			));
+		}
 	}
 
 	public static function setAssets($type, $assets) {
