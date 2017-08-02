@@ -54,8 +54,15 @@ class Config {
 		// else the detection method is the domain
 		elseif(self::$_config['Current']['config']['detection_method'] == 'domain') {
 			// if we are matching the development domain
-			self::$_environment = Request::server('HTTP_HOST') == self::$_config['Dev']['router']['domain'] ? 
-				'Dev' : 'Prod';
+			self::$_environment = (
+				// if there seem to be an exotic port in the http host, use the server name instead
+				stripos(Request::server('HTTP_HOST'),':') !== false ? 
+					Request::server('SERVER_NAME') : 
+					Request::server('HTTP_HOST')
+				// detect environment using the most suitable domain variable available
+				) == self::$_config['Dev']['router']['domain'] ? 
+					'Dev' : 
+					'Prod';
 		}
 		// the detection method is unknown
 		else {
