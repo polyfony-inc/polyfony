@@ -9,7 +9,7 @@ class MainController extends Pf\Controller {
 	public function preAction() {
 		
 		Pf\Response::setMetas(array('title'=>'Bundles/Tools'));
-		Pf\Response::setAssets('css','//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css');
+		Pf\Response::setAssets('css','https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css');
 		
 	}
 
@@ -54,7 +54,7 @@ class MainController extends Pf\Controller {
 				}
 			}
 		}
-	
+
 		// set a notice depending on the presence of errors
 		$this->notice = $has_error ? 
 			new Pf\Notice\Danger('Please check the permissions and folder structure', 'Error!') :

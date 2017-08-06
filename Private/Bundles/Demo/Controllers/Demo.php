@@ -9,7 +9,7 @@ class DemoController extends pf\Controller {
 
 		// set some common metas and assets
 		pf\Response::setMetas(array('title'=>'Bundles/Demo'));
-		pf\Response::setAssets('css','//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css');
+		pf\Response::setAssets('css','https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css');
 		
 		// get the currently browsed tab or null if none
 		// this doesn't sounds safe, using a get parameter, right ?
@@ -131,8 +131,8 @@ class DemoController extends pf\Controller {
 	public function responseAction() {
 		// add the JS portion of bootstrap
 		pf\Response::setAssets('js',array(
-			'//code.jquery.com/jquery-1.11.2.min.js',
-			'//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js'
+			'https://code.jquery.com/jquery-1.11.2.min.js',
+			'https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js'
 		));
 		// add some metas
 		pf\Response::setMetas(array('description'=>'An awesome page'));

@@ -88,6 +88,8 @@ class Response {
 		self::setCharset(Config::get('response', 'default_charset'));
 		// set the default type
 		self::setType(Config::get('response', 'default_type'));
+		// init the assets packing filesystem
+		self::initAssetsPacking();
 		
 	}
 
@@ -252,6 +254,27 @@ class Response {
 		self::$_assets['Js'] = array_unique(self::$_assets['Js']);
 		// return to the original order
 		krsort(self::$_assets['Js']);
+		// if we are allowed to pack js files
+		if(Config::isProd() && Config::get('response','pack_js') == 1) {
+			// generate a unique name for the packed css files
+			$js_pack_name = Keys::generate(self::$_assets['Js']) . '.js';
+			$js_pack_file = '../Private/Storage/Cache/Assets/Js/'.$js_pack_name;
+			// if the pack file doesn't exist yet
+			if(!Filesystem::exists($js_pack_file, true)) {
+				// the content of the pack
+				$js_pack_contents = '';
+				// for each asset
+				foreach(self::$_assets['Js'] as $file) {
+					// append he contents of that file to the pack
+					$js_pack_contents .= ' '.file_get_contents($file);
+				}
+				// populate the cache file
+				file_put_contents($js_pack_file, $js_pack_contents);
+			}
+			// replace the assets import rules with the whole pac
+			self::$_assets['Js'] = ['/Assets/Js/Cache/'.$js_pack_name];
+		}
+
 		// for each file
 		foreach(self::$_assets['Js'] as $file) {
 			// add it
@@ -265,6 +288,26 @@ class Response {
 		self::$_assets['Css'] = array_unique(self::$_assets['Css']);
 		// return to the original order
 		krsort(self::$_assets['Css']);
+		// if we are allowed to pack css files
+		if(Config::isProd() && Config::get('response','pack_css') == 1) {
+			// generate a unique name for the packed css files
+			$css_pack_name = Keys::generate(self::$_assets['Css']) . '.css';
+			$css_pack_file = '../Private/Storage/Cache/Assets/Css/'.$css_pack_name;
+			// if the pack file doesn't exist yet
+			if(!Filesystem::exists($css_pack_file, true)) {
+				// the content of the pack
+				$css_pack_contents = '';
+				// for each asset
+				foreach(self::$_assets['Css'] as $file) {
+					// append he contents of that file to the pack
+					$css_pack_contents .= ' '.file_get_contents($file);
+				}
+				// populate the cache file
+				file_put_contents($css_pack_file, $css_pack_contents);
+			}
+			// replace the assets import rules with the whole pac
+			self::$_assets['Css'] = ['/Assets/Css/Cache/'.$css_pack_name];
+		}
 		// for each file
 		foreach(self::$_assets['Css'] as $file) {
 			// support media specific CSS
@@ -273,6 +316,27 @@ class Response {
 			$media = is_array($file) ? $file[1] : 'all';
 			// add it
 			self::$_content = '<link rel="stylesheet" media="' . $media . '" type="text/css" href="' . $href . '" />' . self::$_content;
+		}
+		
+	}
+
+	private static function initAssetsPacking() {
+		// if we are allowed to use the assets packing feature
+		if(Config::isProd() && (Config::get('response','pack_css') == 1 || Config::get('response','pack_js') == 1 )) {
+			// create css and js packing cache directories
+			Filesystem::mkdir('../Private/Storage/Cache/Assets/Css/', 0777, true) ?: $has_error = true;
+			Filesystem::mkdir('../Private/Storage/Cache/Assets/Js/', 0777, true) ?: $has_error = true;
+			// if the general assets file do not exist
+			Filesystem::mkdir('./Assets/Css/', 0777, true) ?: $has_error = true;
+			Filesystem::mkdir('./Assets/Js/', 0777, true) ?: $has_error = true;
+			// create css and js public symlinks if it doesn't exist already
+			if(!Filesystem::isSymbolic('./Assets/Css/Cache', true)) {
+				Filesystem::symlink('../../../Private/Storage/Cache/Assets/Css/', './Assets/Css/Cache', true) ?: $has_error = true;
+			}
+			// if it doesn't exist already
+			if(!Filesystem::isSymbolic('./Assets/Js/Cache', true)) {
+				Filesystem::symlink('../../../Private/Storage/Cache/Assets/Js/', './Assets/Js/Cache', true) ?: $has_error = true;
+			}
 		}
 	}
 
