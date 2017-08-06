@@ -247,7 +247,7 @@ class Response {
 	}
 
 	// format and return javascripts
-	private static function prependScripts() {
+	private static function appendScripts() {
 		// de-deuplicate js files
 		self::$_assets['Js'] = array_unique(self::$_assets['Js']);
 		// return to the original order
@@ -255,7 +255,7 @@ class Response {
 		// for each file
 		foreach(self::$_assets['Js'] as $file) {
 			// add it
-			self::$_content = '<script type="text/javascript" src="'. $file .'"></script>' . self::$_content;
+			self::$_content .= '<script type="text/javascript" src="'. $file .'"></script>';
 		}
 	}
 	
@@ -321,17 +321,18 @@ class Response {
 			// add the profiler
 			self::$_content .= Config::get('profiler', 'enable_stack', true) ? Profiler::getHtml() : '';
 			// wrap in the body
-			self::$_content = '</head><body>' . self::$_content . '</body></html>';
+			self::$_content = '</head><body>' . self::$_content;
 			// preprend metas
 			self::prependMetas();
-			// preprend scripts
-			self::prependScripts();
 			// preprend css
 			self::prependStyles();
+			// preprend scripts
+			self::appendScripts();
 			// add metas and style up top
 			self::$_content = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 			<html xmlns="http://www.w3.org/1999/xhtml"><head>
-			<meta http-equiv="content-type" content="text/html; charset=' . self::$_charset . '" />' . self::$_content;
+			<meta http-equiv="content-type" content="text/html; charset=' . self::$_charset . '" />' . self::$_content . '</body></html>';
+			
 		}
 		// elseif the type is json
 		elseif(self::$_type == 'json') {
