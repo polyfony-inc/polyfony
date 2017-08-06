@@ -252,8 +252,6 @@ class Response {
 	private static function appendScripts() {
 		// de-deuplicate js files
 		self::$_assets['Js'] = array_unique(self::$_assets['Js']);
-		// return to the original order
-		krsort(self::$_assets['Js']);
 		// if we are allowed to pack js files
 		if(Config::isProd() && Config::get('response','pack_js') == 1) {
 			// generate a unique name for the packed css files
