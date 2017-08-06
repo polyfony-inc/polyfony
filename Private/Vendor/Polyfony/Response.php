@@ -256,21 +256,28 @@ class Response {
 		if(Config::isProd() && Config::get('response','pack_js') == 1) {
 			// generate a unique name for the packed css files
 			$js_pack_name = Keys::generate(self::$_assets['Js']) . '.js';
-			$js_pack_file = '../Private/Storage/Cache/Assets/Js/'.$js_pack_name;
+			$js_pack_file = "../Private/Storage/Cache/Assets/Js/{$js_pack_name}";
 			// if the pack file doesn't exist yet
 			if(!Filesystem::exists($js_pack_file, true)) {
 				// the content of the pack
 				$js_pack_contents = '';
 				// for each asset
 				foreach(self::$_assets['Js'] as $file) {
+					// modify the filename
+					if(substr($file, 0,2 == '//')) {
+						$file = "https:{$file}"; 
+					}
+					elseif(substr($file,0,1) == '/') {
+						$file = ".{$file}";
+					}
 					// append he contents of that file to the pack
-					$js_pack_contents .= ' '.file_get_contents($file);
+					$js_pack_contents .= " \n".file_get_contents($file);
 				}
 				// populate the cache file
 				file_put_contents($js_pack_file, $js_pack_contents);
 			}
 			// replace the assets import rules with the whole pac
-			self::$_assets['Js'] = ['/Assets/Js/Cache/'.$js_pack_name];
+			self::$_assets['Js'] = ["/Assets/Js/Cache/{$js_pack_name}"];
 		}
 
 		// for each file
@@ -284,28 +291,36 @@ class Response {
 	private static function prependStyles() {
 		// de-deuplicate css files
 		self::$_assets['Css'] = array_unique(self::$_assets['Css']);
-		// return to the original order
-		krsort(self::$_assets['Css']);
+		
 		// if we are allowed to pack css files
 		if(Config::isProd() && Config::get('response','pack_css') == 1) {
 			// generate a unique name for the packed css files
 			$css_pack_name = Keys::generate(self::$_assets['Css']) . '.css';
-			$css_pack_file = '../Private/Storage/Cache/Assets/Css/'.$css_pack_name;
+			$css_pack_file = "../Private/Storage/Cache/Assets/Css/{$css_pack_name}";
 			// if the pack file doesn't exist yet
 			if(!Filesystem::exists($css_pack_file, true)) {
 				// the content of the pack
 				$css_pack_contents = '';
 				// for each asset
 				foreach(self::$_assets['Css'] as $file) {
+					// modify the filename
+					if(substr($file, 0,2 == '//')) {
+						$file = "https:{$file}"; 
+					}
+					elseif(substr($file,0,1) == '/') {
+						$file = ".{$file}";
+					}
 					// append he contents of that file to the pack
-					$css_pack_contents .= ' '.file_get_contents($file);
+					$css_pack_contents .= " \n".file_get_contents($file);
 				}
 				// populate the cache file
 				file_put_contents($css_pack_file, $css_pack_contents);
 			}
 			// replace the assets import rules with the whole pac
-			self::$_assets['Css'] = ['/Assets/Css/Cache/'.$css_pack_name];
+			self::$_assets['Css'] = ["/Assets/Css/Cache/{$css_pack_name}"];
 		}
+		// return to the original order
+		krsort(self::$_assets['Css']);
 		// for each file
 		foreach(self::$_assets['Css'] as $file) {
 			// support media specific CSS
