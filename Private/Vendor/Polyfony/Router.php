@@ -217,8 +217,9 @@ class Router {
 		// define the protocol to use (use the current one, or https if it is forced)
 		$protocol = (($force_tls && Config::isProd()) or Request::getProtocol() == 'https')?
 			'https' : 'http';
-		// if we want an absolute url, prefix with the domain
-		!$absolute ?: $url = $protocol . '://' . Config::get('router', 'domain') . $url;
+		// if we want an absolute url, prefix with the domain and with the port if the protocol is not https
+		!$absolute ?: $url = $protocol . '://' . Config::get('router', 'domain') . 
+		(Request::getPort() != 80 && $protocol == 'http' ? ':'.Request::getPort() : '') . $url;
 		// return the reversed url
 		return $url;
 	}

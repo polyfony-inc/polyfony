@@ -24,6 +24,7 @@ class Request {
 	private static $_context;
 	private static $_method;
 	private static $_protocol;
+	private static $_port;
 	private static $_signature;
 	
 	public static function init() {
@@ -39,6 +40,9 @@ class Request {
 
 		// set the request protocol
 		self::$_protocol = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http';
+
+		// set the request port
+		self::$_port = $_SERVER['SERVER_PORT'];
 
 		// set the request signature with post, if any
 		self::$_signature = self::isPost() ? sha1(self::$_url.json_encode($_POST)) : sha1(self::$_url);
@@ -83,6 +87,13 @@ class Request {
 
 		// return current protocol
 		return(self::$_protocol);
+
+	}
+
+	public static function getPort() {
+
+		// return current port
+		return(self::$_port);
 
 	}
 	
