@@ -193,7 +193,7 @@ class Format {
 	}
 	
 	// remove all formatting and invisible symbols to get the shortest possible string
-	public static function obfuscate($string) {
+	public static function minify($string) {
 		// remove all formatting symbols and double spaces	
 		return(str_replace('  ', ' ', str_replace(array("\t", "\n", "\r"), '', $string)));
 	}

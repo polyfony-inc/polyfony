@@ -252,6 +252,8 @@ class Response {
 	private static function appendScripts() {
 		// de-deuplicate js files
 		self::$_assets['Js'] = array_unique(self::$_assets['Js']);
+		// if there are not assets
+		if(!self::$_assets['Js']) { return; }
 		// if we are allowed to pack js files
 		if(Config::isProd() && Config::get('response','pack_js') == 1) {
 			// generate a unique name for the packed css files
@@ -264,7 +266,7 @@ class Response {
 				// for each asset
 				foreach(self::$_assets['Js'] as $file) {
 					// modify the filename
-					if(substr($file, 0,2 == '//')) {
+					if(substr($file, 0,2) == '//') {
 						$file = "https:{$file}"; 
 					}
 					elseif(substr($file,0,1) == '/') {
@@ -272,6 +274,15 @@ class Response {
 					}
 					// append he contents of that file to the pack
 					$js_pack_contents .= " \n".file_get_contents($file);
+				}
+				// if minifying is allowed
+				if(Config::get('response','minify')) {
+					// instanciate a new minifier
+					$minifier = new \Minifier\JS();
+					// add our css contents
+					$minifier->add($js_pack_contents);
+					// minify 
+					$js_pack_contents = $minifier->minify();
 				}
 				// populate the cache file
 				file_put_contents($js_pack_file, $js_pack_contents);
@@ -291,10 +302,11 @@ class Response {
 	private static function prependStyles() {
 		// de-deuplicate css files
 		self::$_assets['Css'] = array_unique(self::$_assets['Css']);
-		
+		// if there are not assets
+		if(!self::$_assets['Css']) { return; }
 		// if we are allowed to pack css files
 		if(Config::isProd() && Config::get('response','pack_css') == 1) {
-			// generate a unique name for the packed css files
+		// generate a unique name for the packed css files
 			$css_pack_name = Keys::generate(self::$_assets['Css']) . '.css';
 			$css_pack_file = "../Private/Storage/Cache/Assets/Css/{$css_pack_name}";
 			// if the pack file doesn't exist yet
@@ -304,7 +316,7 @@ class Response {
 				// for each asset
 				foreach(self::$_assets['Css'] as $file) {
 					// modify the filename
-					if(substr($file, 0,2 == '//')) {
+					if(substr($file, 0,2) == '//') {
 						$file = "https:{$file}"; 
 					}
 					elseif(substr($file,0,1) == '/') {
@@ -312,6 +324,15 @@ class Response {
 					}
 					// append he contents of that file to the pack
 					$css_pack_contents .= " \n".file_get_contents($file);
+				}
+				// if minifying is allowed
+				if(Config::get('response','minify')) {
+					// instanciate a new minifier
+					$minifier = new \Minifier\CSS();
+					// add our css contents
+					$minifier->add($css_pack_contents);
+					// minify 
+					$css_pack_contents = $minifier->minify();
 				}
 				// populate the cache file
 				file_put_contents($css_pack_file, $css_pack_contents);
@@ -428,9 +449,9 @@ class Response {
 			self::$_modification = filemtime(self::$_content);
 		}
 		// in case we are outputing html in any form and obfucation is enabled
-		if(Config::get('response', 'obfuscate') && in_array(self::$_type, array('html', 'html-page'))) {
-			// obfuscate
-			self::$_content = Format::obfuscate(self::$_content);
+		if(Config::get('response', 'minify') && in_array(self::$_type, array('html', 'html-page'))) {
+			// minify
+			self::$_content = Format::minify(self::$_content);
 		}
 		// if the type is not a file and compression is allowed
 		if(self::$_type != 'file' && Config::get('response', 'compress')) {
