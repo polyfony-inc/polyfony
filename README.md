@@ -142,28 +142,28 @@ $account
 * Validating data
 
 You can prevent corrupted data from entering the database. To do so, declare a validator for each column that you want to secure.
-The declaration has to me done in the model, with the constant `validators` being an array. 
+The declaration has to me done in the model, with the constant `VALIDATORS` being an array. 
 The key being the column, the value being an array of authorized values, or a REGEX. Example :
 
 ```php
 
 Models\Accounts extends pf\Records {
 	
-	const id_level = [
+	const ID_LEVEL = [
 		0		=>'Admin',
 		5		=>'Privileged User',
 		10		=>'Simple User',
 	];
 
-	const is_enabled = [
+	const IS_ENABLED = [
 		0	=>'No',
 		1	=>'Yes'
 	];
 
-	const validators = [
+	const VALIDATORS = [
 		'login'		=> '/^\S+@\S+\.\S+$/', // validate an email as login
-		'id_level'	=> self::id_level // validate any key from the const id_level
-		'is_enabled'=> self::is_enabled // validate 0 or 1
+		'id_level'	=> self::ID_LEVEL // validate any key from the const id_level
+		'is_enabled'=> self::IS_ENABLED // validate 0 or 1
 	];
 
 }

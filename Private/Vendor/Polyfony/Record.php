@@ -193,7 +193,7 @@ class Record {
 		// get the class of the object
 		$class_name = get_class($this);
 		// get the validators
-		$validators = $class_name::validators;
+		$validators = $class_name::VALIDATORS;
 		// get the validator
 		$validator = isset($validators[$column]) ? 
 			$validators[$column] : null;

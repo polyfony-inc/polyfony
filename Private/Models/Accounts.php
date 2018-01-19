@@ -9,12 +9,12 @@ use Polyfony as pf;
 
 class Accounts extends pf\Record {
 	
-	const is_enabled = [
+	const IS_ENABLED = [
 		0=>'No',
 		1=>'Yes'
 	];
 
-	const id_level = [
+	const ID_LEVEL = [
 
 		0	=> 'God',
 		1	=> 'Admin',
@@ -23,11 +23,11 @@ class Accounts extends pf\Record {
 
 	];
 
-	const validators = [
+	const VALIDATORS = [
 
 //		'login'		=>'/^\S+@\S+\.\S+$/', // commented out because the demo uses simply "root" as login
-		'is_enabled'=>self::is_enabled,
-		'id_level'	=>self::id_level
+		'IS_ENABLED'=>self::IS_ENABLED,
+		'ID_LEVEL'	=>self::ID_LEVEL
 
 	];
 
@@ -45,13 +45,13 @@ class Accounts extends pf\Record {
 
 	public function enable() {
 
-		$this->set('is_enabled', '1');
+		$this->set('IS_ENABLED', '1');
 
 	}
 
 	public function disable() {
 
-		$this->set('is_enabled', '0');
+		$this->set('IS_ENABLED', '0');
 
 	}
 
@@ -81,7 +81,7 @@ class Accounts extends pf\Record {
 		return(\Polyfony\Database::query()
 			->select()
 			->from('Accounts')
-			->where(array('is_enabled'=>'0'))
+			->where(array('IS_ENABLED'=>'0'))
 			->execute()
 		);
 	}

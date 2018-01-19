@@ -201,7 +201,7 @@ class Security {
 	}
 
 	// this will check that the opened session matches the current client's signature
-	private static function match($account) {
+	private static function match(\Models\Accounts $account) {
 		// get the session key existing in the database
 		$existing_key = $account->get('session_key');
 		// generate a new session key for this request
