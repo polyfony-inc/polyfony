@@ -358,18 +358,18 @@ class Response {
 		// if we are allowed to use the assets packing feature
 		if(Config::isProd() && (Config::get('response','pack_css') == 1 || Config::get('response','pack_js') == 1 )) {
 			// create css and js packing cache directories
-			Filesystem::mkdir('../Private/Storage/Cache/Assets/Css/', 0777, true) ?: $has_error = true;
-			Filesystem::mkdir('../Private/Storage/Cache/Assets/Js/', 0777, true) ?: $has_error = true;
+			Filesystem::mkdir('../Private/Storage/Cache/Assets/Css/', 0777, true);
+			Filesystem::mkdir('../Private/Storage/Cache/Assets/Js/', 0777, true);
 			// if the general assets file do not exist
-			Filesystem::mkdir('./Assets/Css/', 0777, true) ?: $has_error = true;
-			Filesystem::mkdir('./Assets/Js/', 0777, true) ?: $has_error = true;
+			Filesystem::mkdir('./Assets/Css/', 0777, true);
+			Filesystem::mkdir('./Assets/Js/', 0777, true);
 			// create css and js public symlinks if it doesn't exist already
 			if(!Filesystem::isSymbolic('./Assets/Css/Cache', true)) {
-				Filesystem::symlink('../../../Private/Storage/Cache/Assets/Css/', './Assets/Css/Cache', true) ?: $has_error = true;
+				Filesystem::symlink('../../../Private/Storage/Cache/Assets/Css/', './Assets/Css/Cache', true);
 			}
 			// if it doesn't exist already
 			if(!Filesystem::isSymbolic('./Assets/Js/Cache', true)) {
-				Filesystem::symlink('../../../Private/Storage/Cache/Assets/Js/', './Assets/Js/Cache', true) ?: $has_error = true;
+				Filesystem::symlink('../../../Private/Storage/Cache/Assets/Js/', './Assets/Js/Cache', true);
 			}
 		}
 	}

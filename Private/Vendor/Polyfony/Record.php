@@ -17,7 +17,7 @@ class Record {
 	protected $_;
 	
 	// storing the validators
-	const validators = [];
+	const VALIDATORS = [];
 
 	// create a object from scratch, of fetch it in from its table/id
 	public function __construct($table=null, $conditions=null) {
