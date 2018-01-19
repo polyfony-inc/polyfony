@@ -316,30 +316,32 @@ The status code is 500 by default, you can specify any HTTP status code. The cac
 Throw new Exception($error_message, $http_status_code);
 ```
 
-### Notice
+### Alerts
 
-You can use from different types of notice elements to suit your needs
+You can use from different types of bootstrap alerts (previously called Notice) to suit your needs
 ```php
-Notice($message, $title=null)
-Notice\Danger($message, $title=null)
-Notice\Success($message, $title=null)
-Notice\Warning($message, $title=null)
+Bootstrap\Alert($message={info,danger,primary,secondary,dark,light,info}, [$title=null, [$message=null, [$footer=null]]])
 ```
-All will be converted to string elegantly in HTML or text depending on the context (CLI, Ajax…) and it uses bootstrap-friendly classes.
+All will be converted to HTML automatically using bootstrap 4 friendly classes.
 
 Manually getting back notice text
 ```php
-$notice->getMessage($html_safe=true)
-$notice->getTitle($html_safe=true)
+$alert->getMessage()
+$alert->getTitle()
+$alert->getFooter()
 ```
 
 Typical example
 
 ```php
-// set a notice depending on the presence of errors
-$this->notice = $has_error ? 
-	new Notice\Danger('Cache directory has not been emptied', 'Error!') :
-	new Notice\Success('Cache directory has been emptied', 'Success!');
+// set an alert depending on the presence of errors
+$this->alert = $has_error ? 
+	new Bootstrap\Alert('warning','Error!','Cache directory has not been emptied') :
+	new Bootstrap\Alert('success','Success!','Cache directory has been emptied');
+
+// this uses the magic __toString() methods of alerts objects to generate html code on the fly
+echo $this->alert;
+
 ```
 
 ### Response
