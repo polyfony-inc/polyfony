@@ -16,7 +16,7 @@ class Config {
 	protected static $_environment;
 	protected static $_config;
 	
-	public static function init() {
+	public static function init() :void {
 	
 		// get all configurations available
 		self::$_config = array(
@@ -36,14 +36,14 @@ class Config {
 
 	}
 	
-	private static function detectFromCLI() {
+	private static function detectFromCLI() :void {
 	
 		// use the first command line argument as environment name
 		self::$_environment = Request::argv(1) == 'Dev' ? 'Dev' : 'Prod';
 		
 	}
 	
-	private static function detectFromHTTP() {
+	private static function detectFromHTTP() :void {
 		
 		// if the detection method is the port
 		if(self::$_config['Current']['config']['detection_method'] == 'port') {
@@ -72,7 +72,7 @@ class Config {
 
 	}
 
-	private static function merge() {
+	private static function merge() :void {
 
 		// if in production a an aggregated cache is already available, load it
 		if(Config::isProd() && Cache::has('Config')) {
@@ -97,24 +97,24 @@ class Config {
 
 	}
 	
-	public static function set($group, $key, $value=null) {
+	public static function set(string $group, string $key, $value=null) :void {
 		// if only group + one parameters, set the whole group, else set a key of the group
 		$value !== null ? self::$_config['Current'][$group][$key] = $value : self::$_config['Current'][$group] = $key;
 	}
 	
-	public static function get($group, $key=null) {
+	public static function get(string $group, $key=null) {
 		// return the proper config
 		return($key ? self::$_config['Current'][$group][$key] : self::$_config['Current'][$group]);
 	}
 
-	public static function isDev() {
+	public static function isDev() :bool {
 		// return boolean
-		return(self::$_environment == 'Dev' ? true : false);
+		return(self::$_environment == 'Dev');
 	}
 	
-	public static function isProd() {
+	public static function isProd() :bool {
 		// return boolean
-		return(self::$_environment == 'Prod' ? true : false);
+		return(self::$_environment == 'Prod');
 	}
 	
 }	

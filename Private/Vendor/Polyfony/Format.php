@@ -15,7 +15,7 @@ namespace Polyfony;
 class Format {
 
 	// file or folder name that is safe for the filesystem
-	public static function fsSafe($string) {
+	public static function fsSafe($string) :string {
 		// remove any symbol that does not belong in a file name of folder name
 		return(str_replace(array(
 				'..','/','\\',':','@','$','?','*','<','>','&','(',')','{','}',',','%','`','\'','#'), 
@@ -26,19 +26,19 @@ class Format {
 	}
 
 	// string that is safe for javascript variable
-	public static function jsSafe($string) {
+	public static function jsSafe($string) :string {
 		// escape all single quotes
 		return(json_encode($string));
 	}
 	
 	// screen safe
-	public static function htmlSafe($string) {
+	public static function htmlSafe($string) :string {
 		// just remove html entities
 		return(filter_var($string, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
 	}
 
 	// human size
-	public static function size($integer, $precision=1) {
+	public static function size($integer, $precision=1) :string {
 		// declare units
 		$unit = array('b','Ko','Mo','Go','To','Po');
 		// make human readable
@@ -46,7 +46,7 @@ class Format {
 	}
 	
 	// relative date
-	public static function date($timestamp) {
+	public static function date($timestamp) :string {
 
 		// if no timestamp is provided
 		if(!$timestamp) {
@@ -65,7 +65,7 @@ class Format {
 	}
 	
 	// neutral duration
-	public static function duration($seconds, $precision = 0) {
+	public static function duration($seconds, $precision = 0) :string {
 
 		// if no timestamp is provided
 		if(!$seconds) {
@@ -156,7 +156,7 @@ class Format {
 	}
 	
 	// create a link
-	public static function link($string, $url='#', $attributes=array()) {
+	public static function link(string $string, string $url='#', array $attributes=[]) :Element {
 		// build the actual link
 		return(new Element('a', array_merge(array('href'=>$url, 'text'=>$string), $attributes)));
 	}
@@ -210,7 +210,7 @@ class Format {
 	}
 	
 	// will clean the value of anything but 0-9\.- preserve sign return float
-	public static function float($value, $precision = 2) {
+	public static function float($value, $precision = 2) :float {
 		if(strrpos($value, '.')) {
 			$value = str_replace(',', '' , $value);
 		}
@@ -223,9 +223,22 @@ class Format {
 	}
 
 	// convert an array to a csv
-	public static function csv($array, $separator = "\t") {
+	public static function csv(array $array, string $separator = "\t", string $encapsulate_cells = '"') :string {
 
-		// some code goes here
+		// declare our csv
+		$csv = '';
+		// for each line of the array
+		foreach($array as $cells) {
+			// for each cell of that line
+			foreach($cells as $cell) {
+				// protect the cell's value, encapsulate it, and separate it,
+				$csv .= $encapsulate_cells . str_replace($encapsulate_cells, '\\'.$encapsulate_cells, $cell) . $encapsulate_cells . $separator;
+			}
+			// skip to the next line
+			$csv .= "\n";
+		}
+		// return the formatted csv
+		return $csv;
 
 	}
 	

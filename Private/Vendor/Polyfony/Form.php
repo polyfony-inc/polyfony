@@ -15,7 +15,7 @@ namespace Polyfony;
 class Form {
 	
 
-	public static function input($name, $value='', $attributes=array()) {
+	public static function input(string $name, $value='', array $attributes=[]) :Element {
 		// format the form element
 		return(new Element(
 			'input', 
@@ -30,7 +30,7 @@ class Form {
 		));
 	}
 	
-	public static function textarea($name, $value='', $attributes=array()) {
+	public static function textarea(string $name, $value='', array $attributes=[]) :Element {
 		// format the form element
 		return(new Element(
 			'textarea', 
@@ -44,7 +44,7 @@ class Form {
 		));
 	}
 	
-	public static function checkbox($name, $checked=false, $attributes=array()) {
+	public static function checkbox(string $name, bool $checked=false, array $attributes=[]) :Element {
 		// if the checkbox is checked
 		if($checked) {
 			// add to the attributes
@@ -63,7 +63,7 @@ class Form {
 		));
 	}
 	
-	public static function radio($name, $value, $checked=false, $attributes=array()) {
+	public static function radio(string $name, $value, bool $checked=false, array $attributes=[]) :Element {
 		// if the checkbox is checked
 		if($checked) {
 			// add to the attributes
@@ -83,7 +83,7 @@ class Form {
 		));
 	}
 
-	public static function select($name, $options=array(), $value=null, $attributes=array()) {
+	public static function select(string $name, array $options=[], $value=null, array $attributes=[]) :Element {
 		// if multiple and braquets are not trailing yet, add them
 		$name .= isset($attributes['multiple']) && substr($name,0,2) != '[]' ? '[]': '';
 		// format the select element

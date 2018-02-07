@@ -18,7 +18,7 @@ class Bundles {
 	protected static $_configs		= array();
 
 	// will get the list of bundles and get their routes and runtimes
-	public static function init() {
+	public static function init() :void {
 
 		// if cache is enabled and in prod load the cache, else parse bundles
 		Config::isProd() && Cache::has('Includes') ? self::loadCachedDependencies() : self::loadDependencies();
@@ -28,7 +28,7 @@ class Bundles {
 		
 	}
 	
-	private static function loadCachedDependencies() {
+	private static function loadCachedDependencies() :void {
 	
 		// get from the cache
 		$cache = Cache::get('Includes');
@@ -39,7 +39,7 @@ class Bundles {
 		
 	}
 	
-	private static function loadDependencies() {
+	private static function loadDependencies() :void {
 	
 		// for each available bundle
 		foreach(scandir('../Private/Bundles/') as $bundle) {
@@ -66,7 +66,7 @@ class Bundles {
 		
 	}
 	
-	private static function includeLoaders() {
+	private static function includeLoaders() :void {
 		
 		// for each route or runtime filavailablee
 		foreach(array_merge(self::$_routes, self::$_configs) as $file) {
@@ -77,7 +77,7 @@ class Bundles {
 	}
 	
 	// get assets for a bundle
-	public static function getAssets($bundle) {
+	public static function getAssets(string $bundle) :array {
 		// empty list of assets
 		$assets_types = array();
 		// set the assets folder
@@ -99,7 +99,7 @@ class Bundles {
 	}
 	
 	// get locales for a bundle
-	public static function getLocales($bundle) {
+	public static function getLocales(string $bundle) :array {
 
 		// declare an array to hold the list
 		$locales = array();
@@ -122,7 +122,7 @@ class Bundles {
 	}
 	
 	// get the list of available bundles
-	public static function getAvailable() {
+	public static function getAvailable() :array {
 		
 		// return the current list
 		return(self::$_bundles);

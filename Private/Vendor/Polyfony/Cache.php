@@ -13,7 +13,7 @@ namespace Polyfony;
 
 class Cache {
 
-	public static function has($variable) {
+	public static function has(string $variable) :bool {
 		
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
@@ -26,19 +26,23 @@ class Cache {
 				// the file expired, remove it
 				unlink($path);
 				// we don't have that element
-				return(false);
+				return false;
 			}
 			// the cache file has not expired yet
 			else {
 				// we do have the file
-				return(true);
+				return true;
 			}
+		}
+		// file doesn't even ext
+		else {
+			return false;
 		}
 
 	}
 	
 
-	public static function put($variable, $value=null, $overwrite=false, $lifetime=false) {
+	public static function put(string $variable, $value=null, $overwrite=false, $lifetime=false) :bool {
 	
 		// already exists and no overwrite
 		if(self::has($variable) && !$overwrite) {
@@ -59,7 +63,7 @@ class Cache {
 	}
 	
 
-	public static function get($variable) {
+	public static function get(string $variable) {
 		
 		// doesn't exist in the store
 		if(!self::has($variable)) {
@@ -74,7 +78,7 @@ class Cache {
 	}
 	
 	
-	public static function remove($variable) {
+	public static function remove(string $variable) :bool {
 		
 		// doesn't exist in the store
 		if(!self::has($variable)) {

@@ -15,7 +15,7 @@ namespace Polyfony;
 class Filesystem {
 	
 	// this will restrict a path to the data storage folder
-    public static function chroot($path='/', $override = false) {
+    public static function chroot(string $path='/', bool $override = false) {
 
         // if chrooting is enabled in the configuration
         if(Config::get('filesystem', 'chroot') && !$override) {
@@ -37,7 +37,7 @@ class Filesystem {
 
     }
 
-	public static function isDirectory($path, $override_chroot = false) {
+	public static function isDirectory(string $path, bool $override_chroot = false) :bool {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -46,7 +46,7 @@ class Filesystem {
 
 	}
 
-	public static function isFile($path, $override_chroot = false) {
+	public static function isFile(string $path, bool $override_chroot = false) :bool {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -55,7 +55,7 @@ class Filesystem {
 
 	}
 
-	public static function isSymbolic($path, $override_chroot = false) {
+	public static function isSymbolic(string $path, bool $override_chroot = false) :bool {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -64,7 +64,7 @@ class Filesystem {
 
 	}
 
-	public static function isWritable($path, $override_chroot = false) {
+	public static function isWritable(string $path, bool $override_chroot = false) :bool {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -73,12 +73,12 @@ class Filesystem {
 
 	}
 	
-	public static function isNormalName($string) {
+	public static function isNormalName(string $string) :bool {
 		// check if the name starts with a dot
-		return((substr($string,0,1) != '.' ) ? true : false);
+		return(substr($string,0,1) != '.' );
 	}
 
-	public static function exists($path, $override_chroot = false) {
+	public static function exists(string $path, bool $override_chroot = false) :bool {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -87,7 +87,7 @@ class Filesystem {
 
 	}
 	
-	public static function ls($path, $override_chroot = false) {
+	public static function ls(string $path, bool $override_chroot = false) :array {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -113,7 +113,7 @@ class Filesystem {
 
 	}
 
-	public static function symlink($existing_file, $link, $override_chroot = false) {
+	public static function symlink(string $existing_file, string $link, bool $override_chroot = false) :bool {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$existing_file = self::chroot($existing_file, $override_chroot);
@@ -123,7 +123,7 @@ class Filesystem {
 
 	}
 
-	public static function mkdir($path, $mask = 0777, $override_chroot = false) {
+	public static function mkdir(string $path, string $mask = '0777', bool $override_chroot = false) :bool {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -137,7 +137,7 @@ class Filesystem {
 
 	}
 	
-	public static function remove($path, $override_chroot = false) {
+	public static function remove(string $path, bool $override_chroot = false) :bool {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -146,7 +146,7 @@ class Filesystem {
 
 	}
 
-	public static function get($path, $override_chroot = false) {
+	public static function get(string $path, bool $override_chroot = false) :string {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -155,7 +155,7 @@ class Filesystem {
 
 	}
 
-	public static function put($path, $content=null, $override_chroot = false) {
+	public static function put(string $path, $content=null, bool $override_chroot = false) :bool {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -164,7 +164,7 @@ class Filesystem {
 
 	}
 
-	public static function chmod($path, $mask, $override_chroot = false) {
+	public static function chmod(string $path, string $mask, bool $override_chroot = false) :bool {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -173,7 +173,7 @@ class Filesystem {
 
 	}
 
-	public static function chown($path, $user, $override_chroot = false) {
+	public static function chown(string $path, string $user, bool $override_chroot = false) :bool {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -182,7 +182,7 @@ class Filesystem {
 
 	}
 
-	public static function touch($path, $timestamp=null, $override_chroot = false) {
+	public static function touch(string $path, int $timestamp=null, bool $override_chroot = false) :bool {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -191,7 +191,7 @@ class Filesystem {
 
 	}
 
-	public static function copy($source_path, $destination_path, $override_chroot = false) {
+	public static function copy(string $source_path, string $destination_path, bool $override_chroot = false) :bool {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$source_path 		= self::chroot($source_path, $override_chroot);
@@ -201,7 +201,7 @@ class Filesystem {
 
 	}
 
-	public static function info($path, $override_chroot = false) {
+	public static function info(string $path, bool $override_chroot = false) :array {
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -214,7 +214,7 @@ class Filesystem {
 
 	}
 	
-	public static function type($path, $override_chroot = false) {
+	public static function type(string $path, bool $override_chroot = false) {
 		
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);

@@ -24,7 +24,7 @@ class Element {
 	private $content;
 
 	// main constructor
-	public function __construct($type='div', $options=null) {
+	public function __construct(string $type='div', array $options=null) {
 		// initialize variables
 		$this->content 		= '';
 		$this->type 		= $type;
@@ -34,7 +34,7 @@ class Element {
 	}
 
 	// set the text in the tag
-	public function setText($text, $append=true) {
+	public function setText(string $text, bool $append=true) :self {
 		// append by default or replace text
 		$this->content = $append ? $this->content . Format::htmlSafe($text) : Format::htmlSafe($text);
 		// return self
@@ -42,7 +42,7 @@ class Element {
 	}
 
 	// set the html in the tag
-	public function setHtml($html, $append=true) {
+	public function setHtml(string $html, bool $append=true) :self {
 		// append by default or replace html
 		$this->content = $append ? $this->content . $html : $html;
 		// return self
@@ -50,7 +50,7 @@ class Element {
 	}
 
 	// set the value of a tag
-	public function setValue($value) {
+	public function setValue($value) :self {
 		// append by default or replace html
 		$this->attributes['value'] = Format::htmlSafe($value);
 		// return self
@@ -58,7 +58,7 @@ class Element {
 	}
 
 	// set everything, mostly attribute but also content
-	public function set($attribute, $value=null) {
+	public function set($attribute, $value=null) :self {
 		// array is passed
 		if(is_array($attribute)) {
 			// for each associative value in the array
@@ -102,7 +102,7 @@ class Element {
 	}
 
 	// convert our object to an actual html tag
-	public function __toString() {
+	public function __toString() :string {
 		// first tag
 		$html_element = '<' . $this->type;
 		// for each attribute

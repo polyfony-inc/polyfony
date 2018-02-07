@@ -20,7 +20,14 @@ class Database {
 	private static $_config = null;
 
 	// configure the database
-	public static function configure($driver, $database, $hostname=null, $username=null, $password=null, $before=null) {
+	public static function configure(
+		string $driver, 
+		string $database, 
+		string $hostname=null, 
+		string $username=null, 
+		string $password=null, 
+		string $before=null
+	) :void {
 
 		// alter the configuration
 		self::$_config = array(
@@ -42,7 +49,7 @@ class Database {
 	}
 
 	// connect to the database
-	public static function connect() {
+	public static function connect() :void {
 	
 		// if no configuration has been set, configure with the Config.ini
 		self::$_config ?: self::configure(
@@ -118,7 +125,7 @@ class Database {
 	}
 	
 	// instanciate a new query object
-	public static function query() {
+	public static function query() :Query {
 		
 		// if no connection to the database is ready
 		self::$_handle ?: self::connect();
@@ -129,7 +136,7 @@ class Database {
 	}
 	
 	// give the handle to any object that requires it
-	public static function handle() {
+	public static function handle() :\PDO{
 		
 		// if no connection to the database is ready
 		self::$_handle ?: self::connect();
@@ -140,7 +147,7 @@ class Database {
 	}
 
 	// get the description of a table
-	public static function describe($table) {
+	public static function describe(string $table) :array {
 
 		// set the cachefile name
 		$cache_name = ucfirst($table).'Nulls';

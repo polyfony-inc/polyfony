@@ -36,7 +36,7 @@ class Controller {
 	}
 	
 	// include a view
-	final public function view($view_name, $bundle = null) {
+	final public function view(string $view_name, $bundle = null) :void {
 		
 		// set bundle in which the view is
 		$view_bundle = $bundle ? $bundle : Router::getCurrentRoute()->bundle;
@@ -58,7 +58,7 @@ class Controller {
 	}
 	
 	// forward to another controller in the same bundle
-	final public function forward($controller, $action = null) {
+	final public function forward(string $controller, $action = null) :void {
 		
 		// add a profiler marker
 		Profiler::setMarker('forward');
