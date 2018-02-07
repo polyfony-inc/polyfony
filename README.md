@@ -17,12 +17,11 @@ Inspired by Symfony and Laravel but tailored to favour an inclination towards ex
 * ≤ 550 Ko of RAM
 
 ## Requirements
-* PHP >= 5.3 with mbstring and PDO (fully compatible with PHP7)
+* PHP >= 7.1 with mbstring and PDO
 * A rewrite module (mod_rewrite)
 
 ## Installation
 * Point your domain to `/Public/`
-* Under Apache, `/Public/.htaccess` already rewrites everything
 * Under lighttpd, set this rewrite rule
 ```php
 url.rewrite-once = ("^(?!/Assets/).*" => "/?")

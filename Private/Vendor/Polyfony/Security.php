@@ -23,8 +23,8 @@ class Security {
 	protected static $_granted = false;
 	protected static $_account = null;
 	
-	// main authentication method that will authenticated and optionnaly apply a module/level rule
-	public static function enforce($module=null, $level=null) {
+	// main authentication method that will authenticate and optionnaly apply a module/level rule
+	public static function enforce(string $module=null, int $level=null) :void {
 		
 		// if we have a security cookie we authenticate with it
 		!Store\Cookie::has(Config::get('security','cookie')) ?: self::authenticate();
@@ -39,12 +39,16 @@ class Security {
 		!($level && !self::$_granted) ?: self::$_granted = self::hasLevel($level);
 
 		// and now we check if we are granted access
-		self::$_granted ?: self::refuse('You do not have sufficient permissions', 403, false, false);
+		self::$_granted ?: 
+			self::refuse(
+				(!$module && !$level ? 'You are not authenticated' :  'You do not have sufficient permissions'), 
+				403, false, (!$module && !$level)
+			);
 				
 	}
 	
 	// authenticate then close the session
-	public static function disconnect() {
+	public static function disconnect() :void {
 
 		// first authenticate
 		self::enforce();
@@ -67,7 +71,7 @@ class Security {
 	}
 
 	// internal authentication method that will grant access based on an existing session
-	private static function authenticate() {
+	private static function authenticate() :void {
 
 		// if we did not authenticate before
 		if(!self::$_account) {
@@ -102,7 +106,7 @@ class Security {
 	}
 	
 	// internal login method that will open a session
-	private static function login() {
+	private static function login() :void {
 		
 		// look for users with this login
 		$account = Database::query()
@@ -196,7 +200,7 @@ class Security {
 	}
 
 	// internal method to refuse access
-	private static function refuse($message='Forbidden', $code='403', $logout=false, $redirect=true) {
+	private static function refuse(string $message='Forbidden', int $code=403, bool $logout=false, bool $redirect=true) :void {
 		// remove any existing session cookie
 		!$logout ?: Store\Cookie::remove(Config::get('security','cookie'));
 		// we will redirect to the login page
@@ -206,7 +210,7 @@ class Security {
 	}
 
 	// this will check that the opened session matches the current client's signature
-	private static function match($account) {
+	private static function match(\Models\Accounts $account) :bool {
 		// get the session key existing in the database
 		$existing_key = $account->get('session_key');
 		// generate a new session key for this request
@@ -220,7 +224,7 @@ class Security {
 	}
 	
 	// internal method for generating unique signatures
-	private static function getSignature($mixed) {
+	private static function getSignature($mixed) :string {
 		
 		// compute a hash with (the provided string + salt + user agent + remote ip)
 		return(hash(Config::get('security','algo'), 
@@ -231,7 +235,7 @@ class Security {
 	}
 
 	// generate the hash for a specific password (useful for creating users)
-	public static function getPassword($string) {
+	public static function getPassword(string $string) :string {
 		
 		// get a signature using (the provided string + salt)
 		return(hash(Config::get('security','algo'),
@@ -241,7 +245,7 @@ class Security {
 	}
 	
 	// manually check for a specific level
-	public static function hasLevel($level=null) {
+	public static function hasLevel(int $level=null) :bool {
 	
 		// if we have said level
 		return(self::get('id_level', 100) <= $level ? true : false);
@@ -249,7 +253,7 @@ class Security {
 	}
 	
 	// manually check for a specific module
-	public static function hasModule($module=null) {
+	public static function hasModule(string $module=null) :bool {
 		
 		// if module is in our credentials
 		return(in_array($module, self::get('modules_array', array())) ?: false);
@@ -257,13 +261,13 @@ class Security {
 	}
 
 	// check if the user has been authenticated
-	public static function isAuthenticated() {
+	public static function isAuthenticated() :bool {
 		// return the current status
 		return self::$_granted;
 	}
 	
 	// get a specific credential
-	public static function get($credential, $default=null) {
+	public static function get(string $credential, $default=null) {
 
 		// return said credential or default if not authenticated or credential does not exist
 		return(
