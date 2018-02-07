@@ -39,7 +39,7 @@ class Security {
 		!($level && !self::$_granted) ?: self::$_granted = self::hasLevel($level);
 
 		// and now we check if we are granted access
-		self::$_granted ?: self::refuse();
+		self::$_granted ?: self::refuse('You do not have sufficient permissions', 403, false, false);
 				
 	}
 	
@@ -69,30 +69,35 @@ class Security {
 	// internal authentication method that will grant access based on an existing session
 	private static function authenticate() {
 
-		// search for an account with that session key
-		$account = Database::query()
-			->select()
-			->first()
-			->from('Accounts')
-			->where(array('session_key'=>Store\Cookie::get(Config::get('security', 'cookie'))))
-			->whereHigherThan('session_expiration_date', time())
-			->execute();
+		// if we did not authenticate before
+		if(!self::$_account) {
 
-		// if no matching session is found we remove the cookie
-		$account ?: self::refuse('Your session is no longer valid', 403, true);
+			// search for an account with that session key
+			$account = Database::query()
+				->select()
+				->first()
+				->from('Accounts')
+				->where(array('session_key'=>Store\Cookie::get(Config::get('security', 'cookie'))))
+				->whereHigherThan('session_expiration_date', time())
+				->execute();
 
-		// check if the store session key matches the dynamically generated one
-		self::match($account) ?: self::refuse('Your signature has changed, please log-in again', 403, true);
+			// if no matching session is found we remove the cookie
+			$account ?: self::refuse('Your session is no longer valid', 403, true);
 
-		// check account expiration
-		!($account->get('account_expiration_date') && time() > $account->get('account_expiration_date', true)) ?:
-			self::refuse('Your account has expired', 403, true);
+			// check if the store session key matches the dynamically generated one
+			self::match($account) ?: self::refuse('Your signature has changed, please log-in again', 403, true);
 
-		// update our credentials
-		self::$_account = $account;
+			// check account expiration
+			!($account->get('account_expiration_date') && time() > $account->get('account_expiration_date', true)) ?:
+				self::refuse('Your account has expired', 403, true);
 
-		// set access as granted
-		self::$_granted = true;
+			// update our credentials
+			self::$_account = $account;
+
+			// set access as granted
+			self::$_granted = true;
+
+		}
 		
 	}
 	
@@ -201,7 +206,7 @@ class Security {
 	}
 
 	// this will check that the opened session matches the current client's signature
-	private static function match(\Models\Accounts $account) {
+	private static function match($account) {
 		// get the session key existing in the database
 		$existing_key = $account->get('session_key');
 		// generate a new session key for this request
