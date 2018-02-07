@@ -65,13 +65,14 @@ class Query {
 		$this->Object		= null;
 		$this->Table		= null;
 		$this->Operator		= 'AND';
-		$this->Selects		= array();
-		$this->Joins		= array();
-		$this->Conditions	= array();
-		$this->Updates		= array();
-		$this->Inserts		= array();
-		$this->Order		= array();
-		$this->Limit		= array();
+		$this->Selects		= [];
+		$this->Joins		= [];
+		$this->Conditions	= [];
+		$this->Updates		= [];
+		$this->Inserts		= [];
+		$this->Groups		= [];
+		$this->Order		= [];
+		$this->Limit		= [];
 		
 	}
 	
