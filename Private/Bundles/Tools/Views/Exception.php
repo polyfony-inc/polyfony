@@ -1,23 +1,37 @@
 <?php use Polyfony as pf; ?>
+<style type="text/css">
+	.row {
+		padding-top: 2em;
+	}
+	.card {
+		margin-top: 20px; 
+		display: none;
+	}
+	.card-body {
+		padding-bottom: 0;
+	}
+</style>
 <div class="container-fluid">
-	<div class="row">
-		<div class="col-md-4 col-md-offset-4">	
-
+	<div class="row justify-content-center" >
+		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8">	
 			<h1>
-				<span class="glyphicon glyphicon-exclamation-sign"></span> 
+				<span class="<?= $this->icon; ?>"></span> 
 				<?php echo pf\Locales::get($this->Exception->getMessage()); ?>
 			</h1>
 			<div class="">
 				<a href="#" class="btn btn-warning" onclick="reportIncident()">
+					<span class="fa fa-send"></span> 
 					<?php echo pf\Locales::get('Envoyer cet incident à l\'équipe technique'); ?> 
 				</a> 
-				<a href="#" class="btn btn-default" onclick="document.getElementById('trace').style.display='block';">
+				<a href="#" class="btn btn-outline-secondary" onclick="document.getElementById('trace').style.display='block';">
 					<?php echo pf\Locales::get('Détails techniques'); ?> 
-					<span class="glyphicon glyphicon-menu-down"></span>
+					<span class="fa fa-caret-down"></span>
 				</a>
 			</div>
-			<div class="" style="clear:both;padding-top:20px;display:none;" id="trace">
-				<?php echo $this->Trace ?: null; ?>
+			<div class="card" id="trace">
+				<div class="card-body">
+					<?php echo $this->Trace ?: null; ?>
+				</div>
 			</div>
 <textarea id="dump" style="display:none;">
 Date : <?php echo date('r'); ?> 

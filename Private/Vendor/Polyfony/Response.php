@@ -278,7 +278,7 @@ class Response {
 				// if minifying is allowed
 				if(Config::get('response','minify')) {
 					// instanciate a new minifier
-					$minifier = new \Minifier\JS();
+					$minifier = new \MatthiasMullie\Minify\JS();
 					// add our css contents
 					$minifier->add($js_pack_contents);
 					// minify 
@@ -328,7 +328,7 @@ class Response {
 				// if minifying is allowed
 				if(Config::get('response','minify')) {
 					// instanciate a new minifier
-					$minifier = new \Minifier\CSS();
+					$minifier = new \MatthiasMullie\Minify\CSS();
 					// add our css contents
 					$minifier->add($css_pack_contents);
 					// minify 
