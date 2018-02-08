@@ -11,7 +11,7 @@
  */
 
 namespace Polyfony;
- 
+
 class Mail {
 
 	private $title;
@@ -254,7 +254,7 @@ class Mail {
 		}
 
 		// instanciate a new phpmail object (allowing exception to be thrown)
-		$this->mailer = new \PHPMailer\PHPMailer(true);
+		$this->mailer = new \PHPMailer\PHPMailer\PHPMailer(true);
 
 		// configure the mailer from hard config
 		$this->mailer->CharSet 		= $this->charset;

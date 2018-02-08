@@ -2,8 +2,9 @@
 	"name":"sib-retail/polyfony",
 	"description":"Polyfony is a simple and powerfull PHP micro-framework",
 	"keywords": ["lightweight", "fast", "php", "framework"],	
-	"version":"2.1.2",
+	"version":"2.1.3",
 	"license":"GPL-3.0",
+	"type":"project",
 	"authors":[
 		{
 			"name":"AnnoyingTechnology"
