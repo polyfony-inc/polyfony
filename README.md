@@ -21,13 +21,9 @@ Inspired by Symfony and Laravel but tailored to favour an inclination towards ex
 * A rewrite module (mod_rewrite)
 
 ## Installation
-* If you already have Composer, **skip this step**
+
 ```bash
-apt install composer
-```
-* Go to the desired folder and run
-```bash
-composer require sib-retail/polyfony
+git clone https://github.com/sib-retail/polyfony.git
 ```
 * Grant write permissions to your webserver/php on `./Private/Storage/` and `./Public/Assets/`
 * Set the webroot of your webserver to `./Public/`
