@@ -34,7 +34,7 @@ class Element {
 	}
 
 	// set the text in the tag
-	public function setText(string $text, bool $append=true) :self {
+	public function setText(string $text=null, bool $append=true) :self {
 		// append by default or replace text
 		$this->content = $append ? $this->content . Format::htmlSafe($text) : Format::htmlSafe($text);
 		// return self
@@ -42,7 +42,7 @@ class Element {
 	}
 
 	// set the html in the tag
-	public function setHtml(string $html, bool $append=true) :self {
+	public function setHtml(string $html=null, bool $append=true) :self {
 		// append by default or replace html
 		$this->content = $append ? $this->content . $html : $html;
 		// return self
@@ -50,7 +50,7 @@ class Element {
 	}
 
 	// set the value of a tag
-	public function setValue($value) :self {
+	public function setValue($value=null) :self {
 		// append by default or replace html
 		$this->attributes['value'] = Format::htmlSafe($value);
 		// return self
