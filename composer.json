@@ -1,0 +1,37 @@
+{
+	"name":"sib-retail/polyfony",
+	"description":"Polyfony is a simple and powerfull PHP micro-framework",
+	"keywords": ["lightweight", "fast", "php", "framework"],	
+	"version":"2.1.0-alpha",
+	"license":"GPL-3.0",
+	"authors":[
+		{
+			"name":"AnnoyingTechnology"
+		}
+	],
+	"require":{
+		"php":">=7.1.0",
+		"ext-mbstring":"*",
+		"ext-sqlite3":"*",
+		"ext-pdo":"*"
+	},
+	"suggest": {
+		"sib-retail/polyfony-google":"*",
+		"sib-retail/polyfony-bootstrap":"*",
+		"phpmailer/phpmailer":"*",
+		"matthiasmullie/minify":"*"
+	},
+	"config": {
+		"vendor-dir": "Private/Vendor",
+		"bin-dir": "Private/Binaries",
+		"data-dir": "Private/Storage/Data",
+		"cache-dir": "Private/Storage/Cache",
+		"archive-dir": "Private/Storage/Data/Archives",
+		"htaccess-protect": false
+	},
+	"extra": {
+        "installer-paths": {
+            "Private/Bundles/{$name}": ["vendor/package"]
+        }
+    }
+}
