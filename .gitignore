@@ -3,3 +3,5 @@ Private/Storage/Cache/*
 Private/Storage/Data/*
 Private/Storage/Logs/*
 Private/Storage/Store/*
+Private/Binaries/*
+Private/Vendor/*

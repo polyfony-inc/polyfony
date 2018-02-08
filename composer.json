@@ -35,7 +35,7 @@
 	"autoload": {
 		"psr-4": {
 			"Models\\": "Private/Models",
-			"Polyfony\\": "Private/Vendor/Polyfony"
+			"Polyfony\\": "Private/Polyfony"
 		}
 	}
 }

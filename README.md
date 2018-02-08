@@ -21,12 +21,21 @@ Inspired by Symfony and Laravel but tailored to favour an inclination towards ex
 * A rewrite module (mod_rewrite)
 
 ## Installation
-* Point your domain to `/Public/`
+* If you already have Composer, **skip this step**
+```bash
+apt install composer
+```
+* Go to the desired folder and run
+```bash
+composer require sib-retail/polyfony
+```
+* Grant write permissions to your webserver/php on `./Private/Storage/` and `./Public/Assets/`
+* Set the webroot of your webserver to `./Public/`
 * Under lighttpd, set this rewrite rule
 ```php
 url.rewrite-once = ("^(?!/Assets/).*" => "/?")
 ```
-* grant write permissions to your webserver/php/hhvm on `/Private/Storage/` and `/Public/Assets/`
+
 
 ## Quick tour
 You can read this quick tour, or just browse the `../Private/Bundles/Demo/` code.
