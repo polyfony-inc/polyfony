@@ -25,7 +25,7 @@ Current requirements are PHP >= 7.1, ext-pdo, ext-sqlite, ext-mbstring and a rew
 * Download the framework *(and its dependencies)* to your project directory
 
 ```
-composer create-project sib-retail/polyfony your-project-folder
+composer create-project sib-retail/polyfony --stability=dev your-project-folder
 ```
 
 * Grant write permissions to your webserver's user:group
