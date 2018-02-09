@@ -54,13 +54,14 @@ This will update the framework (and its dependencies) to the newest compatible v
 
 ## Deprecated and discontinued features 
 
-| **Previous Feature**   | **Replacement**         | **How to get it**                     | **Status**   |
-|------------------------|-------------------------|---------------------------------------|--------------|
-| Polyfony\Notice()      | Bootstrap\Alert()       | require sib-retail/polyfony-bootstrap | DEPRECATED   |
-| Polyfony\Thumnbail()   | Intervention\Image()    | require intervention/image            | DEPRECATED   |
-| Polyfony\HttpRequest() | Curl\Curl()             | require php-curl-class/php-curl-class | DEPRECATED   |
-| Polyfony\Filesystem()  | Filesystem\Filesystem() | require symfony/filesystem            | DEPRECATED   |
-| Polyfony\Validate()    | -                       | -                                     | DISCONTINUED |
+| **Previous Feature**   | **Status**   | **Replacement**         | **How to get it**                     |
+|------------------------|--------------|-------------------------|---------------------------------------|
+| Polyfony\Notice()      | DEPRECATED   | Bootstrap\Alert()       | require sib-retail/polyfony-bootstrap |
+| Polyfony\Thumnbail()   | DEPRECATED   | Intervention\Image()    | require intervention/image            |
+| Polyfony\HttpRequest() | DEPRECATED   | Curl\Curl()             | require php-curl-class/php-curl-class |
+| Polyfony\Filesystem()  | DEPRECATED   | Filesystem\Filesystem() | require symfony/filesystem            |
+| Polyfony\Uploader()    | DEPRECATED   | FileUpload\FileUpload() | require gargron/fileupload            |
+| Polyfony\Validate()    | DISCONTINUED | -                       | -                                     |
 
 
 

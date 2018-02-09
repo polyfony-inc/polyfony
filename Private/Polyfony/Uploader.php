@@ -31,6 +31,11 @@ class Uploader {
 	
 	// constructor
 	public function __construct() {
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Uploader is deprecated, require gargron/fileupload instead', 
+			E_USER_DEPRECATED
+		);
 		// set the default constraints
 		$this->Limits = new \stdClass();
 		$this->Limits->Size = null;

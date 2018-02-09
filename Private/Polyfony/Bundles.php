@@ -44,7 +44,7 @@ class Bundles {
 		// for each available bundle
 		foreach(scandir('../Private/Bundles/') as $bundle) {
 			// if it's an actual file
-			if(Filesystem::isNormalName($bundle)) {
+			if(substr($bundle,0,1) != '.') {
 				// remember the bundle name
 				self::$_bundles[] = $bundle;
 				// route file
@@ -83,13 +83,13 @@ class Bundles {
 		// set the assets folder
 		$assets_folder = "../Private/Bundles/{$bundle}/Assets/";
 		// if the assets folder exists
-		if(Filesystem::exists($assets_folder, true) && Filesystem::isDirectory($assets_folder, true)) {
+		if(file_exists($assets_folder) && is_dir($assets_folder)) {
 			// for each subfolder in the assets folder
-			foreach(Filesystem::ls($assets_folder, true) as $asset_path => $asset_type) {
-				// if it actually is a subfolder				
-				if(Filesystem::isDirectory($asset_path, true) && Filesystem::isNormalName($asset_type, true)) {
+			foreach(scandir($assets_folder) as $asset_type) {
+				// if it's a folder, and a normal one
+				if(substr($asset_type,0,1) != '.' && is_dir($assets_folder.$asset_type)) {	
 					// spool it with a trailing slash
-					$assets_types[$asset_type] = $asset_path;
+					$assets_types[$asset_type] = "{$assets_folder}{$asset_type}/";
 				}
 			}
 		}
@@ -106,11 +106,11 @@ class Bundles {
 		// set the locales path
 		$locales_path = "../Private/Bundles/{$bundle}/Locales/";
 		// if the directory exists
-		if(Filesystem::exists($locales_path, true) && Filesystem::isDirectory($locales_path, true)) {
+		if(file_exists($locales_path) && is_dir($locales_path)) {
 			// for each file in the directory
 			foreach(scandir($locales_path) as $locales_file) {
 				// if the file is a normal one
-				if(Filesystem::isNormalName($locales_file)) {
+				if(substr($locales_file,0,1) != '.' ) {
 					// push it into the array of locales
 					$locales[] = $locales_path . $locales_file ;
 				}

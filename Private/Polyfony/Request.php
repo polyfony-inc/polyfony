@@ -150,7 +150,7 @@ class Request {
 	 * @return mixed
 	 * @static
 	 */
-	public static function post(srting $variable, $default = null) {
+	public static function post(string $variable, $default = null) {
 		return isset(self::$_post[$variable])
 			? self::$_post[$variable]
 			: $default;

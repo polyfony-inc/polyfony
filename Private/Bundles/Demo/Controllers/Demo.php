@@ -57,11 +57,37 @@ class DemoController extends pf\Controller {
 			'danger',null, 'Lorem ipsum, dolor sit amet'
 		);
 
+		$modal = new Bootstrap\Modal();
+		$modal
+			->setTitle([
+				'text'=>'Which do you prefer ?'
+			],'fa fa-car')
+			->setBody([
+				'html'=>'I mean <strong>good</strong> cars ?'
+			])
+			->addOption([
+				'text'=>'Me likey Porsche',
+				'class'=>'btn btn-secondary'
+			],'fa fa-car')
+			->addOption([
+				'text'=>'Me likey Ferrari',
+				'class'=>'btn btn-danger'
+			],'fa fa-car')
+			->addOption([
+				'text'=>'Me likey McLaren',
+				'class'=>'btn btn-warning'
+			],'fa fa-car')
+			->setTrigger([
+				'text'=>' Do you like cars ?',
+				'class'=>'btn btn-primary'
+			], 'fa fa-car');
+
 		// adopt the alerts and dump them
 		echo $container
 			->adopt($successAlert)
 			->adopt($warningAlert)
-			->adopt($dangerAlert);
+			->adopt($dangerAlert)
+			->adopt($modal);
 
 	}
 
