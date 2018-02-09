@@ -97,7 +97,7 @@ class Config {
 
 	}
 	
-	public static function set(string $group, string $key, $value=null) :void {
+	public static function set(string $group, $key, $value=null) :void {
 		// if only group + one parameters, set the whole group, else set a key of the group
 		$value !== null ? self::$_config['Current'][$group][$key] = $value : self::$_config['Current'][$group] = $key;
 	}
