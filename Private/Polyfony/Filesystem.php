@@ -17,6 +17,12 @@ class Filesystem {
 	// this will restrict a path to the data storage folder
     public static function chroot(string $path='/', bool $override = false) {
 
+    	// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
+
         // if chrooting is enabled in the configuration
         if(Config::get('filesystem', 'chroot') && !$override) {
             // if the path already has the proper (ch)root
@@ -39,6 +45,12 @@ class Filesystem {
 
 	public static function isDirectory(string $path, bool $override_chroot = false) :bool {
 
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
+
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
 		// check if the path is a directory
@@ -47,6 +59,12 @@ class Filesystem {
 	}
 
 	public static function isFile(string $path, bool $override_chroot = false) :bool {
+
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -57,6 +75,12 @@ class Filesystem {
 
 	public static function isSymbolic(string $path, bool $override_chroot = false) :bool {
 
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
+
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
 		// check if it is symbolic
@@ -66,6 +90,12 @@ class Filesystem {
 
 	public static function isWritable(string $path, bool $override_chroot = false) :bool {
 
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
+
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
 		// check if it is writable
@@ -74,11 +104,25 @@ class Filesystem {
 	}
 	
 	public static function isNormalName(string $string) :bool {
+
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
+
 		// check if the name starts with a dot
 		return(substr($string,0,1) != '.' );
+
 	}
 
 	public static function exists(string $path, bool $override_chroot = false) :bool {
+
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -88,6 +132,12 @@ class Filesystem {
 	}
 	
 	public static function ls(string $path, bool $override_chroot = false) :array {
+
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -115,6 +165,12 @@ class Filesystem {
 
 	public static function symlink(string $existing_file, string $link, bool $override_chroot = false) :bool {
 
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
+
 		// if chroot is enabled, restrict the path to the chroot
 		$existing_file = self::chroot($existing_file, $override_chroot);
 		$link = self::chroot($link, $override_chroot);
@@ -124,6 +180,12 @@ class Filesystem {
 	}
 
 	public static function mkdir(string $path, string $mask = '0777', bool $override_chroot = false) :bool {
+
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -139,6 +201,12 @@ class Filesystem {
 	
 	public static function remove(string $path, bool $override_chroot = false) :bool {
 
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
+
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
 		// if path exists and is a file
@@ -147,6 +215,12 @@ class Filesystem {
 	}
 
 	public static function get(string $path, bool $override_chroot = false) :string {
+
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -157,6 +231,12 @@ class Filesystem {
 
 	public static function put(string $path, $content=null, bool $override_chroot = false) :bool {
 
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
+
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
 		// put the content in a file
@@ -165,6 +245,12 @@ class Filesystem {
 	}
 
 	public static function chmod(string $path, string $mask, bool $override_chroot = false) :bool {
+
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -175,6 +261,12 @@ class Filesystem {
 
 	public static function chown(string $path, string $user, bool $override_chroot = false) :bool {
 
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
+
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
 		// apply the chmod
@@ -183,6 +275,12 @@ class Filesystem {
 	}
 
 	public static function touch(string $path, int $timestamp=null, bool $override_chroot = false) :bool {
+
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -193,6 +291,12 @@ class Filesystem {
 
 	public static function copy(string $source_path, string $destination_path, bool $override_chroot = false) :bool {
 
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
+
 		// if chroot is enabled, restrict the path to the chroot
 		$source_path 		= self::chroot($source_path, $override_chroot);
 		$destination_path 	= self::chroot($destination_path, $override_chroot);
@@ -202,6 +306,12 @@ class Filesystem {
 	}
 
 	public static function info(string $path, bool $override_chroot = false) :array {
+
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
 
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);
@@ -215,6 +325,12 @@ class Filesystem {
 	}
 	
 	public static function type(string $path, bool $override_chroot = false) {
+		
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Filesystem is deprecated, require symfony/filesystem instead', 
+			E_USER_DEPRECATED
+		);
 		
 		// if chroot is enabled, restrict the path to the chroot
 		$path = self::chroot($path, $override_chroot);

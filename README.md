@@ -18,7 +18,7 @@ Inspired by Symfony and Laravel but tailored to favour an inclination towards ex
 
 ## Requirements
 * **See composer.json for the requirement**
-Current requirements are PHP >= 7.1, ext-pdo, ext-sqlite, ext-mbstring and a rewrite module (mod_rewrite)
+Current *hard* requirements are PHP >= 7.1, ext-pdo, ext-sqlite3, ext-mbstring and a rewrite module (mod_rewrite)
 
 ## Installation
 
@@ -51,6 +51,18 @@ composer update
 ```
 
 This will update the framework (and its dependencies) to the newest compatible version without damaging your code or data.
+
+## Deprecated and discontinued features 
+
+| **Previous Feature**   | **Replacement**         | **How to get it**                     | **Status**   |
+|------------------------|-------------------------|---------------------------------------|--------------|
+| Polyfony\Notice()      | Bootstrap\Alert()       | require sib-retail/polyfony-bootstrap | DEPRECATED   |
+| Polyfony\Thumnbail()   | Intervention\Image()    | require intervention/image            | DEPRECATED   |
+| Polyfony\HttpRequest() | Curl\Curl()             | require php-curl-class/php-curl-class | DEPRECATED   |
+| Polyfony\Filesystem()  | Filesystem\Filesystem() | require symfony/filesystem            | DEPRECATED   |
+| Polyfony\Validate()    | -                       | -                                     | DISCONTINUED |
+
+
 
 ## Quick tour
 You can read this quick tour, or just browse the `Private/Bundles/Demo/` code.
