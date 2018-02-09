@@ -102,10 +102,12 @@ class Response {
 	}
 	
 	private static function isCachable() {
-		// response is cachable, cache time is set, status is 200, type is not file,  method is get
+		// response is cachable, cache time is set, status is 200, type is not file,  
+		// method is get, it is not ran is CLI mode (as cli is used for maintenance mainly)
 		return(
 			Config::get('response', 'cache') && self::$_status == '200' && 
-			self::$_outputCache && self::$_type != 'file' && !Request::isPost()
+			self::$_outputCache && self::$_type != 'file' && !Request::isPost() &&
+			!Request::isCli()
 		);
 	}
 

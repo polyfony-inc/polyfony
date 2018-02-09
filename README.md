@@ -22,16 +22,10 @@ Current requirements are PHP >= 7.1, ext-pdo, ext-sqlite, ext-mbstring and a rew
 
 ## Installation
 
-* Download the framework *(and its dependencies)* to your project directory
+* Run this command to download the framework *(and its dependencies)* to your project directory
 
 ```
 composer create-project sib-retail/polyfony --stability=dev your-project-folder
-```
-
-* Grant write permissions to your webserver's user:group
-
-```
-chown -R www-data:www-data Private/Storage Public/Assets
 ```
 
 * With lighttpd, set the webroot of your webserver to `Public/` *(or requivalent config for Apache/NginX)*
