@@ -34,5 +34,11 @@
 			"Models\\": "Private/Models",
 			"Polyfony\\": "Private/Polyfony"
 		}
-	}
+	},
+	"scripts": {
+        "post-create-project-cmd": [
+            "chown -R www-data:www-data Private/Storage Public/Assets",
+            "chmod -R 777 Private/Storage Public/Assets"
+        ]
+    }
 }

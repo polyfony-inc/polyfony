@@ -27,22 +27,22 @@ class Request {
 	private static $_port;
 	private static $_signature;
 	
-	public static function init() {
+	public static function init() :void {
 
 		// set proper context depending if we are in command line
 		self::$_context = isset($_SERVER['argv'][0]) ? 'CLI' : 'HTTP';
 		
 		// set current URL depending on the context
-		self::$_url = self::$_context == 'CLI' ? $_SERVER['argv'][2] : $_SERVER['REQUEST_URI'];
+		self::$_url = self::isCli() ? (isset($_SERVER['argv'][2]) ? $_SERVER['argv'][2] : '/') : $_SERVER['REQUEST_URI'];
 		
 		// set the request method depending if post method is properly set
-		self::$_method = $_SERVER['REQUEST_METHOD'] === 'POST' ? 'post' : 'get';
+		self::$_method = isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' ? 'post' : 'get';
 
 		// set the request protocol
 		self::$_protocol = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http';
 
 		// set the request port
-		self::$_port = $_SERVER['SERVER_PORT'];
+		self::$_port = isset($_SERVER['SERVER_PORT']) ? $_SERVER['SERVER_PORT'] : null;
 
 		// set the request signature with post, if any
 		self::$_signature = self::isPost() ? sha1(self::$_url.json_encode($_POST)) : sha1(self::$_url);
@@ -54,7 +54,7 @@ class Request {
 		self::$_files	= isset($_FILES)			? $_FILES			: array();
 		self::$_argv	= isset($_SERVER['argv'])	? $_SERVER['argv']	: array();
 
-		// set the headers with a  FPM fix
+		// set the headers with a FPM fix
 		function_exists('getallheaders') ? self::$_headers = getallheaders() : self::setHeaders();
 
 		// remove globals
@@ -62,42 +62,35 @@ class Request {
 
 	}
 	
-	public static function getContext() {
-		
-		// return current context
-		return(self::$_context);	
-		
-	}
-	
-	public static function getUrl() {
+	public static function getUrl() :string {
 		
 		// get current url
 		return(self::$_url ?: '/');
 		
 	}
 	
-	public static function getSignature() {
+	public static function getSignature() :string {
 		
 		// return current signature
 		return(self::$_signature);
 		
 	}
 
-	public static function getProtocol() {
+	public static function getProtocol() :string {
 
 		// return current protocol
 		return(self::$_protocol);
 
 	}
 
-	public static function getPort() {
+	public static function getPort() :int {
 
 		// return current port
-		return(self::$_port);
+		return((int)self::$_port);
 
 	}
 	
-	private static function setHeaders() {
+	private static function setHeaders() :void {
 	
 		// for each $_server key
 		foreach(self::$_server as $name => $value) { 
@@ -110,7 +103,7 @@ class Request {
 		
 	}
 	
-	public static function setUrlParameter($key,$value=null) {
+	public static function setUrlParameter(string $key, $value=null) :void {
 		
 		// set the value
 		self::$_get[$key] = $value;
@@ -126,7 +119,7 @@ class Request {
 	 * @return mixed
 	 * @static
 	 */
-	public static function header($variable=null, $default=null) {
+	public static function header(string $variable, $default=null) {
 		return isset(self::$_headers[$variable])
 			? self::$_headers[$variable]
 			: $default;
@@ -142,7 +135,7 @@ class Request {
 	 * @return mixed
 	 * @static
 	 */
-	public static function get($variable, $default = null) {
+	public static function get(string $variable, $default = null) {
 		return isset(self::$_get[$variable])
 			? urldecode(self::$_get[$variable])
 			: $default;
@@ -157,7 +150,7 @@ class Request {
 	 * @return mixed
 	 * @static
 	 */
-	public static function post($variable, $default = null) {
+	public static function post(srting $variable, $default = null) {
 		return isset(self::$_post[$variable])
 			? self::$_post[$variable]
 			: $default;
@@ -172,7 +165,7 @@ class Request {
 	 * @return mixed
 	 * @static
 	 */
-	public static function files($variable, $default = null) {
+	public static function files(string $variable, $default = null) {
 		return isset(self::$_files[$variable])
 			? self::$_files[$variable]
 			: $default;
@@ -187,7 +180,7 @@ class Request {
 	 * @return mixed
 	 * @static
 	 */
-	public static function server($variable, $default = null) {
+	public static function server(string $variable, $default = null) {
 		return isset(self::$_server[$variable])
 			? self::$_server[$variable]
 			: $default;
@@ -203,11 +196,25 @@ class Request {
 	 * @return mixed
 	 * @static
 	 */
-	public static function argv($variable, $default = null) {
+	public static function argv(string $variable, $default = null) {
 		return isset(self::$_argv[$variable])
 			? self::$_argv[$variable]
 			: $default;
 	}
+
+	/**
+	 * Check if the request is done in command line interface.
+	 *
+	 * @access public
+	 * @return boolean
+	 * @static
+	 */
+	public static function isCli() :bool {
+		
+		// if method is post return true
+		return self::$_context == 'CLI';
+		
+	}	
 
 	/**
 	 * Check whether the users request was a standard request, or via Ajax.
@@ -216,7 +223,7 @@ class Request {
 	 * @return boolean
 	 * @static
 	 */
-	public static function isAjax() {
+	public static function isAjax() :bool {
 		return isset(self::$_server['HTTP_X_REQUESTED_WITH'])
 			&& strtolower(self::$_server['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest';
 	}
@@ -228,10 +235,10 @@ class Request {
 	 * @return boolean
 	 * @static
 	 */
-	public static function isPost() {
+	public static function isPost() :bool {
 		
 		// if method is post return true
-		return(self::$_method == 'post' ? true : false);
+		return self::$_method == 'post';
 		
 	}
 
@@ -242,10 +249,10 @@ class Request {
 	 * @return boolean
 	 * @static
 	 */
-	public static function isSecure() {
+	public static function isSecure() :bool {
 		
 		// if method is post return true
-		return(self::$_protocol == 'https' ? true : false);
+		return self::$_protocol == 'https';
 		
 	}	
 	

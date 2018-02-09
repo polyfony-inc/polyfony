@@ -26,7 +26,7 @@ class Config {
 		);
 	
 		// depending on the context, detect environment differently
-		Request::getContext() == 'CLI' ? self::detectFromCLI() : self::detectFromHTTP();
+		Request::isCli() ? self::detectFromCLI() : self::detectFromHTTP();
 		
 		// merge the base configuration with the environment specific one
 		self::merge();

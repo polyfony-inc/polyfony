@@ -5,16 +5,4 @@ Private/Storage/Logs/*
 Private/Storage/Store/*
 Private/Binaries/*
 Private/Vendor/*
-
-# -------------------------------------
-# .gitignore (Draft for future release)
-#
-# Public/Assets/*
-# Private/Storage/*
-# Private/Binaries/*
-# Private/Vendor/*
-# Private/Bundles/*
-# Private/Models/*
-# Private/Config/*
-# 
-# -------------------------------------
+composer.lock

@@ -55,13 +55,22 @@ class MainController extends Pf\Controller {
 			}
 		}
 
-		// set a notice depending on the presence of errors
-		$this->notice = $has_error ? 
-			new Bootstrap\Alert('danger','Error!','Please check the permissions and folder structure') :
-			new Bootstrap\Alert('success','Success!','Symlinks have been created');
-
-		// view the main index
-		$this->view('Index');
+		// if the request is from a command line script
+		if(pf\Request::isCli()) {
+			// output some json
+			pf\Response::setType('json');
+			pf\Response::setContent(!$has_error);
+			pf\Response::render();
+		}
+		// the request is done manually thru the web
+		else {
+			// set a notice depending on the presence of errors
+			$this->notice = $has_error ? 
+				new Bootstrap\Alert('danger','Error!','Please check the permissions and folder structure') :
+				new Bootstrap\Alert('success','Success!','Symlinks have been created');
+			// view the main index
+			$this->view('Index');
+		}
 
 	}
 

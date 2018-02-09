@@ -454,7 +454,7 @@ class Response {
 			self::$_content = Format::minify(self::$_content);
 		}
 		// if the type is not a file and compression is allowed
-		if(self::$_type != 'file' && Config::get('response', 'compress')) {
+		if(self::$_type != 'file' && Config::get('response', 'compress') && !Request::isCli()) {
 			// compress
 			self::$_content = gzencode(self::$_content);
 			// add header
