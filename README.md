@@ -17,25 +17,50 @@ Inspired by Symfony and Laravel but tailored to favour an inclination towards ex
 * ≤ 550 Ko of RAM
 
 ## Requirements
-* PHP >= 7.1 with mbstring and PDO
-* A rewrite module (mod_rewrite)
+* **See composer.json for the requirement**
+Current requirements are PHP >= 7.1, ext-pdo, ext-sqlite, ext-mbstring and a rewrite module (mod_rewrite)
 
 ## Installation
 
-```bash
-git clone https://github.com/sib-retail/polyfony.git
+* Download the framework *(and its dependencies)* to your project directory
+
 ```
-* Grant write permissions to your webserver/php on `./Private/Storage/` and `./Public/Assets/`
-* Set the webroot of your webserver to `./Public/`
-* Under lighttpd, set this rewrite rule
-```php
-url.rewrite-once = ("^(?!/Assets/).*" => "/?")
+composer create-project sib-retail/polyfony your-project-folder
 ```
 
+* Grant write permissions to your webserver's user:group
+
+```
+chown -R www-data:www-data Private/Storage Public/Assets
+```
+
+* With lighttpd, set the webroot of your webserver to `Public/` *(or requivalent config for Apache/NginX)*
+```
+server.document-root = "/var/www/your-project-folder/Public/"
+```
+
+* With lighttpd, set this rewrite rule *(or equivalent rule for Apache/NginX)*
+
+```
+url.rewrite-once = (
+    "^(?!/Assets/).*" => "/?"
+)
+```
+
+
+## Updating the framework
+
+* To updade the framework, run this command from your project directory
+
+```bash
+composer update
+```
+
+This will update the framework (and its dependencies) to the newest compatible version without damaging your code or data.
 
 ## Quick tour
-You can read this quick tour, or just browse the `../Private/Bundles/Demo/` code.
-The code bellow assumes that your are using the `Polyfony` namespace in your controller.
+You can read this quick tour, or just browse the `Private/Bundles/Demo/` code.
+The code bellow assumes that your are using the `Polyfony` namespace before each call.
 
 ### Request
 * retrieve an url parameter
@@ -184,7 +209,7 @@ the framework will import that information (and cache it, so empty the cache if 
 
 * Each bundle has a file to place your routes
 ```php
-../Private/Bundles/{BundleName}/Loader/Route.php
+Private/Bundles/{BundleName}/Loader/Route.php
 ```
 
 In these files you can declare as many routes as you like. 
@@ -196,7 +221,7 @@ Dynamic routes can point to different actions depending on a URL parameter, spec
 If no action is provided, indexAction is called, if an action is provided but none match, `defaultAction()` is called.
 A `preAction()` and `postAction()` wrap the action to be called.
 
-* This static route will match /about-us/ and call `../Private/Bundles/Pages/Controllers/Static.php->aboutUsAction();`
+* This static route will match /about-us/ and call `Private/Bundles/Pages/Controllers/Static.php->aboutUsAction();`
 
 ```php
 Router::addRoute('about-us')
@@ -205,7 +230,7 @@ Router::addRoute('about-us')
 ```
 
 * This dynamic route will match /admin/{edit,update,delete,create}/ and /admin/
-It will call `../Private/Bundles/Admin/Controllers/Main.php->{edit,update,delete,create,index}Action();`
+It will call `Private/Bundles/Admin/Controllers/Main.php->{edit,update,delete,create,index}Action();`
 ```php
 Router::addRoute('admin')
 	->url('/admin/:action/:id/')
@@ -223,7 +248,7 @@ a boolean true (it will match anything but a missing value)
 
 ### Environments
 
-By default the `../Private/Config/Config.ini` file is loaded.
+By default the `Private/Config/Config.ini` file is loaded.
 You can use environment specific configuration files by detecting the current domain, or the current port.
 ```
 [polyfony]
@@ -231,7 +256,7 @@ detection_method = "domain" ; or "port"
 ```
 Then the framework will overrides Config.ini values with those of :
 ```
-../Private/Config/Dev.ini
+Private/Config/Dev.ini
 
 [router]
 domain = development.domain.dev
@@ -239,7 +264,7 @@ port = 8080
 ```
 Or, if you are not running the development port :
 ```
-../Private/Config/Prod.ini
+Private/Config/Prod.ini
 
 [router]
 domain = production.domain.prod
@@ -265,10 +290,14 @@ Having specific ini configuration files for development and production allows yo
 Security::enforce();
 ```
 
+Failure to authenticate will throw an exception, and redirect to `Config.ini` -> `router[login_route] = ""`
+
 * If you want to require a specific module (that can be bypassed by a level optionally)
 ```php
 Security::enforce('MOD_NAME', $bypass_level);
 ```
+
+Failure to comply with those requirements will throw an exception, but won't redirect the user anywhere.
 
 * To check manually for credentials 
 ```php
@@ -468,8 +497,8 @@ Config::get($group, $key);
 ```php
 $thumbnail = new Thumbnail();
 $status = $thumbnail
-	->source("../Private/Storage/Data/Photos/Original/photo.jpg")
-	->destination("../Private/Storage/Data/Photos/400/photo.jpg")
+	->source("Private/Storage/Data/Photos/Original/photo.jpg")
+	->destination("Private/Storage/Data/Photos/400/photo.jpg")
 	->size(400)
 	->quality(90)
 	->execute();
@@ -487,7 +516,7 @@ You can get the generated name using the `name()` method, `info()` will also giv
 $uploader = new Uploader();
 $status = $uploader
 	->source(Request::files('estimate_file'))
-	->destination('../Private/Storage/Data/Estimates/')
+	->destination('Private/Storage/Data/Estimates/')
 	->limitTypes(array('application/pdf'))
 	->limitSize(1024*1024*2)
 	->execute();
@@ -690,7 +719,7 @@ To obtain, say, a password field, simply add this to your array of attributes : 
 ### Filesystem
 
 The filesystem class allows you to manipulate directories and files easily.
-It is recommanded that you store all data in `../Privata/Storage/Data/` wich is configured by default in `Config.ini` under `[filesystem]`.
+It is recommanded that you store all data in `Privata/Storage/Data/` wich is configured by default in `Config.ini` under `[filesystem]`.
 You can force all operation to occur inside of this path by setting chroot option to true under `[filesystem]`.
 
 
@@ -698,7 +727,7 @@ You can force all operation to occur inside of this path by setting chroot optio
 Filesystem::mkdir('/my-directory/', '0777');
 Filesystem::mkdir('../../../../my-directory/', '0777');
 ```
-* Both commands will create `../Private/Storage/Data/my-directory/`
+* Both commands will create `Private/Storage/Data/my-directory/`
 
 If you want to operate outside of the Data storage folder, set the last parameter, which is a chroot bypass, to true. The following example will break out of the chroot. Or simply disable the chroot option in the `Config.ini`
 
