@@ -277,8 +277,8 @@ Config::get('group', 'key')
 ```
 
 Having specific ini configuration files for development and production allows your to :
-* set an bypass email to redirect all email sent in development environment
-* enable compression, obfuscation and cache only in production
+* set a bypass email to redirect all email sent in development environment
+* enable compression, obfuscation/minifying and caching only in production
 * show the profiler stack in development
 * use different database configuration in development or production
 * etc.
@@ -290,7 +290,7 @@ Having specific ini configuration files for development and production allows yo
 Security::enforce();
 ```
 
-Failure to authenticate will throw an exception, and redirect to `Config.ini` -> `router[login_route] = ""`
+Failure to authenticate will throw an exception, and redirect to `Private/Config/Config.ini` -> `[router]` -> `login_route = ""`
 
 * If you want to require a specific module (that can be bypassed by a level optionally)
 ```php
