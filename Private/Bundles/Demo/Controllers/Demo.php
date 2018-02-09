@@ -33,6 +33,89 @@ class DemoController extends pf\Controller {
 		$this->view('Demo');
 	}
 	
+	public function vendorBootstrapAction() {
+
+		/*
+
+		bootstrap/alert replaces the old polyfony/notice
+		
+		$container = new pf\Element('div',['class'=>'col-10 offset-1']);
+		echo $container->adopt(new Polyfony\Notice\Success('Description', 'Title'));
+
+		*/
+
+		// just a bootstrap container to align the alerts
+		$container = new pf\Element('div', ['class'=>'col-10 offset-1']);
+
+		$successAlert = new Bootstrap\Alert(
+			'success','Lorem ipsum', 'Dolor sit amet sed ut perspicadis', 'Footer'
+		);
+		$warningAlert = new Bootstrap\Alert(
+			'warning','Lorem ipsum', 'Dolor sit amet sed ut perspicadis', 'Footer'
+		);
+		$dangerAlert = new Bootstrap\Alert(
+			'danger',null, 'Lorem ipsum, dolor sit amet'
+		);
+
+		// adopt the alerts and dump them
+		echo $container
+			->adopt($successAlert)
+			->adopt($warningAlert)
+			->adopt($dangerAlert);
+
+	}
+
+	public function vendorGoogleAction() {
+
+		echo new pf\Element('h1', ['text'=>'Demo of Vendor/Google']);
+		echo new pf\Element('p', ['text'=>'Please note that if you get errors, it is because you should provide a Google API key.']);
+		// address geocoder
+		$address = 'Arc de triomphe, Paris';
+		echo new pf\Element('code', ['text'=>"Google\Position::address('{$address}')"]);
+		var_dump(
+			Google\Position::address($address)
+		);
+		
+		echo new pf\Element('hr');
+
+		// reverse geocoder
+		echo new pf\Element('code', ['text'=>"Google\Position::reverse('48.873','2.292')"]);
+		var_dump(
+			Google\Position::reverse(48.873,2.292)
+		);
+
+		echo new pf\Element('hr');
+
+		// google map
+		echo new pf\Element('code', ['text'=>"new Google\Map('roadmap',400,12, 48.873, 2.292)"]);
+		echo new pf\Element('br');
+
+		$map = new Google\Map('roadmap',400,12, 48.873, 2.292);
+		echo new pf\Element('a', [
+			'href'	=>$map->url(),
+			'target'=>'_blank',
+			'text'	=>'Open map image',
+			'class'	=>'btn btn-outline-primary'
+		]);
+
+		echo new pf\Element('hr');
+
+		// google street view
+		echo new pf\Element('code', ['text'=>"new Google\Photo(400)->position(48.873,2.292)"]);
+		echo new pf\Element('br');
+
+		$photo = (new Google\Photo(400, 90, 10))->position(48.873,2.292);
+		echo new pf\Element('a', [
+			'href'	=>$photo->url(),
+			'target'=>'_blank',
+			'text'	=>'Open streetview image',
+			'class'	=>'btn btn-outline-primary'
+
+		]);
+
+
+	}
+
 	public function loginAction() {	
 
 		// add a notice

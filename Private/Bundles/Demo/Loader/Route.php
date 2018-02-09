@@ -13,7 +13,19 @@ Polyfony\Router::addRoute('demo')
 	// restrict some parameters values
 	->restrict(array(
 		// the type, if set, can only be on of those or the roule will not match
-		'type'=>array('login','secure','disconnect','database','locales','request','response','exception','json')
+		'type'=>array(
+			'login',
+			'secure',
+			'disconnect',
+			'database',
+			'locales',
+			'request',
+			'response',
+			'exception',
+			'json',
+			'vendorBootstrap',
+			'vendorGoogle'
+		)
 	))
 	// set the destination for that route, Bundle, Controller, (optional) Action
 	->destination('Demo','Demo')
