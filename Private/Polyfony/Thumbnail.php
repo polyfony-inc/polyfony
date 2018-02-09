@@ -42,6 +42,11 @@ class Thumbnail {
 	protected	$Error;
 
 	public function __construct() {
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\Thumbnail is deprecated, require intervention/image instead', 
+			E_USER_DEPRECATED
+		);
 		// set the default maximum size
 		$this->Maximum = 1024;
 		// set default quality

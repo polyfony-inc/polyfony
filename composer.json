@@ -21,6 +21,9 @@
 		"sib-retail/polyfony-bootstrap": "dev-master",
 		"sib-retail/polyfony-sync": "dev-master"
 	},
+	"suggest": {
+		"intervention/image":"^2.4"
+	},
 	"config": {
 		"vendor-dir": "Private/Vendor",
 		"bin-dir": "Private/Binaries",

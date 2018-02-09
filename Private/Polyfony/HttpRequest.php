@@ -30,6 +30,12 @@ class HttpRequest {
 	// the constructor
 	public function __construct($url='/', $method='GET', $timeout=60, $retry=3) {
 
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Polyfony\HttpRequest is deprecated, require php-curl-class/php-curl-class instead', 
+			E_USER_DEPRECATED
+		);
+
 		// request initialization
 		$this->url 				= $url;
 		$this->method 			= $method;
