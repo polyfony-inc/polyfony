@@ -167,7 +167,7 @@ class Mail {
 		// single recipient provided
 		else {
 			// if the file exists
-			if(Filesystem::exists($file_path)) {
+			if(file_exists($file_path)) {
 				// push to the table
 				$this->files[$file_path] = $file_name;
 			}
@@ -183,7 +183,7 @@ class Mail {
 
 	public function template($template_path) {
 		// if the template file exists
-		if(Filesystem::exists($template_path)) {
+		if(file_exists($template_path)) {
 			// set the path
 			$this->template = $template_path;
 		}
@@ -305,7 +305,7 @@ class Mail {
 		// if a template exists, use it
 		if($this->template) {
 			// replace the body with the template
-			$this->body = Filesystem::get($this->template);
+			$this->body = file_get_contents($this->template);
 			// for each variables available
 			foreach($this->variables as $key => $value) {
 				// replace in the body

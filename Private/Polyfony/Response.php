@@ -262,7 +262,7 @@ class Response {
 			$js_pack_name = Keys::generate(self::$_assets['Js']) . '.js';
 			$js_pack_file = "../Private/Storage/Cache/Assets/Js/{$js_pack_name}";
 			// if the pack file doesn't exist yet
-			if(!Filesystem::exists($js_pack_file, true)) {
+			if(!file_exists($js_pack_file)) {
 				// the content of the pack
 				$js_pack_contents = '';
 				// for each asset
@@ -312,7 +312,7 @@ class Response {
 			$css_pack_name = Keys::generate(self::$_assets['Css']) . '.css';
 			$css_pack_file = "../Private/Storage/Cache/Assets/Css/{$css_pack_name}";
 			// if the pack file doesn't exist yet
-			if(!Filesystem::exists($css_pack_file, true)) {
+			if(!file_exists($css_pack_file)) {
 				// the content of the pack
 				$css_pack_contents = '';
 				// for each asset
@@ -360,18 +360,18 @@ class Response {
 		// if we are allowed to use the assets packing feature
 		if(Config::isProd() && (Config::get('response','pack_css') == 1 || Config::get('response','pack_js') == 1 )) {
 			// create css and js packing cache directories
-			Filesystem::mkdir('../Private/Storage/Cache/Assets/Css/', 0777, true);
-			Filesystem::mkdir('../Private/Storage/Cache/Assets/Js/', 0777, true);
+			mkdir('../Private/Storage/Cache/Assets/Css/', 0777, true);
+			mkdir('../Private/Storage/Cache/Assets/Js/', 0777, true);
 			// if the general assets file do not exist
-			Filesystem::mkdir('./Assets/Css/', 0777, true);
-			Filesystem::mkdir('./Assets/Js/', 0777, true);
+			mkdir('./Assets/Css/', 0777, true);
+			mkdir('./Assets/Js/', 0777, true);
 			// create css and js public symlinks if it doesn't exist already
-			if(!Filesystem::isSymbolic('./Assets/Css/Cache', true)) {
-				Filesystem::symlink('../../../Private/Storage/Cache/Assets/Css/', './Assets/Css/Cache', true);
+			if(!is_link('./Assets/Css/Cache', true)) {
+				symlink('../../../Private/Storage/Cache/Assets/Css/', './Assets/Css/Cache');
 			}
 			// if it doesn't exist already
-			if(!Filesystem::isSymbolic('./Assets/Js/Cache', true)) {
-				Filesystem::symlink('../../../Private/Storage/Cache/Assets/Js/', './Assets/Js/Cache', true);
+			if(!is_link('./Assets/Js/Cache', true)) {
+				symlink('../../../Private/Storage/Cache/Assets/Js/', './Assets/Js/Cache');
 			}
 		}
 	}
@@ -445,8 +445,14 @@ class Response {
 		}
 		// elseif the type is file
 		elseif(self::$_type == 'file') {
+			// get a new fileinfo object
+			$info = new \finfo(FILEINFO_MIME);
+			// get the mimetype
+			$vague_type = $info->file(self::$_content);
+			// deduce the mimetype of the file
+			list($content_type) = strpos($vague_type,';') !== false ? explode(';',$vague_type) : [$vague_type];
 			// detect the mimetype to set the proper header
-			$headers['Content-Type'] = Filesystem::type(self::$_content);
+			$headers['Content-Type'] = $content_type;
 			// detect the modification time of the file
 			self::$_modification = filemtime(self::$_content);
 		}
