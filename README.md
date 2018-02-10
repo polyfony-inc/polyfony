@@ -1,6 +1,6 @@
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/713fa5be-b3d6-4a10-b544-90ef45580ec0/big.png)](https://insight.sensiolabs.com/projects/713fa5be-b3d6-4a10-b544-90ef45580ec0)
 
-## Polyfony 2 is a simple and powerful PHP micro-framework.
+## Polyfony is a simple and powerful PHP micro-framework.
 
 Compared to major PHP frameworks, Polyfony covers 95% of what we need most of the time, whilst using 5% of ressources, space, configuration files and dependencies required by major frameworks.
 Our approach is to allow you to know how everything works by keeping the codebase extremely small. Instead of refering to the documentation, you can look at the source code almost as easily.
@@ -61,7 +61,7 @@ This will update the framework (and its dependencies) to the newest compatible v
 | Polyfony\HttpRequest() | DEPRECATED   | Curl\Curl()             | require php-curl-class/php-curl-class |
 | Polyfony\Filesystem()  | DEPRECATED   | Filesystem\Filesystem() | require symfony/filesystem            |
 | Polyfony\Uploader()    | DEPRECATED   | FileUpload\FileUpload() | require gargron/fileupload            |
-| Polyfony\Validate()    | DISCONTINUED | -                       | -                                     |
+| Polyfony\Validate()    | DISCONTINUED | Validator\Validation()  | require symfony/valiator              |
 
 
 
@@ -105,6 +105,10 @@ Request::isAjax();
 Request::isSecure();
 ```
 
+* check if the request is fril the command line
+```php
+Request::isCli();
+```
 
 ### Database
 
@@ -153,13 +157,13 @@ $account
 * List of search parameters
 
 ```php
-->where()				// == $value
+->where()					// == $value
 ->whereNot()			// <> $value
 ->whereBetween()		// BETWEEN $min_value AND $max_value
 ->whereMatch()			// MATCH column AGAINST $value
 ->whereContains()		// % $value %
 ->whereEndWith()		// % $value
-->whereStartsWith() 	// $value %
+->whereStartsWith() 		// $value %
 ->whereNotEmpty() 		// <> '' and NOT NULL
 ->whereEmpty() 			// '' or NULL
 ->whereNotNull() 		// NOT NULL

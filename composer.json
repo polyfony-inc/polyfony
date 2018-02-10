@@ -25,6 +25,7 @@
 		"intervention/image": "^2.4",
 		"php-curl-class/php-curl-class": "^8.0",
 		"symfony/filesystem": "^4.0",
+		"symfony/validator": "^4.0",
 		"gargron/fileupload": "^1.4"
 	},
 	"config": {
@@ -43,8 +44,11 @@
 	},
 	"scripts": {
         "post-create-project-cmd": [
-            "chown -R www-data:www-data Private/Storage Public/Assets",
-            "chmod -R 777 Private/Storage Public/Assets"
+            "mkdir -m 777 Private/Storage/Cache",
+            "mkdir -m 777 Private/Storage/Data",
+            "mkdir -m 777 Private/Storage/Logs",
+            "mkdir -m 777 Private/Storage/Store",
+            "mkdir -m 777 Public/Assets"
         ]
     }
 }
