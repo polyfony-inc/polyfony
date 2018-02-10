@@ -501,79 +501,6 @@ Config::get($group);
 Config::get($group, $key);
 ```
 
-### Thumbnail
-
-`Thumbnails` are generated in JPEG format. The source image can be PNG or JPEG.
-
-```php
-$thumbnail = new Thumbnail();
-$status = $thumbnail
-	->source("Private/Storage/Data/Photos/Original/photo.jpg")
-	->destination("Private/Storage/Data/Photos/400/photo.jpg")
-	->size(400)
-	->quality(90)
-	->execute();
-```
-```php
-boolean $status
-```
-
-### Uploader
-
-`Uploader` will generate a unique name for your file if you only provided a destination folder.
-You can get the generated name using the `name()` method, `info()` will also give you lots of informations about your uploaded file, including its size, mimetype, etc.
-
-```php
-$uploader = new Uploader();
-$status = $uploader
-	->source(Request::files('estimate_file'))
-	->destination('Private/Storage/Data/Estimates/')
-	->limitTypes(array('application/pdf'))
-	->limitSize(1024*1024*2)
-	->execute();
-```
-```php
- boolean $status
- array $uploader->info()
- string $uploader->error()
- string $uploader->name()
- ```
-
-### HttpRequest
-
-This class provides a simple interface to build HTTP Requests
-
-```php
-$request = new HttpRequest([$url, [$method, [$timeout, [$retry]]]]);
-$status = $this->Request
-	->url('https://maps.googleapis.com/maps/api/geocode/json')
-	->timeout(15)
-	->data('address','Paris')
-	->get();
-```
-
-This example will tro access `https://maps.googleapis.com/maps/api/geocode/json?address=Paris`, 
-waiting 15 seconds for a response, retrying 2 times if doesn't get a 200 status code.
-The default waiting is 60 seconds, and retry is 3 times.
-
-```php
-boolean $status
-string $request->getHeader('Content-Type')
-mixed $request->getBody()
-
-```
-Responses of type application/json will be decoded to array, response of type application/xml will be decoded to SimpleXML object.
-
-* Attaching a file 
-```php
-$request->file($field_name, $path);
-```
-
-* Sending a cookie
-```php
-$request->cookie($key, $value)
-```
-
 
 ### Mail
 
@@ -726,25 +653,6 @@ List of available elements :
 Form elements general syntax is : `$name, $value, $options` when you get a form element from a `Record`, the `$name` and `$value` are set automatically, only `$options` are available. The select elements is slighly different : `$name, $list, $value, $options`
 
 To obtain, say, a password field, simply add this to your array of attributes : 'type'=>'password'
-
-### Filesystem
-
-The filesystem class allows you to manipulate directories and files easily.
-It is recommanded that you store all data in `Privata/Storage/Data/` wich is configured by default in `Config.ini` under `[filesystem]`.
-You can force all operation to occur inside of this path by setting chroot option to true under `[filesystem]`.
-
-
-```php
-Filesystem::mkdir('/my-directory/', '0777');
-Filesystem::mkdir('../../../../my-directory/', '0777');
-```
-* Both commands will create `Private/Storage/Data/my-directory/`
-
-If you want to operate outside of the Data storage folder, set the last parameter, which is a chroot bypass, to true. The following example will break out of the chroot. Or simply disable the chroot option in the `Config.ini`
-
-```php
-Filesystem::get('/tmp/somefile.raw', true);
-```
 
 ## Database structure
 

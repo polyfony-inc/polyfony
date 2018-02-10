@@ -8,8 +8,15 @@ class DemoController extends pf\Controller {
 	public function preAction() {
 
 		// set some common metas and assets
-		pf\Response::setMetas(array('title'=>'Bundles/Demo'));
-		pf\Response::setAssets('css','//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css');
+		pf\Response::set([
+			'metas'=>[
+				'title'=>'Bundles/Demo',
+				'description'=>'Demo bundle with example of most features'
+			],
+			'assets'=>[
+				'css'=>['//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css']
+			]
+		]);
 		
 		// get the currently browsed tab or null if none
 		// this doesn't sounds safe, using a get parameter, right ?
@@ -283,12 +290,24 @@ class DemoController extends pf\Controller {
 
 	public function jsonAction() {
 
+		pf\Response::set([
+			'type'		=>'json',
+			'content'	=>[
+				'edible'	=>['Hoummus','Mango','Peach','Cheese'],
+				'not_edible'=>['Dog','Cow','Rabbit','Lizard']
+			]
+		]);
+
+		/*
+		Alternatively you can also use this longer syntax
+
 		pf\Response::setType('json');
-		pf\Response::setContent(array(
-			'edible'=>array('Hoummus','Mango','Peach','Cheese'),
-			'not_edible'=>array('Dog','Cow','Rabbit','Lizard')
-		));
+		pf\Response::setContent([
+			'edible'	=>['Hoummus','Mango','Peach','Cheese'],
+			'not_edible'=>['Dog','Cow','Rabbit','Lizard']
+		]);
 		pf\Response::render();
+		*/
 
 	}
 	

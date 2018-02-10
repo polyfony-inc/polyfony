@@ -33,44 +33,57 @@ class Response {
 	protected static $_checksum;		// checksum of the content
 
 	// list of http status codes and messages
-	protected static $_codes = array(
-			// 100 status range
-			'100'=>'Continue', '101'=>'Switching Protocols', '102'=>'Processing',
-			// 200 status range
-			'200'=>'OK', '201'=>'Created', '202'=>'Accepted', '203'=>'Non-Authoritative Information', '204'=>'No Content',
-			'205'=>'Reset Content', '206'=>'Partial Content', '207'=>'Multi-Status', '208'=>'Already Reported', '226'=>'IM Used',
-			// 300 status range
-			'300'=>'Multiple Choices', '301'=>'Moved Permanently', '302'=>'Found', '303'=>'See Other', '304'=>'Not Modified',
-			'305'=>'Use Proxy', '306'=>'Switch Proxy', '307'=>'Temporary Redirect', '308'=>'Permanent Redirect',
-			// 400 status range
-			'400'=>'Bad Request', '401'=>'Unauthorized', '402'=>'Payment Required', '403'=>'Forbidden', '404'=>'Not Found',
-			'405'=>'Method Not Allowed', '406'=>'Not Acceptable', '407'=>'Proxy Authentication Required',
-			'408'=>'Request Timeout', '409'=>'Conflict', '410'=>'Gone', '411'=>'Length Required', '412'=>'Precondition Failed',
-			'413'=>'Request Entity Too Large', '414'=>'Request-URI Too Long', '415'=>'Unsupported Media Type',
-			'416'=>'Requested Range Not Satisfiable', '417'=>'Expectation Failed', '418'=>'I\'m a teapot', '451'=>'Censored',
-			// 500 status range
-			'500'=>'Internal Server Error', '501'=>'Not Implemented', '502'=>'Bad Gateway', '503'=>'Service Unavailable',
-			'504'=>'Gateway Timeout', '505'=>'HTTP Version Not Supported', '506'=>'Variant Also Negotiates', 
-			'507'=>'Insufficient Storage', '508'=>'Loop Detected', '509'=>'Bandwidth Limit Exceeded',
-		);
+	const CODES = [
+		// 100 status range
+		100=>'Continue', 101=>'Switching Protocols', 102=>'Processing',
+		// 200 status range
+		200=>'OK', 201=>'Created', 202=>'Accepted', 203=>'Non-Authoritative Information', 204=>'No Content',
+		205=>'Reset Content', 206=>'Partial Content', 207=>'Multi-Status', 208=>'Already Reported', 226=>'IM Used',
+		// 300 status range
+		300=>'Multiple Choices', 301=>'Moved Permanently', 302=>'Found', 303=>'See Other', 304=>'Not Modified',
+		305=>'Use Proxy', 306=>'Switch Proxy', 307=>'Temporary Redirect', 308=>'Permanent Redirect',
+		// 400 status range
+		400=>'Bad Request', 401=>'Unauthorized', 402=>'Payment Required', 403=>'Forbidden', 404=>'Not Found',
+		405=>'Method Not Allowed', 406=>'Not Acceptable', 407=>'Proxy Authentication Required',
+		408=>'Request Timeout', 409=>'Conflict', 410=>'Gone', 411=>'Length Required', 412=>'Precondition Failed',
+		413=>'Request Entity Too Large', 414=>'Request-URI Too Long', 415=>'Unsupported Media Type',
+		416=>'Requested Range Not Satisfiable', 417=>'Expectation Failed', 418=>'I\'m a teapot', 451=>'Censored',
+		// 500 status range
+		500=>'Internal Server Error', 501=>'Not Implemented', 502=>'Bad Gateway', 503=>'Service Unavailable',
+		504=>'Gateway Timeout', 505=>'HTTP Version Not Supported', 506=>'Variant Also Negotiates', 
+		507=>'Insufficient Storage', 508=>'Loop Detected', 509=>'Bandwidth Limit Exceeded',
+	];
+
+	// list of response types
+	const TYPES = [
+		'html-page'	=>'text/html',
+		'html'		=>'text/html',
+		'json'		=>'application/json',
+		'file'		=>'application/octet-stream',
+		'csv'		=>'text/csv',
+		'xml'		=>'text/xml',
+		'js'		=>'text/javascript',
+		'css'		=>'text/css',
+		'text'		=>'text/plain'
+	];
 
 	// init the response
-	public static function init() {
+	public static function init() :void {
 		
 		// check if we can render a response from the cache
 		self::isCached() === false ?: self::renderFromCache();
 		// start the output buffer
 		ob_start();
 		// set default assets
-		self::$_assets = array(
+		self::$_assets = [
 			// as empty arrays
-			'Css'	=>array(),
-			'Js'	=>array()
-		);
+			'Css'	=>[],
+			'Js'	=>[]
+		];
 		// set default headers
-		self::$_headers = array();
+		self::$_headers = [];
 		// set default metas
-		self::$_metas = array();
+		self::$_metas = [];
 		// default is to allow browser cache
 		self::$_browserCache = true;
 		// default is to disable the output cache (0 hour of cache)
@@ -78,12 +91,12 @@ class Response {
 		// set the default status as ok
 		self::setStatus(200);
 		// set default language
-		self::setHeaders(array(
+		self::setHeaders([
 			// hide the php version
-			'X-Powered-By'		=> 'PHP',
+			'X-Powered-By'		=> Config::get('response', 'header_x_powered_by'),
 			// hide the web server
-			'Server'			=> 'Mind your own business !'
-		));
+			'Server'			=> Config::get('response', 'header_server')
+		]);
 		// set default charset
 		self::setCharset(Config::get('response', 'default_charset'));
 		// set the default type
@@ -93,7 +106,28 @@ class Response {
 		
 	}
 
-	private static function isCached() {
+	// setters shortcut
+	public static function set(array $array) :void {
+
+		// simple setters shortcuts
+		!isset($array['type']) ?: 		self::setType($array['type']);
+		!isset($array['metas']) ?: 		self::setMetas($array['metas']);
+		!isset($array['status']) ?: 	self::setStatus($array['status']);
+		!isset($array['content']) ?: 	self::setContent($array['content']);
+		!isset($array['charset']) ?: 	self::setCharset($array['charset']);
+		!isset($array['headers']) ?: 	self::setHeaders($array['headers']);
+		!isset($array['redirect']) ?: 	self::setRedirect($array['redirect'][0], $array['redirect'][1]);
+
+		// assets setter short
+		if(isset($array['assets'])) {
+			foreach($array['assets'] as $type => $assets) {
+				self::setAssets($type, $assets);
+			}
+		}
+
+	}
+
+	private static function isCached() :bool {
 		// the cache has this request signature in store, cache is enabled, and browser allows cache
 		return(
 			Config::get('response', 'cache') && Cache::has(Request::getSignature()) && 
@@ -101,51 +135,51 @@ class Response {
 		);
 	}
 	
-	private static function isCachable() {
+	private static function isCachable() :bool {
 		// response is cachable, cache time is set, status is 200, type is not file,  
 		// method is get, it is not ran is CLI mode (as cli is used for maintenance mainly)
 		return(
-			Config::get('response', 'cache') && self::$_status == '200' && 
+			Config::get('response', 'cache') && self::$_status == 200 && 
 			self::$_outputCache && self::$_type != 'file' && !Request::isPost() &&
 			!Request::isCli()
 		);
 	}
 
-	public static function disableBrowserCache() {
+	public static function disableBrowserCache() :void {
 		// disable the browser's cache
 		self::$_browserCache = false;
 	}
 
-	public static function enableOutputCache($hours = 24) {
+	public static function enableOutputCache($hours = 24) :void {
 		// enable the generated output to be cached for some time
 		self::$_outputCache = round($hours * 3600);
 	}
 	
-	public static function setCharset($charset) {
+	public static function setCharset(string $charset) :void {
 		// set the charset in meta tags and http headers
 		self::$_charset = $charset;
 	}
 	
-	public static function setRedirect($url, $delay=0) {
+	public static function setRedirect(string $url, int $delay=0) :void {
 		// if a delay is provided
 		if($delay) {
 			// set the refresh header that support delays, it is not at all understood by Google Bot
-			self::setHeaders(array(
+			self::setHeaders([
 				'Refresh' => "{$delay};url=$url"
-			));	
+			]);	
 		}
 		// no delay is provided, use location that is understood by Google Bot
 		else {
 			// use standard redirect
-			self::setHeaders(array(
+			self::setHeaders([
 				'Location' => $url
-			));
+			]);
 		}
 	}
 
-	public static function setAssets($type, $assets) {
+	public static function setAssets(string $type, $assets) :void {
 		// if single element provided
-		$assets = is_array($assets) ? $assets : array($assets);
+		$assets = is_array($assets) ? $assets : [$assets];
 		// for each assets to set
 		foreach($assets as $asset) {
 			// convert the case of the type
@@ -157,58 +191,43 @@ class Response {
 		}
 	}
 
-	public static function setMetas($metas, $replace=false) {
+	public static function setMetas(array $metas, $replace=false) :void {
 		// replace or merge with current metas
 		self::$_metas = $replace ? self::$_metas : array_merge(self::$_metas,$metas);
 	}
 
-	public static function setHeaders($headers) {	
-		// if array provided
-		if(is_array($headers)) {
-			// merge current and new headers (replacing old ones)
-			self::$_headers = array_merge(self::$_headers,$headers);
-		}
+	public static function setHeaders(array $headers) :void {	
+		// merge current and new headers (replacing old ones)
+		self::$_headers = array_merge(self::$_headers,$headers);
 	}
 
-	public static function setType($type) {
+	public static function setType(string $type) :void {
 		
 		// remove previously output data on change of type
 		ob_clean();
 
 		// if the type is allowed
-		if(in_array($type,array('html-page','json','file','csv','xml','html','js','css','text'))) {
+		if(in_array($type, array_keys(self::TYPES))) {
 			// update the current type
 			self::$_type = $type;
 		}
-		// list of available types
-		$types = array(
-			'html-page'	=>'text/html',
-			'html'		=>'text/html',
-			'json'		=>'application/json',
-			'file'		=>'application/octet-stream',
-			'csv'		=>'text/csv',
-			'xml'		=>'text/xml',
-			'js'		=>'text/javascript',
-			'css'		=>'text/css',
-			'text'		=>'text/plain'
-		);
 		// add the header
-		self::setHeaders(array(
-			'Content-type'=> $types[$type] . '; charset='.self::$_charset
-		));
+		self::setHeaders([
+			'Content-type'=> self::TYPES[$type] . '; charset='.self::$_charset
+		]);
 		
 	}
 
 	// register a status header for that response
-	public static function setStatus($code) {
+	public static function setStatus(int $code) :void {
 	
 		// set the actual status or 500 if incorrect
-		self::$_status = in_array($code, array_keys(self::$_codes)) ? $code : 500;
+		self::$_status = in_array($code, array_keys(self::CODES)) ? $code : 500;
 		
 	}
 
 	// get the status header
-	public static function getStatus() {
+	public static function getStatus() :int {
 	
 		// get the currently set status
 		return self::$_status;
@@ -216,7 +235,7 @@ class Response {
 	}
 
 	// set raw content
-	public static function setContent($content) {
+	public static function setContent($content) :void {
 		
 		// remove any bufferred output
 		self::clean();
@@ -225,18 +244,18 @@ class Response {
 
 	}
 
-	public static function getType() {
+	public static function getType() :string {
 		// the current output type
 		return(self::$_type);
 	}
 
-	public static function getCharset() {
+	public static function getCharset() :string {
 		// the current charset
 		return(self::$_charset);
 	}
 
 	// format an return metas
-	private static function prependMetas() {
+	private static function prependMetas() :void {
 		// de-deuplicate js files
 		self::$_metas = array_unique(self::$_metas);
 		// return to the original order
@@ -251,7 +270,7 @@ class Response {
 	}
 
 	// format and return javascripts
-	private static function appendScripts() {
+	private static function appendScripts() :void {
 		// de-deuplicate js files
 		self::$_assets['Js'] = array_unique(self::$_assets['Js']);
 		// if there are not assets
@@ -289,7 +308,7 @@ class Response {
 				// populate the cache file
 				file_put_contents($js_pack_file, $js_pack_contents);
 			}
-			// replace the assets import rules with the whole pac
+			// replace the assets import rules with the whole pack
 			self::$_assets['Js'] = ["/Assets/Js/Cache/{$js_pack_name}"];
 		}
 
@@ -301,7 +320,7 @@ class Response {
 	}
 	
 	// format an return stylesheets
-	private static function prependStyles() {
+	private static function prependStyles() :void {
 		// de-deuplicate css files
 		self::$_assets['Css'] = array_unique(self::$_assets['Css']);
 		// if there are not assets
@@ -356,7 +375,7 @@ class Response {
 		
 	}
 
-	private static function initAssetsPacking() {
+	private static function initAssetsPacking() :void {
 		// if we are allowed to use the assets packing feature
 		if(Config::isProd() && (Config::get('response','pack_css') == 1 || Config::get('response','pack_js') == 1 )) {
 			// create css and js packing cache directories
@@ -385,7 +404,7 @@ class Response {
 	}
 
 	// return the footprint a the response
-	private static function getFootprint() {
+	private static function getFootprint() :string {
 
 		// get the profiler data
 		$profiler = Profiler::getData();
@@ -394,7 +413,7 @@ class Response {
 
 	}
 
-	private static function renderFromCache() {
+	private static function renderFromCache() :string {
 
 		// get the body and headers from the cache
 		list($headers, $body) = Cache::get(Request::getSignature());
@@ -412,10 +431,10 @@ class Response {
 
 	}
 	
-	private static function formatContent() {
+	private static function formatContent() :void {
 		
 		// base headers
-		$headers = array();
+		$headers = [];
 		// case of html page
 		if(self::$_type == 'html-page') {
 			// add the profiler
@@ -506,17 +525,17 @@ class Response {
 		
 	}	
 
-	public static function clean() {
+	public static function clean() :string {
 		// clean the reponse
 		return(ob_get_clean());
 	}
 
-	public static function render() {
+	public static function render() :void {
 
 		// if no content is set yet we garbage collect
 		self::$_content = self::$_content ?: self::clean();
 		// set the current protocol of fallback to HTTP 1.1 and set the status code plus message
-		header(Request::server('SERVER_PROTOCOL', 'HTTP/1.1') . ' ' . self::$_status . ' ' . self::$_codes[self::$_status]);
+		header(Request::server('SERVER_PROTOCOL', 'HTTP/1.1') . ' ' . self::$_status . ' ' . self::CODES[self::$_status]);
 		// format the content
 		self::formatContent();
 		// for each header
@@ -533,15 +552,15 @@ class Response {
 		
 	}
 	
-	private static function cache() {
+	private static function cache() :void {
 		// store the content and the header of this response
 		Cache::put(
 			// with the key being a signature of that request
 			Request::getSignature(), 
-			array(
+			[
 				self::$_headers,
 				base64_encode(self::$_content)
-			), 
+			], 
 			// replace any already existing cache file
 			true, 
 			// set the cache for some time
@@ -549,12 +568,12 @@ class Response {
 		);
 	}
 	
-	public static function download($file_name) {
+	public static function download($file_name) :void {
 		// set download headers
-		self::setHeaders(array(
+		self::setHeaders([
 			'Content-Description'	=>'File Transfer',
 			'Content-Disposition'	=>'attachment; filename="' . Format::fsSafe($file_name) . '"'
-		));
+		]);
 		// render
 		self::render();
 	}
