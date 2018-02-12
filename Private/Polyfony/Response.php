@@ -378,20 +378,15 @@ class Response {
 	private static function initAssetsPacking() :void {
 		// if we are allowed to use the assets packing feature
 		if(Config::isProd() && (Config::get('response','pack_css') == 1 || Config::get('response','pack_js') == 1 )) {
-			// create css and js packing cache directories
-			mkdir('../Private/Storage/Cache/Assets/Css/', 0777, true);
-			mkdir('../Private/Storage/Cache/Assets/Js/', 0777, true);
+			// create css and js packing cache directories if they don't exist yet
+			is_dir('../Private/Storage/Cache/Assets/Css/') ?: 	mkdir('../Private/Storage/Cache/Assets/Css/', 0777, true);
+			is_dir('../Private/Storage/Cache/Assets/Js/') ?: 	mkdir('../Private/Storage/Cache/Assets/Js/', 0777, true);
 			// if the general assets file do not exist
-			mkdir('./Assets/Css/', 0777, true);
-			mkdir('./Assets/Js/', 0777, true);
+			is_dir('./Assets/Css/') ?: 	mkdir('./Assets/Css/', 0777, true);
+			is_dir('./Assets/Js/') ?: 	mkdir('./Assets/Js/', 0777, true);
 			// create css and js public symlinks if it doesn't exist already
-			if(!is_link('./Assets/Css/Cache')) {
-				symlink('../../../Private/Storage/Cache/Assets/Css/', './Assets/Css/Cache');
-			}
-			// if it doesn't exist already
-			if(!is_link('./Assets/Js/Cache')) {
-				symlink('../../../Private/Storage/Cache/Assets/Js/', './Assets/Js/Cache');
-			}
+			is_link('./Assets/Css/Cache') ?: 	symlink('../../../Private/Storage/Cache/Assets/Css/', './Assets/Css/Cache');
+			is_link('./Assets/Js/Cache') ?: 	symlink('../../../Private/Storage/Cache/Assets/Js/', './Assets/Js/Cache');
 		}
 	}
 

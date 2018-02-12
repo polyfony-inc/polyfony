@@ -14,24 +14,24 @@ namespace Polyfony;
 class Router {
 	
 	// all the routes
-	protected static $_routes;
+	protected static $_routes = [];
 	// the currently matched route
-	protected static $_match;
+	protected static $_match = null;
 	// the currently instanciated controller
-	protected static $_controller;
+	protected static $_controller = null;
 	
 	public static function init() {
-	
+
 		// find a matching route
 		self::route();
 		
 	}
 	
 	// map a route
-	public static function addRoute($route_name) {
+	public static function addRoute(string $route_name) :Route {
 		
 		// We cannot allow duplicate route names for reversing reasons
-		if (isset(self::$_routes[$route_name])) {
+		if(isset(self::$_routes[$route_name])) {
 			// throw an exception
 			throw new Exception("Router::addRoute() The route {$route_name} has already been declared");
 		}
@@ -43,23 +43,23 @@ class Router {
 	}
 	
 	// check if the route exists
-	public static function hasRoute($route_name) {
+	public static function hasRoute(string $route_name) :bool {
 	
 		// true if route exists, false otherwise
-		return(isset(self::$_routes[$route_name]) ? true : false);
+		return isset(self::$_routes[$route_name]);
 		
 	}
 	
 	// get a specific route
-	public static function getRoute($route_name) {
+	public static function getRoute(string $route_name) {
 		
 		// return the route of false
-		return(isset(self::$_routes[$route_name]) ? self::$_routes[$route_name] : false);
+		return isset(self::$_routes[$route_name]) ? self::$_routes[$route_name] : false;
 		
 	}
 	
 	// update the current route after forwarding
-	public static function setCurrentRoute($route) {
+	public static function setCurrentRoute(Route $route) :void {
 		
 		// update the matched route
 		self::$_match = $route;
@@ -70,19 +70,21 @@ class Router {
 	public static function getCurrentRoute() {
 	
 		// returned the matched route
-		return(self::$_match ? self::$_match : null);
+		return self::$_match ? self::$_match : null;
 		
 	}
 	
 	// find the proper route
-	public static function route() {
+	public static function route() :void {
 
 		// get the requested url
 		$request_url = Request::getUrl();
+		// get the requested method
+		$request_method = Request::getMethod();
 		// Loop over each route and test to see if they are valid
 		foreach(self::$_routes as $route) {
 			// if the route matches
-			if(self::routeMatch($request_url, $route)) {
+			if(self::routeMatch($request_url, $request_method, $route)) {
 				// get it
 				self::$_match = $route;
 				// stop trying
@@ -94,7 +96,7 @@ class Router {
 		// if no match is found and we don't have an error route to fallback on
 		if(!self::$_match) {
 			// throw a native exception since there is no cleaner alternative
-			Throw new Exception('Router::route() no matching route',404);
+			Throw new Exception('Router::route() no matching route', 404);
 		}
 		// send the matching route to the dispatcher
 		self::forward(self::$_match);	
@@ -109,7 +111,12 @@ class Router {
 	 * @param  Core\Route $route      A Route declared by the application.
 	 * @return boolean
 	 */
-	private static function routeMatch($request_url, $route) {
+	private static function routeMatch(string $request_url, string $request_method, Route $route) :bool {
+		// if the method is set for that route, and it doesn't match
+		if($route->method && $route->method != $request_method) {
+			// don't even got any further
+			return false;
+		}
 		// break apart the route URL
 		$route_portions = strstr($route->url,':') ? explode(':',$route->url) : $route->url;
 		// set the base part
@@ -117,7 +124,7 @@ class Router {
 		// if the start does not match
 		if(stripos($request_url,$route_base) !== 0) {
 			// not matching
-			return(false);
+			return false;
 		}
 		// if the route is declared to handle some parameters
 		if(is_array($route_portions)) {			
@@ -158,7 +165,7 @@ class Router {
 					// restriction is not met
 					else {
 						// route does not match
-						return(false);	
+						return false;	
 					}
 				}
 				// parameter is not set
@@ -166,7 +173,7 @@ class Router {
 					// if it should be
 					if($restriction === true) {
 						// route does not match
-						return(false);	
+						return false;	
 					}
 				}
 			}
@@ -180,12 +187,11 @@ class Router {
 			// no parameters to treat (static route), check if perfect match
 			if($request_url != $route->url) {
 				// not perfectly matching
-				return(false);	
+				return false;	
 			}
 		}
 		// we got there ? then we've find out route !
-		return($route);
-
+		return true;
 	}
 	
 	/**
@@ -201,7 +207,7 @@ class Router {
 	 * @throws \Exception           If the route does not exist.
 	 * @static
 	 */
-	public static function reverse($route_name, $parameters = array(), $absolute = false, $force_tls = false) {
+	public static function reverse(string $route_name, array $parameters = array(), bool $absolute = false, bool $force_tls = false) :string {
 		// Does the route actually exist?
 		if(!isset(self::$_routes[$route_name])) {
 			// we cannot reverse a route that does not exist
@@ -213,6 +219,16 @@ class Router {
 		foreach($parameters as $variable => $value) {
 			// replace it in the url
 			$url = str_replace(":{$variable}/", urlencode($value) . '/', $url);
+		}
+		// the list of all parameters present in the url
+		$all_parameters = (array) explode('/', $url);
+		// for each parameter
+		foreach($all_parameters as $index => $a_parameter) {
+			// if it starts with a semicolon
+			if(substr($a_parameter, 0, 1) == ':') {
+				// if it's still in this form in the url, we remove it
+				$url = str_replace("{$a_parameter}/", '', $url);
+			}
 		}
 		// define the protocol to use (use the current one, or https if it is forced)
 		$protocol = (($force_tls && Config::isProd()) or Request::getProtocol() == 'https')?

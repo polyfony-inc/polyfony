@@ -11,6 +11,7 @@
 	<a class="btn btn-warning btn-md" href="/demo/database/" role="button"/>Database object</a> 
 	<a class="btn btn-warning btn-md" href="/demo/response/" role="button"/>Response object</a> 
 	<a class="btn btn-warning btn-md" href="/demo/request/" role="button"/>Request object</a> 
+	<a class="btn btn-warning btn-md" href="/demo/router/" role="button"/>Router object</a> 
 	<a class="btn btn-warning btn-md" href="/demo/exception/" role="button"/>Exception</a> 
 	<a class="btn btn-warning btn-md" href="/demo/json/" role="button"/>JSON</a><br /><br />
 	<h4>

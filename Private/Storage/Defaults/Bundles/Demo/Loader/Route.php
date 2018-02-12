@@ -23,6 +23,7 @@ Polyfony\Router::addRoute('demo')
 			'response',
 			'exception',
 			'json',
+			'router',
 			'vendorBootstrap',
 			'vendorGoogle'
 		)
@@ -35,6 +36,7 @@ Polyfony\Router::addRoute('demo')
 // a shortcut for the login route
 Polyfony\Router::addRoute('login')
 	->url('/login/')
+	->method('get')
 	->destination('Demo','Demo','login');
 
 

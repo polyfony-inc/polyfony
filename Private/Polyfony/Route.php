@@ -18,6 +18,8 @@ class Route {
 
 	// url to match
 	public $url;
+	// method to match
+	public $method;
 	// parameter restriction
 	public $restrictions;
 	// name of that route
@@ -31,37 +33,42 @@ class Route {
 	// (optional) url variable to trigger action
 	public $trigger;
 
-
 	// construct the route given its name
-	public function __construct($name) {
+	public function __construct(string $name) {
 		$this->name			= $name;
 		$this->trigger		= null;
 		$this->bundle		= null;
 		$this->controller	= null;
 		$this->action		= null;
+		$this->method 		= null;
 		$this->restrictions	= array();
 	}
 	
 	// set the url to match
-	public function url($url) {
+	public function url(string $url) :self {
 		$this->url = $url;
 		return $this;
 	}
 
+	public function method(string $method) :self {
+		$this->method = in_array(strtolower($method), Request::METHODS) ? strtolower($method) : null;
+		return $this;
+	}
+
 	// set an associative array of contraints for the url parameters
-	public function restrict($restrictions) {
+	public function restrict(array $restrictions) :self {
 		$this->restrictions = $restrictions;
 		return $this;
 	}
 	
 	// set the name of a parameter that will trigger the action
-	public function trigger($trigger) {
+	public function trigger(string $trigger) :self {
 		$this->trigger = $trigger;
 		return $this;
 	}
 
 	// set the destination for that route
-	public function destination($bundle, $controller=null, $action=null) {
+	public function destination(string $bundle, string $controller=null, string $action=null) :self {
 		$this->bundle = $bundle;
 		$this->controller = $controller !== null ? $controller : 'Index';
 		$this->action = $action !== null ? $action : null;

@@ -30,6 +30,7 @@ class DemoController extends pf\Controller {
 
 	public function welcomeAction() {
 
+
 		// view the main index/welcome page
 		$this->view('Index');
 	}
@@ -38,6 +39,15 @@ class DemoController extends pf\Controller {
 
 		// view the main demo index
 		$this->view('Demo');
+	
+	}
+
+	public function routerAction() {
+
+		// generating an url using its route
+		$this->url = pf\Router::reverse('demo', ['type'=>'locales'], true, true);
+		$this->view('Router');
+
 	}
 	
 	public function vendorBootstrapAction() {

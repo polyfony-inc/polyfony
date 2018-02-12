@@ -26,7 +26,12 @@ class Request {
 	private static $_protocol;
 	private static $_port;
 	private static $_signature;
-	
+
+	// available methods	
+	const METHODS = [
+		'put', 'post', 'get', 'delete', 'options', 'head'
+	]; 
+
 	public static function init() :void {
 
 		// set proper context depending if we are in command line
@@ -35,8 +40,8 @@ class Request {
 		// set current URL depending on the context
 		self::$_url = self::isCli() ? (isset($_SERVER['argv'][2]) ? $_SERVER['argv'][2] : '/') : $_SERVER['REQUEST_URI'];
 		
-		// set the request method depending if post method is properly set
-		self::$_method = isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST' ? 'post' : 'get';
+		// set the request method, use "get" as a fallback
+		self::$_method = isset($_SERVER['REQUEST_METHOD']) && in_array(strtolower($_SERVER['REQUEST_METHOD']), self::METHODS) ? strtolower($_SERVER['REQUEST_METHOD']) : 'get';
 
 		// set the request protocol
 		self::$_protocol = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http';
@@ -65,28 +70,35 @@ class Request {
 	public static function getUrl() :string {
 		
 		// get current url
-		return(self::$_url ?: '/');
+		return self::$_url ?: '/';
 		
+	}
+
+	public static function getMethod() :string {
+
+		// get the current method (used by the Router for matching routes)
+		return self::$_method;
+
 	}
 	
 	public static function getSignature() :string {
 		
 		// return current signature
-		return(self::$_signature);
+		return self::$_signature;
 		
 	}
 
 	public static function getProtocol() :string {
 
 		// return current protocol
-		return(self::$_protocol);
+		return self::$_protocol;
 
 	}
 
 	public static function getPort() :int {
 
 		// return current port
-		return((int)self::$_port);
+		return (int) self::$_port;
 
 	}
 	
@@ -229,6 +241,20 @@ class Request {
 	}
 
 	/**
+	 * Check if the request is a GET.
+	 *
+	 * @access public
+	 * @return boolean
+	 * @static
+	 */
+	public static function isGet() :bool {
+		
+		// if method is post return true
+		return self::$_method == 'get';
+		
+	}
+
+	/**
 	 * Check if the request is a POST.
 	 *
 	 * @access public
@@ -239,6 +265,34 @@ class Request {
 		
 		// if method is post return true
 		return self::$_method == 'post';
+		
+	}
+
+	/**
+	 * Check if the request is a DELETE.
+	 *
+	 * @access public
+	 * @return boolean
+	 * @static
+	 */
+	public static function isDelete() :bool {
+		
+		// if method is post return true
+		return self::$_method == 'delete';
+		
+	}
+
+	/**
+	 * Check if the request is a PUT.
+	 *
+	 * @access public
+	 * @return boolean
+	 * @static
+	 */
+	public static function isPut() :bool {
+		
+		// if method is post return true
+		return self::$_method == 'put';
 		
 	}
 
