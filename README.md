@@ -666,13 +666,12 @@ To obtain, say, a password field, simply add this to your array of attributes : 
 
 ## Database structure
 
-The framework can work without any database. 
-You just loose `Security`, the `Mail` storage feature, the `Store\Database` engine and the `Logger`'s database feature.
+The framework has been extensively tested using SQLite, it *should* work with other engines, and even without. 
+Without, you'd just loose `Security`, the `Mail` storage feature, the `Store\Database` engine and the `Logger`'s database feature.
 
-A SQLite database is created upon installation. 
+The database's structure is available by dumping the SQLite Database `Private/Storage/Database/Polyfony.db`.
+The PDO driver can be changed for MySQL, PosgreSQL in `Private/Config/Config.ini`.
 
-Based on the structure available in `Private/Storage/Defaults/Database/Structure.sql`,
-and the data available in `Private/Storage/Defaults/Database/Data.sql`
 
 ## Performance
 Polyfony has been designed to be fast, no compromise. 
