@@ -131,9 +131,14 @@ $accounts = Database::query()
 	->execute();
 ```
 
-* Retrieve a single record by its ID
+* Retrieve a single account by its ID
 ```php
 $account = new Models\Accounts(1);
+```
+
+* Retrieve a single account by its email
+```php
+$account = new Models\Accounts(['email'=>'root@local.domain']);
 ```
 
 * Retrieve a single record by its ID and generate an input to change a property
@@ -640,10 +645,10 @@ Shortcuts are available from `Record` object (and objects inheriting Record clas
 
 * retrieve an account from its id
 ```php
-$record = new Accounts(1);
-$record->set('login', 'mylogin@example.com')
+$account = new Accounts(1);
+$account->set('login', 'mylogin@example.com')
 
-echo $record->input('login', array('data-validators'=>'required'));
+echo $account->input('login', array('data-validators'=>'required'));
 ```
 ```html
 <input type="text" name="Accounts[login]" value="mylogin@example.com" data-validators="required"/>
@@ -662,71 +667,12 @@ To obtain, say, a password field, simply add this to your array of attributes : 
 ## Database structure
 
 The framework can work without any database. 
-You just loose `Security`, the `Mail` storage feature, the `Store\Database` engine and the `Logger`'s file feature.
+You just loose `Security`, the `Mail` storage feature, the `Store\Database` engine and the `Logger`'s database feature.
 
-* Bellow is the SQL statement used to create the database. The framework has been extensively tested with SQlite but should work with MySQL as well. SQlite generally is more that sufficient and a DBMS would be overkill.
+A SQLite database is created upon installation. 
 
-```sql
-
-CREATE TABLE "Accounts" (
-  "id" integer NULL PRIMARY KEY AUTOINCREMENT,
-  "id_level" numeric NULL,
-  "is_enabled" numeric NULL,
-  "creation_date" numeric NULL,
-  "login" text NULL,
-  "password" text NULL,
-  "modules_array" text NULL,
-  "account_expiration_date" numeric NULL,
-  "session_expiration_date" numeric NULL,
-  "session_key" text NULL,
-  "last_login_origin" text NULL,
-  "last_login_agent" text NULL,
-  "last_login_date" numeric NULL,
-  "last_failure_origin" numeric NULL,
-  "last_failure_agent" numeric NULL,
-  "last_failure_date" numeric NULL
-);
-
-CREATE TABLE "Logs" (
-  "id" integer NULL PRIMARY KEY AUTOINCREMENT,
-  "id_account" integer NULL,
-  "id_level" integer NULL,
-  "creation_date" numeric NULL,
-  "bundle" text NULL,
-  "controller" text NULL,
-  "method" text NULL,
-  "post_array" text NULL,
-  "cookies_array" text NULL,
-  "request_origin" text NULL,
-  "request_method" text NULL,
-  "request_uri" text NULL,
-  "message" text NULL,
-  FOREIGN KEY ("id_account") REFERENCES "Accounts" ("id") ON DELETE RESTRICT ON UPDATE NO ACTION
-);
-
-CREATE TABLE "Mails" (
-  "id" integer NULL PRIMARY KEY AUTOINCREMENT,
-  "is_sent" numeric NULL,
-  "creation_date" numeric NULL,
-  "sending_date" numeric NULL,
-  "format" text NULL,
-  "from_mail" text NULL,
-  "from_name" text NULL,
-  "body" text NULL,
-  "subject" text NULL,
-  "bcc_array" text NULL,
-  "cc_array" text NULL,
-  "to_array" text NULL,
-  "files_array" text NULL
-);
-
-CREATE TABLE "Store" (
-  "id" text NULL,
-  "key" text NULL,
-  "content" blob NULL
-);
-
-```
+Based on the structure available in `Private/Storage/Defaults/Database/Structure.sql`,
+and the data available in `Private/Storage/Defaults/Database/Data.sql`
 
 ## Performance
 Polyfony has been designed to be fast, no compromise. 
