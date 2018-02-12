@@ -385,11 +385,11 @@ class Response {
 			mkdir('./Assets/Css/', 0777, true);
 			mkdir('./Assets/Js/', 0777, true);
 			// create css and js public symlinks if it doesn't exist already
-			if(!is_link('./Assets/Css/Cache', true)) {
+			if(!is_link('./Assets/Css/Cache')) {
 				symlink('../../../Private/Storage/Cache/Assets/Css/', './Assets/Css/Cache');
 			}
 			// if it doesn't exist already
-			if(!is_link('./Assets/Js/Cache', true)) {
+			if(!is_link('./Assets/Js/Cache')) {
 				symlink('../../../Private/Storage/Cache/Assets/Js/', './Assets/Js/Cache');
 			}
 		}

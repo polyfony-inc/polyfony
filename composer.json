@@ -2,7 +2,7 @@
 	"name":"sib-retail/polyfony",
 	"description":"Polyfony is a simple and powerfull PHP micro-framework",
 	"keywords": ["lightweight", "fast", "php", "framework"],	
-	"version":"2.1.10",
+	"version":"2.1.11",
 	"license":"GPL-3.0",
 	"type":"project",
 	"authors":[
@@ -43,13 +43,13 @@
 		}
 	},
 	"scripts": {
-        "post-create-project-cmd": [
-        	"cp -R Private/Storage/Defaults/Bundles/* Private/Bundles/",
-        	"cp Private/Storage/Defaults/Config/* Private/Config/",
-        	"cp Private/Storage/Defaults/Models/* Private/Models/",
-        	"cp Private/Storage/Defaults/Database/Polyfony.db Private/Storage/Database/Polyfony.db",
-            "chmod -R 777 Private/Storage",
-            "chmod -R 777 Public/Assets"
-        ]
-    }
+		"post-create-project-cmd": [
+			"cp -R Private/Storage/Defaults/Bundles/* Private/Bundles/",
+			"cp Private/Storage/Defaults/Config/* Private/Config/",
+			"cp Private/Storage/Defaults/Models/* Private/Models/",
+			"cp Private/Storage/Defaults/Database/Polyfony.db Private/Storage/Database/Polyfony.db",
+			"chmod -R 777 Private/Storage",
+			"chmod -R 777 Public/Assets"
+		]
+	}
 }
