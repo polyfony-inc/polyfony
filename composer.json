@@ -44,11 +44,10 @@
 	},
 	"scripts": {
         "post-create-project-cmd": [
-        	"touch test-where-am-i.txt",
-        	"Private/Storage/Scripts/InstallConfig",
+        	"cp -R Private/Storage/Defaults/Bundles/* Private/Bundles/",
+        	"cp Private/Storage/Defaults/Config/* Private/Config/",
+        	"cp Private/Storage/Defaults/Models/* Private/Models/",
         	"Private/Storage/Scripts/InstallDatabase",
-        	"Private/Storage/Scripts/InstallModels",
-        	"Private/Storage/Scripts/InstallBundles",
             "chmod -R 777 Private/Storage",
             "chmod -R 777 Public/Assets"
         ]
