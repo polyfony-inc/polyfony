@@ -1,8 +1,12 @@
-Public/Assets/*
+Private/Binaries/*
+Private/Bundles/*
+Private/Config/*
+Private/Models/*
 Private/Storage/Cache/*
 Private/Storage/Data/*
+Private/Storage/Database/*
 Private/Storage/Logs/*
 Private/Storage/Store/*
-Private/Binaries/*
 Private/Vendor/*
+Public/Assets/*
 composer.lock

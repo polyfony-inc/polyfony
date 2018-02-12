@@ -1,0 +1,101 @@
+[config]
+detection_method = "domain"
+use_strict = 0
+timezone = "Europe/Paris"
+
+[filesystem]
+data_path = "../Private/Storage/Data/"
+chroot = 1
+
+[store]
+path = "../Private/Storage/Store/"
+
+[response]
+default_type = "html-page"
+default_charset = "utf-8"
+header_x_powered_by = "PHP"
+header_server = "None of your business"
+checksum = 0
+minify = 0
+compress = 0
+cache = 0
+pack_css = 0
+pack_js = 0
+
+[cache]
+path = "../Private/Storage/Cache/"
+
+[router]
+login_route = "/login/"
+exit_route = "/"
+
+[database]
+driver = "sqlite"
+database = "../Private/Storage/Database/Polyfony.db"
+hostname = ""
+username = ""
+password = ""
+before = "PRAGMA foreign_keys = ON;"
+
+[profiler]
+enable = 1
+enable_stack = 0
+
+[logger]
+enable = 1
+type = "file"
+path = "../Private/Storage/Logs/Polyfony.log"
+mail = "nospam.polyfony@gribouille.eu"
+
+[locales]
+cookie = "pfLocale"
+default = "fr"
+available[] = "fr"
+available[] = "en"
+
+[security]
+cookie = "pfSecurity"
+algo = "sha512"
+salt = "023FRB2DE3HS71JQNWDH68700ZDFGRR9HY"
+waiting_duration = 3
+session_duration = 100
+login = "pfLogin"
+password = "pfPassword"
+
+[mail]
+default_charset = "utf-8"
+format = "html"
+tech_support_mail = "support@plfny.com"
+from_name = "Polyfony"
+from_mail = "polyfony@plfny.com"
+bypass_mail = "bypass@plfny.com"
+smtp_host = ""
+smtp_user = ""
+smtp_pass = ""
+alternative_smtp_host = ""
+alternative_smtp_user = ""
+alternative_smtp_pass = ""
+
+[keys]
+algo = "sha1"
+salt = "VF6RV2087HASIU92hx:2DMKJ2+!d2=_d_DjlsS"
+
+[sync]
+remote_host = "0.0.0.0"
+remote_port = "22"
+remote_user = "www-data"
+remote_path = "/var/www/domains/my-project/"
+local_path = "/var/www/domains/my-project/"
+always_sync_folders[] = "Public/"
+always_sync_folders[] = "Private/Bundles/"
+always_sync_folders[] = "Private/Config/"
+always_sync_folders[] = "Private/Vendor/"
+always_sync_folders[] = "Private/Models/"
+always_sync_folders[] = "Private/Polyfony/"
+always_sync_folders[] = "Private/Vendor/"
+always_sync_folders[] = "Private/Binaries/"
+ask_sync_folders[] = "Private/Storage/Database/" 
+ask_sync_folders[] = "Private/Storage/Data/" 
+ask_sync_folders[] = "Private/Storage/Cache/" 
+ask_sync_folders[] = "Private/Storage/Store/" 
+ask_sync_folders[] = "Private/Storage/Logs/"

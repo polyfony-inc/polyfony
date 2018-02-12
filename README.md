@@ -25,7 +25,7 @@ Current *hard* requirements are PHP >= 7.1, ext-pdo, ext-sqlite3, ext-mbstring a
 * Run this command to download the framework *(and its dependencies)* to your project directory
 
 ```
-composer create-project sib-retail/polyfony --stability=dev your-project-folder
+composer create-project sib-retail/polyfony your-project-folder
 ```
 
 * With lighttpd, set the webroot of your webserver to `Public/` *(or requivalent config for Apache/NginX)*
@@ -44,13 +44,18 @@ url.rewrite-once = (
 
 ## Updating the framework
 
-* To updade the framework, run this command from your project directory
+#### To updade **the framework**, run this command from your project directory (beware of backward incompatible changes)
+
+```bash
+git pull
+```
+
+#### To updade **the dependencies**, run this command from your project directory
 
 ```bash
 composer update
 ```
 
-This will update the framework (and its dependencies) to the newest compatible version without damaging your code or data.
 
 ## Deprecated and discontinued features 
 

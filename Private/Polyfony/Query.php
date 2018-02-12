@@ -637,7 +637,7 @@ class Query {
 		// no forced type
 		else {
 			// use the table name, or generic Record if none available
-			$class = $this->Table ? '\Models\\'.$this->Table : '\Polyfony\Record';
+			$class = $this->Table && class_exists('\Models\\'.$this->Table) ? '\Models\\'.$this->Table : '\Polyfony\Record';
 		}
 		// fetch all results
 		$this->Result = $this->Prepared->fetchAll(

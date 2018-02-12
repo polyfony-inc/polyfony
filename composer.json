@@ -44,11 +44,13 @@
 	},
 	"scripts": {
         "post-create-project-cmd": [
-            "mkdir -m 777 Private/Storage/Cache",
-            "mkdir -m 777 Private/Storage/Data",
-            "mkdir -m 777 Private/Storage/Logs",
-            "mkdir -m 777 Private/Storage/Store",
-            "mkdir -m 777 Public/Assets"
+        	"touch test-where-am-i.txt",
+        	"Private/Storage/Scripts/InstallConfig",
+        	"Private/Storage/Scripts/InstallDatabase",
+        	"Private/Storage/Scripts/InstallModels",
+        	"Private/Storage/Scripts/InstallBundles",
+            "chmod -R 777 Private/Storage",
+            "chmod -R 777 Public/Assets"
         ]
     }
 }
