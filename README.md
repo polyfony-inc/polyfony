@@ -2,7 +2,7 @@
 
 ## Polyfony is a simple and powerful PHP micro-framework.
 
-Compared to major PHP frameworks, Polyfony covers 95% of what we need most of the time, whilst using 5% of ressources, space, configuration files and dependencies required by major frameworks.
+Compared to major PHP frameworks, Polyfony covers 95% of what we need most of the time, while using 5% of ressources, space, configuration files and dependencies required by major frameworks.
 Our approach is to allow you to know how everything works by keeping the codebase extremely small. Instead of refering to the documentation, you can look at the source code almost as easily.
 Polyfony is fast by design (≤ 20ms/hit on your average app & server), and can get even faster (1~5ms) using the different integrated caching options.
 
@@ -13,11 +13,10 @@ routing, bundles, controllers, views, database abstraction, environments, locale
 Inspired by Symfony and Laravel but tailored to favour an inclination towards extreme simplicity and efficiency
 
 #### Footprint (of an Hello World)
-* ≤ 400 Ko of disk space (35% of comment lines)
-* ≤ 550 Ko of RAM
+* ≤ 300 Ko of disk space (35% of comment lines)
+* ≤ 400 Ko of RAM
 
 ## Requirements
-* **See composer.json for the requirement**
 Current *hard* requirements are PHP >= 7.1, ext-pdo, ext-sqlite3, ext-mbstring and a rewrite module (mod_rewrite)
 
 ## Installation
@@ -61,7 +60,7 @@ This will update the framework (and its dependencies) to the newest compatible v
 | Polyfony\HttpRequest() | DEPRECATED   | Curl\Curl()             | require php-curl-class/php-curl-class |
 | Polyfony\Filesystem()  | DEPRECATED   | Filesystem\Filesystem() | require symfony/filesystem            |
 | Polyfony\Uploader()    | DEPRECATED   | FileUpload\FileUpload() | require gargron/fileupload            |
-| Polyfony\Validate()    | DISCONTINUED | Validator\Validation()  | require symfony/valiator              |
+| Polyfony\Validate()    | DISCONTINUED | Validator\Validation()  | require symfony/validator              |
 
 
 
