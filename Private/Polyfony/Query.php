@@ -521,6 +521,8 @@ class Query {
 	public function first() {
 		// return only the first record
 		$this->First = true;
+		// artificially restrict the number of results to one
+		$this->limitTo(0,1);
 		// return self query
 		return $this;
 	}
