@@ -15,6 +15,7 @@ Inspired by Symfony and Laravel but tailored to favour an inclination towards ex
 #### Footprint (of an Hello World)
 * ≤ 300 Ko of disk space (35% of comment lines)
 * ≤ 400 Ko of RAM
+* ≤ 2.5 ms (cold)
 
 ## Requirements
 Current *hard* requirements are PHP >= 7.1, ext-pdo, ext-sqlite3, ext-mbstring and a rewrite module (mod_rewrite)
