@@ -55,6 +55,26 @@ class Route {
 		return $this;
 	}
 
+	// shortcut for method
+	public function get() :self {
+		return $this->method('get');
+	}
+
+	// shortcut for method
+	public function post() :self {
+		return $this->method('post');
+	}
+
+	// shortcut for method
+	public function delete() :self {
+		return $this->method('delete');
+	}
+
+	// shortcut for method
+	public function put() :self {
+		return $this->method('put');
+	}
+
 	// set an associative array of contraints for the url parameters
 	public function restrict(array $restrictions) :self {
 		$this->restrictions = $restrictions;
@@ -73,5 +93,22 @@ class Route {
 		$this->controller = $controller !== null ? $controller : 'Index';
 		$this->action = $action !== null ? $action : null;
 		return $this;
+	}
+
+	// shortcut for destination
+	public function to($merged_destination) {
+		// explode the parameters
+		list($bundle, $controller_with_action) = explode('/', $merged_destination);
+		// if the parameters are incomplete
+		if(!$controller_with_action) {
+			Throw new Exception('Route->to() should look like ("Bundle/Controller->method"');
+		}
+		// explode parameters further
+		list($controller, $action) = explode('->', $controller_with_action);
+		// define the action
+		// if the action contains :
+		// if empty
+		// if normal...
+
 	}
 }
