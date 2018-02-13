@@ -27,21 +27,74 @@ class Router {
 		
 	}
 	
-	// map a route
-	public static function addRoute(string $route_name) :Route {
+	// LEGACY way of mapping a route
+	public static function addRoute(string $route_name = null) :Route {
 		
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Router::addRoute() is deprecated, use Router::map() or Router::{get/post/put/delete}() instead', 
+			E_USER_DEPRECATED
+		);
+
 		// We cannot allow duplicate route names for reversing reasons
-		if(isset(self::$_routes[$route_name])) {
+		if($route_name && isset(self::$_routes[$route_name])) {
 			// throw an exception
 			throw new Exception("Router::addRoute() The route {$route_name} has already been declared");
 		}
 		// create a new route
-		self::$_routes[$route_name] = new Route($route_name);
+		$route = new Route($route_name);
+		// add the route to the list
+		self::$_routes[$route->name] = $route;
 		// return that route
-		return self::$_routes[$route_name];
+		return self::$_routes[$route->name];
 		
 	}
 	
+	// NEW syntax for mapping routes
+	public static function map(string $url = null, string $to, string $route_name = null, string $method = null) :Route {
+		// We cannot allow duplicate route names for reversing reasons
+		if($route_name && isset(self::$_routes[$route_name])) {
+			// throw an exception
+			throw new Exception("Router::map() The route {$route_name} has already been declared");
+		}
+		// create a new route
+		$route = new Route($route_name);
+		// configure the route
+		$route
+			->url($url)
+			->to($to)
+			->method($method);
+		// add it to the list of known routes
+		self::$_routes[$route->name] = $route;
+		// return the route for finer tuning
+		return self::$_routes[$route->name];
+	}
+
+	// new syntax for mapping routes
+	public static function get(string $url, string $to, $route_name = null) :Route {
+		return self::map($url, $to, $route_name, 'get');
+	}
+
+	// new syntax for mapping routes
+	public static function post(string $url, string $to, $route_name = null) {	
+		return self::map($url, $to, $route_name, 'post');
+	}
+
+	// new syntax for mapping routes
+	public static function delete(string $url, string $to, $route_name = null) {	
+		return self::map($url, $to, $route_name, 'delete');
+	}
+
+	// new syntax for mapping routes
+	public static function put(string $url, string $to, $route_name = null) {	
+		return self::map($url, $to, $route_name, 'put');
+	}
+
+	// new syntax for quick redirects
+	public static function redirect(string $source_url, string $redirection_url, int $status_code = 301) :void {
+
+	}
+
 	// check if the route exists
 	public static function hasRoute(string $route_name) :bool {
 	
@@ -119,6 +172,10 @@ class Router {
 		}
 		// break apart the route URL
 		$route_portions = strstr($route->url,':') ? explode(':',$route->url) : $route->url;
+		
+		// we should also be breaking appart the {} symbols (new syntax)
+		// code to be produced here
+
 		// set the base part
 		$route_base = is_array($route_portions) ? $route_portions[0] : $route_portions;
 		// if the start does not match

@@ -18,39 +18,45 @@ class Route {
 
 	// url to match
 	public $url;
-	// method to match
-	public $method;
-	// parameter restriction
-	public $restrictions;
 	// name of that route
 	public $name;
 	// bundle destination
 	public $bundle;
 	// controller destination
 	public $controller;
-	// action destination
+	// (optional) action destination
 	public $action;
 	// (optional) url variable to trigger action
 	public $trigger;
+	// (optional)method to match 
+	public $method;
+	// (optional) parameter restriction
+	public $restrictions;
+	// (optional) redirection url
+	public $redirect;
+	// (optional) redirection status code
+	public $redirectStatus;
 
 	// construct the route given its name
-	public function __construct(string $name) {
-		$this->name			= $name;
-		$this->trigger		= null;
-		$this->bundle		= null;
-		$this->controller	= null;
-		$this->action		= null;
-		$this->method 		= null;
-		$this->restrictions	= array();
+	public function __construct(string $name = null) {
+		$this->name				= $name ?: uniqid('route-');
+		$this->trigger			= null;
+		$this->bundle			= null;
+		$this->controller		= null;
+		$this->action			= null;
+		$this->method 			= null;
+		$this->redirect 		= null;
+		$this->redirectStatus 	= null;
+		$this->restrictions		= [];
 	}
 	
 	// set the url to match
-	public function url(string $url) :self {
+	public function url(string $url = null) :self {
 		$this->url = $url;
 		return $this;
 	}
 
-	public function method(string $method) :self {
+	public function method(string $method = null) :self {
 		$this->method = in_array(strtolower($method), Request::METHODS) ? strtolower($method) : null;
 		return $this;
 	}
@@ -76,19 +82,39 @@ class Route {
 	}
 
 	// set an associative array of contraints for the url parameters
-	public function restrict(array $restrictions) :self {
+	public function where(array $restrictions) :self {
 		$this->restrictions = $restrictions;
 		return $this;
+	}
+
+	// set an associative array of constraints (alias)
+	public function restrict(array $restrictions) :self {
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Route->restrict() is deprecated, use Route->where() instead', 
+			E_USER_DEPRECATED
+		);
+		return $this->where($restrictions);
 	}
 	
 	// set the name of a parameter that will trigger the action
 	public function trigger(string $trigger) :self {
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Route->destination() is deprecated, use Router::map("url","Bundle/Controller@{your_trigger}") instead', 
+			E_USER_DEPRECATED
+		);
 		$this->trigger = $trigger;
 		return $this;
 	}
 
 	// set the destination for that route
 	public function destination(string $bundle, string $controller=null, string $action=null) :self {
+		// this is now deprecated, will probably be removed in a future release
+		trigger_error(
+			'Usage of Route->destination() is deprecated, use Router::map("url","Bundle/Controller@action") instead', 
+			E_USER_DEPRECATED
+		);
 		$this->bundle = $bundle;
 		$this->controller = $controller !== null ? $controller : 'Index';
 		$this->action = $action !== null ? $action : null;
@@ -96,19 +122,34 @@ class Route {
 	}
 
 	// shortcut for destination
-	public function to($merged_destination) {
+	public function to($merged_destination) :self {
 		// explode the parameters
-		list($bundle, $controller_with_action) = explode('/', $merged_destination);
+		list($this->bundle, $controller_with_action) = explode('/', $merged_destination);
 		// if the parameters are incomplete
 		if(!$controller_with_action) {
-			Throw new Exception('Route->to() should look like ("Bundle/Controller->method"');
+			// we don't allow to proceed
+			Throw new Exception('Route->to() should look like ("Bundle/Controller@method"');
 		}
 		// explode parameters further
-		list($controller, $action) = explode('->', $controller_with_action);
-		// define the action
-		// if the action contains :
-		// if empty
-		// if normal...
-
+		list($this->controller, $action) = explode('@', $controller_with_action);
+		// if the action exists and contain a semicolon or is surounded by braquets
+		if($action && (substr($action, 0, 1) == ':' || (substr($action, 0, 1) == '{') && substr($action, -1, 1) == '}')) {
+			// we have an action triggered by an url parameter, remove special chars, and set the trigger
+			$this->trigger = str_replace([':','{','}'],'', $action);
+			// action is not known yet
+			$this->action = null;
+		}
+		// the action exist, and it is a regual one
+		elseif($action) {
+			// define the action
+			$this->action = $action;
+		}
+		// the action is totaly unspecified
+		else {
+			// so we use the index
+			$this->action = 'index';
+		}
+		// return the route
+		return $this;
 	}
 }
