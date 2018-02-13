@@ -23,9 +23,12 @@ class Bundles {
 		// if cache is enabled and in prod load the cache, else parse bundles
 		Config::isProd() && Cache::has('Includes') ? self::loadCachedDependencies() : self::loadDependencies();
 		
-		// include what has been found
-		self::includeLoaders();
-		
+		// now that we have the list of config files, pass them to the config class
+		Config::includeBundlesConfigs(self::$_configs);
+
+		// now that we have the list of route files, pass them to the router class
+		Router::includeBundlesRoutes(self::$_routes);
+
 	}
 	
 	private static function loadCachedDependencies() :void {
@@ -65,17 +68,7 @@ class Bundles {
 		), true);
 		
 	}
-	
-	private static function includeLoaders() :void {
-		
-		// for each route or runtime filavailablee
-		foreach(array_merge(self::$_routes, self::$_configs) as $file) {
-			// include it
-			include($file);	
-		}
-		
-	}
-	
+
 	// get assets for a bundle
 	public static function getAssets(string $bundle) :array {
 		// empty list of assets
@@ -125,10 +118,10 @@ class Bundles {
 	public static function getAvailable() :array {
 		
 		// return the current list
-		return(self::$_bundles);
+		return self::$_bundles;
 		
 	}
-	
+
 }
 
 ?>

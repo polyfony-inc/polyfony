@@ -27,6 +27,36 @@ class Router {
 		
 	}
 	
+	public static function includeBundlesRoutes($bundles_routes_files) :void {
+		
+		// if we are in prod, and allowed to cache routes, and have a cache file available
+		if(Config::isProd() && Cache::has('Routes') && Config::get('router', 'cache')) {
+			// restore the routes from the cache
+			foreach(Cache::get('Routes') as $route_name => $route) {
+				// reinstanciate a route
+				$route_object = new Route($route_name);
+				// for each attribute
+				foreach($route as $key => $value) {
+					// re-set it
+					$route_object->{$key} = $value;
+				}
+				// add the route
+				self::$_routes[$route_name] = $route_object;
+			}
+		}
+		// then we have to include the routes files
+		else {
+			// for each of those files
+			foreach($bundles_routes_files as $file) {
+				// include it
+				include($file);
+			}
+			// as we have build the routes objet, we should cache them
+			Cache::put('Routes', self::$_routes, true);
+		}
+
+	}
+
 	// LEGACY way of mapping a route
 	public static function addRoute(string $route_name = null) :Route {
 		

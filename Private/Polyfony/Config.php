@@ -36,6 +36,14 @@ class Config {
 
 	}
 	
+	public static function includeBundlesConfigs($bundles_configuration_files) :void {
+		// for each of those files
+		foreach($bundles_configuration_files as $file) {
+			// include it
+			include($file);
+		}
+	}
+
 	private static function detectFromCLI() :void {
 	
 		// use the first command line argument as environment name
