@@ -41,6 +41,13 @@ url.rewrite-once = (
 )
 ```
 
+Or, if you are using Let's Encrypt
+```
+url.rewrite-once = (
+    "^(?!/Assets/)(?!/\.well-known/).*" => "/?"
+)
+```
+
 
 ## Updating the framework
 
@@ -667,6 +674,33 @@ List of available elements :
 Form elements general syntax is : `$name, $value, $options` when you get a form element from a `Record`, the `$name` and `$value` are set automatically, only `$options` are available. The select elements is slighly different : `$name, $list, $value, $options`
 
 To obtain, say, a password field, simply add this to your array of attributes : 'type'=>'password'
+
+## CRSF Protection
+
+A CRSF Protection and double-submit guard is available.
+
+In the middle of your html form (in a View)
+
+```html
+<form action="" method="post">
+<!-- more form here -->
+
+<?= new Polyfony\Form\Token(); ?>
+
+<!-- more form here -->
+</form>
+```
+
+In your controller
+
+```php
+Polyfony\Form\Token::enforce();
+```
+
+**That's it.** 
+
+* Instanciating a "Token" objet generates a unique token, stores it in the PHP SESSION and builds an html input element. 
+* The static enforce method, checks if a request has been POSTed, and if so, if a token exists, and matches one stored in the session. Otherwise, throws an exception and redirects to the previous page.
 
 ## Database structure
 

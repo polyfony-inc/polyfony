@@ -9,12 +9,10 @@ class DemoController extends pf\Controller {
 
 		// set some common metas and assets
 		pf\Response::set([
-			'metas'=>[
-				'title'=>'Bundles/Demo',
-				'description'=>'Demo bundle with example of most features'
-			],
-			'assets'=>[
-				'css'=>['//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css']
+			'css'	=>['//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'],
+			'metas'	=>[
+				'title'			=>'Bundles/Demo',
+				'description'	=>'Demo bundle with example of most features'
 			]
 		]);
 		
@@ -188,6 +186,8 @@ class DemoController extends pf\Controller {
 	
 	public function secureAction() {	
 
+		// enforce XSS protectionfor this action
+		pf\Form\Token::enforce();
 		// enforce security for this action
 		pf\Security::enforce();
 
@@ -255,23 +255,27 @@ class DemoController extends pf\Controller {
 	}
 	
 	public function responseAction() {
-		// add the JS portion of bootstrap
-		pf\Response::setAssets('js',array(
-			'//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js',
-			'//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js'
-		));
-		// add some metas
-		pf\Response::setMetas(array('description'=>'An awesome page'));
-		// manually change the status
-		pf\Response::setStatus(202);
-		// set manual header
-		pf\Response::setHeaders(array('X-Knock-Knock'=>'Who\'s there ?'));
+		
+		// new response setters shortcuts
+		pf\Response::set([
+			'status'	=>202,
+			'metas'		=>['description'	=>'An awesome page'],
+			'headers'	=>['X-Knock-Knock'	=>'Who\'s there ?'],
+			'js'		=>[
+				'//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js',
+				'//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js'
+			]
+		]);
+		
 		// simply import the view
 		$this->view('Response');
 	}
 	
 	public function requestAction() {
 		
+		// this will make sure a CSRF token is present, and is valid (in case of a post)
+		Polyfony\Form\Token::enforce();
+
 		// check if something has been posted
 		$this->Feedback = pf\Request::isPost() ? 
 			new Bootstrap\Alert('Success','You posted the following string : ',pf\Request::post('test')) : null;

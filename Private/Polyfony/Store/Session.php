@@ -11,6 +11,24 @@ namespace Polyfony\Store;
  */
 class Session implements StoreInterface
 {
+
+	/**
+	 * Starts a PHP session is none is ready yet.
+	 *
+	 * @access private
+	 * @return void
+	 * @static
+	 */
+	private static function startSessionIfNeeded() :void {
+
+		// if no session has been initiated yet
+		if(session_status() == PHP_SESSION_NONE) {
+			// we have to start one
+			session_start();
+		}
+
+	}
+
 	/**
 	 * Check whether the variable exists in the store.
 	 *
@@ -20,6 +38,7 @@ class Session implements StoreInterface
 	 * @static
 	 */
 	public static function has($variable) {
+		self::startSessionIfNeeded();
 		return isset($_SESSION[$variable]);
 	}
 
@@ -35,6 +54,7 @@ class Session implements StoreInterface
 	 * @static
 	 */
 	public static function put($variable, $value, $overwrite = false) {
+		self::startSessionIfNeeded();
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (self::has($variable) && ! $overwrite) {
 			throw new \Exception($variable . ' already exists in the store.');
@@ -54,6 +74,7 @@ class Session implements StoreInterface
 	 * @static
 	 */
 	public static function get($variable) {
+		self::startSessionIfNeeded();
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (! self::has($variable)) {
 			throw new \Exception("{$variable} does not exist in the store.");
@@ -72,6 +93,7 @@ class Session implements StoreInterface
 	 * @static
 	 */
 	public static function remove($variable) {
+		self::startSessionIfNeeded();
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (! self::has($variable)) {
 			throw new \Exception("{$variable} does not exist in the store.");

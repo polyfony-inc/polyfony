@@ -2,12 +2,12 @@
 	<h1>Request</h1>
 	<p>
 		Posting some things and getting them back<br />
-		This example uses the <code>Request</code> abstraction, the <code>Form</code> helper and the <code>Notice</code> object.
+		This example uses the <code>Request</code> abstraction, the <code>Form</code> helper, the <code>Alert</code> object and the <code>Token (CSRF prevention)</code> feature.
 	</p>
 	
 	<form action="" method="post">
 	<div class="panel panel-default">
-		
+		<?= new Polyfony\Form\Token(); ?>
 		<div class="panel-heading">A basic form</div>
 		<div class="panel-content" style="padding: 25px;">
 			<div class="form-group">

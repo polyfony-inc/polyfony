@@ -4,6 +4,7 @@
 		<div class="panel-body">
 			<?php echo $this->Notice; ?>
 			<form action="/demo/secure/" method="post">
+				<?= new Polyfony\Form\Token(); ?>
 				<div class="form-group">
 					<label for="inputLogin">Login</label>
 					<?php echo $this->LoginInput; ?>

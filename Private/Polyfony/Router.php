@@ -274,15 +274,15 @@ class Router {
 		$url = self::$_routes[$route_name]->url;
 		// for each provided parameter
 		foreach($parameters as $variable => $value) {
-			// replace it in the url
-			$url = str_replace(":{$variable}/", urlencode($value) . '/', $url);
+			// replace it in the url in both possible forms
+			$url = str_replace([":{$variable}/",'{'.$variable.'}'] , urlencode($value) . '/', $url);
 		}
 		// the list of all parameters present in the url
 		$all_parameters = (array) explode('/', $url);
 		// for each parameter
 		foreach($all_parameters as $index => $a_parameter) {
-			// if it starts with a semicolon
-			if(substr($a_parameter, 0, 1) == ':') {
+			// if it starts with a semicolon or is enclosed by brackets
+			if(substr($a_parameter, 0, 1) == ':' || (substr($a_parameter, 0, 1) == '{' && substr($a_parameter, -1, 1) == '}')) {
 				// if it's still in this form in the url, we remove it
 				$url = str_replace("{$a_parameter}/", '', $url);
 			}
@@ -297,7 +297,7 @@ class Router {
 		return $url;
 	}
 	
-	public static function forward(Route $route) {
+	public static function forward(Route $route) :void {
 		
 		// set full controller
 		$script = "../Private/Bundles/{$route->bundle}/Controllers/{$route->controller}.php";

@@ -13,7 +13,6 @@
 namespace Polyfony;
 
 class Form {
-	
 
 	public static function input(string $name, $value='', array $attributes=[]) :Element {
 		// format the form element

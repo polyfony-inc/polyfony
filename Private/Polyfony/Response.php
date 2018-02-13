@@ -110,6 +110,8 @@ class Response {
 	public static function set(array $array) :void {
 
 		// simple setters shortcuts
+		!isset($array['js']) ?: 		self::setAssets('js', $array['js']);
+		!isset($array['css']) ?: 		self::setAssets('css', $array['css']);
 		!isset($array['type']) ?: 		self::setType($array['type']);
 		!isset($array['metas']) ?: 		self::setMetas($array['metas']);
 		!isset($array['status']) ?: 	self::setStatus($array['status']);
@@ -117,14 +119,7 @@ class Response {
 		!isset($array['charset']) ?: 	self::setCharset($array['charset']);
 		!isset($array['headers']) ?: 	self::setHeaders($array['headers']);
 		!isset($array['redirect']) ?: 	self::setRedirect($array['redirect'][0], $array['redirect'][1]);
-
-		// assets setter short
-		if(isset($array['assets'])) {
-			foreach($array['assets'] as $type => $assets) {
-				self::setAssets($type, $assets);
-			}
-		}
-
+		
 	}
 
 	private static function isCached() :bool {
