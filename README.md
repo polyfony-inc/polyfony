@@ -45,9 +45,12 @@ url.rewrite-once = (
 ## Updating the framework
 
 #### To updade **the framework**, run this command from your project directory (beware of backward incompatible changes)
+The first and last command allow you to preserve and restore your composer.json after the udpate
 
 ```bash
+git stash
 git pull
+git stash apply
 ```
 
 #### To updade **the dependencies**, run this command from your project directory
