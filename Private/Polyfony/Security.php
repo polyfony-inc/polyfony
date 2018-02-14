@@ -71,7 +71,7 @@ class Security {
 	}
 
 	// internal authentication method that will grant access based on an existing session
-	private static function authenticate() :void {
+	protected static function authenticate() :void {
 
 		// if we did not authenticate before
 		if(!self::$_account) {
@@ -106,7 +106,7 @@ class Security {
 	}
 	
 	// internal login method that will open a session
-	private static function login() :void {
+	protected static function login() :void {
 		
 		// look for users with this login
 		$account = Database::query()
@@ -200,7 +200,7 @@ class Security {
 	}
 
 	// internal method to refuse access
-	private static function refuse(string $message='Forbidden', int $code=403, bool $logout=false, bool $redirect=true) :void {
+	protected static function refuse(string $message='Forbidden', int $code=403, bool $logout=false, bool $redirect=true) :void {
 		// remove any existing session cookie
 		!$logout ?: Store\Cookie::remove(Config::get('security','cookie'));
 		// we will redirect to the login page
@@ -210,7 +210,7 @@ class Security {
 	}
 
 	// this will check that the opened session matches the current client's signature
-	private static function match(\Models\Accounts $account) :bool {
+	protected static function match(\Models\Accounts $account) :bool {
 		// get the session key existing in the database
 		$existing_key = $account->get('session_key');
 		// generate a new session key for this request
@@ -224,7 +224,7 @@ class Security {
 	}
 	
 	// internal method for generating unique signatures
-	private static function getSignature($mixed) :string {
+	protected static function getSignature($mixed) :string {
 		
 		// compute a hash with (the provided string + salt + user agent + remote ip)
 		return(hash(Config::get('security','algo'), 
