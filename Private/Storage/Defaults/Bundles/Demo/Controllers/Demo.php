@@ -59,6 +59,9 @@ class DemoController extends pf\Controller {
 
 		*/
 
+		// an alert is created and stored, for being flashed at a later time in a view
+		(new Bootstrap\Alert('success', null, 'Hello! I was created in a previous action, when you visited the Vendor/Bootstrap demo'))->save();
+
 		// just a bootstrap container to align the alerts
 		$container = new pf\Element('div', ['class'=>'col-10 offset-1']);
 

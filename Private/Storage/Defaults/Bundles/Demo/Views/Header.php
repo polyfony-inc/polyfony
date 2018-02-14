@@ -13,3 +13,4 @@
 		<?php endif; ?>
 	<?php endif; ?>
 </ol>
+<?= Bootstrap\Alert::flash(); ?>
