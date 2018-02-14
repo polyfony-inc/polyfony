@@ -52,7 +52,7 @@ class Cache {
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
 		// store it
-		file_put_contents(Config::get('cache', 'path') . $variable, json_encode($value));
+		file_put_contents(Config::get('cache', 'path') . $variable, msgpack_pack($value));
 		// compute the expiration time or set to a year by default
 		$lifetime = $lifetime ? time() + $lifetime : time() + 365 * 24 * 3600;
 		// alter the modification time
@@ -73,7 +73,7 @@ class Cache {
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
 		// return it
-		return(json_decode(file_get_contents(Config::get('cache', 'path') . $variable), true));
+		return(msgpack_unpack(file_get_contents(Config::get('cache', 'path') . $variable)));
 		
 	}
 	

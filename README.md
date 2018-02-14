@@ -18,7 +18,7 @@ Inspired by Symfony and Laravel but tailored to favour an inclination towards ex
 * ≤ 2.5 ms (cold)
 
 ## Requirements
-Current *hard* requirements are PHP >= 7.1, ext-pdo, ext-sqlite3, ext-mbstring and a rewrite module (mod_rewrite)
+Current *hard* requirements are PHP >= 7.1, ext-pdo, ext-sqlite3, ext-mbstring, ext-msgpack and a rewrite module (mod_rewrite)
 
 ## Installation
 
