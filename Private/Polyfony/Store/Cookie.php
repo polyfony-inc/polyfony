@@ -41,7 +41,7 @@ class Cookie implements StoreInterface {
 			throw new \Polyfony\Exception("{$variable} already exists in the store.");
 		}
 		// if a lifetime is set convert it to seconds in the future, or use a default of 24 hours
-		$lifetime = $lifetime ? time() + $lifetime * 3600 : 24 * 3600;
+		$lifetime = $lifetime ? time() + $lifetime * 3600 : time() + 24 * 3600;
 		// encode and compress the value
 		$value = gzcompress(json_encode($value));
 		// actually set the cookie
