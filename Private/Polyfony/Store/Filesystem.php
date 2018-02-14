@@ -60,7 +60,9 @@ class Filesystem implements StoreInterface {
 		}
 
 		// store the variable or document
-		file_put_contents($path . $file, serialize($value));
+		\Polyfony\Config::get('store', 'compress') ? 
+			file_put_contents($path . $file, gzdeflate(msgpack_pack($value))) :
+			file_put_contents($path . $file, msgpack_pack($value));
 
 		// return status
 		return self::has($variable);
@@ -80,8 +82,10 @@ class Filesystem implements StoreInterface {
 		list($path, $file) = self::path($variable);
 
 		// return it
-		return unserialize(file_get_contents($path . $file));
-		
+		return \Polyfony\Config::get('store', 'compress') ? 
+			msgpack_unpack(gzinflate(file_get_contents($path . $file))) :
+			msgpack_unpack(file_get_contents($path . $file));
+
 	}
 	
 	

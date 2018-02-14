@@ -10,6 +10,10 @@ class DemoController extends pf\Controller {
 		// set some common metas and assets
 		pf\Response::set([
 			'css'	=>['//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'],
+			'js'	=>[
+				'//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js',
+				'//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'
+			],
 			'metas'	=>[
 				'title'			=>'Bundles/Demo',
 				'description'	=>'Demo bundle with example of most features'
@@ -27,7 +31,6 @@ class DemoController extends pf\Controller {
 	}
 
 	public function welcomeAction() {
-
 
 		// view the main index/welcome page
 		$this->view('Index');
@@ -59,21 +62,33 @@ class DemoController extends pf\Controller {
 
 		*/
 
-		// an alert is created and stored, for being flashed at a later time in a view
-		(new Bootstrap\Alert('success', null, 'Hello! I was created in a previous action, when you visited the Vendor/Bootstrap demo'))->save();
+		// an alert is created a stored, for being flashed at a later time
+		(new Bootstrap\Alert([
+			'message'=>'Hi, I was created in a previous action, when you visited the Vendor/Bootstrap demo',
+			'dismissible'=>true
+		]))->save();
 
 		// just a bootstrap container to align the alerts
 		$container = new pf\Element('div', ['class'=>'col-10 offset-1']);
 
-		$successAlert = new Bootstrap\Alert(
-			'success','Lorem ipsum', 'Dolor sit amet sed ut perspicadis', 'Footer'
-		);
-		$warningAlert = new Bootstrap\Alert(
-			'warning','Lorem ipsum', 'Dolor sit amet sed ut perspicadis', 'Footer'
-		);
-		$dangerAlert = new Bootstrap\Alert(
-			'danger',null, 'Lorem ipsum, dolor sit amet'
-		);
+		$successAlert = new Bootstrap\Alert([
+			'class'		=>'success',
+			'title'		=>'Lorem ipsum',
+			'message'	=>'Dolor sit amet sed ut perspicadis',
+			'footer'	=>'Footer'
+		]);
+
+		$warningAlert = new Bootstrap\Alert([
+			'class'		=>'warning',
+			'title'		=>'Dolor sit amet sed ut perspicadis',
+			'footer'	=>'footer'
+		]);
+
+		$dangerAlert = new Bootstrap\Alert([
+			'class'		=>'danger',
+			'message'	=>'Lorem ipsum, dolor sit amet',
+			'dismissible'=>true
+		]);
 
 		$modal = new Bootstrap\Modal();
 		$modal
@@ -263,11 +278,7 @@ class DemoController extends pf\Controller {
 		pf\Response::set([
 			'status'	=>202,
 			'metas'		=>['description'	=>'An awesome page'],
-			'headers'	=>['X-Knock-Knock'	=>'Who\'s there ?'],
-			'js'		=>[
-				'//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js',
-				'//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js'
-			]
+			'headers'	=>['X-Knock-Knock'	=>'Who\'s there ?']
 		]);
 		
 		// simply import the view
