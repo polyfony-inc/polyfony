@@ -1,5 +1,5 @@
 {
-	"name":"sib-retail/polyfony",
+	"name":"polyfony-inc/polyfony",
 	"description":"Polyfony is a simple and powerfull PHP micro-framework",
 	"keywords": ["lightweight", "fast", "php", "framework"],	
 	"version":"2.1.21",
@@ -18,9 +18,10 @@
 		"ext-msgpack": "*",
 		"phpmailer/phpmailer": "^6.0",
 		"matthiasmullie/minify": "^1.3",
-		"sib-retail/polyfony-google": "dev-master",
-		"sib-retail/polyfony-bootstrap": "dev-master",
-		"sib-retail/polyfony-sync": "dev-master"
+		"polyfony-inc/google": "dev-master",
+		"polyfony-inc/bootstrap": "dev-master",
+		"polyfony-inc/console": "dev-master",
+		"polyfony-inc/sync": "dev-master"
 	},
 	"suggest": {
 		"intervention/image": "^2.4",
