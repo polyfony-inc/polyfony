@@ -178,7 +178,10 @@ class DemoController extends pf\Controller {
 	public function loginAction() {	
 
 		// add a notice
-		$this->Notice = new Bootstrap\Alert('info','Only one account exists by default','That account is : root/toor');
+		$this->Notice = new Bootstrap\Alert([
+			'message'=>'Only one account exists by default',
+			'footer'=>'That account is : root/toor'
+		]);
 
 		// build input field
 		$this->LoginInput = pf\Form::input(pf\Config::get('security','login'), null, array(
@@ -292,7 +295,10 @@ class DemoController extends pf\Controller {
 
 		// check if something has been posted
 		$this->Feedback = pf\Request::isPost() ? 
-			new Bootstrap\Alert('Success','You posted the following string : ',pf\Request::post('test')) : null;
+			new Bootstrap\Alert([
+				'message'	=>'You posted the following string',
+				'footer'	=>pf\Request::post('test')
+			]) : null;
 		
 		// create a new input, using posted data if available
 		$this->InputExample = pf\Form::input(

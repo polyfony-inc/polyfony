@@ -1,7 +1,6 @@
 <?php
 
 use Polyfony as pf;
-use Polyfony\Store as st;
 
 // new example class to realize tests
 class ExceptionController extends Polyfony\Controller {
@@ -32,12 +31,15 @@ class ExceptionController extends Polyfony\Controller {
 				'title'=> $this->Exception->getMessage()
 			));
 			
-			// css neat style
-			pf\Response::setAssets('css','//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css');
-			pf\Response::setAssets('css', '//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css');
-			
-			// js neat style
-			pf\Response::setAssets('js','//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js');
+			pf\Response::set([
+				'css'	=>[
+					'//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css',
+					'//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'
+				],
+				'js'	=>[
+					'//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js'
+				]
+			]);
 			
 			// disable space removal for the trace stack
 			pf\Config::set('response','minify', 0);

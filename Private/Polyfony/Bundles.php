@@ -68,28 +68,6 @@ class Bundles {
 		), true);
 		
 	}
-
-	// get assets for a bundle
-	public static function getAssets(string $bundle) :array {
-		// empty list of assets
-		$assets_types = array();
-		// set the assets folder
-		$assets_folder = "../Private/Bundles/{$bundle}/Assets/";
-		// if the assets folder exists
-		if(file_exists($assets_folder) && is_dir($assets_folder)) {
-			// for each subfolder in the assets folder
-			foreach(scandir($assets_folder) as $asset_type) {
-				// if it's a folder, and a normal one
-				if(substr($asset_type,0,1) != '.' && is_dir($assets_folder.$asset_type)) {	
-					// spool it with a trailing slash
-					$assets_types[$asset_type] = "{$assets_folder}{$asset_type}/";
-				}
-			}
-		}
-		// return the list of available assets folders
-		return($assets_types);
-		
-	}
 	
 	// get locales for a bundle
 	public static function getLocales(string $bundle) :array {
