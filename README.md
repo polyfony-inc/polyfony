@@ -84,7 +84,8 @@ composer update
 You can read this quick tour, or just browse the `Private/Bundles/Demo/` code.
 The code bellow assumes that your are using the `Polyfony` namespace before each call.
 
-### Request
+### [Request](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyrequest)
+
 * retrieve an url parameter
 ```php
 Request::get('format');
@@ -125,7 +126,7 @@ Request::isSecure();
 Request::isCli();
 ```
 
-### Database
+### [Database]https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyquery
 
 * Retrieve the login and id of 5 accounts with level 1 that logged in, in the last 24h
 ```php
@@ -236,7 +237,7 @@ the framework will import that information (and cache it, so empty the cache if 
 
 
 
-### Router
+### [Router](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyrouter)
 
 * Each bundle has a file to place your routes
 ```php
@@ -280,6 +281,8 @@ a boolean true (it will match anything but a missing value)
 
 ### Environments
 
+https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyconfig
+
 By default the `Private/Config/Config.ini` file is loaded.
 You can use environment specific configuration files by detecting the current domain, or the current port.
 ```
@@ -315,7 +318,7 @@ Having specific ini configuration files for development and production allows yo
 * use different database configuration in development or production
 * etc.
 
-### Security
+### [Security](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonysecurity)
 
 * To secure a page (require a user to be logged in)
 ```php
@@ -337,7 +340,7 @@ Security::hasModule($module_name);
 Security::hasLevel($level);
 ```
 
-### Profiler
+### [Profiler](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyprofiler)
 
 Set markers arounds heavy code blocks to estimate the time and memory impact of that bloc.
 ```php
@@ -349,7 +352,7 @@ If the `Config::get('profiler', 'enable_stack')` if set to true,
 the stack of markers will be added at the bottom an html `Response` as a nice ul/li lists, or merged into a json `Response`
 
 
-### Locales
+### [Locales](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonylocales)
 
 Locales are stored in csv files (tab + double-quotes), stored in each bundle in the `Bundles/MyBundle/Locales/` folder.
 The files are parsed the first time you ask for a locale. The language is automatically detected using the browser's language, you can set it manually.
@@ -372,7 +375,7 @@ Locales::get($key, $language)
 Locales::setLanguague($language)
 ```
 
-### Exception
+### [Exception](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyexception)
 
 Exception are routed to a route named « exception » if any, otherwise exception are thrown normally.
 The status code is 500 by default, you can specify any HTTP status code. The cache is disabled by such a status code.
@@ -382,7 +385,7 @@ Throw new Exception($error_message, $http_status_code);
 ```
 
 
-### Response
+### [Response](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyresponse)
 
 The response if preconfigured according to the Config.ini
 You can alter the response type and parameters at runtime, ex.
@@ -483,7 +486,7 @@ The example bellow shows the same Hello World `Response` as above, but from the 
 < X-Cached-Until: Sun, 18 Jan 2015 00:51:38 +0100
 ```
 
-### Store
+### [Store](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonystorestoreinterface)
 
 The Store interface looks like this :
 ```php
@@ -506,7 +509,7 @@ Store\Request
 The last on stores your key-value only for the time of the current request.
 Some of those engines have more capabilities than others, but all implement the basic interface and can store both variables, arrays, or raw data.
 
-### Bundle configurations
+### [Bundle configurations](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonyconfig)
 
 * Store some bundle specific data in Bundles/MyBundle/Loader/Config.php (ex. static list choices, etc.)
 * Note that these configurations are merged with Config.php + Dev.ini/Prod.ini so all your configs are available in one place, with one interface : `Config`
@@ -523,7 +526,7 @@ Config::get($group, $key);
 ```
 
 
-### Mail
+### (Mail)[https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonymail]
 
 * Mail are very simple to use and built over PHPMailer
 
@@ -581,7 +584,7 @@ $mail->set('message','My example')
 
 If the mail format is html, your value will be escaped automatically
 
-### Element
+### [Element](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonyelement)
 
 * Create an HTML tag (similar to mootools' Element)
 
@@ -605,7 +608,7 @@ $quote->adopt($image);
 
 Setting `value` will escape its html so will with setting `text`.
 
-### Form
+### [Form](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonyform)
 
 Form helper allow you to build and preset form elements, ex.
 
@@ -675,7 +678,7 @@ Form elements general syntax is : `$name, $value, $options` when you get a form 
 
 To obtain, say, a password field, simply add this to your array of attributes : 'type'=>'password'
 
-## CRSF Protection
+## [CRSF Protection](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyformtoken)
 
 A CRSF Protection and double-submit guard is available.
 
