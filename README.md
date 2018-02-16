@@ -126,7 +126,7 @@ Request::isSecure();
 Request::isCli();
 ```
 
-### [Database]https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyquery
+### [Database](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyquery)
 
 * Retrieve the login and id of 5 accounts with level 1 that logged in, in the last 24h
 ```php
@@ -526,7 +526,7 @@ Config::get($group, $key);
 ```
 
 
-### (Mail)[https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonymail]
+### [Mail](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonymail)
 
 * Mail are very simple to use and built over PHPMailer
 
