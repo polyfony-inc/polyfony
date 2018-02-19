@@ -12,7 +12,7 @@ routing, bundles, controllers, views, database abstraction, environments, locale
 #### Philosophy
 Inspired by Symfony and Laravel but tailored to favour an inclination towards extreme simplicity and efficiency
 
-#### Footprint [of an Hello World][(https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
+#### Footprint [of an Hello World](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
 * ≤ 300 Ko of disk space (35% of comment lines)
 * ≤ 400 Ko of RAM
 * ≤ 2.5 ms (cold)  
