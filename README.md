@@ -1,21 +1,19 @@
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/713fa5be-b3d6-4a10-b544-90ef45580ec0/big.png)](https://insight.sensiolabs.com/projects/713fa5be-b3d6-4a10-b544-90ef45580ec0)
 
-## Polyfony is a simple and powerful PHP micro-framework.
-
-Compared to major PHP frameworks, Polyfony covers 95% of what we need most of the time, while using 5% of ressources, space, configuration files and dependencies required by major frameworks.
-Our approach is to allow you to know how everything works by keeping the codebase extremely small. Instead of refering to the documentation, you can look at the source code almost as easily.
-Polyfony is [fast by design](https://github.com/polyfony-inc/polyfony/wiki/Benchmark) (≤ 20ms/hit on your average app & server), and can get even faster (1~5ms) using the different integrated caching options.
-
-#### Features
-routing, bundles, controllers, views, database abstraction, environments, locales, cache, vendor, helpers, authentication, profiler…
+## Polyfony is an intuitive, lightweight and powerful PHP micro-framework.
 
 #### Philosophy
-Inspired by Symfony and Laravel but tailored to favour an inclination towards extreme simplicity and efficiency
+Inspired by Symfony and Laravel but tailored to favour an inclination towards extreme simplicity and efficiency.
+
+Compared to major PHP frameworks, Polyfony covers 95%+ of what we need most of the time, and does so using a fragment of the ressources, space, configuration files and dependencies required by major frameworks.
+
+#### Features
+Routing, bundles, controllers, views, ORM, environments, locales, cache, authentication, form helper... and limitless extensibility via composer.
 
 #### Footprint [of an Hello World](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
-* ≤ 300 Ko of disk space (35% of comment lines)
+* ≤ 300 Ko of disk space *(35% of comment lines)*
 * ≤ 400 Ko of RAM
-* ≤ 2.5 ms (cold)  
+* ≤ 2.5 ms (cold)
 
 ## Requirements
 Current *hard* requirements are : Linux/MacOS/xBSD, PHP >= 7.1, ext-pdo, ext-sqlite3, ext-mbstring, ext-msgpack and a rewrite module (mod_rewrite)
@@ -29,56 +27,20 @@ composer create-project --stability=dev polyfony-inc/polyfony your-project-folde
 ```
 *--stability=dev allows you to git pull later on*
 
-* With lighttpd, set the webroot of your webserver to `Public/` *(or requivalent config for Apache/NginX)*
+* With lighttpd, set the webroot of your webserver to `Public/`
 ```
 server.document-root = "/var/www/your-project-folder/Public/"
 ```
 
-* With lighttpd, set this rewrite rule *(or equivalent rule for Apache/NginX)*
+* With lighttpd, set this rewrite rule
 
 ```
 url.rewrite-once = (
     "^(?!/Assets/).*" => "/?"
+    # Let's Encrypt version bellow
+    # "^(?!/Assets/)(?!/\.well-known/).*" => "/?"
 )
 ```
-
-Or, if you are using Let's Encrypt
-```
-url.rewrite-once = (
-    "^(?!/Assets/)(?!/\.well-known/).*" => "/?"
-)
-```
-
-
-## Updating the framework
-
-#### To updade **the framework**, run this command from your project directory (beware of backward incompatible changes)
-The first and last command allow you to preserve and restore your composer.json after the udpate
-
-```bash
-git stash
-git pull
-git stash apply
-```
-
-#### To updade **the dependencies**, run this command from your project directory
-
-```bash
-composer update
-```
-
-
-## Deprecated and discontinued features 
-
-| **Previous Feature**   | **Status**   | **Replacement**         | **How to get it**                     |
-|------------------------|--------------|-------------------------|---------------------------------------|
-| Polyfony\Notice()      | DEPRECATED   | Bootstrap\Alert()       | require sib-retail/polyfony-bootstrap |
-| Polyfony\Thumnbail()   | DEPRECATED   | Intervention\Image()    | require intervention/image            |
-| Polyfony\HttpRequest() | DEPRECATED   | Curl\Curl()             | require php-curl-class/php-curl-class |
-| Polyfony\Filesystem()  | DEPRECATED   | Filesystem\Filesystem() | require symfony/filesystem            |
-| Polyfony\Uploader()    | DEPRECATED   | FileUpload\FileUpload() | require gargron/fileupload            |
-| Polyfony\Validate()    | DISCONTINUED | Validator\Validation()  | require symfony/validator              |
-
 
 
 ## Quick tour
@@ -456,35 +418,35 @@ Response::enableOutputCache($hours);
 
 A cache hit will always use less than 400 Ko of RAM and execute much faster, under a millisecond on any decent server
 
-* The `Response` provides some headers by default
+* The `Response` provides some headers by default *Relative slowness of this example is due the the filesystem being NFS thru wifi*
 
 ```
 < HTTP/1.1 200 OK
-< X-Powered-By: Polyfony
-< Server: Undisclosed
+< X-Powered-By: PHP
+< Server: None of your business
 < Content-Language: fr
 < Content-type: text/html; charset=utf-8
-< Content-Encoding: gzip
-< Content-Length: 667
-< X-Memory-Usage: 832 Ko
-< X-Execution-Time: 21 ms
+< Content-Length: 11
+< X-Memory-Usage: 436.9 Ko
+< X-Execution-Time: 13.5 ms
 ```
 
 The example bellow shows the same Hello World `Response` as above, but from the cache
 
 ```
 < HTTP/1.1 200 OK
-< X-Powered-By: Polyfony
-< Server: Undisclosed
-< Content-Language: fr
+< X-Powered-By: PHP
+< Server: None of your business
 < Content-type: text/html; charset=utf-8
 < Content-Encoding: gzip
-< Content-Length: 667
-< X-Memory-Usage: 389 Ko
-< X-Execution-Time: 1 ms
-< X-From-Cache: hit
-< X-Cached-On: Sat, 17 Jan 2015 00:51:38 +0100
-< X-Cached-Until: Sun, 18 Jan 2015 00:51:38 +0100
+< Content-Length: 31
+< X-Footprint: 13.5 ms 436.9 Ko
+< X-Environment: Prod
+< Date: Mon, 19 Feb 2018 19:54:19 +0100
+< Expires: Mon, 19 Feb 2018 23:54:19 +0100
+< X-Cache: hit
+< X-Cache-Footprint: 1.2 ms 418.2 Ko
+
 ```
 
 ### [Store](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonystorestoreinterface)
@@ -713,6 +675,37 @@ Without, you'd just loose `Security`, the `Mail` storage feature, the `Store\Dat
 
 The database's structure is available by dumping the SQLite Database `Private/Storage/Database/Polyfony.db`.
 The PDO driver can be changed for MySQL, PosgreSQL in `Private/Config/Config.ini`.
+
+
+
+## Updating the framework
+
+#### To updade **the framework**, run this command from your project directory (beware of backward incompatible changes)
+The first and last command allow you to preserve and restore your composer.json after the udpate
+
+```bash
+git stash
+git pull
+git stash apply
+```
+
+#### To updade **the dependencies**, run this command from your project directory
+
+```bash
+composer update
+```
+
+
+## Deprecated and discontinued features 
+
+| **Previous Feature**   | **Status**   | **Replacement**         | **How to get it**                     |
+|------------------------|--------------|-------------------------|---------------------------------------|
+| Polyfony\Notice()      | DEPRECATED   | Bootstrap\Alert()       | require sib-retail/polyfony-bootstrap |
+| Polyfony\Thumnbail()   | DEPRECATED   | Intervention\Image()    | require intervention/image            |
+| Polyfony\HttpRequest() | DEPRECATED   | Curl\Curl()             | require php-curl-class/php-curl-class |
+| Polyfony\Filesystem()  | DEPRECATED   | Filesystem\Filesystem() | require symfony/filesystem            |
+| Polyfony\Uploader()    | DEPRECATED   | FileUpload\FileUpload() | require gargron/fileupload            |
+| Polyfony\Validate()    | DISCONTINUED | Validator\Validation()  | require symfony/validator              |
 
 
 ## [Performance](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
