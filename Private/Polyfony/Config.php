@@ -31,6 +31,9 @@ class Config {
 		// merge the base configuration with the environment specific one
 		self::merge();
 
+		// set the project root path
+		self::$_config['config']['root_path'] = realpath(__DIR__.'/../../') . '/';
+
 		// set the proper timezone
 		!self::get('config', 'timezone') ?: date_default_timezone_set(self::get('config', 'timezone'));
 

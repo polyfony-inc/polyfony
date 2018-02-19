@@ -4,7 +4,7 @@
 
 Compared to major PHP frameworks, Polyfony covers 95% of what we need most of the time, while using 5% of ressources, space, configuration files and dependencies required by major frameworks.
 Our approach is to allow you to know how everything works by keeping the codebase extremely small. Instead of refering to the documentation, you can look at the source code almost as easily.
-Polyfony is fast by design (≤ 20ms/hit on your average app & server), and can get even faster (1~5ms) using the different integrated caching options.
+Polyfony is [fast by design](https://github.com/polyfony-inc/polyfony/wiki/Benchmark) (≤ 20ms/hit on your average app & server), and can get even faster (1~5ms) using the different integrated caching options.
 
 #### Features
 routing, bundles, controllers, views, database abstraction, environments, locales, cache, vendor, helpers, authentication, profiler…
@@ -12,21 +12,22 @@ routing, bundles, controllers, views, database abstraction, environments, locale
 #### Philosophy
 Inspired by Symfony and Laravel but tailored to favour an inclination towards extreme simplicity and efficiency
 
-#### Footprint (of an Hello World)
+#### Footprint [of an Hello World][(https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
 * ≤ 300 Ko of disk space (35% of comment lines)
 * ≤ 400 Ko of RAM
-* ≤ 2.5 ms (cold)
+* ≤ 2.5 ms (cold)  
 
 ## Requirements
-Current *hard* requirements are PHP >= 7.1, ext-pdo, ext-sqlite3, ext-mbstring, ext-msgpack and a rewrite module (mod_rewrite)
+Current *hard* requirements are : Linux/MacOS/xBSD, PHP >= 7.1, ext-pdo, ext-sqlite3, ext-mbstring, ext-msgpack and a rewrite module (mod_rewrite)
 
 ## Installation
 
 * Run this command to download the framework *(and its dependencies)* to your project directory
 
 ```
-composer create-project polyfony-inc/polyfony your-project-folder
+composer create-project --stability=dev polyfony-inc/polyfony your-project-folder
 ```
+*--stability=dev allows you to git pull later on*
 
 * With lighttpd, set the webroot of your webserver to `Public/` *(or requivalent config for Apache/NginX)*
 ```
@@ -707,16 +708,16 @@ Polyfony\Form\Token::enforce();
 
 ## Database structure
 
-The framework has been extensively tested using SQLite, it *should* work with other engines, and even without. 
+The framework has been extensively tested using SQLite, it *may* work with other engines, it defitively works without. 
 Without, you'd just loose `Security`, the `Mail` storage feature, the `Store\Database` engine and the `Logger`'s database feature.
 
 The database's structure is available by dumping the SQLite Database `Private/Storage/Database/Polyfony.db`.
 The PDO driver can be changed for MySQL, PosgreSQL in `Private/Config/Config.ini`.
 
 
-## Performance
-Polyfony has been designed to be fast, no compromise. 
-If implementating a « convenience » tool/function into the framework was to cost a global 30% bump in execution time, it is either implemented in a more efficient manner, or not implemented at all.
+## [Performance](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
+Polyfony has been designed to be fast, no compromise (> 2000 req/s). 
+If implementating a « convenience » tool/function into the framework was to cost a global bump in execution time, it is either implemented in a more efficient manner, or not implemented at all.
 
 ## Security
 The codebase is small, straightforward and abundantly commented. It's audited using SensioInsight, RIPS, and Sonar.

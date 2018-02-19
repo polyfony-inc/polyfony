@@ -13,12 +13,19 @@ namespace Polyfony;
 
 class Cache {
 
-	public static function has(string $variable) :bool {
-		
+	private static function path($variable) :string {
+
 		// secure the variable name
 		$variable = \Polyfony\Format::fsSafe($variable);
+		// build the path
+		return Config::get('cache', 'path') . $variable;
+
+	}
+
+	public static function has(string $variable) :bool {
+
 		// set the variable path
-		$path = Config::get('cache', 'path') . $variable;
+		$path = self::path($variable);
 		// if the file exists 
 		if(file_exists($path)) {
 			// if it expired
@@ -34,7 +41,7 @@ class Cache {
 				return true;
 			}
 		}
-		// file doesn't even ext
+		// file doesn't even exist
 		else {
 			return false;
 		}
@@ -49,14 +56,12 @@ class Cache {
 			// throw an exception
 			Throw new \Polyfony\Exception("{$variable} already exists in the store.");
 		}
-		// secure the variable name
-		$variable = \Polyfony\Format::fsSafe($variable);
 		// store it
-		file_put_contents(Config::get('cache', 'path') . $variable, msgpack_pack($value));
+		file_put_contents(self::path($variable), msgpack_pack($value));
 		// compute the expiration time or set to a year by default
 		$lifetime = $lifetime ? time() + $lifetime : time() + 365 * 24 * 3600;
 		// alter the modification time
-		touch(Config::get('cache', 'path') . $variable, $lifetime);
+		touch(self::path($variable), $lifetime);
 		// return status
 		return(self::has($variable));
 		
@@ -70,10 +75,9 @@ class Cache {
 			// throw an exception
 			Throw new \Polyfony\Exception("{$variable} does not exist in the store.");
 		}
-		// secure the variable name
-		$variable = \Polyfony\Format::fsSafe($variable);
+		
 		// return it
-		return(msgpack_unpack(file_get_contents(Config::get('cache', 'path') . $variable)));
+		return(msgpack_unpack(file_get_contents(self::path($variable))));
 		
 	}
 	
@@ -85,11 +89,9 @@ class Cache {
 			// return false
 			return(false);	
 		}
-		// secure the variable name
-		$variable = \Polyfony\Format::fsSafe($variable);
-		// return it
-		unlink(Config::get('cache', 'path') . $variable);
-		// return opposite of presence of the object
+		// remove it
+		unlink(self::path($variable));
+		// return it	
 		return(!self::has($variable));
 		
 	}
