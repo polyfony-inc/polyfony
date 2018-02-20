@@ -115,10 +115,19 @@ class Request {
 		
 	}
 	
+	// rarely used but can allow to artificially set a get parameter
 	public static function setUrlParameter(string $key, $value=null) :void {
 		
 		// set the value
 		self::$_get[$key] = $value;
+		
+	}
+
+	// return all url parameters (for the Profiler only)
+	public static function getUrlParameters() :array {
+		
+		// set the value
+		return self::$_get;
 		
 	}
 	

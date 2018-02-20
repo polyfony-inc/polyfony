@@ -20,6 +20,9 @@ class Bundles {
 	// will get the list of bundles and get their routes and runtimes
 	public static function init() :void {
 
+		// marker
+		Profiler::setMarker('Bundles.init');
+
 		// if cache is enabled and in prod load the cache, else parse bundles
 		Config::isProd() && Cache::has('Includes') ? self::loadCachedDependencies() : self::loadDependencies();
 		
@@ -28,6 +31,9 @@ class Bundles {
 
 		// now that we have the list of route files, pass them to the router class
 		Router::includeBundlesRoutes(self::$_routes);
+
+		// marker
+		Profiler::releaseMarker('Bundles.init');
 
 	}
 	

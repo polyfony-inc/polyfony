@@ -70,6 +70,8 @@ class Response {
 	// init the response
 	public static function init() :void {
 		
+		// marker
+		Profiler::setMarker('Response.init');
 		// check if we can render a response from the cache
 		self::isCached() === false ?: self::renderFromCache();
 		// start the output buffer
@@ -103,6 +105,8 @@ class Response {
 		self::setType(Config::get('response', 'default_type'));
 		// init the assets packing filesystem
 		self::initAssetsPacking();
+		// marker
+		Profiler::releaseMarker('Response.init');
 		
 	}
 
@@ -512,8 +516,8 @@ class Response {
 		}
 		// set some headers
 		self::setHeaders($headers);
-		
-	}	
+
+	}
 
 	public static function clean() :string {
 		// clean the reponse
@@ -521,7 +525,6 @@ class Response {
 	}
 
 	public static function render() :void {
-
 		// if no content is set yet we garbage collect
 		self::$_content = self::$_content ?: self::clean();
 		// set the current protocol of fallback to HTTP 1.1 and set the status code plus message

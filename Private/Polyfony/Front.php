@@ -18,18 +18,12 @@ class Front {
 		
 		// start the profiler
 		Profiler::init();
-		
+
 		// detect context CLI/WEB and set the proper url
-		Request::init();
-		
-		// marker
-		Profiler::setMarker('init_request');
+		Request::init();	
 		
 		// detect env and load .ini files accordingly
 		Config::init();
-		
-		// marker
-		Profiler::setMarker('init_config');
 
 		// init the response so that is can render a cached one
 		Response::init();
@@ -37,14 +31,8 @@ class Front {
 		// start the exeption catcher (quite late, but we gotta know if config has use_strict)
 		Exception::init();
 		
-		// marker
-		Profiler::setMarker('init_response');
-		
 		// look for runtime and routes in the bundles
 		Bundles::init();
-		
-		// marker
-		Profiler::setMarker('init_bundles');
 		
 		// route the request to a matching bundle/controller/action if any
 		Router::init();

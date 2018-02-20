@@ -622,8 +622,12 @@ class Query {
 			// throw an exception
 			Throw new Exception("Query->execute() : Failed to prepare query [{$exception_infos}]");
 		}
+		// marker
+		$id_marker = Profiler::setMarker(null, 'db');
 		// execute the statement
 		$this->Success = $this->Prepared->execute($this->Values);
+		// marker
+		Profiler::releaseMarker($id_marker);
 		// if execution failed
 		if($this->Success === false) {
 			// prepare informations to be thrown

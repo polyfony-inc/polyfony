@@ -9,7 +9,10 @@ class DemoController extends pf\Controller {
 
 		// set some common metas and assets
 		pf\Response::set([
-			'css'	=>['//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css'],
+			'css'	=>[
+				'//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css',
+				'//use.fontawesome.com/releases/v5.0.6/css/all.css'
+			],
 			'js'	=>[
 				'//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js',
 				'//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'

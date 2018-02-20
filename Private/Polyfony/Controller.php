@@ -51,17 +51,18 @@ class Controller {
 		}
 		// the file exists
 		else {
+			// marker
+			$id_marker = Profiler::setMarker("View.{$view_bundle}/{$view_name}", 'view');
 			// simply include it
-			require($view_path);	
+			require($view_path);
+			// marker
+			Profiler::releaseMarker($id_marker);
 		}
 		
 	}
 	
 	// forward to another controller in the same bundle
 	final public function forward(string $controller, $action = null) :void {
-		
-		// add a profiler marker
-		Profiler::setMarker('forward');
 
 		// get the current route as a base
 		$route = Router::getCurrentRoute();
