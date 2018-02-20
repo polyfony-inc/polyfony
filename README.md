@@ -79,12 +79,12 @@ Request::isPost();
 Request::isAjax();
 ```
 
-* check if the request is done using SSL
+* check if the request is done thru TLS/SSL
 ```php
 Request::isSecure();
 ```
 
-* check if the request is fril the command line
+* check if the request is from the command line
 ```php
 Request::isCli();
 ```
@@ -166,7 +166,7 @@ $account
 * Validating data
 
 You can prevent corrupted data from entering the database. To do so, declare a validator for each column that you want to secure.
-The declaration has to me done in the model, with the constant `VALIDATORS` being an array. 
+The declaration has to be done in the model, with the constant `VALIDATORS` being an array. 
 The key being the column, the value being an array of authorized values, or a REGEX. Example :
 
 ```php
@@ -260,7 +260,7 @@ Private/Config/Dev.ini
 domain = development.domain.dev
 port = 8080
 ```
-Or, if you are not running the development port :
+Or, if you are not in development environment :
 ```
 Private/Config/Prod.ini
 
@@ -274,7 +274,7 @@ port 80
 Config::get('group', 'key')
 ```
 
-Having specific ini configuration files for development and production allows your to :
+Having specific ini configuration files for development and production allows you to :
 * set a bypass email to redirect all email sent in development environment
 * enable compression, obfuscation/minifying and caching only in production
 * show the profiler stack in development
@@ -305,14 +305,18 @@ Security::hasLevel($level);
 
 ### [Profiler](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyprofiler)
 
-Set markers arounds heavy code blocks to estimate the time and memory impact of that bloc.
+Set markers arounds heavy code blocks to estimate the time and memory impact of that block.
 ```php
-Profiler::setMarker('begining_of_a_heavy_operation');
-Profiler::setMarker('end_of_heavy_opeartion')
+Profiler::setMarker('ClueA.subclue1');
+Profiler::releaseMarker('Clue1.subclue1')
 ```
 
-If the `Config::get('profiler', 'enable_stack')` if set to true,
-the stack of markers will be added at the bottom an html `Response` as a nice ul/li lists, or merged into a json `Response`
+If the `Config::get('profiler', 'enable')` if set to `true (1)` and your `Response` is of type `html`, you will see a nice bar at the bottom of the page, with lots of useful informations.
+That bar depends on bootstrap 4 CSS and JS. Be sure to add those to your assets to enjoy the bull benefits of the Profiler.
+By default, some markers are placed in key places (around every `Database` queries, around Controller forwarding...).
+
+If your `Response` is of type `json`, then the `Profiler` ìnformations will be merged with your `Response` as an array.
+
 
 
 ### [Locales](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonylocales)

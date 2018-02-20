@@ -432,7 +432,7 @@ class Response {
 		// case of html page
 		if(self::$_type == 'html-page') {
 			// add the profiler
-			self::$_content .= Config::get('profiler', 'enable_stack', true) ? Profiler::getHtml() : '';
+			self::$_content .= Config::get('profiler', 'enable', true) ? Profiler::getHtml() : '';
 			// wrap in the body
 			self::$_content = '</head><body>' . self::$_content;
 			// preprend metas

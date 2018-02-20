@@ -54,7 +54,7 @@ class Profiler {
 	
 	public static function setMarker($name=null, $user=null, $additional_infos=null) {
 		// profiler is disabled
-		if (!Config::get('profiler', 'enable_stack')) {
+		if (!Config::get('profiler', 'enable')) {
 			return false;
 		}
 		// generate a marker id
@@ -73,7 +73,7 @@ class Profiler {
 
 	public static function releaseMarker($id) :void {
 
-		if(Config::get('profiler', 'enable_stack') && array_key_exists($id, self::$_stack)) {
+		if(Config::get('profiler', 'enable') && array_key_exists($id, self::$_stack)) {
 			self::$_stack[$id]['duration'] 	= microtime(true) - self::$_stack[$id]['start'];
 			self::$_stack[$id]['memory'] 	= memory_get_usage() - self::$_stack[$id]['memory'];
 		}
