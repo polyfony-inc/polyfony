@@ -21,7 +21,7 @@ class Bundles {
 	public static function init() :void {
 
 		// marker
-		Profiler::setMarker('Bundles.init');
+		Profiler::setMarker('Bundles.init', 'framework');
 
 		// if cache is enabled and in prod load the cache, else parse bundles
 		Config::isProd() && Cache::has('Includes') ? self::loadCachedDependencies() : self::loadDependencies();
@@ -33,7 +33,7 @@ class Bundles {
 		Router::includeBundlesRoutes(self::$_routes);
 
 		// marker
-		Profiler::releaseMarker('Bundles.init');
+		Profiler::releaseMarker('Bundles.init', 'framework');
 
 	}
 	

@@ -76,6 +76,15 @@ class Query {
 		
 	}
 	
+	// debugging methods (for the Profiler)
+	public function getQuery() {
+		return $this->Query;
+	}
+	// debugging methods (for the Profiler)
+	public function getValues() {
+		return $this->Values;
+	}
+
 	// passrthu a query with values if needed
 	public function query($query, $values=null, $table=null) {
 		// set the main action
@@ -613,6 +622,8 @@ class Query {
 			// assemble the limit options to the query
 			$this->Query .= " LIMIT {$this->Limit[0]},{$this->Limit[1]}";
 		}
+		// marker
+		$id_marker = Profiler::setMarker(null, 'database', ['Query'=>$this]);
 		// prepare the statement
 		$this->Prepared = \Polyfony\Database::handle()->prepare($this->Query);
 		// if prepare failed
@@ -622,8 +633,6 @@ class Query {
 			// throw an exception
 			Throw new Exception("Query->execute() : Failed to prepare query [{$exception_infos}]");
 		}
-		// marker
-		$id_marker = Profiler::setMarker(null, 'db');
 		// execute the statement
 		$this->Success = $this->Prepared->execute($this->Values);
 		// marker

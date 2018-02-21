@@ -35,22 +35,33 @@ class Mail {
 		$this->subject 		= '';
 		$this->mailer 		= null;
 		$this->title 		= null;
-		$this->files 		= array();
-		$this->variables 	= array();
-		$this->recipients 	= array(
-			'to'	=> array(),
-			'cc'	=> array(),
-			'bcc'	=> array()
-		);
-		$this->from 		= array(
+		$this->files 		= [];
+		$this->variables 	= [];
+		$this->recipients 	= [
+			'to'	=> [],
+			'cc'	=> [],
+			'bcc'	=> []
+		];
+		$this->from = [
 			'name'	=> Config::get('mail', 'from_name'),
 			'mail'	=> Config::get('mail', 'from_mail')
-		);
-		$this->smtp 		= array(
+		];
+		$this->smtp = [
 			'host'	=> Config::get('mail', 'smtp_host'),
 			'user'	=> Config::get('mail', 'smtp_user'),
 			'pass'	=> Config::get('mail', 'smtp_pass')
-		);
+		];
+	}
+
+	public function getDebugData() {
+		return [
+			'recipients'=>$this->recipients,
+			'subject'	=>$this->subject,
+			'files'		=>$this->files,
+			'from'		=>$this->from,
+			'format'	=>$this->format,
+			'smtp'		=>$this->smtp
+		];
 	}
 
 	public function format($format) {
@@ -225,7 +236,10 @@ class Mail {
 	}
 
 	public function send($save=false) {
-		
+
+		// marker
+		$id_marker = Profiler::setMarker(null, 'email', ['Email'=>$this]);
+
 		// --------------------------------------------------------
 		// - depending on the presence of an alternate smtp relay -
 		// --- we may alter the configuration of the SMTP server --
@@ -353,6 +367,9 @@ class Mail {
 				->into('Mails')
 				->execute();
 		}
+
+		// marker
+		Profiler::releaseMarker($id_marker);
 
 		// return the sending status
 		return($is_sent);

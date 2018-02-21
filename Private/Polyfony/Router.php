@@ -161,7 +161,7 @@ class Router {
 	public static function route() :void {
 
 		// marker
-		Profiler::setMarker('Router.route');
+		Profiler::setMarker('Router.route', 'framework');
 		// get the requested url
 		$request_url = Request::getUrl();
 		// get the requested method
@@ -177,7 +177,7 @@ class Router {
 			}
 		}
 		// marker
-		Profiler::releaseMarker('Router.route');
+		Profiler::releaseMarker('Router.route', 'framework');
 		// if no match is found and we don't have an error route to fallback on
 		if(!self::$_match) {
 			// throw a native exception since there is no cleaner alternative
@@ -356,7 +356,7 @@ class Router {
 		// if method is missing replace by default
 		$method = method_exists($class,$method) ? $method : 'defaultAction';
 		// marker
-		Profiler::setMarker("{$route->controller}.{$method}", 'controller');
+		$id_marker = Profiler::setMarker("{$route->controller}.{$method}", "controller");
 		// pre action
 		self::$_controller->preAction();
 		// call the method
@@ -364,7 +364,7 @@ class Router {
 		// post action
 		self::$_controller->postAction();	
 		// marker
-		Profiler::setMarker("{$route->controller}.{$method}");
+		Profiler::releaseMarker($id_marker);
 		
 	}
 	

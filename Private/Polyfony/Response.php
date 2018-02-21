@@ -71,7 +71,7 @@ class Response {
 	public static function init() :void {
 		
 		// marker
-		Profiler::setMarker('Response.init');
+		Profiler::setMarker('Response.init', 'framework');
 		// check if we can render a response from the cache
 		self::isCached() === false ?: self::renderFromCache();
 		// start the output buffer
@@ -106,7 +106,7 @@ class Response {
 		// init the assets packing filesystem
 		self::initAssetsPacking();
 		// marker
-		Profiler::releaseMarker('Response.init');
+		Profiler::releaseMarker('Response.init', 'framework');
 		
 	}
 
@@ -432,7 +432,7 @@ class Response {
 		// case of html page
 		if(self::$_type == 'html-page') {
 			// add the profiler
-			self::$_content .= Config::get('profiler', 'enable', true) ? Profiler::getHtml() : '';
+			self::$_content .= Config::get('profiler', 'enable', true) ? new Profiler\Html() : '';
 			// wrap in the body
 			self::$_content = '</head><body>' . self::$_content;
 			// preprend metas

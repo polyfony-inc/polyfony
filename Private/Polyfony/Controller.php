@@ -52,7 +52,7 @@ class Controller {
 		// the file exists
 		else {
 			// marker
-			$id_marker = Profiler::setMarker("View.{$view_bundle}/{$view_name}", 'view');
+			$id_marker = Profiler::setMarker("{$view_bundle}/{$view_name}", 'view');
 			// simply include it
 			require($view_path);
 			// marker

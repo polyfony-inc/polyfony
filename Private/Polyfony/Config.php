@@ -18,6 +18,9 @@ class Config {
 	
 	public static function init() :void {
 	
+		// marker
+		Profiler::setMarker('Config.init', 'framework', [], true);
+
 		// get all configurations available
 		self::$_config = array(
 			'Current'	=> parse_ini_file('../Private/Config/Config.ini', true),
@@ -36,6 +39,9 @@ class Config {
 
 		// set the proper timezone
 		!self::get('config', 'timezone') ?: date_default_timezone_set(self::get('config', 'timezone'));
+
+		// marker
+		Profiler::releaseMarker('Config.init', true);
 
 	}
 	
@@ -115,7 +121,12 @@ class Config {
 	
 	public static function get(string $group, $key=null) {
 		// return the proper config
-		return($key ? self::$_config['Current'][$group][$key] : self::$_config['Current'][$group]);
+		return($key ? 
+			// make sure the group's key exists before trying to access it
+			(isset(self::$_config['Current'][$group][$key]) ? self::$_config['Current'][$group][$key] : null) : 
+			// make sure the group exists before trying to access it
+			(isset(self::$_config['Current'][$group]) ? self::$_config['Current'][$group] : null)
+		);
 	}
 
 	public static function isDev() :bool {

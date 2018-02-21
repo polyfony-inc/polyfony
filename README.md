@@ -277,7 +277,7 @@ Config::get('group', 'key')
 Having specific ini configuration files for development and production allows you to :
 * set a bypass email to redirect all email sent in development environment
 * enable compression, obfuscation/minifying and caching only in production
-* show the profiler stack in development
+* show the profiler in development
 * use different database configuration in development or production
 * etc.
 
@@ -308,7 +308,7 @@ Security::hasLevel($level);
 Set markers arounds heavy code blocks to estimate the time and memory impact of that block.
 ```php
 Profiler::setMarker('ClueA.subclue1');
-Profiler::releaseMarker('Clue1.subclue1')
+Profiler::releaseMarker('ClueA.subclue1')
 ```
 
 If the `Config::get('profiler', 'enable')` if set to `true (1)` and your `Response` is of type `html`, you will see a nice bar at the bottom of the page, with lots of useful informations.
@@ -317,7 +317,9 @@ By default, some markers are placed in key places (around every `Database` queri
 
 If your `Response` is of type `json`, then the `Profiler` ìnformations will be merged with your `Response` as an array.
 
+![Profiler Demo1](https://i.imgur.com/rQoVmD3.png)
 
+![Profiler Demo2](https://i.imgur.com/z4ohjVx.png)
 
 ### [Locales](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonylocales)
 

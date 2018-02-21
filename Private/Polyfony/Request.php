@@ -34,6 +34,9 @@ class Request {
 
 	public static function init() :void {
 
+		// marker
+		Profiler::setMarker('Request.init', 'framework', [], true);
+
 		// set proper context depending if we are in command line
 		self::$_context = isset($_SERVER['argv'][0]) ? 'CLI' : 'HTTP';
 		
@@ -64,6 +67,9 @@ class Request {
 
 		// remove globals
 		unset($_GET, $_POST, $_SERVER, $_FILES);
+
+		// marker
+		Profiler::releaseMarker('Request.init', true);
 
 	}
 	
