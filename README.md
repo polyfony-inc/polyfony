@@ -86,28 +86,14 @@ Request::isCli();
 
 Examples bellow assume a table named `Accounts` exists in the database.
 
-* Retrieve the login and id of 5 accounts with level 1 that logged in, in the last 24h
-```php
-// demo query
-$accounts = Database::query()
-	->select(array('login','id'))
-	->from('Accounts')
-	->where(array(
-		'id_level'=>1
-	))
-	->whereHigherThan('last_login_date',time()+24*3600)
-	->limitTo(0,5)
-	->execute();
-```
-
 * Retrieve a single account by its ID
 ```php
 $account = new Models\Accounts(1);
 ```
 
-* Retrieve a single account by its email
+* Retrieve a single account by its `login`
 ```php
-$account = new Models\Accounts(['email'=>'root@local.domain']);
+$account = new Models\Accounts(['login'=>'root@local.domain']);
 ```
 
 * Retrieve a single record by its ID and generate an input to change a property
@@ -141,6 +127,20 @@ Models\Accounts::create([
 	'id_level'	=>1
 	// more columns and values...
 ]);
+```
+
+* Retrieve the `login` and `id` of 5 accounts with `id_level` 1 that logged in, in the last 24h
+```php
+// demo query
+$accounts = Database::query()
+	->select(array('login','id'))
+	->from('Accounts')
+	->where(array(
+		'id_level'=>1
+	))
+	->whereHigherThan('last_login_date',time()+24*3600)
+	->limitTo(0,5)
+	->execute();
 ```
 
 ##### Parameters
