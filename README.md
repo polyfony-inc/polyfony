@@ -279,39 +279,74 @@ a boolean true (it will match anything but a missing value)
 
 https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyconfig
 
-By default the `Private/Config/Config.ini` file is loaded.
-You can use environment specific configuration files by detecting the current domain, or the current port.
+Environments characterize a context of execution, with their own set of variables. 
+**Two environments exist in Polyfony** 
+* `Dev`, the development environment (this is where your coding occurs, most likely on your local developement server, or your own computer), 
+* `Prod`, the production environment (also refered to as `Live`).
+
+Variables that are common to both environments should be put in the main configuration file `Private/Config/Config.ini` 
+The environment detection can be based on either : 
+* the domain name 
+* the port. 
+
+You can chose the detection method in `Config.ini` 
+
 ```
 [polyfony]
 detection_method = "domain" ; or "port"
 ```
-Then the framework will overrides Config.ini values with those of :
+
+Depending on the detected environment, either 
+* `Private/Config/Dev.ini` or 
+* `Private/Config/Prod.ini` 
+will overload/merge with the main `Config.ini`
+
+
+* Bellow is sample `Dev.ini` with its development domain
 ```
 Private/Config/Dev.ini
 
 [router]
-domain = development.domain.dev
-port = 8080
+domain = my-project.my-company.ext.devel
+port = 80
 ```
-Or, if you are not in development environment :
+
+* And a sample `Prod.ini` with its production domain
+*The framework falls back to production if neither domain or port are matched*
+
 ```
 Private/Config/Prod.ini
 
 [router]
-domain = production.domain.prod
+domain = my-project.my-company.ext
 port 80
+
+[response]
+minify = 1
+compress = 1
+cache = 1
+pack_js = 1
+pack_css = 1
+
 ```
 
-* To retrieve configurations values (from the environment specific ini file)
+*Default configurations files with ready-to-go settings are put in place by composer during installation*
+
+* To retrieve configurations values (from the merged configurations files)
 ```php
-Config::get('group', 'key')
+// retrieve the whole 'response' group
+Config::get('response');
+
+// retrieve only a key from that group
+Config::get('response', 'minify');
 ```
 
-Having specific ini configuration files for development and production allows you to :
-* set a bypass email to redirect all email sent in development environment
+Having distinct configuration files allows you to :
+* set a bypass email to catch all emails sent in development environment
 * enable compression, obfuscation/minifying and caching only in production
-* show the profiler in development
-* use different database configuration in development or production
+* show the profiler in development (and even, in the early production stage if needed)
+* use different database configuration
+* harden security parameters in production while allowing softer settings during local tests
 * etc.
 
 ### [Security](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonysecurity)
