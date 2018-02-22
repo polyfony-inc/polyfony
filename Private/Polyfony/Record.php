@@ -224,28 +224,28 @@ class Record {
 	private function convert($column, $raw = false) {
 		
 		// if we want the raw result ok, but exclude arrays that can never be gotten raw
-		if($raw === true && strpos($column,'_array') === false) {
+		if($raw === true && substr($column,-6,6) != '_array') {
 			// return as is
 			return $this->{$column};
 		}
 		// otherwise convert it
 		// if the column contains an array
-		if(strpos($column,'_array') !== false) {
+		if(substr($column,-6,6) == '_array') {
 			// decode the array
 			return json_decode($this->{$column},true);
 		}
 		// if the column contains a size value
-		elseif(strpos($column,'_size') !== false) {
+		elseif(substr($column,-5,5) == '_size') {
 			// convert to human size
 			return Format::size($this->{$column});
 		}
 		// if the column contains a datetime
-		elseif(strpos($column,'_datetime') !== false) {
+		elseif(substr($column,-9,9) == '_datetime') {
 			// if the value is set
 			return !empty($this->{$column}) ? date('d/m/Y H:i', $this->{$column}) : '';
 		}
 		// if the column contains a date
-		elseif(strpos($column,'_date') !== false || substr($column,-3,3) == '_at') {
+		elseif(substr($column,-5,5) == '_date' || substr($column,-3,3) == '_at' || substr($column,-3,3) == '_on') {
 			// if the value is set
 			return !empty($this->{$column}) ? date('d/m/Y', $this->{$column}) : '';
 		}
@@ -311,6 +311,27 @@ class Record {
 		return $deleted ? true : false;
 	}
 
+	// put the record into the trash
+	public function trash() {
+
+		// and return the object for chaining
+		return $this->set([
+			'trashed_on'=>time(),
+			'trashed_by'=>Security::get('id')
+		]);
+
+	}
+
+	// remove the object from the trash
+	public function untrash() {
+
+		// and return the object for chaining
+		return $this->set([
+			'trashed_on'=>null,
+			'trashed_by'=>null
+		]);
+
+	}
 
 	// returns the name of the class that has extended this one (aka, the Table name)
 	private static function tableName() :string {

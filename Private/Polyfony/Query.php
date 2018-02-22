@@ -690,7 +690,13 @@ class Query {
 			$value = json_encode($value);
 		}
 		// if we are dealing with a date and the value is not empty or null
-		elseif((strpos($column,'_date') !== false || substr($column,-3,3) == '_at') && $value != '') {
+		elseif(
+			(
+				substr($column,-9,9) == '_datetime' || 
+				substr($column,-5,5) == '_date' || 
+				substr($column,-3,3) == '_at' || 
+				substr($column,-3,3) == '_on'
+			) && $value != '') {
 			// if the date has a time with it
 			if(
 				substr_count($value, '/') == 2 && 

@@ -135,10 +135,8 @@ echo $account->input('login', ['type'=>'email']);
 	->set([
 		'login'				=> 'test',
 		'id_level'			=> 1,
-		// magic column name ending with _date will be translated to a timestamp automatically
-		'last_login_date'	=> '18/04/1995',
-		// magic column name ending with _array will be translated to a JSON string automatically
-		'modules_array'		=> ['MOD_BOOKS', 'MOD_USERS', 'MOD_EXAMPLE'],
+		'last_login_date'	=> '18/04/1995', // magic column
+		'modules_array'		=> ['MOD_BOOKS', 'MOD_USERS', 'MOD_EXAMPLE'], // magic column
 		'password'			=> Security::getPassword('test')
 	])
 	->save();
@@ -178,6 +176,24 @@ Models\Accounts::create([
 ->groupBy()				// ?
 ->first()				// return the first record instead of an array of records
 ```
+
+##### Magic columns
+
+* Columns ending with `_date`, `_on`, `_at` will be converted from `DD/MM/AAAA` to a timestamp and vice-versa
+* Columns ending with `_datetime` will be converted from `DD/MM/AAAA HH:mm` to a timestamp and vice-versa
+* Columns ending with `_array` will be converted and stored as json, then restored to their original type
+* Columns ending with `_size` will be converted from bytes to human readable size
+
+|                    Setters                   |     Stored as     |           Getters          |          var_dump         |
+|:--------------------------------------------:|:-----------------:|:--------------------------:|:-------------------------:|
+| ->set(['creation_date'=>'01/01/2018'])       |     1514808000    | ->get('creation_date')     | string '01/01/2018'       |
+| ->set(['creation_at'=>'01/01/2018'])         |     1514808000    | ->get('creation_at', true) | string '1514808000'       |
+| ->set(['creation_on'=>'1514808000'])         |     1514808000    | ->get('creation_on')       | string '01/01/2018'       |
+| ->set(['creation_datetime'=>'1514808000'])   |     1514808000    | ->get('creation_datetime') | string '01/01/2018 12:00' |
+| ->set(['products_array'=>['apple','peach']]) | ["apple","peach"] | ->get('products_array')    | array ['apple','peach']   |
+| ->set(['picture_size'=>'24938'])             |       24938       | ->get('picture_size')      | string '24.4 Ko'          |
+| ->set(['picture_size'=>'24938'])             |       24938       | ->get('picture_size',true) | string '24938'            |
+
 
 ##### Data validators
 
