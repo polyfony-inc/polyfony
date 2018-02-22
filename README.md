@@ -226,45 +226,45 @@ Note that you don't have to include `NULL` or `EMPTY` values in your validators 
 
 ### [Router](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyrouter)
 
-* Each bundle has a file to place your routes
-```php
-Private/Bundles/{BundleName}/Loader/Route.php
-```
+**A route maps an URL to an `Action`, which resides in a `Controller`, which resides in a `Bundle`**
+Routes are to be declared in each bundle's `Loader` directory, in a file called `Route.php`
 
-In these files you can declare as many routes as you like. 
-Static routes (not accepting parameters, require a perfect URL match) or dynamic routes, accepting parameters, that you can optionally restrict.
-All routes must point to a Bundle and Controller, specificied by the second parameter of `Router::map('/url/', 'Bundle/Controller')` method.
+*Example : `Private/Bundles/{BundleName}/Loader/Route.php`*
 
-**Static** route, you must provide the action in the route, as such 
-`Router::map('/url/', 'Bundle/Controller@action)`.
 
-**Dynamic** routes can point to different actions depending on a URL parameter, as such 
-`Router::map('/admin/:what/:id/', 'Bundle/Controller@{what}')`.
+Routes can accept a number of parameters, and lack thereof 
+* `Router::map('/admin/:what/:id/', 'Bundle/Controller@{what}')`.
+* `Router::map('/url/', 'Bundle/Controller@action)`.
 
-If no action is provided, `indexAction` is called, if an action is provided but none match, `defaultAction()` is called.
-A `preAction()` and `postAction()` wrap the action to be called.
+The action can 
+* be a parameter of the url (as with the first example. The action would be the 2nd parameter `{what}`)
+* be ommited. In that case an `indexAction` is called. If it doesn't exist, `defaultAction()` will be called, if it doesn't exist an exception is thrown.
 
-* The following static route will match a GET request to /about-us/ and call `Private/Bundles/Pages/Controllers/Static.php->aboutUsAction();`
+Before calling the action `preAction()` will be called on the controller. *You can declare one, or ommit it.*
+after the real action has been be called `postAction()` will be called on the controller. *You can declare one, or ommit it.*
+
+
+* The following route will match a GET request to /about-us/ 
+It will call `Private/Bundles/Pages/Controllers/Static.php->aboutUsAction();`
 
 ```php
 Router::get('/about-us/', 'Pages/Static@aboutUs');
 ```
 
-`Router::get()` is a shortcut for the fourth parameter of `Router::map()`, also available are `Router::post()`, `Router::delete()`, `Router::put()`
+* The following route will match a request of any method (GET,POST...) to /admin/{edit,update,delete,create}/ and /admin/
+It will call `Private/Bundles/Admin/Controllers/Main.php->{action}Action();`
 
-* The following dynamic route will match a request of any method to /admin/{edit,update,delete,create}/ and /admin/
-It will call `Private/Bundles/Admin/Controllers/Main.php->{edit,update,delete,create,index}Action();`
 ```php
 Router::map('/admin/:action/:id/', 'Admin/Main@{action}')
-	->where([
-		'action'=>['edit','update','delete','create']
-	]);
+	->where(['action'=>['edit','update','delete','create']]);
 ```
 
-You can restrict parameters further, you can pass :
-an array of allowed value (it will also match no value)
-a regex (it will also match no value)
-a boolean true (it will match anything but a missing value)
+You can restrict parameters further, passing :
+* an array of allowed value (it will also match no value)
+* a regex (it will also match no value)
+* a boolean true (it will match anything but a missing value)
+
+*Route can also be generated dynamically, over database iterations.*
 
 ### Environments
 
