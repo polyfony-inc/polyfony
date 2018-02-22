@@ -43,9 +43,11 @@ url.rewrite-once = (
 ```
 
 
-## Quick tour
-You can read this quick tour, or just browse the `Private/Bundles/Demo/` code.
-The code bellow assumes that your are using the `Polyfony` namespace before each call.
+## No learning curve
+
+This *readme.md* file should be enough to get you started, however, you can also browse the `Private/Bundles/Demo/` bundle.
+
+*The code bellow assumes you are prefixing the `Polyfony` namespace before each call.*
 
 ### [Request](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyrequest)
 
@@ -91,6 +93,8 @@ Request::isCli();
 
 ### [Database](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyquery)
 
+Examples bellow assume a table named `Accounts` exists in the database.
+
 * Retrieve the login and id of 5 accounts with level 1 that logged in, in the last 24h
 ```php
 // demo query
@@ -117,31 +121,43 @@ $account = new Models\Accounts(['email'=>'root@local.domain']);
 
 * Retrieve a single record by its ID and generate an input to change a property
 ```php
-$account = new Models\Accounts(1);
-echo $account->input('login');
+$account = new Models\Accounts;
+echo $account->input('login', ['type'=>'email']);
 ```
+* Outputs
 ```html
-<input type="text" name="Accounts[login]" value="root" />
+<input type="email" name="Accounts[login]" value="root" />
 ```
 
-* Create a record, populate and insert it
+* Create an account, populate and insert it
 ```php
-$account = new Accounts();
-$account
-	->set('login', 'test')
-	->set('id_level', '1')
-	// magic column name ending with _date will be translated to a timestamp automatically
-	->set('last_login_date', '18/04/1995')
-	// magic column name ending with _array will be translated to a JSON string automatically
-	->set('modules_array', array('MOD_BOOKS', 'MOD_USERS', 'MOD_EXAMPLE'))
-	->set('password', Security::getPassword('test'))
+(new Models\Accounts)
+	->set([
+		'login'				=> 'test',
+		'id_level'			=> 1,
+		// magic column name ending with _date will be translated to a timestamp automatically
+		'last_login_date'	=> '18/04/1995',
+		// magic column name ending with _array will be translated to a JSON string automatically
+		'modules_array'		=> ['MOD_BOOKS', 'MOD_USERS', 'MOD_EXAMPLE'],
+		'password'			=> Security::getPassword('test')
+	])
 	->save();
+
 ```
 
-* List of search parameters
+* Alternatively, you can also create an account this way
+```php
+Models\Accounts::create([
+	'login'		=>'test',
+	'id_level'	=>1
+	// more columns and values...
+]);
+```
+
+##### Parameters
 
 ```php
-->where()					// == $value
+->where()				// == $value
 ->whereNot()			// <> $value
 ->whereBetween()		// BETWEEN $min_value AND $max_value
 ->whereMatch()			// MATCH column AGAINST $value
@@ -154,7 +170,7 @@ $account
 ->whereNull() 			// NULL
 ```
 
-* List of options
+##### Options
 
 ```php
 ->orderBy()				// associative array ('column'=>'ASC')
@@ -163,15 +179,18 @@ $account
 ->first()				// return the first record instead of an array of records
 ```
 
-* Validating data
+##### Data validators
 
-You can prevent corrupted data from entering the database. To do so, declare a validator for each column that you want to secure.
-The declaration has to be done in the model, with the constant `VALIDATORS` being an array. 
-The key being the column, the value being an array of authorized values, or a REGEX. Example :
+**Data validation should be managed by the developer with `symfony/validator`, `respect/validation`, `wixel/gump`, or similar packages.** 
+That being said, there is a very basic *(and optional)* built-in validator, to prevent corrupted data from entering the database while manipulating objects.
+
+To enforce it, declare a `VALIDATORS` constant array in your model, each key being a column, and each value being a regex, or an array of allowed vallues.
+
+* Example
 
 ```php
 
-Models\Accounts extends pf\Records {
+Models\Accounts extends Polyfony\Records {
 	
 	const ID_LEVEL = [
 		0		=>'Admin',
@@ -193,11 +212,9 @@ Models\Accounts extends pf\Records {
 }
 ```
 
-The validation occurs when `->set()` is invoked and will throw exceptions.
-Note that you don't have to include `NULL` or `EMPTY` values in your validators to allow them. 
-Instead, allow NULL values for that column in the Table configuration of your database engine, 
-the framework will import that information (and cache it, so empty the cache if you change `NULL`/`NOT NULL` of certain fields in the database).
+The validation occurs when `->set()` is invoked and will throw exceptions. 
 
+Note that you don't have to include `NULL` or `EMPTY` values in your validators to allow them. `NULL/NOT NULL` are to be configured in your database, so that the framework knows which column can, and cannot be null.
 
 
 ### [Router](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyrouter)

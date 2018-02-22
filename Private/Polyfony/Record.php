@@ -245,7 +245,7 @@ class Record {
 			return !empty($this->{$column}) ? date('d/m/Y H:i', $this->{$column}) : '';
 		}
 		// if the column contains a date
-		elseif(strpos($column,'_date') !== false) {
+		elseif(strpos($column,'_date') !== false || substr($column,-3,3) == '_at') {
 			// if the value is set
 			return !empty($this->{$column}) ? date('d/m/Y', $this->{$column}) : '';
 		}
@@ -310,6 +310,57 @@ class Record {
 		// if it went well
 		return $deleted ? true : false;
 	}
+
+
+	// returns the name of the class that has extended this one (aka, the Table name)
+	private static function tableName() :string {
+
+		// removed the namespace from the class name
+		return str_replace('Models\\','',get_called_class());
+
+	}
+
+	// shortcut to insert an element
+	public static function create(array $columns_and_values=[]) {
+
+		return Database::query()
+			->insert($columns_and_values)
+			->into(self::tableName())
+			->execute();
+
+	}
+
+	// shortcut that bootstraps a select query
+	public static function _select(array $select=[]) :Query {
+
+		// returns a Query object, to execute, or to complement with some more parameters
+		return Database::query()
+			->select($select)
+			->from(self::tableName());
+
+	}
+
+	// shortcut that bootstraps an update query
+	public static function _update(array $columns_and_values=[]) :Query {
+
+		// returns a Query object, to execute, or to complement with some more parameters
+		return Database::query()
+			->update(self::tableName())
+			->set($columns_and_values);
+
+	}
+
+	// shortcut that bootstraps a delete query
+	public static function _delete() :Query {
+
+		// returns a Query object, to execute, or to complement with some more parameters
+		return Database::query()
+			->delete()
+			->from(self::tableName());
+
+	}
+
+
 	
 }
 

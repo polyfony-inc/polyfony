@@ -34,7 +34,7 @@ class Accounts extends pf\Record {
 	// what we mean by recent authentication failure (3 days)
 	const RECENT_FAILURE = 259200;
 
-	public function hasModule($searched_module) {
+	public function hasModule($searched_module) :bool {
 
 		return in_array(
 			$searched_module, 
@@ -43,20 +43,20 @@ class Accounts extends pf\Record {
 
 	}
 
-	public function enable() {
+	public function enable() :self {
 
-		$this->set('IS_ENABLED', '1');
+		return $this->set('IS_ENABLED', '1');
 
 	}
 
-	public function disable() {
+	public function disable() :self {
 
-		$this->set('IS_ENABLED', '0');
+		return $this->set('IS_ENABLED', '0');
 
 	}
 
 	// retrieve all accounts
-	public static function all() {
+	public static function all() :array {
 
 		return pf\Database::query()
 			->select()
@@ -66,7 +66,7 @@ class Accounts extends pf\Record {
 	}
 
 	// that have been created recenlty
-	public static function recentlyCreated($maximum=5) {
+	public static function recentlyCreated($maximum=5) :array {
 		return(\Polyfony\Database::query()
 			->select()
 			->from('Accounts')
@@ -77,7 +77,7 @@ class Accounts extends pf\Record {
 	}
 	
 	// that are disabled
-	public static function disabled() {
+	public static function disabled() :array {
 		return(\Polyfony\Database::query()
 			->select()
 			->from('Accounts')
@@ -87,7 +87,7 @@ class Accounts extends pf\Record {
 	}
 
 	// accounts that have had issues login in recently
-	public static function withErrors() {
+	public static function withErrors() :array {
 
 		return pf\Database::query()
 			->select()

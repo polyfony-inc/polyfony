@@ -16,7 +16,7 @@ class Html {
 
 		$profiler = new \Polyfony\Element('div', [
 			'id'=>'pfProfiler',
-			'style'=>'position:absolute;bottom:0;left:0;background#c3c3c3;padding-left:10px;padding-bottom:10px;'
+			'style'=>'position:fixed;bottom:0;left:0;background#c3c3c3;padding-left:10px;padding-bottom:10px;'
 		]);
 		$timing_modal = new \Bootstrap\Modal('xxl');
 		$timing_body = [];
