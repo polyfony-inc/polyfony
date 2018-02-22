@@ -27,19 +27,10 @@ composer create-project --stability=dev polyfony-inc/polyfony your-project-folde
 ```
 *--stability=dev allows you to git pull later on*
 
-* With lighttpd, set the webroot of your webserver to `Public/`
+* With lighttpd, set the webroot of your webserver to `Public/` and rewrite everything except `/Assets/*` to `/?`
 ```
-server.document-root = "/var/www/your-project-folder/Public/"
-```
-
-* With lighttpd, set this rewrite rule
-
-```
-url.rewrite-once = (
-    "^(?!/Assets/).*" => "/?"
-    # Let's Encrypt version bellow
-    # "^(?!/Assets/)(?!/\.well-known/).*" => "/?"
-)
+server.document-root 	= "/var/www/your-project-folder/Public/"
+url.rewrite-once 		= ("^(?!/Assets/).*" => "/?")
 ```
 
 
@@ -126,7 +117,7 @@ echo $account->input('login', ['type'=>'email']);
 ```
 * Outputs
 ```html
-<input type="email" name="Accounts[login]" value="root" />
+<input type="email" name="Accounts[login]" value="root@local.domain" />
 ```
 
 * Create an account, populate and insert it
