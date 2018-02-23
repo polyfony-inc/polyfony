@@ -4,6 +4,6 @@
 require("../Private/Vendor/autoload.php");
 
 // front end
-new Polyfony\Front();
+new Polyfony\Front;
 
 ?>

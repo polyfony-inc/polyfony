@@ -412,7 +412,7 @@ class Response {
 		// get the body and headers from the cache
 		list($headers, $body) = Cache::get(Request::getSignature());
 		// if the profiler is enabled
-		!Config::get('profiler', 'enable') ?: $headers['X-Cache-Footprint'] = self::getFootprint();
+		!Config::get('profiler', 'enable_headers') ?: $headers['X-Cache-Footprint'] = self::getFootprint();
 		// tell that we are from the cache
 		$headers['X-Cache'] = 'hit';
 		// for each header associated with the cached request
@@ -432,7 +432,7 @@ class Response {
 		// case of html page
 		if(self::$_type == 'html-page') {
 			// add the profiler
-			self::$_content .= Config::get('profiler', 'enable', true) ? new Profiler\Html() : '';
+			self::$_content .= Config::get('profiler', 'enable') ? new Profiler\Html : '';
 			// wrap in the body
 			self::$_content = '</head><body>' . self::$_content;
 			// preprend metas
@@ -450,7 +450,7 @@ class Response {
 		// elseif the type is json
 		elseif(self::$_type == 'json') {
 			// add the profiler if required
-			self::$_content = Config::get('profiler', 'enable_stack') && is_array(self::$_content) ? 
+			self::$_content = Config::get('profiler', 'enable') && is_array(self::$_content) ? 
 				array_merge(self::$_content, Profiler::getArray()) : 
 				self::$_content;
 			// encode the content to json
@@ -487,7 +487,9 @@ class Response {
 			$headers['Content-MD5'] = self::$_type == 'file' ? md5_file(self::$_content) : md5(self::$_content);
 		}
 		// the content length (after any compression or obfuscation occured)
-		$headers['Content-Length'] = self::$_type == 'file' ? filesize(self::$_content) : strlen(self::$_content);
+		$headers['Content-Length'] 	= self::$_type == 'file' ? filesize(self::$_content) : strlen(self::$_content);
+		// always show the current environment
+		$headers['X-Environment'] 	= Config::isDev() ? 'Dev' : 'Prod';
 		// if we have a modification date
 		if(self::$_modification) {
 			// output the proper modification date
@@ -499,11 +501,9 @@ class Response {
 			$headers['Cache-Control'] = 'must-revalidate, post-check=0, pre-check=0';	
 		}
 		// if the profiler is enabled
-		if(Config::get('profiler','enable')) {
+		if(Config::get('profiler','enable_headers')) {
 			// memory usage	and execution time
-			$headers['X-Footprint'] 		= self::getFootprint();
-			// current environment
-			$headers['X-Environment'] 		= Config::isDev() ? 'Dev' : 'Prod';
+			$headers['X-Footprint'] = self::getFootprint();
 		}
 		// if the request is cachable
 		if(self::isCachable()) {
