@@ -20,23 +20,16 @@ class Database {
 	private static $_config = null;
 
 	// configure the database
-	public static function configure(
-		string $driver, 
-		string $database, 
-		string $hostname=null, 
-		string $username=null, 
-		string $password=null, 
-		string $before=null
-	) :void {
+	public static function configureAndGetDSN() :string {
 
 		// alter the configuration
 		self::$_config = array(
-			'driver'	=> $driver,
-			'database'	=> $database,
-			'hostname'	=> $hostname,
-			'username'	=> $username,
-			'password'	=> $password,
-			'before'	=> $before,
+			'driver'	=> Config::get('database','driver'),
+			'database'	=> Config::get('database', 'database'),
+			'hostname'	=> Config::get('database', 'hostname'),
+			'username'	=> Config::get('database', 'username'),
+			'password'	=> Config::get('database', 'password'),
+			'before'	=> Config::get('database', 'before'),
 			'quote'		=> '',
 			'nulls'		=> [
 				'query'		=>'',
@@ -46,55 +39,23 @@ class Database {
 			]
 		);
 
-	}
-
-	// connect to the database
-	public static function connect() :void {
-	
-		// if no configuration has been set, configure with the Config.ini
-		self::$_config ?: self::configure(
-			Config::get('database','driver'),
-			Config::get('database', 'database'),
-			Config::get('database', 'hostname'),
-			Config::get('database', 'username'),
-			Config::get('database', 'password'),
-			Config::get('database', 'before')
-		);
-
 		// depending on the driver
 		switch(self::$_config['driver']) {
 			
 			case 'sqlite':
-				$pdo = 'sqlite:' . self::$_config['database'];
-				self::$_config['nulls'] = [
-					'query'		=>'PRAGMA table_info( *table* )',
-					'column'	=>'notnull',
-					'true'		=>'0',
-					'false'		=>'1',
-				];
+				$dsn = self::configureForSQLite();
 			break;
 			
 			case 'mysql':
-				$pdo = 'mysql:dbname=' . self::$_config['database'] . 
-					';host=' . self::$_config['hostname'];
-				self::$_config['quote'] = '"';
-				self::$_config['nulls'] = [
-					'query'		=>'DESCRIBE "*table*"',
-					'column'	=>'Null',
-					'true'		=>'YES',
-					'false'		=>'NO',
-				];
+				$dsn = self::configureForMySQL();
 			break;
 
 			case 'postgres':
-				$pdo = 'pgsql:dbname=' . self::$_config['database'] . 
-					';host=' . self::$_config['hostname'];
-				self::$_config['quote'] = '"';
+				$dsn = self::configureForPGSql();
 			break;
 
 			case 'odbc':
-				$pdo = 'odbc:' . self::$_config['database'];
-				self::$_config['quote'] = '"';
+				$dsn = self::configureForODBC();
 			break;
 			
 			default:
@@ -104,9 +65,20 @@ class Database {
 			
 		}
 
+		// the dsn we have assembled
+		return $dsn;
+
+	}
+
+	// connect to the database
+	public static function connect() :void {
+
+		// configure the database and get the dns
+		$dsn = self::configureAndGetDSN();
+
 		// try to connect
 		self::$_handle = new \PDO(
-			$pdo, 
+			$dsn, 
 			self::$_config['username'] ?: null, 
 			self::$_config['password'] ?: null
 		);
@@ -124,6 +96,53 @@ class Database {
 		}
 	}
 	
+	private static function configureForSQLite() :string {
+		
+		// configure
+		self::$_config['nulls'] = [
+			'query'		=>'PRAGMA table_info( *table* )',
+			'column'	=>'notnull',
+			'true'		=>'0',
+			'false'		=>'1',
+		];
+
+		// return the dsn
+		return 'sqlite:' . self::$_config['database'];
+	}
+
+	private static function configureForMySQL() :string {
+		
+		// configure 
+		self::$_config['quote'] = '"';
+		self::$_config['nulls'] = [
+			'query'		=>'DESCRIBE "*table*"',
+			'column'	=>'Null',
+			'true'		=>'YES',
+			'false'		=>'NO',
+		];
+
+		// return the dsn
+		return 'mysql:dbname=' . self::$_config['database'] . ';host=' . self::$_config['hostname'];
+	}
+
+	private static function configureForPGSql() :string {
+		
+		// configure
+		self::$_config['quote'] = '"';
+
+		// return the dns
+		return 'pgsql:dbname=' . self::$_config['database'] . ';host=' . self::$_config['hostname'];
+	}
+
+	private static function configureForODBC() :string {
+
+		// configure 
+		self::$_config['quote'] = '"';
+
+		// return the dsn
+		return 'odbc:' . self::$_config['database'];
+	}
+
 	// instanciate a new query object
 	public static function query() :Query {
 		
