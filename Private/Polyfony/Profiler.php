@@ -111,6 +111,15 @@ class Profiler {
 		);
 	}
 
+	public static function getFootprint() :string {
+
+		// get the data
+		$data = self::getData();
+		// assemble and return memory with time
+		return round($data['time'] * 1000, 1) . ' ms '. Format::size($data['memory']);
+
+	}
+
 	public static function getArray() :array {
 		// return stacked data
 		return array('Profiler' => self::getData());

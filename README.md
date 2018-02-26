@@ -1,4 +1,4 @@
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/713fa5be-b3d6-4a10-b544-90ef45580ec0/big.png)](https://insight.sensiolabs.com/projects/713fa5be-b3d6-4a10-b544-90ef45580ec0)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/713fa5be-b3d6-4a10-b544-90ef45580ec0/mini.png)](https://insight.sensiolabs.com/projects/713fa5be-b3d6-4a10-b544-90ef45580ec0) [![Maintainability](https://api.codeclimate.com/v1/badges/dcb85f03d218814504ac/maintainability)](https://codeclimate.com/github/polyfony-inc/polyfony/maintainability)
 
 ## Polyfony is an intuitive, lightweight and powerful PHP micro-framework.
 
@@ -710,7 +710,7 @@ To obtain, say, a password field, simply add this to your array of attributes : 
 
 A CRSF Protection and double-submit guard is available.
 
-######In the middle of your html form (in a View)
+###### In the middle of your html form (in a View)
 
 ```html
 <form action="" method="post">
@@ -722,7 +722,7 @@ A CRSF Protection and double-submit guard is available.
 </form>
 ```
 
-######In your controller
+###### In your controller
 
 ```php
 Polyfony\Form\Token::enforce();
@@ -739,7 +739,7 @@ The framework has been extensively tested using SQLite, it *may* work with other
 Without, you'd just loose `Security`, the `Mail` storage feature, the `Store\Database` engine and the `Logger`'s database feature.
 
 The database's structure is available by dumping the SQLite Database `Private/Storage/Database/Polyfony.db`.
-The PDO driver can be changed for MySQL, PosgreSQL in `Private/Config/Config.ini`.
+The PDO driver can be changed to `MySQL`, `Postgres` or `ODBC` in `Private/Config/Config.ini`. **There is no `Query` object support for Postgres and ODBC.**
 
 
 

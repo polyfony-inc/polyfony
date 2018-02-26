@@ -14,23 +14,23 @@ namespace Polyfony;
 class Response {
 
 	// set manually
-	protected static $_content;			// raw content before internal formatting
-	protected static $_metas;			// list of meta tags
-	protected static $_assets;			// list of assets
-	protected static $_type;			// type of the output (html/json/…)
-	protected static $_headers;			// list of headers
-	protected static $_status;			// the HTTP status code to use
-	protected static $_redirect;		// url to redirect to
-	protected static $_delay;			// delay before redirection
-	protected static $_charset;			// charset of the response
-	protected static $_modification;	// modification date of the content
-	protected static $_browserCache;	// allow browser to cache the response
-	protected static $_outputCache;		// allow the framework to cache the response
+	protected static $_content;					// raw content before internal formatting
+	protected static $_type;					// type of the output (html/json/…)
+	protected static $_headers 			= [];	// list of headers
+	protected static $_status 			= 200;	// the HTTP status code to use
+	protected static $_redirect;				// url to redirect to
+	protected static $_delay;					// delay before redirection
+	protected static $_charset;					// charset of the response
+	protected static $_modification;			// modification date of the content
+
+	// stuff about caching
+	protected static $_browserCache 	= true;	// allow browser to cache the response
+	protected static $_outputCache 		= 0;	// allow the framework to cache the response
 	
 	// computed by the class itself
-	protected static $_formatted;		// content after formatting
-	protected static $_length;			// length of the content
-	protected static $_checksum;		// checksum of the content
+	protected static $_formatted;				// content after formatting
+	protected static $_length;					// length of the content
+	protected static $_checksum;				// checksum of the content
 
 	// list of http status codes and messages
 	const CODES = [
@@ -74,24 +74,10 @@ class Response {
 		Profiler::setMarker('Response.init', 'framework');
 		// check if we can render a response from the cache
 		self::isCached() === false ?: self::renderFromCache();
-		// start the output buffer
+		// start the output buffer (collecting anything that is outputted anywhere, to output it later with our own Response formatting)
 		ob_start();
-		// set default assets
-		self::$_assets = [
-			// as empty arrays
-			'Css'	=>[],
-			'Js'	=>[]
-		];
-		// set default headers
-		self::$_headers = [];
-		// set default metas
-		self::$_metas = [];
-		// default is to allow browser cache
-		self::$_browserCache = true;
-		// default is to disable the output cache (0 hour of cache)
-		self::$_outputCache = 0;
-		// set the default status as ok
-		self::setStatus(200);
+		// init the assets packing filesystem
+		Response\HTML::createAssetsPackingDirectories();
 		// set default language
 		self::setHeaders([
 			// hide the php version
@@ -103,8 +89,6 @@ class Response {
 		self::setCharset(Config::get('response', 'default_charset'));
 		// set the default type
 		self::setType(Config::get('response', 'default_type'));
-		// init the assets packing filesystem
-		self::initAssetsPacking();
 		// marker
 		Profiler::releaseMarker('Response.init', 'framework');
 		
@@ -161,38 +145,32 @@ class Response {
 	
 	public static function setRedirect(string $url, int $delay=0) :void {
 		// if a delay is provided
-		if($delay) {
-			// set the refresh header that support delays, it is not at all understood by Google Bot
-			self::setHeaders([
-				'Refresh' => "{$delay};url=$url"
-			]);	
-		}
-		// no delay is provided, use location that is understood by Google Bot
-		else {
-			// use standard redirect
-			self::setHeaders([
-				'Location' => $url
-			]);
-		}
+		$delay ?
+			// set the refresh header that support delays
+			// BEWARE : it is not at all understood by Google Bot
+			self::setHeaders(['Refresh' => "{$delay};url=$url"]) : 	
+			// or else, use standard redirect
+			self::setHeaders(['Location' => $url]);
 	}
 
 	public static function setAssets(string $type, $assets) :void {
 		// if single element provided
 		$assets = is_array($assets) ? $assets : [$assets];
-		// for each assets to set
-		foreach($assets as $asset) {
-			// convert the case of the type
-			$type = ucfirst(strtolower($type));
-			// if asset is absolute
-			$asset = (substr($asset,0,1) == '/' or substr($asset,0,4) == 'http') ? $asset : "/Assets/{$type}/{$asset}";
-			// push in the list
-			self::$_assets[$type][] = $asset;
+		// for css assets
+		if(strtolower($type) == 'css') {
+			// pass to the class that now handles that
+			Response\HTML::setLinks($assets);
+		}
+		// for js assets
+		elseif(strtolower($type) == 'js') {
+			// pass to the class that now handles that
+			Response\HTML::setScripts($assets);
 		}
 	}
 
 	public static function setMetas(array $metas, $replace=false) :void {
-		// replace or merge with current metas
-		self::$_metas = $replace ? self::$_metas : array_merge(self::$_metas,$metas);
+		// pass to the class that now handles that
+		Response\HTML::setMetas($metas, $replace);
 	}
 
 	public static function setHeaders(array $headers) :void {	
@@ -219,174 +197,38 @@ class Response {
 
 	// register a status header for that response
 	public static function setStatus(int $code) :void {
-	
 		// set the actual status or 500 if incorrect
 		self::$_status = in_array($code, array_keys(self::CODES)) ? $code : 500;
-		
-	}
-
-	// get the status header
-	public static function getStatus() :int {
-	
-		// get the currently set status
-		return self::$_status;
-		
 	}
 
 	// set raw content
 	public static function setContent($content) :void {
-		
 		// remove any bufferred output
 		self::clean();
 		// replace direclty
 		self::$_content = $content;
+	}
 
+	// set the modification date of the reponse
+	public static function setModification(int $timestamp) :void {
+		// set as is
+		self::$_modification = $timestamp;
+	}
+
+	// get the status header
+	public static function getStatus() :int {
+		// get the currently set status
+		return self::$_status;
 	}
 
 	public static function getType() :string {
 		// the current output type
-		return(self::$_type);
+		return self::$_type;
 	}
 
 	public static function getCharset() :string {
 		// the current charset
-		return(self::$_charset);
-	}
-
-	// format an return metas
-	private static function prependMetas() :void {
-		// de-deuplicate js files
-		self::$_metas = array_unique(self::$_metas);
-		// return to the original order
-		krsort(self::$_metas);
-		// for each file
-		foreach(self::$_metas as $meta => $value) {
-			// add it
-			self::$_content = '<meta name="'.$meta.'" content="' . Format::htmlSafe($value) . '" />' . self::$_content;
-			// if the meta is a title, it's a bit special
-			self::$_content = $meta == 'title' ? '<title>' . Format::htmlSafe($value) . '</title>' . self::$_content : self::$_content;
-		}
-	}
-
-	// format and return javascripts
-	private static function appendScripts() :void {
-		// de-deuplicate js files
-		self::$_assets['Js'] = array_unique(self::$_assets['Js']);
-		// if there are not assets
-		if(!self::$_assets['Js']) { return; }
-		// if we are allowed to pack js files
-		if(Config::isProd() && Config::get('response','pack_js') == 1) {
-			// generate a unique name for the packed css files
-			$js_pack_name = Keys::generate(self::$_assets['Js']) . '.js';
-			$js_pack_file = "../Private/Storage/Cache/Assets/Js/{$js_pack_name}";
-			// if the pack file doesn't exist yet
-			if(!file_exists($js_pack_file)) {
-				// the content of the pack
-				$js_pack_contents = '';
-				// for each asset
-				foreach(self::$_assets['Js'] as $file) {
-					// modify the filename
-					if(substr($file, 0,2) == '//') {
-						$file = "https:{$file}"; 
-					}
-					elseif(substr($file,0,1) == '/') {
-						$file = ".{$file}";
-					}
-					// append he contents of that file to the pack
-					$js_pack_contents .= " \n".file_get_contents($file);
-				}
-				// if minifying is allowed
-				if(Config::get('response','minify')) {
-					// instanciate a new minifier
-					$minifier = new \MatthiasMullie\Minify\JS();
-					// add our css contents
-					$minifier->add($js_pack_contents);
-					// minify 
-					$js_pack_contents = $minifier->minify();
-				}
-				// populate the cache file
-				file_put_contents($js_pack_file, $js_pack_contents);
-			}
-			// replace the assets import rules with the whole pack
-			self::$_assets['Js'] = ["/Assets/Js/Cache/{$js_pack_name}"];
-		}
-
-		// for each file
-		foreach(self::$_assets['Js'] as $file) {
-			// add it
-			self::$_content .= '<script type="text/javascript" src="'. $file .'"></script>';
-		}
-	}
-	
-	// format an return stylesheets
-	private static function prependStyles() :void {
-		// de-deuplicate css files
-		self::$_assets['Css'] = array_unique(self::$_assets['Css']);
-		// if there are not assets
-		if(!self::$_assets['Css']) { return; }
-		// if we are allowed to pack css files
-		if(Config::isProd() && Config::get('response','pack_css') == 1) {
-		// generate a unique name for the packed css files
-			$css_pack_name = Keys::generate(self::$_assets['Css']) . '.css';
-			$css_pack_file = "../Private/Storage/Cache/Assets/Css/{$css_pack_name}";
-			// if the pack file doesn't exist yet
-			if(!file_exists($css_pack_file)) {
-				// the content of the pack
-				$css_pack_contents = '';
-				// for each asset
-				foreach(self::$_assets['Css'] as $file) {
-					// modify the filename
-					if(substr($file, 0,2) == '//') {
-						$file = "https:{$file}"; 
-					}
-					elseif(substr($file,0,1) == '/') {
-						$file = ".{$file}";
-					}
-					// append he contents of that file to the pack
-					$css_pack_contents .= " \n".file_get_contents($file);
-				}
-				// if minifying is allowed
-				if(Config::get('response','minify')) {
-					// instanciate a new minifier
-					$minifier = new \MatthiasMullie\Minify\CSS();
-					// add our css contents
-					$minifier->add($css_pack_contents);
-					// minify 
-					$css_pack_contents = $minifier->minify();
-				}
-				// populate the cache file
-				file_put_contents($css_pack_file, $css_pack_contents);
-			}
-			// replace the assets import rules with the whole pac
-			self::$_assets['Css'] = ["/Assets/Css/Cache/{$css_pack_name}"];
-		}
-		// return to the original order
-		krsort(self::$_assets['Css']);
-		// for each file
-		foreach(self::$_assets['Css'] as $file) {
-			// support media specific CSS
-			$href = is_array($file) ? $file[0] : $file;
-			// default is for all medias
-			$media = is_array($file) ? $file[1] : 'all';
-			// add it
-			self::$_content = '<link rel="stylesheet" media="' . $media . '" type="text/css" href="' . $href . '" />' . self::$_content;
-		}
-		
-	}
-
-	private static function initAssetsPacking() :void {
-		// if we are allowed to use the assets packing feature
-		if(Config::isProd() && (Config::get('response','pack_css') == 1 || Config::get('response','pack_js') == 1 )) {
-			// create css and js packing cache directories if they don't exist yet
-			is_dir('../Private/Storage/Cache/Assets/Css/') ?: 	mkdir('../Private/Storage/Cache/Assets/Css/', 0777, true);
-			is_dir('../Private/Storage/Cache/Assets/Js/') ?: 	mkdir('../Private/Storage/Cache/Assets/Js/', 0777, true);
-			// if the general assets file do not exist
-			is_dir('./Assets/Css/') ?: 	mkdir('./Assets/Css/', 0777, true);
-			is_dir('./Assets/Js/') ?: 	mkdir('./Assets/Js/', 0777, true);
-			// create css and js public symlinks if it doesn't exist already
-			is_link('./Assets/Css/Cache') ?: 	symlink('../../../Private/Storage/Cache/Assets/Css/', './Assets/Css/Cache');
-			is_link('./Assets/Js/Cache') ?: 	symlink('../../../Private/Storage/Cache/Assets/Js/', './Assets/Js/Cache');
-		}
+		return self::$_charset;
 	}
 
 	// return current content
@@ -397,22 +239,13 @@ class Response {
 		
 	}
 
-	// return the footprint a the response
-	private static function getFootprint() :string {
-
-		// get the profiler data
-		$profiler = Profiler::getData();
-		// assemble and return memory with time
-		return(round($profiler['time'] * 1000, 1) . ' ms '. Format::size($profiler['memory']));
-
-	}
-
 	private static function renderFromCache() :string {
 
 		// get the body and headers from the cache
 		list($headers, $body) = Cache::get(Request::getSignature());
 		// if the profiler is enabled
-		!Config::get('profiler', 'enable_headers') ?: $headers['X-Cache-Footprint'] = self::getFootprint();
+		!Config::get('profiler', 'enable_headers') ?: 
+			$headers['X-Cache-Footprint'] = Profiler::getFootprint();
 		// tell that we are from the cache
 		$headers['X-Cache'] = 'hit';
 		// for each header associated with the cached request
@@ -431,21 +264,8 @@ class Response {
 		$headers = [];
 		// case of html page
 		if(self::$_type == 'html-page') {
-			// add the profiler
-			self::$_content .= Config::get('profiler', 'enable') ? new Profiler\Html : '';
-			// wrap in the body
-			self::$_content = '</head><body>' . self::$_content;
-			// preprend metas
-			self::prependMetas();
-			// preprend css
-			self::prependStyles();
-			// preprend scripts
-			self::appendScripts();
-			// add metas and style up top
-			self::$_content = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-			<html xmlns="http://www.w3.org/1999/xhtml"><head>
-			<meta http-equiv="content-type" content="text/html; charset=' . self::$_charset . '" />' . self::$_content . '</body></html>';
-			
+			// build and get an html page
+			self::$_content = Response\HTML::buildAndGetPage(self::$_content);
 		}
 		// elseif the type is json
 		elseif(self::$_type == 'json') {
@@ -503,7 +323,7 @@ class Response {
 		// if the profiler is enabled
 		if(Config::get('profiler','enable_headers')) {
 			// memory usage	and execution time
-			$headers['X-Footprint'] = self::getFootprint();
+			$headers['X-Footprint'] = Profiler::getFootprint();
 		}
 		// if the request is cachable
 		if(self::isCachable()) {
