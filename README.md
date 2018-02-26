@@ -460,20 +460,47 @@ Response::setContent(array('example'))
 Response::render()
 ```
 
-###### to add css files
+###### to add css files and headers links
 ```php
-Response::setAssets('css','//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css')
+Response\HTML::setLinks(['//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css'])
 ```
 
-###### to add js files
+You can also specify optional attributes, such as `media`
 ```php
-Response::setAssets('js','/Assets/js/myfile.js')
+Response\HTML::setLinks([
+	'//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css'=>[
+		'media'=>'screen'
+	]
+])
+```
+
+Or even set totaly different types of links, such as a favicon
+```php
+Response\HTML::setLinks([
+	'/Assets/Shared/Svg/Favicon.svg'=>[
+		'rel'	=>'icon',
+		'sizes'	=>'any',
+		'type'	=>'image/svg+xml'
+	]
+])
+```
+
+###### to add js files (local or remote)
+```php
+Response\HTML::setScripts([
+	'//code.jquery.com/jquery-3.3.1.slim.min.js'
+	'/Assets/js/myfile.js'
+])
 ```
 
 ###### to add a meta tag
 ```php
-Response::setMetas('google-site-verification', 'google-is-watching-you')
+Response\HTML::setMetas(['google-site-verification'=>'google-is-watching-you'])
 ```
+
+
+Anything that is common to **all** responses, you will find in `Response`.
+**As `links`, `scripts`, and `metas` are specific to HTML `Response`s, those are set in the subnamespace  `Response\HTML`** 
 
 ###### To cache the result of a reponse (all output type will be cached except `file`)
 *Note that cache has to be enabled in your ini configuration, posted `Request` are not cached, errors `Response` neither.*
@@ -530,7 +557,6 @@ Store\Cookie
 Store\Filesystem
 Store\Session
 Store\Database
-Store\Apc
 Store\Memcache
 Store\Request
 ```
@@ -539,8 +565,10 @@ Some of those engines have more capabilities than others, but all implement the 
 
 ### [Bundle configurations](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonyconfig)
 
-###### Store some bundle specific data in Bundles/MyBundle/Loader/Config.php (ex. static list choices, etc.)
-*Note that these configurations are merged with Config.php + Dev.ini/Prod.ini so all your configs are available in one place, with one interface : `Config`*
+###### Storing some bundle specific data 
+
+Configurations that are specific to a bundle should be placed in `Bundles/MyBundle/Loader/Config.php` (ex. static list choices, etc.) 
+*Note that these configurations are merged with `Config.ini` + `Dev.ini`/`Prod.ini` so all your configs are available with one interface : `Config::{get()/set()}`*
 
 ```php
 Config::set($group, $key, $value);
