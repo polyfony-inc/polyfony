@@ -226,7 +226,7 @@ Note that you don't have to include `NULL` or `EMPTY` values in your validators 
 
 ### [Router](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyrouter)
 
-**A route maps an URL to an `Action`, which resides in a `Controller`, which resides in a `Bundle`**\s\s
+**A route maps an URL to an `Action`, which resides in a `Controller`, which resides in a `Bundle`**  
 Routes are to be declared in each bundle's `Loader` directory, in a file called `Route.php`
 
 *Example : `Private/Bundles/{BundleName}/Loader/Route.php`*
@@ -240,7 +240,7 @@ Routes are to be declared in each bundle's `Loader` directory, in a file called 
 * be a parameter of the url (as with the first example. The action would be the 2nd parameter `{what}`)
 * be ommited. In that case an `indexAction` is called. If it doesn't exist, `defaultAction()` will be called, if it doesn't exist an exception is thrown.
 
-Before calling the action `preAction()` will be called on the controller. *You can declare one, or ommit it.*\s\s
+Before calling the action `preAction()` will be called on the controller. *You can declare one, or ommit it.*  
 after the real action has been be called `postAction()` will be called on the controller. *You can declare one, or ommit it.*
 
 

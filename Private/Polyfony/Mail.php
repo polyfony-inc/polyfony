@@ -261,7 +261,7 @@ class Mail {
 		// catch any exception
 		catch (Exception $exception) {
 			// log the error
-			Logger::warning($exception->getMessage()):
+			Logger::warning($exception->getMessage());
 			// return that we failed to send
 			$is_sent = false;
 		}
