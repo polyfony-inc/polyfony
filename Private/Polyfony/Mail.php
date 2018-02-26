@@ -235,100 +235,21 @@ class Mail {
 		return(isset($this->mailer) ? $this->mailer->ErrorInfo : '');
 	}
 
+
+
 	public function send($save=false) {
 
 		// marker
 		$id_marker = Profiler::setMarker(null, 'email', ['Email'=>$this]);
 
-		// --------------------------------------------------------
-		// - depending on the presence of an alternate smtp relay -
-		// --- we may alter the configuration of the SMTP server --
-		// --------------------------------------------------------
-
 		// if we have triggers for an alternate SMTP relay, and and alternative SMTP relay server defined
-		if(
-			Config::get('mail','alternative_triggers') &&
-			Config::get('mail','alternative_smtp_host')
-		) {
-			// for each and EVERY recipients that might receive this email
-			foreach(array_merge($this->recipients['to'], $this->recipients['cc'], $this->recipients['bcc']) as $email => $name) {
-				// for each of the possible triggers
-				foreach(Config::get('mail', 'alternative_triggers') as $needle) {
-					// if there is at least a simple partial case match (insensitive, and no regex allowed)
-					if(stripos($email, $needle) !== false) {
-						// apply the alternative configuration for this mail object
-						$this->smtp = [
-							'host'	=> Config::get('mail', 'alternative_smtp_host'),
-							'user'	=> Config::get('mail', 'alternative_smtp_user'),
-							'pass'	=> Config::get('mail', 'alternative_smtp_pass')
-						];
-					}
-				}
-			}
-		}
+		$this->enforceAlternativeRelay();
 
-		// instanciate a new phpmail object (allowing exception to be thrown)
-		$this->mailer = new \PHPMailer\PHPMailer\PHPMailer(true);
+		// configure the php mailer object
+		$this->configurePHPMailer();
 
-		// configure the mailer from hard config
-		$this->mailer->CharSet 		= $this->charset;
-		// configure the mailer from instance config
-		$this->mailer->From 		= $this->from['mail'];
-		$this->mailer->FromName 	= $this->from['name'];
-		$this->mailer->Subject 		= $this->subject;
-		// change the mailer engine if necessary
-		$this->mailer->Mailer 	= $this->smtp['host'] ? 'smtp' : 'mail';
-		$this->mailer->SMTPAuth = $this->smtp['user'] ? true : false;
-		$this->mailer->Host 	= $this->smtp['host'];
-		$this->mailer->Username = $this->smtp['user'];
-		$this->mailer->Password = $this->smtp['pass'];
-
-		// set the format of the mail
-		$this->mailer->isHTML($this->format == 'html' ? true : false);
-
-		// if we are in production
-        if(Config::isProd()) {
-            // set the recipients
-            foreach($this->recipients['to'] as $mail => $name) {
-                // add to the mailer
-                $this->mailer->addAddress($mail, $name);
-            }
-            // set the recipients
-            foreach($this->recipients['cc'] as $mail => $name) {
-                // add to the mailer
-                $this->mailer->addCC($mail, $name);
-            }
-            // set the recipients
-            foreach($this->recipients['bcc'] as $mail => $name) {
-                // add to the mailer
-                $this->mailer->addBCC($mail, $name);
-            }
-        }
-        // development enviroment
-        else {
-            // add the bypass address
-            $this->mailer->addAddress(Config::get('mail', 'bypass_mail'));
-        }
-		
-		// for each attachment
-		foreach($this->files as $path => $name) {
-			// add to the mailer
-			$this->mailer->addAttachment($path, $name);
-		}
-
-		// if a template exists, use it
-		if($this->template) {
-			// replace the body with the template
-			$this->body = file_get_contents($this->template);
-			// for each variables available
-			foreach($this->variables as $key => $value) {
-				// replace in the body
-				$this->body = str_replace("__{$key}__", $value, $this->body);
-			}
-		}
-
-		// set the body in the mailer
-		$this->mailer->Body = $this->body;
+		// configure environment specifics parameters/options
+		$this->configureEnvironmentSpecifics();
 
 		// default status is false
 		$is_sent = null;
@@ -339,9 +260,9 @@ class Mail {
 		}
 		// catch any exception
 		catch (Exception $exception) {
-			// set an error
-			$this->error = $exception->getMessage();
-			// don't use it, but return false
+			// log the error
+			Logger::warning($exception->getMessage()):
+			// return that we failed to send
 			$is_sent = false;
 		}
 
@@ -376,6 +297,107 @@ class Mail {
 
 	}
 
+	// --------------------------------------------------------
+	// - depending on the presence of an alternate smtp relay -
+	// --- we may alter the configuration of the SMTP server --
+	// --------------------------------------------------------
+	private function enforceAlternativeRelay() {
+		
+		if(
+			// if triggers are set
+			Config::get('mail','alternative_triggers') &&
+			// and an alternative smtp relay is also set
+			Config::get('mail','alternative_smtp_host')
+		) {
+			// for each and EVERY recipients that might receive this email
+			foreach(array_merge($this->recipients['to'], $this->recipients['cc'], $this->recipients['bcc']) as $email => $name) {
+				// for each of the possible triggers
+				foreach(Config::get('mail', 'alternative_triggers') as $needle) {
+					// if there is at least a simple partial case match (insensitive, and no regex allowed)
+					if(stripos($email, $needle) !== false) {
+						// apply the alternative configuration for this mail object
+						$this->smtp = [
+							'host'	=> Config::get('mail', 'alternative_smtp_host'),
+							'user'	=> Config::get('mail', 'alternative_smtp_user'),
+							'pass'	=> Config::get('mail', 'alternative_smtp_pass')
+						];
+					}
+				}
+			}
+		}
+
+	}
+
+	private function configurePHPMailer() {
+
+		// instanciate a new phpmail object (allowing exception to be thrown)
+		$this->mailer = new \PHPMailer\PHPMailer\PHPMailer(true);
+
+		// configure the mailer from hard config
+		$this->mailer->CharSet 		= $this->charset;
+
+		// configure the mailer from instance config
+		$this->mailer->From 		= $this->from['mail'];
+		$this->mailer->FromName 	= $this->from['name'];
+		$this->mailer->Subject 		= $this->subject;
+
+		// change the mailer engine if necessary
+		$this->mailer->Mailer 		= $this->smtp['host'] ? 'smtp' : 'mail';
+		$this->mailer->SMTPAuth 	= $this->smtp['user'] ? true : false;
+		$this->mailer->Host 		= $this->smtp['host'];
+		$this->mailer->Username 	= $this->smtp['user'];
+		$this->mailer->Password 	= $this->smtp['pass'];
+
+		// set the format of the mail
+		$this->mailer->isHTML($this->format == 'html' ? true : false);
+		
+		// for each attachment
+		foreach($this->files as $path => $name) {
+			// add to the mailer
+			$this->mailer->addAttachment($path, $name);
+		}
+
+		// if a template exists, use it
+		if($this->template) {
+			// replace the body with the template
+			$this->body = file_get_contents($this->template);
+			// for each variables available
+			foreach($this->variables as $key => $value) {
+				// replace in the body
+				$this->body = str_replace("__{$key}__", $value, $this->body);
+			}
+		}
+
+		// set the body in the mailer
+		$this->mailer->Body = $this->body;
+	}
+
+	// this applies options that are only used in development, or only in production  
+	private function configureEnvironmentSpecifics() {
+		// if we are in production we set the actual recipients
+        if(Config::isProd()) {
+            // set the main recipients
+            foreach($this->recipients['to'] as $mail => $name) {
+                // add to the mailer
+                $this->mailer->addAddress($mail, $name);
+            }
+            // set the carbon copy recipients
+            foreach($this->recipients['cc'] as $mail => $name) {
+                // add to the mailer
+                $this->mailer->addCC($mail, $name);
+            }
+            // set the hidden recipients
+            foreach($this->recipients['bcc'] as $mail => $name) {
+                // add to the mailer
+                $this->mailer->addBCC($mail, $name);
+            }
+        }
+        // if we are in the development enviroment
+        else {
+            // add the bypass address only
+            $this->mailer->addAddress(Config::get('mail', 'bypass_mail'));
+        }
+	}
 
 }
 

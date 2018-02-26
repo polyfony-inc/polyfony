@@ -5,10 +5,8 @@
 #### Philosophy
 Inspired by Symfony and Laravel but tailored to favour an inclination towards extreme simplicity and efficiency.
 
-Compared to major PHP frameworks, Polyfony covers 95%+ of what we need most of the time, and does so using a fragment of the ressources, space, configuration files and dependencies required by major frameworks.
+Compared to major PHP frameworks, Polyfony covers 95%+ of what we need most of the time, and does so using a fragment of the ressources, space, configuration files and dependencies required by major frameworks. It features routing, bundles, controllers, views, ORM, environments, locales, cache, authentication, form helper... and limitless extensibility via composer.
 
-#### Features
-Routing, bundles, controllers, views, ORM, environments, locales, cache, authentication, form helper... and limitless extensibility via composer.
 
 #### Footprint [of an Hello World](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
 * ≤ 300 Ko of disk space *(35% of comment lines)*
@@ -36,7 +34,9 @@ url.rewrite-once 		= ("^(?!/Assets/).*" => "/?")
 
 ## No learning curve
 
-This *readme.md* file should be enough to get you started, however, you can also browse the `Private/Bundles/Demo/` bundle.
+This *readme.md* file should be enough to get you started, you can also browse the `Private/Bundles/Demo/` bundle.
+As the framework classes are static, everything is **always available, everywhere** thru simple and natural naming. There's no verbose namespace inclusions, no extensive functions parameters passing. 
+
 
 *The code bellow assumes you are prefixing the `Polyfony` namespace before each call.*
 
@@ -226,21 +226,21 @@ Note that you don't have to include `NULL` or `EMPTY` values in your validators 
 
 ### [Router](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyrouter)
 
-**A route maps an URL to an `Action`, which resides in a `Controller`, which resides in a `Bundle`**
+**A route maps an URL to an `Action`, which resides in a `Controller`, which resides in a `Bundle`**\s\s
 Routes are to be declared in each bundle's `Loader` directory, in a file called `Route.php`
 
 *Example : `Private/Bundles/{BundleName}/Loader/Route.php`*
 
 
-Routes can accept a number of parameters, and lack thereof 
+###### Routes can accept a number of parameters, and lack thereof 
 * `Router::map('/admin/:what/:id/', 'Bundle/Controller@{what}')`.
 * `Router::map('/url/', 'Bundle/Controller@action)`.
 
-The action can 
+###### The action can 
 * be a parameter of the url (as with the first example. The action would be the 2nd parameter `{what}`)
 * be ommited. In that case an `indexAction` is called. If it doesn't exist, `defaultAction()` will be called, if it doesn't exist an exception is thrown.
 
-Before calling the action `preAction()` will be called on the controller. *You can declare one, or ommit it.*
+Before calling the action `preAction()` will be called on the controller. *You can declare one, or ommit it.*\s\s
 after the real action has been be called `postAction()` will be called on the controller. *You can declare one, or ommit it.*
 
 
@@ -259,7 +259,7 @@ Router::map('/admin/:action/:id/', 'Admin/Main@{action}')
 	->where(['action'=>['edit','update','delete','create']]);
 ```
 
-You can restrict parameters further, passing :
+###### You can restrict parameters further, passing :
 * an array of allowed value (it will also match no value)
 * a regex (it will also match no value)
 * a boolean true (it will match anything but a missing value)
