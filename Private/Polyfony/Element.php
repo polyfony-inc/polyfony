@@ -49,6 +49,19 @@ class Element {
 		return($this);
 	}
 
+	// set the style for the tag
+	public function setStyle(array $css_properties=[], bool $append=true) {
+		// init the style attribute is it didn't exist already
+		isset($this->attributes['style']) ?: $this->attributes['style'] = '';
+		// for each of the css properties
+		foreach($css_properties as $css_property => $css_value) {
+			// add them to the already existing ones
+			$this->attributes['style'] .= $css_property.':'.$css_value.';';
+		}
+		// return self
+		return($this);
+	}
+
 	// set the value of a tag
 	public function setValue($value=null) :self {
 		// append by default or replace html
@@ -78,6 +91,11 @@ class Element {
 		elseif($attribute == 'html') {
 			// use the setter
 			$this->setHtml($value);
+		}
+		// specific case of style
+		elseif($attribute == 'style' && is_array($value)) {
+			// use the setter
+			$this->setStyle($value);
 		}
 		// specific case of value
 		elseif($attribute == 'value') {

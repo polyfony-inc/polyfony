@@ -28,16 +28,8 @@ class Profiler {
 	const USERS = [
 		'framework', 'controller', 'view', 'database', 'email', 'user'
 	];
-	// bootstrap classes for these users
-	const USERS_CLASSES = [
-		'framework'	=>'secondary', 
-		'controller'=>'primary', 
-		'view'		=>'success', 
-		'database'	=>'danger', 
-		'email'		=>'warning', 
-		'user'		=>'info'
-	];
 
+	// important parameters to look for
 	const IMPORTANT_PHP_INI = [
 		'memory_limit',
 		'max_execution_time',

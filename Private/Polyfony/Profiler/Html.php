@@ -5,25 +5,63 @@ namespace Polyfony\Profiler;
 // generate an HTML Profiler that will be fixed to the bottom of a page
 class Html {
 
-	public function __construct() {
+	// bootstrap classes for these users
+	const USERS_CLASSES = [
+		'framework'	=>'secondary', 
+		'controller'=>'primary', 
+		'view'		=>'success', 
+		'database'	=>'danger', 
+		'email'		=>'warning', 
+		'user'		=>'info'
+	];
+
+	public static function getContainer() :\Polyfony\Element {
+
+		return new \Polyfony\Element('div', [
+			'id'	=>'pfProfiler',
+			'style'	=>[
+				'position'			=>'fixed',
+				'z-index'			=>1400,
+				'bottom'			=>0,
+				'left'				=>0,
+				'padding-left'		=>'10px',
+				'padding-bottom'	=>'10px'
+			]
+		]);
+
+	}
+
+	public static function getProfiler() :\Polyfony\Element {
+
+		// get profiler raw data
+		$data = \Polyfony\Profiler::getData();
+		
+		// assemble the profiler
+		return (self::getContainer())
+			->adopt(self::getTimingComponent	($data))
+			->adopt(self::getMemoryComponent	($data))
+			->adopt(self::getRoutingComponent	($data))
+			->adopt(self::getQueriesComponent	($data))
+			->adopt(self::getEmailsComponent	($data))
+			->adopt(self::getSecurityComponent	($data));
 
 	}
 
 	public function __toString() {
 
-		// get profiler raw data
-		$data = \Polyfony\Profiler::getData();
+		// conversion to pure html string
+		return (string) self::getProfiler();
 
-		$profiler = new \Polyfony\Element('div', [
-			'id'=>'pfProfiler',
-			'style'=>'position:absolute;bottom:0;left:0;background#c3c3c3;padding-left:10px;padding-bottom:10px;'
-		]);
+	}
+
+	public static function getTimingComponent(array $data) :\Bootstrap\Modal {
+
 		$timing_modal = new \Bootstrap\Modal('xxl');
 		$timing_body = [];
 		// for each stacked element
 		foreach($data['stack'] as $elem) {
 			// a color class for that type of element
-			$class = \Polyfony\Profiler::USERS_CLASSES[$elem['user']];
+			$class 					= self::USERS_CLASSES[$elem['user']];
 			// width depends on the duration, cannot reach 100% but 95% (to allow for non overflowing elements on the right)
 			$width 					= round($elem['duration'] * 95 / $data['time'],1);
 			// height depends on the memory consuption, the thickness/height is on a natural logarythmic scale
@@ -39,12 +77,24 @@ class Html {
 
 			// the actual bar/stack element
 			$timing_body[] = new \Polyfony\Element('div', [
-				'style'	=>"min-height:6px;height:{$height}px;width:{$width}%;min-width:6px;margin-left:{$relative_start_percent}%;margin-bottom:1px;border-radius:4px;", 
+				'style'	=>[
+					'min-height'	=>'6px',
+					'height'		=>"{$height}px",
+					'min-width'		=>'6px',
+					'width'			=>"{$width}%",
+					'margin-left'	=>"{$relative_start_percent}%",
+					'margin-bottom'	=>'1px',
+					'border-radius'	=>'4px'
+				],
 				'class'	=>"bg-{$class}"
 			]);
 			// then label/details for that bar/stack element
 			$timing_body[] = new \Polyfony\Element('div', [
-				'style'	=>"font-size:11px;margin-left:{$relative_start_percent}%;margin-bottom:1px;", 
+				'style'	=>[
+					'font-size'		=>'11px',
+					'margin-left'	=>"{$relative_start_percent}%",
+					'margin-bottom'	=>'1px'
+				],
 				'class'	=>"text-{$class}",
 				'html'	=> 
 					(new \Polyfony\Element('strong', ['text'=>$elem['name']])) . ' ' .
@@ -54,12 +104,12 @@ class Html {
 
 		// the general legend for the waterfall graphics
 		$legend=[];
-		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-secondary','text'=>'Framework']);
-		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-primary','text'=>'Controllers']);
-		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-success','text'=>'Views']);
-		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-danger','text'=>'Database']);
-		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-warning','text'=>'Emails']);
-		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-info','text'=>'User defined']);
+		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-secondary',	'text'=>'Framework']);
+		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-primary',	'text'=>'Controllers']);
+		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-success',	'text'=>'Views']);
+		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-danger',	'text'=>'Database']);
+		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-warning',	'text'=>'Emails']);
+		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-info',		'text'=>'User defined']);
 
 		$timing_modal
 			->setTrigger([
@@ -81,6 +131,12 @@ class Html {
 				'html'=>implode(' ',$legend)
 			]);
 
+		return $timing_modal;
+
+
+	}
+
+	public static function getMemoryComponent(array $data) :\Bootstrap\Dropdown {
 
 		// MEMORY
 		$memory_dropdown = new \Bootstrap\Dropdown();
@@ -103,6 +159,12 @@ class Html {
 		$memory_dropdown->addItem([
 			'html'=>"<strong>Current</strong> {$total}"
 		]);
+
+		return $memory_dropdown;
+
+	}
+
+	public static function getRoutingComponent(array $data) :\Bootstrap\Dropdown {
 
 		// ROUTING
 		$route = \Polyfony\Router::getCurrentRoute();
@@ -170,6 +232,12 @@ class Html {
 			'html'=>'<strong>Action</strong> '.		(new \Polyfony\Element('code',['text'=>$route->action]))
 		]);
 
+		return $routing_dropdown;
+
+	}
+
+	public static function getSecurityComponent(array $data) : \Bootstrap\Dropdown {
+
 		// SECURITY
 		$security_dropdown = new \Bootstrap\Dropdown();
 		$security_dropdown
@@ -203,6 +271,12 @@ class Html {
 		$security_dropdown->addItem([
 			'html'=>"<strong>Expires</strong> {$expiration}"
 		]);
+
+		return $security_dropdown;
+
+	}
+
+	public static function getQueriesComponent(array $data) :\Bootstrap\Modal {
 
 		// QUERIES
 		$queries_count = 0;
@@ -257,6 +331,12 @@ class Html {
 			], 'fa fa-database')
 			->setTitle(	['html'=>' &nbsp;Queries'], 'fa fa-database')
 			->setBody(	['html'=>implode(' ', $queries)]);
+
+		return $queries_modal;
+
+	}
+
+	public static function getEmailsComponent(array $data) :\Bootstrap\Modal {
 
 		$emails_count = 0;
 		$emails = [];
@@ -313,17 +393,8 @@ class Html {
 			], 'fa fa-envelope')
 			->setTitle(	['html'=>' &nbsp;Emails'], 'fa fa-envelope')
 			->setBody(	['html'=>implode(' ', $emails)]);
-		
 
-		$profiler
-			->adopt($timing_modal)
-			->adopt($memory_dropdown)
-			->adopt($routing_dropdown)
-			->adopt($queries_modal)
-			->adopt($emails_modal)
-			->adopt($security_dropdown);
-
-		return (string) $profiler;
+		return $emails_modal;
 
 	}
 
