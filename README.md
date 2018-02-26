@@ -42,42 +42,42 @@ As the framework classes are static, everything is **always available, everywher
 
 ### [Request](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyrequest)
 
-* retrieve an url parameter
+###### retrieve an url parameter
 ```php
 Request::get('format');
 ```
 
-* retrieve a posted field named `search`
+###### retrieve a posted field named `search`
 ```php
 Request::post('search');
 ```
 
-* retrieve a file
+###### retrieve a file
 ```php
 Request::files('attachment_document');
 ```
 
-* retrieve a request header
+###### retrieve a request header
 ```php
 Request::header('Accept-Encoding');
 ```
 
-* check if the method is post
+###### check if the method is post
 ```php
 Request::isPost();
 ```
 
-* check if the request is done using ajax
+###### check if the request is done using ajax
 ```php
 Request::isAjax();
 ```
 
-* check if the request is done thru TLS/SSL
+###### check if the request is done thru TLS/SSL
 ```php
 Request::isSecure();
 ```
 
-* check if the request is from the command line
+###### check if the request is from the command line
 ```php
 Request::isCli();
 ```
@@ -86,27 +86,27 @@ Request::isCli();
 
 Examples bellow assume a table named `Accounts` exists in the database.
 
-* Retrieve a single account by its ID
+###### Retrieve a single account by its ID
 ```php
 $account = new Models\Accounts(1);
 ```
 
-* Retrieve a single account by its `login`
+###### Retrieve a single account by its `login`
 ```php
 $account = new Models\Accounts(['login'=>'root@local.domain']);
 ```
 
-* Retrieve a single record by its ID and generate an input to change a property
+###### Retrieve a single record by its ID and generate an input to change a property
 ```php
 $account = new Models\Accounts;
 echo $account->input('login', ['type'=>'email']);
 ```
-* Outputs
+###### Outputs
 ```html
 <input type="email" name="Accounts[login]" value="root@local.domain" />
 ```
 
-* Create an account, populate and insert it
+###### Create an account, populate and insert it
 ```php
 (new Models\Accounts)
 	->set([
@@ -120,7 +120,7 @@ echo $account->input('login', ['type'=>'email']);
 
 ```
 
-* Alternatively, you can also create an account this way
+###### Alternatively, you can also create an account this way
 ```php
 Models\Accounts::create([
 	'login'		=>'test',
@@ -129,7 +129,7 @@ Models\Accounts::create([
 ]);
 ```
 
-* Retrieve the `login` and `id` of 5 accounts with `id_level` 1 that logged in, in the last 24h
+###### Retrieve the `login` and `id` of 5 accounts with `id_level` 1 that logged in, in the last 24h
 ```php
 // demo query
 $accounts = Database::query()
@@ -143,7 +143,7 @@ $accounts = Database::query()
 	->execute();
 ```
 
-##### Parameters
+#### Parameters
 
 ```php
 ->where()				// == $value
@@ -159,7 +159,7 @@ $accounts = Database::query()
 ->whereNull() 			// NULL
 ```
 
-##### Options
+#### Options
 
 ```php
 ->orderBy()				// associative array ('column'=>'ASC')
@@ -168,7 +168,7 @@ $accounts = Database::query()
 ->first()				// return the first record instead of an array of records
 ```
 
-##### Magic columns
+#### Magic columns
 
 * Columns ending with `_date`, `_on`, `_at` will be converted from `DD/MM/AAAA` to a timestamp and vice-versa
 * Columns ending with `_datetime` will be converted from `DD/MM/AAAA HH:mm` to a timestamp and vice-versa
@@ -186,7 +186,7 @@ $accounts = Database::query()
 | ->set(['picture_size'=>'24938'])             |       24938       | ->get('picture_size',true) | string '24938'            |
 
 
-##### Data validators
+#### Data validators
 
 **Data validation should be managed by the developer with `symfony/validator`, `respect/validation`, `wixel/gump`, or similar packages.** 
 That being said, there is a very basic *(and optional)* built-in validator, to prevent corrupted data from entering the database while manipulating objects.
@@ -293,7 +293,7 @@ Depending on the detected environment, either
 will overload/merge with the main `Config.ini`
 
 
-* Bellow is sample `Dev.ini` with its development domain
+###### Bellow is sample `Dev.ini` with its development domain
 ```
 Private/Config/Dev.ini
 
@@ -302,7 +302,7 @@ domain = my-project.my-company.ext.devel
 port = 80
 ```
 
-* And a sample `Prod.ini` with its production domain
+###### And a sample `Prod.ini` with its production domain
 *The framework falls back to production if neither domain or port are matched*
 
 ```
@@ -323,7 +323,7 @@ pack_css = 1
 
 *Default configurations files with ready-to-go settings are put in place by composer during installation*
 
-* To retrieve configurations values (from the merged configurations files)
+###### To retrieve configurations values (from the merged configurations files)
 ```php
 // retrieve the whole 'response' group
 Config::get('response');
@@ -342,21 +342,21 @@ Having distinct configuration files allows you to :
 
 ### [Security](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonysecurity)
 
-* To secure a page (require a user to be logged in)
+###### To secure a page (require a user to be logged in)
 ```php
 Security::enforce();
 ```
 
 Failure to authenticate will throw an exception, and redirect to `Private/Config/Config.ini` -> `[router]` -> `login_route = ""`
 
-* If you want to require a specific module (that can be bypassed by a level optionally)
+###### If you want to require a specific module (that can be bypassed by a level optionally)
 ```php
 Security::enforce('MOD_NAME', $bypass_level);
 ```
 
 Failure to comply with those requirements will throw an exception, but won't redirect the user anywhere.
 
-* To check manually for credentials 
+###### To check manually for credentials 
 ```php
 Security::hasModule($module_name);
 Security::hasLevel($level);
@@ -385,19 +385,19 @@ If your `Response` is of type `json`, then the `Profiler` ìnformations will be 
 Locales are stored in csv files (tab + double-quotes), stored in each bundle in the `Bundles/MyBundle/Locales/` folder.
 The files are parsed the first time you ask for a locale. The language is automatically detected using the browser's language, you can set it manually.
 
-* Retrieve a locale in the current language (auto-detection)
+###### Retrieve a locale in the current language (auto-detection)
 
 ```php
 Locales::get($key)
 ```
 
-* Retrieve a locale in a different languague
+###### Retrieve a locale in a different languague
 
 ```php
 Locales::get($key, $language)
 ```
 
-* Set the language (it is memorized in a cookie for a month)
+###### Set the language (it is memorized in a cookie for a month)
 
 ```php
 Locales::setLanguague($language)
@@ -418,72 +418,72 @@ Throw new Exception($error_message, $http_status_code);
 The response if preconfigured according to the Config.ini
 You can alter the response type and parameters at runtime, ex.
 
-* To redirect
+###### To redirect
 ```php
 Response::setRedirect($url [, $after_seconds=0])
 ```
 
-* to change the charset
+###### to change the charset
 ```php
 Response::setCharset('utf-8')
 ```
 
-* to output a file inline
+###### to output a file inline
 ```php
 Response::setType('file')
 Response::setContent($file_path)
 Response::render()
 ```
 
-* to download a file
+###### to download a file
 ```php
 Response::setType('file')
 Response::setContent($file_path)
 Response::download('Myfilename.ext'[, $force_download=false])
 ```
 
-* to change the status code (to 400 Bad Request for example)
-Doing that will prevent the response from being cached. Only 200 status can be cached.
+###### to change the status code (to 400 Bad Request for example)
+*Doing that will prevent the response from being cached. Only 200 status can be cached.*
 ```php
 Response::setStatus(400)
 ```
 
-* to output plaintext
+###### to output plaintext
 ```php
 Response::setType('text')
 ```
 
-* to output json
+###### to output json
 ```php
 Response::setType('json')
 Response::setContent(array('example'))
 Response::render()
 ```
 
-* to add css files
+###### to add css files
 ```php
 Response::setAssets('css','//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css')
 ```
 
-* to add js files
+###### to add js files
 ```php
 Response::setAssets('js','/Assets/js/myfile.js')
 ```
 
-* to add a meta tag
+###### to add a meta tag
 ```php
 Response::setMetas('google-site-verification', 'google-is-watching-you')
 ```
 
-* To cache the result of a reponse (all output type will be cached except `file`)
-Note that cache has to be enabled in your ini configuration, posted `Request` are not cached, errors `Response` neither.
+###### To cache the result of a reponse (all output type will be cached except `file`)
+*Note that cache has to be enabled in your ini configuration, posted `Request` are not cached, errors `Response` neither.*
 ```php
 Response::enableOutputCache($hours);
 ```
 
 A cache hit will always use less than 400 Ko of RAM and execute much faster, under a millisecond on any decent server
 
-* The `Response` provides some headers by default *Relative slowness of this example is due the the filesystem being NFS thru wifi*
+###### The `Response` provides some headers by default *Relative slowness of this example is due the the filesystem being NFS thru wifi*
 
 ```
 < HTTP/1.1 200 OK
@@ -496,7 +496,7 @@ A cache hit will always use less than 400 Ko of RAM and execute much faster, und
 < X-Execution-Time: 13.5 ms
 ```
 
-The example bellow shows the same Hello World `Response` as above, but from the cache
+###### The example bellow shows the same Hello World `Response` as above, but from the cache
 
 ```
 < HTTP/1.1 200 OK
@@ -516,7 +516,7 @@ The example bellow shows the same Hello World `Response` as above, but from the 
 
 ### [Store](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonystorestoreinterface)
 
-The Store interface looks like this :
+###### The Store interface looks like this
 ```php
 Store\Engine::has($variable);
 Store\Engine::put($variable, $value [, $overwrite = false]);
@@ -524,7 +524,7 @@ Store\Engine::get($variable);
 Store\Engine::remove($variable);
 ```
 
-You can choose from different storage engines
+###### You can choose from different storage engines
 ```
 Store\Cookie
 Store\Filesystem
@@ -539,14 +539,14 @@ Some of those engines have more capabilities than others, but all implement the 
 
 ### [Bundle configurations](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonyconfig)
 
-* Store some bundle specific data in Bundles/MyBundle/Loader/Config.php (ex. static list choices, etc.)
-* Note that these configurations are merged with Config.php + Dev.ini/Prod.ini so all your configs are available in one place, with one interface : `Config`
+###### Store some bundle specific data in Bundles/MyBundle/Loader/Config.php (ex. static list choices, etc.)
+*Note that these configurations are merged with Config.php + Dev.ini/Prod.ini so all your configs are available in one place, with one interface : `Config`*
 
 ```php
 Config::set($group, $key, $value);
 ```
 
-* Retrieve values (whole bundle, or a subset)
+###### Retrieve values (whole bundle, or a subset)
 
 ```php
 Config::get($group);
@@ -556,7 +556,7 @@ Config::get($group, $key);
 
 ### [Mail](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonymail)
 
-* Mail are very simple to use and built over PHPMailer
+###### Mail are very simple to use and built over PHPMailer
 
 ```php
 $mail = new Mail();
@@ -577,7 +577,7 @@ boolean $status
 string $mail->error()
 ```
 
-* Mail with a template using smtp
+###### Mail with a template using smtp
 
 ```php
 $mail = new Mail();
@@ -614,7 +614,7 @@ If the mail format is html, your value will be escaped automatically
 
 ### [Element](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonyelement)
 
-* Create an HTML tag (similar to mootools' Element)
+###### Create an HTML tag (similar to mootools' Element)
 
 ```php
 $image = new Element('img',array('src'=>'/img/demo.png'))->set('alt','test');
@@ -624,7 +624,7 @@ echo $image;
 <img src="/img/demo.png" alt="test" />
 ```
 
-* Create an HTML element with an opening and a closing tag 
+###### Create an HTML element with an opening and a closing tag 
 
 ```php
 $quote = new Element('quote',array('text'=>'Assurément, les affaires humaines ne méritent pas le grand sérieux'));
@@ -638,20 +638,20 @@ Setting `value` will escape its html so will with setting `text`.
 
 ### [Form](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonyform)
 
-Form helper allow you to build and preset form elements, ex.
+###### Form helper allow you to build and preset form elements, ex.
 
 ```php
 echo Form::input($name[, $value=null [, $options=array()]]);
 ```
 
-This will build a two element select (with the class `form-control`), and preset Peach.
+###### This will build a two element select (with the class `form-control`), and preset Peach.
 
 ```php
 echo Form::select('sample', array( 0 => 'Apple', 1 => 'Peach' ), 1, array('class'=>'form-control'));
 ```
 
-This will build a select element with optgroups.
-Note that optgroup are replaced by a matching locale (if any), and values are also replaced by matching locale (if any).
+###### This will build a select element with optgroups.
+*Note that optgroup are replaced by a matching locale (if any), and values are also replaced by matching locale (if any).*
 
 ```php
 echo Form::select('sample', array(
@@ -683,9 +683,9 @@ echo Form::select('sample', array(
 ```
 
 
-Shortcuts are available from `Record` object (and objects inheriting Record class), ex.
+Shortcuts are available from objects that extends the `Record` class (ex: your Models).
 
-* retrieve an account from its id
+###### retrieve an account from its id
 ```php
 $account = new Accounts(1);
 $account->set('login', 'mylogin@example.com')
@@ -710,7 +710,7 @@ To obtain, say, a password field, simply add this to your array of attributes : 
 
 A CRSF Protection and double-submit guard is available.
 
-In the middle of your html form (in a View)
+######In the middle of your html form (in a View)
 
 ```html
 <form action="" method="post">
@@ -722,7 +722,7 @@ In the middle of your html form (in a View)
 </form>
 ```
 
-In your controller
+######In your controller
 
 ```php
 Polyfony\Form\Token::enforce();
@@ -730,8 +730,8 @@ Polyfony\Form\Token::enforce();
 
 **That's it.** 
 
-* Instanciating a "Token" objet generates a unique token, stores it in the PHP SESSION and builds an html input element. 
-* The static enforce method, checks if a request has been POSTed, and if so, if a token exists, and matches one stored in the session. Otherwise, throws an exception and redirects to the previous page.
+Instanciating a "Token" objet generates a unique token, stores it in the PHP SESSION and builds an html input element.  
+The static enforce method, checks if a request has been POSTed, and if so, if a token exists, and matches one stored in the session. Otherwise, throws an exception and redirects to the previous page.
 
 ## Database structure
 
