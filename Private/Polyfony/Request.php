@@ -292,7 +292,7 @@ class Request {
 	 */
 	public static function isDelete() :bool {
 		
-		// if method is post return true
+		// if method is delete return true
 		return self::$_method == 'delete';
 		
 	}
@@ -306,7 +306,7 @@ class Request {
 	 */
 	public static function isPut() :bool {
 		
-		// if method is post return true
+		// if method is put return true
 		return self::$_method == 'put';
 		
 	}
@@ -320,8 +320,22 @@ class Request {
 	 */
 	public static function isSecure() :bool {
 		
-		// if method is post return true
+		// if protocol is https return true
 		return self::$_protocol == 'https';
+		
+	}
+
+	/**
+	 * Check if the request allows caching.
+	 *
+	 * @access public
+	 * @return boolean
+	 * @static
+	 */
+	public static function isCacheAllowed() :bool {
+		
+		// if no headers prevent is return true
+		return self::header('Cache-Control') != 'max-age=0';
 		
 	}	
 	

@@ -18,14 +18,14 @@ Current *hard* requirements are : Linux/MacOS/xBSD, PHP >= 7.1, ext-pdo, ext-sql
 
 ## Installation
 
-* Run this command to download the framework *(and its dependencies)* to your project directory
+###### Run this command to download the framework *(and its dependencies)* to your project directory
 
 ```
 composer create-project --stability=dev polyfony-inc/polyfony your-project-folder
 ```
 *--stability=dev allows you to git pull later on*
 
-* With lighttpd, set the webroot of your webserver to `Public/` and rewrite everything except `/Assets/*` to `/?`
+###### With lighttpd, set the webroot of your webserver to `Public/` and rewrite everything except `/Assets/*` to `/?`
 ```
 server.document-root 	= "/var/www/your-project-folder/Public/"
 url.rewrite-once 		= ("^(?!/Assets/).*" => "/?")

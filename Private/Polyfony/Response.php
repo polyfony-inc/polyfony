@@ -76,8 +76,6 @@ class Response {
 		self::isCached() === false ?: self::renderFromCache();
 		// start the output buffer (collecting anything that is outputted anywhere, to output it later with our own Response formatting)
 		ob_start();
-		// init the assets packing filesystem
-		Response\HTML::createAssetsPackingDirectories();
 		// set default language
 		self::setHeaders([
 			// hide the php version
@@ -86,9 +84,9 @@ class Response {
 			'Server'			=> Config::get('response', 'header_server')
 		]);
 		// set default charset
-		self::setCharset(Config::get('response', 'default_charset'));
+		self::setCharset(		Config::get('response', 'default_charset'));
 		// set the default type
-		self::setType(Config::get('response', 'default_type'));
+		self::setType(			Config::get('response', 'default_type'));
 		// marker
 		Profiler::releaseMarker('Response.init', 'framework');
 		
@@ -111,21 +109,29 @@ class Response {
 	}
 
 	private static function isCached() :bool {
-		// the cache has this request signature in store, cache is enabled, and browser allows cache
-		return(
-			Config::get('response', 'cache') && Cache::has(Request::getSignature()) && 
-			Request::header('Cache-Control') != 'max-age=0' ? true : false
-		);
+		return
+			// we are allowed to (use) cache(d) responses
+			Config::get('response', 'cache') && 
+			// the cache has a response for this request's signature
+			Cache::has(Request::getSignature()) && 
+			// the request has not explicitely asked for non-cached responses
+			Request::isCacheAllowed();
 	}
 	
 	private static function isCachable() :bool {
-		// response is cachable, cache time is set, status is 200, type is not file,  
-		// method is get, it is not ran is CLI mode (as cli is used for maintenance mainly)
-		return(
-			Config::get('response', 'cache') && self::$_status == 200 && 
-			self::$_outputCache && self::$_type != 'file' && !Request::isPost() &&
-			!Request::isCli()
-		);
+		return 
+			// we are allowed to cache responses
+			Config::get('response', 'cache') && 
+			// the response satus code is a success one
+			self::$_status == 200 && 
+			// we have been explicitely told to cache that specific response
+			self::$_outputCache && 
+			// the response is not a file
+			self::$_type != 'file' && 
+			// the request is a get
+			Request::isGet() &&
+			// the request is not comming from a command line interface
+			!Request::isCli();
 	}
 
 	public static function disableBrowserCache() :void {
@@ -134,7 +140,7 @@ class Response {
 	}
 
 	public static function enableOutputCache($hours = 24) :void {
-		// enable the generated output to be cached for some time
+		// enable the generated output to be cached BY THE FRAMEWORK for some time
 		self::$_outputCache = round($hours * 3600);
 	}
 	
@@ -180,14 +186,10 @@ class Response {
 
 	public static function setType(string $type) :void {
 		
-		// remove previously output data on change of type
+		// remove previously output(ed?) data on change of type
 		ob_clean();
-
-		// if the type is allowed
-		if(in_array($type, array_keys(self::TYPES))) {
-			// update the current type
-			self::$_type = $type;
-		}
+		// if the type is allowed we update the current type
+		!array_key_exists($type, self::TYPES) ?: self::$_type = $type;
 		// add the header
 		self::setHeaders([
 			'Content-type'=> self::TYPES[$type] . '; charset='.self::$_charset
@@ -198,7 +200,7 @@ class Response {
 	// register a status header for that response
 	public static function setStatus(int $code) :void {
 		// set the actual status or 500 if incorrect
-		self::$_status = in_array($code, array_keys(self::CODES)) ? $code : 500;
+		self::$_status = array_key_exists($code, self::CODES) ? $code : 500;
 	}
 
 	// set raw content
@@ -235,7 +237,7 @@ class Response {
 	private static function getContent() {
 		
 		// if response type is file, get the content of the file from the path, else return the normal content
-		return(self::$_type == 'file' ? file_get_contents(self::$_content) : self::$_content);
+		return self::$_type == 'file' ? file_get_contents(self::$_content) : self::$_content;
 		
 	}
 
@@ -315,9 +317,9 @@ class Response {
 			// output the proper modification date
 			$headers['Last-Modified'] = date('r', self::$_modification);
 		}
-		// if cache is disabled or we are outputing an error
+		// if browser cache is disabled or we are outputing an error
 		if(!self::$_browserCache || self::$_status != 200) {
-			// output specific headers to disable browser cache
+			// output specific headers to excplicitely disable browser cache
 			$headers['Cache-Control'] = 'must-revalidate, post-check=0, pre-check=0';	
 		}
 		// if the profiler is enabled
@@ -325,14 +327,17 @@ class Response {
 			// memory usage	and execution time
 			$headers['X-Footprint'] = Profiler::getFootprint();
 		}
-		// if the request is cachable
+		// if the request is cachable by the framework
 		if(self::isCachable()) {
 			// add the caching time
 			$headers['Date'] 	= date('r');
-			// add the caching until (so that the browser too can cache)
-			$headers['Expires'] = date('r', time() + self::$_outputCache);
-			// tell that we are not from the cache
+			// tell that we are not from the cache yet
 			$headers['X-Cache'] = 'miss';
+			// if the browser is alowed allowed to cache the response on its side too
+			if(self::$_browserCache) {
+				// we tell him when the cached file will expire on the server side
+				$headers['Expires'] = date('r', time() + self::$_outputCache);
+			}
 		}
 		// set some headers
 		self::setHeaders($headers);
@@ -381,7 +386,7 @@ class Response {
 		);
 	}
 	
-	public static function download($file_name) :void {
+	public static function download(string $file_name) :void {
 		// set download headers
 		self::setHeaders([
 			'Content-Description'	=>'File Transfer',
