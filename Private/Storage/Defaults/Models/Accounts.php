@@ -26,8 +26,8 @@ class Accounts extends pf\Record {
 	const VALIDATORS = [
 
 //		'login'		=>'/^\S+@\S+\.\S+$/', // commented out because the demo uses simply "root" as login
-		'IS_ENABLED'=>self::IS_ENABLED,
-		'ID_LEVEL'	=>self::ID_LEVEL
+		'is_enabled'=>self::IS_ENABLED,
+		'id_level'	=>self::ID_LEVEL
 
 	];
 

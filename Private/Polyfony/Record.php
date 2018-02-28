@@ -24,15 +24,11 @@ class Record {
 
 		// if this has been inherited in a child class
 		if(get_class($this) != 'Polyfony\Record') {
-
 			// use the table parameter as conditions and ignore the conditions parameter
 			$conditions = $table ?: null;
-
 			// use the class name as table name
 			$table = str_replace('Models\\','',get_class($this));
-
 		}
-
 		// init the list of altered columns
 		$this->_ = [
 			// if of the record
@@ -51,8 +47,7 @@ class Record {
 			}
 			// grab that object from the database
 			$record = Database::query()
-				->select()
-				->first()
+				->select()->first()
 				->from($this->_['table'])
 				->where($conditions)
 				->execute();
@@ -64,8 +59,11 @@ class Record {
 				return($this);	
 			}
 			else {
-				// return false
-				Throw new Exception(get_class($this)."->__construct() No matching record in table {$this->_['table']}", 404);
+				// throw a 404 Not found Exception
+				Throw new Exception(
+					"new Models\\".get_class($this)." : No matching record in table {$this->_['table']}", 
+					404
+				);
 			}
 		}
 		// return self
@@ -83,15 +81,18 @@ class Record {
 		$this->_['id'] = isset($this->id) ? $this->id : $this->_['id'];
 	}
 	
-	public function get($column, $raw = false) {
+	public function get($column, $get_it_raw = false) {
 		// return the columns or null if it does not exist		
-		return(isset($this->{$column}) ? $this->convert($column, $raw) : null);
+		return isset($this->{$column}) && strlen($this->{$column}) ? 
+			\Polyfony\Query\Convert::valueFromDatabase($column, $this->{$column}, $get_it_raw) : 
+			null;
 	}
 	
 	private function field($column) {
 		return("{$this->_['table']}[$column]");
 	}
 
+	// shortcut to generate a preconfigured HTML Form element
 	public function input($column, $options = []) {
 		return(Form::input(
 			$this->field($column), 
@@ -100,6 +101,7 @@ class Record {
 		));
 	}
 	
+	// shortcut to generate a preconfigured HTML Form element
 	public function textarea($column, $options = []) {
 		return(Form::textarea(
 			$this->field($column), 
@@ -108,6 +110,7 @@ class Record {
 		));
 	}
 	
+	// shortcut to generate a preconfigured HTML Form element
 	public function select($column, $list = [], $options = []) {
 		return(Form::select(
 			$this->field($column), 
@@ -117,6 +120,7 @@ class Record {
 		));
 	}
 	
+	// shortcut to generate a preconfigured HTML Form element
 	public function checkbox($column, $options = array()) {
 		return(Form::checkbox(
 			$this->field($column), 
@@ -136,10 +140,15 @@ class Record {
 		}
 		// setting only a single value
 		else {
-			// validate the attribute
-			$this->validateAttribute($column_or_array, $value);
+			// validate the value according to what we know (nulls, existing columns, const validators)
+			\Polyfony\Record\Validator::isThisValueAcceptable(
+				$this->_['table'], 
+				get_class($this), 
+				$column_or_array, 
+				$value
+			);
 			// convert the value depending on the column name
-			$this->{$column_or_array} = Query::convert($column_or_array, $value);
+			$this->{$column_or_array} = Query\Convert::valueForDatabase($column_or_array, $value);
 			// update the altered list
 			$this->alter($column_or_array);
 		}
@@ -186,75 +195,12 @@ class Record {
 		// remove the id attribute too
 		$this->id = null;
 	}
-	
-	private function validateAttribute($column, $value) {
-		// get the allowed null values
-		$allowed_nulls = Database::describe($this->_['table']);
-		// get the class of the object
-		$class_name = get_class($this);
-		// get the validators
-		$validators = $class_name::VALIDATORS;
-		// get the validator
-		$validator = isset($validators[$column]) ? 
-			$validators[$column] : null;
-		// check if the column exists
-		if(!array_key_exists($column, $allowed_nulls)) {
-			// throw a useful exception
-			Throw new Exception(get_class($this).'->set('.$column.') : column does not exist');
-		}
-		// check if the value is null/empty and that it is not allowed to have such a value
-		if($allowed_nulls[$column] == false && (is_null($value) || $value === '')) {
-			// throw a useful exception
-			Throw new Exception(get_class($this).'->set('.$column.') : cannot be null');
-		}
-		// check if the value is not null and a validator exists
-		if(!is_null($value) && $validator && ((is_string($validator) && !preg_match($validator, $value)) || (is_array($validator) && !in_array($value, array_keys($validator)))) )  {
-			// throw a useful exception
-			Throw new Exception(get_class($this).'->set('.$column.') : does not conform to the REGEX or is not in the allowed array');
-		}
-	}
 
 	private function alter($column) {
 		// push
 		$this->_['altered'][] = $column;
 		// deduplicate
 		$this->_['altered'] = array_unique($this->_['altered']);
-	}
-	
-	private function convert($column, $raw = false) {
-		
-		// if we want the raw result ok, but exclude arrays that can never be gotten raw
-		if($raw === true && substr($column,-6,6) != '_array') {
-			// return as is
-			return $this->{$column};
-		}
-		// otherwise convert it
-		// if the column contains an array
-		if(substr($column,-6,6) == '_array') {
-			// decode the array
-			return json_decode($this->{$column},true);
-		}
-		// if the column contains a size value
-		elseif(substr($column,-5,5) == '_size') {
-			// convert to human size
-			return Format::size($this->{$column});
-		}
-		// if the column contains a datetime
-		elseif(substr($column,-9,9) == '_datetime') {
-			// if the value is set
-			return !empty($this->{$column}) ? date('d/m/Y H:i', $this->{$column}) : '';
-		}
-		// if the column contains a date
-		elseif(substr($column,-5,5) == '_date' || substr($column,-3,3) == '_at' || substr($column,-3,3) == '_on') {
-			// if the value is set
-			return !empty($this->{$column}) ? date('d/m/Y', $this->{$column}) : '';
-		}
-		// not a magic column
-		else {
-			// return as is
-			return $this->{$column};
-		}
-		
 	}
 	
 	// update or create
@@ -299,46 +245,38 @@ class Record {
 		// if id or table if missing
 		if(!$this->_['table'] || !$this->_['id']) {
 			// throw an exception
-			Throw new Exception(get_class($this).'->delete() : cannot delete a record without table and id');
+			Throw new Exception(get_class($this).'->delete() : cannot delete a record without table and id', 400);
 		}
-		// try to delete
-		$deleted = Database::query()
+		// if it went well
+		return (bool) Database::query()
 			->delete()
 			->from($this->_['table'])
 			->where(['id'=>$this->_['id']])
 			->execute();
-		// if it went well
-		return $deleted ? true : false;
 	}
 
 	// put the record into the trash
 	public function trash() {
-
 		// and return the object for chaining
 		return $this->set([
 			'trashed_on'=>time(),
 			'trashed_by'=>Security::get('id')
 		]);
-
 	}
 
 	// remove the object from the trash
 	public function untrash() {
-
 		// and return the object for chaining
 		return $this->set([
 			'trashed_on'=>null,
 			'trashed_by'=>null
 		]);
-
 	}
 
 	// returns the name of the class that has extended this one (aka, the Table name)
 	private static function tableName() :string {
-
 		// removed the namespace from the class name
 		return str_replace('Models\\','',get_called_class());
-
 	}
 
 	// shortcut to insert an element

@@ -136,7 +136,7 @@ class Query {
 			// for each column
 			foreach($array as $function_or_index_or_column => $column) {
 				// secure the column name
-				list($column, $placeholder) = $this->secure($column, true);
+				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column, true);
 				// if the key is function_or_index_or_column
 				if(is_numeric($function_or_index_or_column)) {
 					// just select the column
@@ -145,14 +145,14 @@ class Query {
 				// the key contains a dot, we are trying to create a alias
 				elseif(stripos($function_or_index_or_column, '.') !== false) {
 					// secure the column
-					list($column) = $this->secure($function_or_index_or_column);
+					list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$function_or_index_or_column);
 					// select the column and create an alias
 					$this->Selects[] = "{$column} AS {$placeholder}";
 				}
 				// the key is a SQL function
 				else {
 					// secure the function
-					list($function) = $this->secure($function_or_index_or_column);
+					list($function) = Query\Convert::columnToPlaceholder($this->Quote ,$function_or_index_or_column);
 					// select the column using a function
 					$this->Selects[] = "{$function}({$column}) AS {$function}_{$placeholder}";
 				}
@@ -170,11 +170,11 @@ class Query {
 			// for each provided strict condition
 			foreach($columns_and_values as $column => $value) {
 				// secure the column name
-				list($column, $placeholder) = $this->secure($column);
+				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 				// save the condition
 				$this->Updates[] = "{$column} = :{$placeholder}";
 				// save the value (converted if necessary)
-				$this->Values[":{$placeholder}"] = $this->convert($column,$value);
+				$this->Values[":{$placeholder}"] = Query\Convert::valueForDatabase($column,$value);
 			}
 		}
 		// return self to the next method
@@ -186,7 +186,7 @@ class Query {
 		// set the main action
 		$this->action('UPDATE');
 		// set the destination table
-		list($this->Table) = $this->secure($table);
+		list($this->Table) = Query\Convert::columnToPlaceholder($this->Quote ,$table);
 		// return self to the next method
 		return $this;
 	}
@@ -200,11 +200,11 @@ class Query {
 			// for each column and value
 			foreach($columns_and_values as $column => $value) {
 				// secure the column name
-				list($column) = $this->secure($column);
+				list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 				// push the column
 				$this->Inserts[] = $column;
 				// check for automatic conversion and push in place
-				$this->Values[] = $this->convert($column, $value);
+				$this->Values[] = Query\Convert::valueForDatabase($column, $value);
 			}
 		}
 		// return self to the next method
@@ -222,7 +222,7 @@ class Query {
 	// select the table
 	public function from($table) {
 		// set the table
-		list($this->Table) = $this->secure($table);	
+		list($this->Table) = Query\Convert::columnToPlaceholder($this->Quote ,$table);	
 		// return self to the next method
 		return $this;
 	}
@@ -238,9 +238,9 @@ class Query {
 	// select another table to join on (implicit INNER JOIN)
 	public function join($table, $match, $against) {
 		// secure parameters
-		list($table) 	= $this->secure($table);
-		list($match) 	= $this->secure($match);
-		list($against) 	= $this->secure($against);
+		list($table) 	= Query\Convert::columnToPlaceholder($this->Quote ,$table);
+		list($match) 	= Query\Convert::columnToPlaceholder($this->Quote ,$match);
+		list($against) 	= Query\Convert::columnToPlaceholder($this->Quote ,$against);
 		// push the join condition
 		$this->Joins[] = "JOIN {$table} ON {$match} = {$against}";
 		// return self to the next method
@@ -250,9 +250,9 @@ class Query {
 	// select another table to join on (LEFT JOIN)
 	public function leftJoin($table, $match, $against) {
 		// secure parameters
-		list($table) 	= $this->secure($table);
-		list($match) 	= $this->secure($match);
-		list($against) 	= $this->secure($against);
+		list($table) 	= Query\Convert::columnToPlaceholder($this->Quote ,$table);
+		list($match) 	= Query\Convert::columnToPlaceholder($this->Quote ,$match);
+		list($against) 	= Query\Convert::columnToPlaceholder($this->Quote ,$against);
 		// push the join condition
 		$this->Joins[] = "LEFT JOIN {$table} ON {$match} = {$against}";
 		// return self to the next method
@@ -262,9 +262,9 @@ class Query {
 	// select another table to join on (RIGHT JOIN)
 	public function rightJoin($table, $match, $against) {
 		// secure parameters
-		list($table) 	= $this->secure($table);
-		list($match) 	= $this->secure($match);
-		list($against) 	= $this->secure($against);
+		list($table) 	= Query\Convert::columnToPlaceholder($this->Quote ,$table);
+		list($match) 	= Query\Convert::columnToPlaceholder($this->Quote ,$match);
+		list($against) 	= Query\Convert::columnToPlaceholder($this->Quote ,$against);
 		// push the join condition
 		$this->Joins[] = "RIGHT JOIN {$table} ON {$match} = {$against}";
 		// return self to the next method
@@ -274,7 +274,7 @@ class Query {
 	// add into for inserts
 	public function into($table) {
 		// set the table
-		list($this->Table) = $this->secure($table);
+		list($this->Table) = Query\Convert::columnToPlaceholder($this->Quote ,$table);
 		// return self to the next method
 		return $this;
 	}
@@ -300,7 +300,7 @@ class Query {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
 				// secure the column name
-				list($column, $placeholder) = $this->secure($column);
+				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 				// save the condition
 				$this->Conditions[] = "{$this->Operator} ( {$column} = :{$placeholder} )";
 				// save the value
@@ -318,7 +318,7 @@ class Query {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
 				// secure the column name
-				list($column, $placeholder) = $this->secure($column);
+				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 				// save the condition
 				$this->Conditions[] = "{$this->Operator} ( {$column} <> :{$placeholder} )";
 				// save the value
@@ -336,7 +336,7 @@ class Query {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
 				// secure the column name
-				list($column, $placeholder) = $this->secure($column);
+				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 				// save the condition
 				$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
 				// save the value
@@ -352,7 +352,7 @@ class Query {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
 				// secure the column name
-				list($column, $placeholder) = $this->secure($column);
+				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 				// save the condition
 				$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
 				// save the value
@@ -368,7 +368,7 @@ class Query {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
 				// secure the column name
-				list($column, $placeholder) = $this->secure($column);
+				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 				// save the condition
 				$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
 				// save the value
@@ -384,7 +384,7 @@ class Query {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
 				// secure the column name
-				list($column, $placeholder) = $this->secure($column);
+				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 				// save the condition
 				$this->Conditions[] = "{$this->Operator} ( {$column} MATCH :{$placeholder} )";
 				// save the value
@@ -400,7 +400,7 @@ class Query {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
 				// secure the column name
-				list($column, $placeholder) = $this->secure($column);
+				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 				// save the condition
 				$this->Conditions[] = "{$this->Operator} ( {$column} > :{$placeholder} )";
 				// save the value
@@ -416,7 +416,7 @@ class Query {
 			// for each provided strict condition
 			foreach($conditions as $column => $value) {
 				// secure the column name
-				list($column, $placeholder) = $this->secure($column);
+				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 				// save the condition
 				$this->Conditions[] = "{$this->Operator} ( {$column} < :{$placeholder} )";
 				// save the value
@@ -430,7 +430,7 @@ class Query {
 		// if lower or higher is numeric
 		if(is_numeric($lower) && is_numeric($higher)) {
 			// secure the column name
-			list($column, $placeholder) = $this->secure($column);
+			list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 			// save the condition
 			$this->Conditions[] = "{$this->Operator} ( {$column} BETWEEN :min_{$placeholder} AND :max_{$placeholder} )";
 			// add the min value
@@ -445,7 +445,7 @@ class Query {
 	}
 	public function whereEmpty($column) {
 		// secure the column name
-		list($column, $placeholder) = $this->secure($column);
+		list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 		// save the condition
 		$this->Conditions[] = "{$this->Operator} ( {$column} == :empty_{$placeholder} OR {$column} IS NULL )";
 		// add the empty value
@@ -455,7 +455,7 @@ class Query {
 	}
 	public function whereNotEmpty($column) {
 		// secure the column name
-		list($column, $placeholder) = $this->secure($column);
+		list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 		// save the condition
 		$this->Conditions[] = "{$this->Operator} ( {$column} <> :empty_{$placeholder} AND {$column} IS NOT NULL )";
 		// add the empty value
@@ -465,7 +465,7 @@ class Query {
 	}
 	public function whereNull($column) {
 		// secure the column name
-		list($column, $placeholder) = $this->secure($column);
+		list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 		// save the condition
 		$this->Conditions[] = "{$this->Operator} ( {$column} IS NULL )";
 		// add the empty value
@@ -475,7 +475,7 @@ class Query {
 	}
 	public function whereNotNull($column) {
 		// secure the column name
-		list($column) = $this->secure($column);
+		list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 		// save the condition
 		$this->Conditions[] = "{$this->Operator} ( {$column} IS NOT NULL )";
 		// return self to the next method
@@ -490,7 +490,7 @@ class Query {
 				// if the direction is not valid force ASC
 				$direction == 'ASC' || $direction == 'DESC' ?: $direction = 'ASC';
 				// secure the column name
-				list($column) = $this->secure($column);
+				list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 				// push it
 				$this->Order[] = "{$column} $direction";
 			}
@@ -506,7 +506,7 @@ class Query {
 			// for each given parameter
 			foreach($columns as $column) {
 				// secure the column name
-				list($column) = $this->secure($column);
+				list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 				// push it
 				$this->Groups[] = $column;
 			}
@@ -681,68 +681,6 @@ class Query {
 		// return the results
 		return($this->Result);
 	}
-
-	// convert the value depending on the column name
-	public static function convert($column, $value) {
-		// if we find a serialization keyword
-		if(strpos($column,'_array') !== false) {
-			// encode the content as JSON, being it array, null, false, whatever
-			$value = json_encode($value);
-		}
-		// if we are dealing with a date and the value is not empty or null
-		elseif(
-			(
-				substr($column,-9,9) == '_datetime' || 
-				substr($column,-5,5) == '_date' || 
-				substr($column,-3,3) == '_at' || 
-				substr($column,-3,3) == '_on'
-			) && $value != '') {
-			// if the date has a time with it
-			if(
-				substr_count($value, '/') == 2 && 
-				substr_count($value, ':') == 1  && 
-				substr_count($value, ' ') == 1
-			) {
-				// explode the date's elements
-				list($date, $time) 			= explode(' ', $value);
-				// explode the date's elements
-				list($day, $month, $year) 	= explode('/', $date);
-				// explode the time element
-				list($hour, $minute) 		= explode(':', $time);
-				// create a timestamp early in the morning
-				$value = mktime($hour, $minute, 1, $month, $day, $year);
-			}
-			// if the date is alone
-			elseif(substr_count($value, '/') == 2) {
-				// explode the date's elements
-				list($day, $month, $year) = explode('/', $value);
-				// create a timestamp early in the morning
-				$value = mktime(0, 0, 1, $month, $day, $year);
-			}
-			// date format in unknown, and does not look like a timestamp
-			elseif(!is_numeric($value)) {
-				// we can't allow such weird data get into the _date column
-				Throw new Exception('Query->secure() : Wrong data type for magic date field '.$column);
-			}
-		}
-		// return the value
-		return($value);
-	}
-
-	// secure a column name and get a placeholder for that column
-    private function secure($column = null, $allow_wildcard = false) {
-    	// if the column name is missing of numerical
-    	if(!$column || is_numeric($column)) {
-    		// prevent from going further
-    		Throw new Exception('Query->secure() Column name cannot be empty or a numeric value');
-    	}
-        // apply the secure regex for the column name
-        $column = preg_replace(($allow_wildcard ? '/[^a-zA-Z0-9_\.\*]/' : '/[^a-zA-Z0-9_\.]/'), '', $column);    
-        // cleanup the placeholder
-        $placeholder = str_replace(['.', '*'], '_', strtolower($column)); 
-        // return cleaned column
-        return(array($this->Quote . $column . $this->Quote, $placeholder));
-    }
 
     // set the action internally
     private function action($action_name) {
