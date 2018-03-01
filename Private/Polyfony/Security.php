@@ -16,6 +16,7 @@
  */
 
 namespace Polyfony;
+use Polyfony\Store\Cookie as Cook;
 
 class Security {
 	
@@ -27,7 +28,7 @@ class Security {
 	public static function enforce(string $module=null, int $level=null) :void {
 		
 		// if we have a security cookie we authenticate with it
-		!Store\Cookie::has(Config::get('security','cookie')) ?: self::authenticate();
+		!Cook::has(Config::get('security','cookie')) ?: self::authenticate();
 		
 		// if we have a post and posted a login, we log in with it
 		!Request::post(Config::get('security','login')) ?: self::login();
@@ -60,7 +61,7 @@ class Security {
 			->save();
 
 		// remove the cookie
-		Store\Cookie::remove(Config::get('security', 'cookie'));
+		Cook::remove(Config::get('security', 'cookie'));
 
 		// and redirect to the exit route or fallback to the login route
 		Response::setRedirect(Config::get('router', 'exit_route') ?: Config::get('router', 'login_route'));
@@ -76,24 +77,23 @@ class Security {
 		// if we did not authenticate before
 		if(!self::$_account) {
 
-			// search for an account with that session key
-			$account = Database::query()
-				->select()
-				->first()
-				->from('Accounts')
-				->where(array('session_key'=>Store\Cookie::get(Config::get('security', 'cookie'))))
-				->whereHigherThan('session_expiration_date', time())
-				->execute();
+			// search for an enabled account with that session key and a non expired session
+			$account = \Models\Accounts::getFirstEnabledWithNonExpiredSession(
+				// the session key
+				Cook::get(Config::get('security', 'cookie'))
+			);
 
 			// if no matching session is found we remove the cookie
 			$account ?: self::refuse('Your session is no longer valid', 403, true);
 
 			// check if the store session key matches the dynamically generated one
-			self::match($account) ?: self::refuse('Your signature has changed, please log-in again', 403, true);
+			$account->hasMatchingDynamicKey() ?: self::refuse('Your signature has changed, please log-in again', 403, true);
 
 			// check account expiration
-			!($account->get('account_expiration_date') && time() > $account->get('account_expiration_date', true)) ?:
-				self::refuse('Your account has expired', 403, true);
+			!$account->hasItsValidityExpired() ?:
+				self::refuse(
+					"Your account has expired, it was valid until {$account->get('account_expiration_date')}", 
+					403, true);
 
 			// update our credentials
 			self::$_account = $account;
@@ -104,47 +104,39 @@ class Security {
 		}
 		
 	}
-	
+
 	// internal login method that will open a session
 	protected static function login() :void {
 		
 		// look for users with this login
-		$account = Database::query()
-			->select()
-			->from('Accounts')
-			->where(array(
-				'login'		=> Request::post(Config::get('security', 'login')),
-				'is_enabled'=> 1
-			))
-			->first()
-			->execute();
-			
+		$account = \Models\Accounts::getFirstEnabledWithLogin(
+			Request::post(
+				Config::get('security', 'login')
+			)
+		);
+		
 		// user is found
 		if($account) {
-			// if the account has been forced by the same ip recently
-			if(
-				$account->get('last_failure_origin') == Request::server('REMOTE_ADDR') &&
-				$account->get('last_failure_date', true) > time() - Config::get('security', 'waiting_duration')
-			) {
+			// if the account has been forced that ip recently
+			if($account->hasFailedLoginAttemptsRecentFrom(self::getSafeRemoteAddress())) {
 				// extend the lock on the account
-				$account
-					->set('last_failure_date', time())
-					->set('last_failure_agent', Request::server('HTTP_USER_AGENT'))
-					->save();
+				$account->extendLoginBan();
 				// log the action
-				Logger::warning("User {$account->get('login')} is being blocked");
+				Logger::warning("Account {$account->get('login')} is being blocked");
 				// refuse access
 				self::refuse('Please wait ' . Config::get('security', 'waiting_duration') . ' seconds before trying again');
 			}
 			
 			// if the account has expired
-			if($account->get('account_expiration_date') && time() > $account->get('account_expiration_date',true)) {
+			if($account->hasItsValidityExpired()) {
+				// log the attempt
+				Logger::notice("Expired account {$account->get('login')} has tried to log-in");
 				// refuse access
-				self::refuse('Your account was only valid until '.$account->get('account_expiration_date'));	
+				self::refuse("Your account has expired, it was valid until {$account->get('account_expiration_date')}");	
 			}
 
-			// if the password matches
-			if($account->get('password') === self::getPassword(Request::post(Config::get('security', 'password')))) {
+			// if the posted password matches the account password
+			if($account->hasThisPassword(Request::post(Config::get('security', 'password')))) {
 
 				// generate the expiration date
 				$session_expiration = time() + ( Config::get('security', 'session_duration') * 3600 );
@@ -154,7 +146,7 @@ class Security {
 					$account->get('login') . $account->get('password') . $session_expiration);
 
 				// store a cookie with our current session key in it
-				$cookie_creation = Store\Cookie::put(
+				$cookie_creation = Cook::put(
 					Config::get('security', 'cookie'), 
 					$session_signature, 
 					true, 
@@ -163,34 +155,21 @@ class Security {
 				
 				// if the cookie creation failed
 				$cookie_creation ?: self::refuse('You must accept cookies to log in');
-				
-				// update the account
-				$account
-					->set('session_expiration_date',$session_expiration)	
-					->set('session_key',			$session_signature)
-					->set('last_login_origin',		Request::server('REMOTE_ADDR'))
-					->set('last_login_agent',		Request::server('HTTP_USER_AGENT'))
-					->set('last_login_date',		time())
-					->save();
 
-				// update our credentials
-				self::$_account = $account;
+				// open the session on the database record, and update our current credentials/informations
+				self::$_account = $account->openSessionUntil($session_expiration, $session_signature);
 
 				// allow the basic authentication
 				self::$_granted = true;
-
 				// log the loggin action
-				Logger::info('User has logged in');
-				
+				Logger::info("Account {$account->get('login')} has logged in");
 			}
 			// passwords dont match
 			else {
-				// update the account
-				$account
-					->set('last_failure_agent',	Request::server('HTTP_USER_AGENT'))
-					->set('last_failure_origin',Request::server('REMOTE_ADDR'))
-					->set('last_failure_date',	time())
-					->save();
+				// register that failure
+				$account->registerFailedLoginAttemptFrom(self::getSafeRemoteAddress(), self::getSafeUserAgent());
+				// log the failed login
+				Logger::notice("Account {$account->get('login')} has tried to log-in with a wrong password");
 				// refuse access
 				self::refuse('Wrong password');
 			}
@@ -202,33 +181,19 @@ class Security {
 	// internal method to refuse access
 	protected static function refuse(string $message='Forbidden', int $code=403, bool $logout=false, bool $redirect=true) :void {
 		// remove any existing session cookie
-		!$logout ?: Store\Cookie::remove(Config::get('security','cookie'));
+		!$logout ?: Cook::remove(Config::get('security','cookie'));
 		// we will redirect to the login page
 		!$redirect ?: Response::setRedirect(Config::get('router','login_route'), 3);
 		// trhow a polyfony exception that by itself will stop the execution with maybe a nice exception handler
 		Throw new Exception($message, $code);
 	}
-
-	// this will check that the opened session matches the current client's signature
-	protected static function match(\Models\Accounts $account) :bool {
-		// get the session key existing in the database
-		$existing_key = $account->get('session_key');
-		// generate a new session key for this request
-		$dynamic_key = self::getSignature(
-			$account->get('login') . $account->get('password') . 
-			$account->get('session_expiration_date', true)
-		);
-		// return true only if they match
-		return($existing_key === $dynamic_key ? true : false);
-
-	}
 	
 	// internal method for generating unique signatures
-	protected static function getSignature($mixed) :string {
+	public static function getSignature($mixed) :string {
 		
 		// compute a hash with (the provided string + salt + user agent + remote ip)
 		return(hash(Config::get('security','algo'), 
-			Request::server('HTTP_USER_AGENT') . Request::server('REMOTE_ADDR') . 
+			self::getSafeUserAgent() . self::getSafeRemoteAddress() . 
 			Config::get('security','salt') . is_string($mixed) ? $mixed : json_encode($mixed)
 		));
 		
@@ -248,7 +213,7 @@ class Security {
 	public static function hasLevel(int $level=null) :bool {
 	
 		// if we have said level
-		return(self::get('id_level', 100) <= $level ? true : false);
+		return self::get('id_level', 100) <= $level;
 		
 	}
 	
@@ -256,7 +221,7 @@ class Security {
 	public static function hasModule(string $module=null) :bool {
 		
 		// if module is in our credentials
-		return(in_array($module, self::get('modules_array', array())) ?: false);
+		return in_array($module, self::get('modules_array', array()));
 		
 	}
 
@@ -276,7 +241,17 @@ class Security {
 		);
 		
 	}
-	
+
+	// return the user agent truncate to prevent database filling by huge faked user agent
+	public static function getSafeUserAgent() {
+		return Format::truncate(Request::server('HTTP_USER_AGENT'), 512);
+	}
+
+	public static function getSafeRemoteAddress() {
+		return Format::truncate(Request::server('REMOTE_ADDR'), 32);
+	}
+
+
 }	
 
 ?>

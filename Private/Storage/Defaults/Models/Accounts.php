@@ -7,7 +7,7 @@ use Polyfony as pf;
 // it's a repository for stored SQL queries
 // there should not be any functionnal code or conditions here
 
-class Accounts extends pf\Record {
+class Accounts extends \Polyfony\Security\Accounts {
 	
 	const IS_ENABLED = [
 		0=>'No',
@@ -33,6 +33,7 @@ class Accounts extends pf\Record {
 
 	// what we mean by recent authentication failure (3 days)
 	const RECENT_FAILURE = 259200;
+
 
 	public function hasModule($searched_module) :bool {
 
@@ -99,6 +100,7 @@ class Accounts extends pf\Record {
 			->execute();
 
 	}
+
 
 }
 
