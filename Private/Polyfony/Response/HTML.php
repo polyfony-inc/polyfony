@@ -108,7 +108,7 @@ class HTML {
 		// close the head, add the body, and add the scripts
 		$page .= '</head><body>' . $content . self::buildScriptsTags();
 		// add the profiler (if enabled)
-		$page .= \Polyfony\Config::get('profiler', 'enable') ? new \Polyfony\Profiler\Html : '';
+		$page .= \Polyfony\Config::get('profiler', 'enable') ? new \Polyfony\Profiler\HTML : '';
 		// close the document and return the assembled html page
 		return $page . '</body></html>';
 

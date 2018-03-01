@@ -78,7 +78,7 @@ class Accounts extends \Polyfony\Record {
 	}
 
 
-	public function tryOpeningSession() {
+	public function tryOpeningSession() :bool {
 
 		// generate the expiration date
 		$session_expiration = time() + ( Conf::get('security', 'session_duration') * 3600 );
