@@ -26,23 +26,32 @@ class Router {
 		self::route();
 		
 	}
+
+	private static function canWeUseCachedRoutes() :bool {
+		return Config::isProd() && Cache::has('Routes') && Config::get('router', 'cache');
+	}
 	
+	private static function restoreCachedRoutes() :void {
+		// restore the routes from the cache
+		foreach(Cache::get('Routes') as $route_name => $route) {
+			// reinstanciate a route
+			$route_object = new Route($route_name);
+			// for each attribute
+			foreach($route as $key => $value) {
+				// re-set it
+				$route_object->{$key} = $value;
+			}
+			// add the route
+			self::$_routes[$route_name] = $route_object;
+		}
+	}
+
 	public static function includeBundlesRoutes($bundles_routes_files) :void {
 		
 		// if we are in prod, and allowed to cache routes, and have a cache file available
-		if(Config::isProd() && Cache::has('Routes') && Config::get('router', 'cache')) {
-			// restore the routes from the cache
-			foreach(Cache::get('Routes') as $route_name => $route) {
-				// reinstanciate a route
-				$route_object = new Route($route_name);
-				// for each attribute
-				foreach($route as $key => $value) {
-					// re-set it
-					$route_object->{$key} = $value;
-				}
-				// add the route
-				self::$_routes[$route_name] = $route_object;
-			}
+		if(self::canWeUseCachedRoutes()) {
+			// we can restore the routes from the cache
+			self::restoreCachedRoutes();
 		}
 		// then we have to include the routes files
 		else {
@@ -187,7 +196,8 @@ class Router {
 		self::forward(self::$_match);	
 		
 	}
-	
+
+
 	/**
 	 * Test to see if this route is valid against the URL.
 	 *
@@ -198,12 +208,12 @@ class Router {
 	 */
 	private static function routeMatch(string $request_url, string $request_method, Route $route) :bool {
 		// if the method is set for that route, and it doesn't match
-		if($route->method && $route->method != $request_method) {
+		if($route->hasMethodAndItIsNot($request_method)) {
 			// don't even got any further
 			return false;
 		}
 		// break apart the route URL
-		$route_portions = strstr($route->url,':') ? explode(':',$route->url) : $route->url;
+		$route_portions = $route->getUrlPortions();
 		
 		// we should also be breaking appart the {} symbols (new syntax)
 		// code to be produced here
@@ -266,7 +276,7 @@ class Router {
 					}
 				}
 			}
-			// if a trigger is defined use to to set the action
+			// if a trigger is defined use it to set the action
 			if($route->trigger !== null) {
 				// update dynamically the route's action or fallback to index if missing
 				$route->action = Request::get($route->trigger) ? Request::get($route->trigger) : 'index';

@@ -104,7 +104,7 @@ class Mail {
 		return($this);
 	}
 
-	public function to($mail, $name=null) {
+	private function recipient(string $type, $mail, $name=null) {
 		// array of recipients provided
 		if(is_array($mail)) {
 			// for each recipients
@@ -112,56 +112,31 @@ class Mail {
 				// if we have only an email, set the name to null
 				list($individual_mail, $individual_name) = is_array($individual_mail) ? $individual_mail : array($individual_mail, null);
 				// recurse
-				$this->to($individual_mail, $individual_name);
+				$this->recipient($type, $individual_mail, $individual_name);
 			}
 		}
 		// single recipient provided
 		else {
 			// push to the table
-			$this->recipients['to'][$mail] = $name;
+			$this->recipients[$type][$mail] = $name;
 		}
 		// return self
 		return($this);
+	}
+
+	public function to($mail, $name=null) {
+		// return self
+		return $this->recipient('to', $mail, $name);
 	}
 
 	public function cc($mail, $name=null) {
-		// array of recipients provided
-		if(is_array($mail)) {
-			// for each recipients
-			foreach($mail as $individual_mail) {
-				// if we have only an email, set the name to null
-				list($individual_mail, $individual_name) = is_array($individual_mail) ? $individual_mail : array($individual_mail, null);
-				// recurse
-				$this->cc($individual_mail, $individual_name);
-			}
-		}
-		// single recipient provided
-		else {
-			// push to the table
-			$this->recipients['cc'][$mail] = $name;
-		}
 		// return self
-		return($this);
+		return $this->recipient('cc', $mail, $name);
 	}
 
 	public function bcc($mail, $name=null) {
-		// array of recipients provided
-		if(is_array($mail)) {
-			// for each recipients
-			foreach($mail as $individual_mail) {
-				// if we have only an email, set the name to null
-				list($individual_mail, $individual_name) = is_array($individual_mail) ? $individual_mail : array($individual_mail, null);
-				// recurse
-				$this->bcc($individual_mail, $individual_name);
-			}
-		}
-		// single recipient provided
-		else {
-			// push to the table
-			$this->recipients['bcc'][$mail] = $name;
-		}
 		// return self
-		return($this);
+		return $this->recipient('bcc', $mail, $name);
 	}
 
 	public function file($file_path, $file_name='') {
@@ -169,24 +144,21 @@ class Mail {
 		if(is_array($file_path)) {
 			// for each recipients
 			foreach($file_path as $individual_path) {
-				// if we have only an email, set the name to null
+				// if we only have to path or if we also have the name
 				list($individual_path, $individual_name) = is_array($individual_path) ? $individual_path : array($individual_path, null);
 				// recurse
 				$this->file($individual_path, $individual_name);
 			}
 		}
-		// single recipient provided
+		// // if the file exists
+		elseif(file_exists($file_path)) {
+			// push to the table
+			$this->files[$file_path] = $file_name;
+		}
+		// file does not exist
 		else {
-			// if the file exists
-			if(file_exists($file_path)) {
-				// push to the table
-				$this->files[$file_path] = $file_name;
-			}
-			// file does not exist
-			else {
-				// throw an exeption
-				Throw new Exception('Mail->file() the attachment file does not exist');
-			}
+			// throw an exeption
+			Throw new Exception('Mail->file() the attachment file does not exist');
 		}
 		// return self
 		return($this);
@@ -244,15 +216,13 @@ class Mail {
 
 		// if we have triggers for an alternate SMTP relay, and and alternative SMTP relay server defined
 		$this->enforceAlternativeRelay();
-
 		// configure the php mailer object
 		$this->configurePHPMailer();
-
 		// configure environment specifics parameters/options
 		$this->configureEnvironmentSpecifics();
 
 		// default status is false
-		$is_sent = null;
+		$is_sent = false;
 
 		// try sending
 		try {
@@ -293,7 +263,7 @@ class Mail {
 		Profiler::releaseMarker($id_marker);
 
 		// return the sending status
-		return($is_sent);
+		return $is_sent;
 
 	}
 
@@ -310,7 +280,7 @@ class Mail {
 			Config::get('mail','alternative_smtp_host')
 		) {
 			// for each and EVERY recipients that might receive this email
-			foreach(array_merge($this->recipients['to'], $this->recipients['cc'], $this->recipients['bcc']) as $email => $name) {
+			foreach($this->getMergedRecipients()) as $email => $name) {
 				// for each of the possible triggers
 				foreach(Config::get('mail', 'alternative_triggers') as $needle) {
 					// if there is at least a simple partial case match (insensitive, and no regex allowed)
@@ -326,6 +296,10 @@ class Mail {
 			}
 		}
 
+	}
+
+	private function getMergedRecipients() :array {
+		return array_merge($this->recipients['to'], $this->recipients['cc'], $this->recipients['bcc']);
 	}
 
 	private function configurePHPMailer() {

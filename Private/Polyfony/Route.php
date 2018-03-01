@@ -152,4 +152,14 @@ class Route {
 		// return the route
 		return $this;
 	}
+
+	public function hasMethodAndItIsNot(string $method) :bool {
+		// if the method is defined, and it doesn't match
+		return $this->method && $this->method != $method;
+	}
+
+	public function getUrlPortions() {
+		return strstr($this->url,':') ? explode(':',$this->url) : $this->url;
+	}
+
 }
