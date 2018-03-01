@@ -209,8 +209,10 @@ To enforce it, declare a `VALIDATORS` constant array in your model, each key bei
 
 ```php
 
-Models\Accounts extends Polyfony\Records {
-	
+Models\Accounts extends Polyfony\Security\Accounts {
+// Normal model classes extend Polyfony\Record. 
+// Accounts extends an intermediate (but transparent) class that adds authentication logic.
+
 	const ID_LEVEL = [
 		0		=>'Admin',
 		5		=>'Privileged User',
