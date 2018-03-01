@@ -3,6 +3,8 @@
 namespace Polyfony\Security;
 use Polyfony\Config as Conf;
 use Polyfony\Security as Sec;
+use Polyfony\Logger as Log;
+use Polyfony\Store\Cookie as Cook;
 
 class Accounts extends \Polyfony\Record {
 
@@ -30,6 +32,15 @@ class Accounts extends \Polyfony\Record {
 			->execute();
 	}
 
+	public function closeSession() :bool {
+
+		// remove the session from the database, and remove the session cookie
+		return 
+			$this->set(['session_key'=>'','session_expiration_date'=>''])->save() && 
+			Cook::remove(Conf::get('security', 'cookie'));
+			
+	}
+
 	// this methods should be moved to Models\Accounts but that would break backward compatiblity
 	public function hasFailedLoginAttemptsRecentFrom(string $remote_address) :bool {
 		return 
@@ -50,6 +61,9 @@ class Accounts extends \Polyfony\Record {
 
 	// this methods should be moved to Models\Accounts but that would break backward compatiblity
 	public function extendLoginBan() :void {
+		// log the action
+		Log::warning("Account {$this->get('login')} got its ban period extended due to wrong password");
+		// updathe the account
 		$this->set([
 			'last_failure_date'		=>time(),
 			'last_failure_agent'	=>Sec::getSafeUserAgent()
@@ -64,7 +78,38 @@ class Accounts extends \Polyfony\Record {
 	}
 
 
-	public function openSessionUntil(int $expiration_date, string $session_signature) {
+	public function tryOpeningSession() {
+
+		// generate the expiration date
+		$session_expiration = time() + ( Conf::get('security', 'session_duration') * 3600 );
+		
+		// generate a session key with its expiration, the login, the password, the ip, the user agent
+		$session_signature = Sec::getSignature($this->get('login').$this->get('password').$session_expiration);
+
+		// if we manage to open the session properly
+		return 
+			// if the cookie creation went right
+			$this->createCookieSession($session_signature) && 
+			// and the account record updating went right too
+			$this->createDatabaseSessionUntil($session_expiration, $session_signature);
+
+	}
+
+	// first part of the session opening process
+	private function createCookieSession(string $session_signature) :bool {
+
+		// store a cookie with our current session key in it
+		return Cook::put(
+			Conf::get('security', 'cookie'), 
+			$session_signature, 
+			true, 
+			Conf::get('security', 'session_duration')
+		);
+
+	}
+
+	// second part of the session opening process
+	private function createDatabaseSessionUntil(int $expiration_date, string $session_signature) :bool {
 
 		// open the session
 		return $this->set([
@@ -73,12 +118,14 @@ class Accounts extends \Polyfony\Record {
 			'last_login_origin'			=> Sec::getSafeRemoteAddress(),
 			'last_login_agent'			=> Sec::getSafeUserAgent(),
 			'last_login_date'			=> time()
-		])->save() ? $this : false;
+		])->save();
 
 	}
 
 	public function registerFailedLoginAttemptFrom(string $remote_address, string $user_agent) :void {
 
+		// log the failed login
+		Log::warning("Account {$this->get('login')} has tried to log-in with a wrong password");
 		// save the incident to prevent bruteforce attacks
 		$this->set([
 			'last_failure_agent'	=>$user_agent,
