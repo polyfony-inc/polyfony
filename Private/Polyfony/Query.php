@@ -20,7 +20,6 @@ class Query {
 	protected	$Prepared;
 	protected	$Success;
 	protected	$Result;
-	protected	$Array;
 	protected	$Action;
 	protected	$Hash;
 	protected	$Quote;
@@ -43,7 +42,7 @@ class Query {
 		// set the query as being empty for now
 		$this->Query		= null;
 		// set an array to store all values to pass to the prepared query
-		$this->Values		= array();
+		$this->Values		= [];
 		// set the PDO prepare object
 		$this->Prepared		= null;
 		// set the status of the query
@@ -52,8 +51,6 @@ class Query {
 		$this->First 		= false;
 		// set the result as being empty for no
 		$this->Result		= null;
-		// set the array of results as being empty too
-		$this->Array		= array();
 		// set the main action (INSERT, UPDATE, DELETE, SELECT or QUERY in case of passthru)
 		$this->Action		= null;
 		// set the unique hash of the query for caching purpose
@@ -62,7 +59,7 @@ class Query {
 		$this->Quote 		= $quote;
 
 		// initialize attributes
-		$this->Object		= null;
+		$this->Object		= 'Record';
 		$this->Table		= null;
 		$this->Operator		= 'AND';
 		$this->Selects		= [];
@@ -538,8 +535,84 @@ class Query {
 
 	// execute the query
 	public function execute() {
+		
+		// build the query
+		$this->buildQuery();
+
+		// prepare the statement
+		$this->Prepared = \Polyfony\Database::handle()->prepare($this->Query);
+		
+		// marker start (after preparation, otherwise we would not be able to read the query, it wouldn't exist yet!)
+		$id_marker = Profiler::setMarker(null, 'database', ['Query'=>$this]);
+
+		// if prepare failed
+		if(!$this->Prepared) {
+			// throw an exception
+			$this->throwExceptionOn('prepare');
+		}
+		
+		// execute the statement
+		$this->Success = $this->Prepared->execute($this->Values);
+		
+		// if execution failed
+		if($this->Success === false) {
+			// throw an exception
+			$this->throwExceptionOn('execute');
+		}
+
+		// if a forced type of object has been defined
+		$this->Object = $this->Object && $this->Object != 'Record' ? 
+			'\Models\\'.$this->Object : 
+			'\Models\\'.$this->Table;
+		
+		// fetch all results as objects
+		$this->Result = $this->Prepared->fetchAll(PDO::FETCH_CLASS, $this->Object);
+
+		// format the result
+		$this->formatSelectResult();
+		$this->formatUpdateOrDeleteResult();
+		$this->formatInsertResult();
+
+		// marker end, release after all manipulation has been done
+		Profiler::releaseMarker($id_marker);
+
+		// return whatever result we got
+		return $this->Result;
+	}
+
+	private function getExecutedAction() {
+		// return the first 6 letters of the query
+		return $this->Action ? $this->Action : substr(trim($this->Query),0,6);
+	}
+
+	private function formatUpdateOrDeleteResult() {
+		// actions of type UPDATE or DELETE
+		if(in_array($this->getExecutedAction(),['UPDATE','DELETE'])) {
+			// return the number of affected rows
+			$this->Result = $this->Prepared->rowCount();
+		}
+	}
+
+	private function formatInsertResult() :void {
+		// actions of type INSERT
+		if($this->Action == 'INSERT') {
+			$this->Result = $this->Success ? 
+				new $this->Object(\Polyfony\Database::handle()->lastInsertId()) : false;
+		}
+	}
+
+	private function formatSelectResult() :void {
+		// actions of type SELECT & first element
+		if($this->Action == 'SELECT' && $this->First) {
+			$this->Result = isset($this->Result[0]) ? 
+				$this->Result[0] : false;
+		}
+	}
+
+	private function buildQuery() :void {
+
 		// if the action is missing
-		if(!$this->Action) { Throw new Exception('Query->execute() : Missing action'); }
+		if(!$this->Action) { Throw new Exception('Query->buildQuery() : Missing action'); }
 		// if action anything but query
 		if($this->Action != 'QUERY') {
 			// set the first keyword
@@ -548,7 +621,7 @@ class Query {
 		// if action is insert
 		if($this->Action == 'INSERT') {
 			// if the table is missing
-			if(!$this->Table) { Throw new Exception('Query->execute() : Missing INTO'); }
+			if(!$this->Table) { Throw new Exception('Query->buildQuery() : Missing INTO'); }
 			// if missing values
 			if(!$this->Values || !count($this->Values)) { Throw new Exception('Query->execute() : Missing VALUES');}
 			// set destination and columns
@@ -559,14 +632,14 @@ class Query {
 		// if action is select
 		if($this->Action == 'SELECT') {
 			// if the table is missing
-			if(!$this->Table) { Throw new Exception('Query->execute() : Missing FROM'); }
+			if(!$this->Table) { Throw new Exception('Query->buildQuery() : Missing FROM'); }
 			// if columns are set for selection
 			$this->Query .= count($this->Selects) ? ' ' . implode(', ', $this->Selects) . ' ' : ' * ';
 		}
 		// if the action is delete
 		if($this->Action == 'DELETE') {
 			// if the table is missing
-			if(!$this->Table) { Throw new Exception('Query->execute() : Missing table to delete from'); }
+			if(!$this->Table) { Throw new Exception('Query->buildQuery() : Missing table to delete from'); }
 			// set the query
 			$this->Query = 'DELETE ';
 		}
@@ -578,9 +651,9 @@ class Query {
 		// if action is an update
 		if($this->Action == 'UPDATE') {
 			// if the table is missing
-			if(!$this->Table) { Throw new Exception('Query->execute() : No table to update'); }
+			if(!$this->Table) { Throw new Exception('Query->buildQuery() : No table to update'); }
 			// if there is nothing to update
-			if(!count($this->Updates)) { Throw new Exception('Query->execute() : No columns to update'); }
+			if(!count($this->Updates)) { Throw new Exception('Query->buildQuery() : No columns to update'); }
 			// assemble the updates
 			$this->Updates = implode(', ', $this->Updates);
 			// prepare the update query
@@ -622,64 +695,7 @@ class Query {
 			// assemble the limit options to the query
 			$this->Query .= " LIMIT {$this->Limit[0]},{$this->Limit[1]}";
 		}
-		// marker
-		$id_marker = Profiler::setMarker(null, 'database', ['Query'=>$this]);
-		// prepare the statement
-		$this->Prepared = \Polyfony\Database::handle()->prepare($this->Query);
-		// if prepare failed
-		if(!$this->Prepared) {
-			// prepare informations to be thrown
-			$exception_infos = implode(":",\Polyfony\Database::handle()->ErrorInfo()).":$this->Query";
-			// throw an exception
-			Throw new Exception("Query->execute() : Failed to prepare query [{$exception_infos}]");
-		}
-		// execute the statement
-		$this->Success = $this->Prepared->execute($this->Values);
-		// marker
-		Profiler::releaseMarker($id_marker);
-		// if execution failed
-		if($this->Success === false) {
-			// prepare informations to be thrown
-			$exception_infos = implode(":",\Polyfony\Database::handle()->ErrorInfo()).":$this->Query";
-			// throw an exception
-			Throw new Exception("Query->execute() : Failed to execute query [{$exception_infos}]");
-		}
-		// if a forced type of object has been defined
-		if($this->Object) {
-			// use the forced type
-			$class = '\Models\\'.$this->Object;
-		}
-		// no forced type
-		else {
-			// use the table name, or generic Record if none available
-			$class = $this->Table && class_exists('\Models\\'.$this->Table) ? '\Models\\'.$this->Table : '\Polyfony\Record';
-		}
-		// fetch all results
-		$this->Result = $this->Prepared->fetchAll(
-			// fetch as an object
-			PDO::FETCH_CLASS,
-			// of this specific class
-			$class
-		);
-		// if action was UPDATE or DELETE or one of those via QUERY
-		if(in_array($this->Action,array('UPDATE','DELETE')) || ($this->Action == 'QUERY' && in_array(substr($this->Query,0,6),array('UPDATE','DELETE')) && $this->Table)) {
-			// return the number of affected rows
-			return($this->Prepared->rowCount());
-		}
-		// if the query was an insert and it succeeded
-		if($this->Action == 'INSERT' && $this->Success) {
-			// instanciate a new query
-			$this->Result = new Query();
-			// get the newly inserted element from its id
-			return(new Record($this->Table, \Polyfony\Database::handle()->lastInsertId()));
-		}
-		// if we want the first result only from a select query
-		if($this->First && $this->Action == 'SELECT' && isset($this->Result[0])) {
-			// return only the first result
-			$this->Result = $this->Result[0];
-		}
-		// return the results
-		return($this->Result);
+
 	}
 
     // set the action internally
@@ -690,7 +706,14 @@ class Query {
 			$this->Action = $action_name;
 		}
 		// an action has already been set, this is impossible
-		else { Throw new Exception("Query->action() : An incompatible action already exists : {$this->Action}"); }
+		else { Throw new Exception("Query->action({$action_name}) : An incompatible action already exists : {$this->Action}"); }
+    }
+
+    private function throwExceptionOn(string $occured_on) {
+    	// prepare informations to be thrown
+		$exception_infos = implode(":",\Polyfony\Database::handle()->ErrorInfo()).":$this->Query";
+		// throw an exception
+		Throw new Exception("Query->{$occured_on}() failed because : {$exception_infos}");
     }
 	
 }
