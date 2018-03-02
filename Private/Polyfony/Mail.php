@@ -1,14 +1,4 @@
 <?php
-/**
- * PHP Version 5
- * Mail generation and sending class
- * @package Polyfony
- * @link https://github.com/SIB-FRANCE/Polyfony
- * @license http://www.gnu.org/licenses/lgpl.txt GNU General Public License
- * @note This program is distributed in the hope that it will be useful - WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.
- */
 
 namespace Polyfony;
 
@@ -280,7 +270,7 @@ class Mail {
 			Config::get('mail','alternative_smtp_host')
 		) {
 			// for each and EVERY recipients that might receive this email
-			foreach($this->getMergedRecipients()) as $email => $name) {
+			foreach($this->getMergedRecipients() as $email => $name) {
 				// for each of the possible triggers
 				foreach(Config::get('mail', 'alternative_triggers') as $needle) {
 					// if there is at least a simple partial case match (insensitive, and no regex allowed)

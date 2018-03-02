@@ -4,6 +4,18 @@ namespace Polyfony\Profiler\HTML;
 
 class Timing {
 
+	private static function applySpecificNaming($element) {
+
+		if($element['user'] == 'database') {
+			$element['name'] = ucfirst(
+				strtolower(
+					$element['informations']['Query']->getExecutedAction()
+				)
+			);
+		}
+		return $element;
+	}
+
 	private static function getBody($data) {
 
 		$timing_body = [];
@@ -23,7 +35,8 @@ class Timing {
 			$readable_duration 		= round($elem['duration']*1000, 1) ? round($elem['duration'] * 1000, 1) . ' ms' : '';
 			// human readable memory consumption
 			$readable_memory 		= $elem['memory'] ? \Polyfony\Format::size($elem['memory']) : '';
-
+			// trick for database queris
+			$elem = self::applySpecificNaming($elem);
 			// the actual bar/stack element
 			$timing_body[] = new \Polyfony\Element('div', [
 				'style'	=>[

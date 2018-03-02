@@ -2,10 +2,7 @@
 /**
  * Stores data within Memcache.
  *
- * @copyright Copyright (c) 2012-2013 Christopher Hill
- * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
  * @author    Christopher Hill <cjhill@gmail.com>
- * @package   MVC
  */
 
 namespace Polyfony\Store;

@@ -1,13 +1,4 @@
 <?php
-/**
- * PHP Version 5
- * @package Polyfony
- * @link https://github.com/SIB-FRANCE/Polyfony
- * @license http://www.gnu.org/licenses/lgpl.txt GNU General Public License
- * @note This program is distributed in the hope that it will be useful - WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.
- */
  
 namespace Polyfony;
 use \PDO;
@@ -580,7 +571,7 @@ class Query {
 		return $this->Result;
 	}
 
-	private function getExecutedAction() {
+	public function getExecutedAction() {
 		// return the first 6 letters of the query
 		return $this->Action ? $this->Action : substr(trim($this->Query),0,6);
 	}

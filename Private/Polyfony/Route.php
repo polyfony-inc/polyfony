@@ -1,53 +1,33 @@
 <?php
-/**
- * A single route for the application.
- *
- * Routes can contain variables which are prepended by a colon. Paths are greedy
- * by default, they will grab any URL that they match irrespective of what comes
- * after the matched fragments of the request URL. Anything after the route path
- * will be parsed as a GET variable.
- * @copyright Copyright (c) 2012-2013 Christopher Hill
- * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- * @author    Christopher Hill <cjhill@gmail.com>
- * @package   MVC
- */
  
 namespace Polyfony;
 
 class Route {
 
 	// url to match
-	public $url;
+	public $url				= '';
 	// name of that route
-	public $name;
+	public $name			= null;
 	// bundle destination
-	public $bundle;
+	public $bundle			= null;
 	// controller destination
-	public $controller;
+	public $controller		= null;
 	// (optional) action destination
-	public $action;
+	public $action			= null;
 	// (optional) url variable to trigger action
-	public $trigger;
+	public $trigger			= null;
 	// (optional)method to match 
-	public $method;
+	public $method			= null;
 	// (optional) parameter restriction
-	public $restrictions;
+	public $restrictions	= [];
 	// (optional) redirection url
-	public $redirect;
+	public $redirect		= null;
 	// (optional) redirection status code
-	public $redirectStatus;
+	public $redirectStatus 	= null;
 
 	// construct the route given its name
 	public function __construct(string $name = null) {
 		$this->name				= $name ?: uniqid('route-');
-		$this->trigger			= null;
-		$this->bundle			= null;
-		$this->controller		= null;
-		$this->action			= null;
-		$this->method 			= null;
-		$this->redirect 		= null;
-		$this->redirectStatus 	= null;
-		$this->restrictions		= [];
 	}
 	
 	// set the url to match
@@ -55,6 +35,26 @@ class Route {
 		$this->url = $url;
 		return $this;
 	}
+
+	public function redirectTo(string $destination_url) {
+		$this->redirect = $destination_url;
+		return $this;
+	}
+
+	public function redirectStatus(int $status) :self {
+		$this->redirectStatus = $status;
+		return $this;
+	}
+
+	public function redirectIfItIsOne() :void {
+		// if we are a redirection
+		if($this->redirect) {
+			Response::setStatus($this->redirectStatus);
+			Response::setRedirect($this->redirect, 0);
+			Response::setType('text');
+			Response::render(); 
+		}
+	} 
 
 	public function method(string $method = null) :self {
 		$this->method = in_array(strtolower($method), Request::METHODS) ? strtolower($method) : null;
@@ -84,40 +84,6 @@ class Route {
 	// set an associative array of contraints for the url parameters
 	public function where(array $restrictions) :self {
 		$this->restrictions = $restrictions;
-		return $this;
-	}
-
-	// set an associative array of constraints (alias)
-	public function restrict(array $restrictions) :self {
-		// this is now deprecated, will probably be removed in a future release
-		trigger_error(
-			'Usage of Route->restrict() is deprecated, use Route->where() instead', 
-			E_USER_DEPRECATED
-		);
-		return $this->where($restrictions);
-	}
-	
-	// set the name of a parameter that will trigger the action
-	public function trigger(string $trigger) :self {
-		// this is now deprecated, will probably be removed in a future release
-		trigger_error(
-			'Usage of Route->destination() is deprecated, use Router::map("url","Bundle/Controller@{your_trigger}") instead', 
-			E_USER_DEPRECATED
-		);
-		$this->trigger = $trigger;
-		return $this;
-	}
-
-	// set the destination for that route
-	public function destination(string $bundle, string $controller=null, string $action=null) :self {
-		// this is now deprecated, will probably be removed in a future release
-		trigger_error(
-			'Usage of Route->destination() is deprecated, use Router::map("url","Bundle/Controller@action") instead', 
-			E_USER_DEPRECATED
-		);
-		$this->bundle = $bundle;
-		$this->controller = $controller !== null ? $controller : 'Index';
-		$this->action = $action !== null ? $action : null;
 		return $this;
 	}
 
@@ -160,6 +126,67 @@ class Route {
 
 	public function getUrlPortions() {
 		return strstr($this->url,':') ? explode(':',$this->url) : $this->url;
+	}
+
+	public function getDestinationScript() :string {
+		return "../Private/Bundles/{$this->bundle}/Controllers/{$this->controller}.php";
+	}
+
+	public function getDestinationControllerClass() :string {
+		return "{$this->controller}Controller";
+	}
+
+	public function getDestinationControllerMethod() :string {
+		return $this->action ? "{$this->action}Action" : 'indexAction';
+	}
+
+	public static function isThisAParameterName($unknown_string) :bool {
+		return 
+			// if we've got an old school parameter
+			substr($unknown_string, 0, 1) == ':' || 
+			(
+				// or if we've got a new syntax parameter
+				substr($unknown_string, 0, 1) == '{' && 
+				substr($unknown_string, -1, 1) == '}'
+			);
+	}
+
+	// assembles an url using provided url parameters
+	public function getAssembledUrl(
+		array $parameters=[], bool $absolute = false, bool $force_tls = false
+	) :string {
+
+		// declare a variable for the assembled url
+		$url = $this->url;
+		// for each provided parameter
+		foreach($parameters as $variable => $value) {
+			// replace it in the url in both possible forms
+			$url = str_replace([":{$variable}/",'{'.$variable.'}'] , urlencode($value) . '/', $url);
+		}
+		// the list of all parameters present in the url
+		$all_parameters = (array) explode('/', $url);
+		// for each parameter
+		foreach($all_parameters as $index => $a_parameter) {
+			// if it starts with a semicolon or is enclosed by brackets
+			if(self::isThisAParameterName($a_parameter)) {
+				// if it has not been replaced by a value, we remove it
+				$url = str_replace("{$a_parameter}/", '', $url);
+			}
+		}
+		// define the protocol to use (use the current one, or https if it is forced)
+		$protocol = 
+			// if we are in prod and tls is to be enforced
+			((Config::isProd() && $force_tls) || 
+			// or if we already are rolling https
+			Request::getProtocol() == 'https') ? 
+			'https' : 'http';
+
+		// if we want an absolute url, prefix with the domain and with the port if the protocol is not https
+		!$absolute ?: $url = $protocol . '://' . Config::get('router', 'domain') . 
+		(Request::getPort() != 80 && $protocol == 'http' ? ':'.Request::getPort() : '') . $url;
+
+		return $url;
+
 	}
 
 }

@@ -1,15 +1,10 @@
 <?php
-/**
- * PHP Version 5
- * Simple HTTP Request abstraction class to ease http handling without the pecl_http (HttpRequest) module
- * It uses CURL which is most commonly installed
- * @package Polyfony
- * @link https://github.com/SIB-FRANCE/Polyfony
- * @license http://www.gnu.org/licenses/lgpl.txt GNU General Public License
- * @note This program is distributed in the hope that it will be useful - WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.
- */
+
+ //  ___                           _          _ 
+ // |   \ ___ _ __ _ _ ___ __ __ _| |_ ___ __| |
+ // | |) / -_) '_ \ '_/ -_) _/ _` |  _/ -_) _` |
+ // |___/\___| .__/_| \___\__\__,_|\__\___\__,_|
+ //          |_|                                
 
 namespace Polyfony;
 

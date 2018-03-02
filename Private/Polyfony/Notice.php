@@ -1,16 +1,10 @@
 <?php
-/**
- * PHP Version 5
- * Provide an object to easily store a notice for the enduser
- * This notice can be rendered nicely as a string or you can get
- * the title and message separately to format them your way
- * @package Polyfony
- * @link https://github.com/SIB-FRANCE/Polyfony
- * @license http://www.gnu.org/licenses/lgpl.txt GNU General Public License
- * @note This program is distributed in the hope that it will be useful - WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.
- */
+
+ //  ___                           _          _ 
+ // |   \ ___ _ __ _ _ ___ __ __ _| |_ ___ __| |
+ // | |) / -_) '_ \ '_/ -_) _/ _` |  _/ -_) _` |
+ // |___/\___| .__/_| \___\__\__,_|\__\___\__,_|
+ //          |_|                                
 
 namespace Polyfony;
 

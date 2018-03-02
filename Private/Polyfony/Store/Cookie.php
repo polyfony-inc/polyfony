@@ -2,10 +2,7 @@
 /**
  * Stores data within the users own cookie store.
  *
- * @copyright Copyright (c) 2012-2013 Christopher Hill
- * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- * @author    Christopher Hill <cjhill@gmail.com>
- * @package   MVC
+ * @author    Christopher Hill <cjhill@gmail.com> modified by AnnoyingTechnology
  */
 
 namespace Polyfony\Store;

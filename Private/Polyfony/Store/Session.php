@@ -4,10 +4,7 @@ namespace Polyfony\Store;
 /**
  * Stores data for a user session.
  *
- * @copyright Copyright (c) 2012-2013 Christopher Hill
- * @license   http://www.opensource.org/licenses/mit-license.php The MIT License
- * @author    Christopher Hill <cjhill@gmail.com>
- * @package   MVC
+ * @author    Christopher Hill <cjhill@gmail.com>, modified by AnnoyingTechnology
  */
 class Session implements StoreInterface
 {

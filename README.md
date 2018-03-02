@@ -1,11 +1,11 @@
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/713fa5be-b3d6-4a10-b544-90ef45580ec0/mini.png)](https://insight.sensiolabs.com/projects/713fa5be-b3d6-4a10-b544-90ef45580ec0) [![Maintainability](https://api.codeclimate.com/v1/badges/dcb85f03d218814504ac/maintainability)](https://codeclimate.com/github/polyfony-inc/polyfony/maintainability)
 
-## Polyfony is an intuitive, lightweight and powerful PHP micro-framework.
+## Polyfony is an intuitive, light and powerful PHP micro-framework.
 
 #### Philosophy
-Inspired by Symfony and Laravel but tailored to favour an inclination towards extreme simplicity and efficiency.
-
-Compared to major PHP frameworks, Polyfony covers 95%+ of what we need most of the time, and does so using a fragment of the ressources, space, configuration files and dependencies required by major frameworks. It features routing, bundles, controllers, views, ORM, environments, locales, cache, authentication, form helper... and limitless extensibility via composer.
+Inspired by Symfony and Laravel but tailored to favour an inclination towards extreme simplicity and efficiency.  
+Compared to major PHP frameworks, Polyfony covers 95%+ of what we need most of the time, and does so using a fragment of the ressources, space, configuration files and dependencies required by major frameworks.  
+It features routing, bundles, controllers, profiler, views, ORM, environments, locales, cache, authentication, form helper, cli helper... and limitless extensibility via composer.
 
 
 #### Footprint [of an Hello World](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)

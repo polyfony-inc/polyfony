@@ -1,18 +1,12 @@
 <?php
+
 /**
- * PHP Version 5
  * This security class support three levels of authentication
  * The first one is just being logged in, the second one is having a minimal numerical level
  * The third one is having a module, than can be bypassed by a certain level.
  * Authentication uses a cookie to store the session key, this session key is associated with
  * The user agent and the IP, so that stealing the cookie will result in the closing of the session.
  * The default hash algorithm is sha512 and a salt is used.
- * @package Polyfony
- * @link https://github.com/SIB-FRANCE/Polyfony
- * @license http://www.gnu.org/licenses/lgpl.txt GNU General Public License
- * @note This program is distributed in the hope that it will be useful - WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 namespace Polyfony;
