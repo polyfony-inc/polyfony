@@ -555,6 +555,11 @@ class Query {
 		$this->Object = $this->Object && $this->Object != 'Record' ? 
 			'\Models\\'.$this->Object : 
 			'\Models\\'.$this->Table;
+
+		// temporary fix, if we don't have an object class at all
+		if($this->Object == '\Models\\') {
+			$this->Object = '\Polyfony\\Record';
+		}
 		
 		// fetch all results as objects
 		$this->Result = $this->Prepared->fetchAll(PDO::FETCH_CLASS, $this->Object);

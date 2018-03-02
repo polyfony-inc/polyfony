@@ -11,14 +11,21 @@ class Record {
 	const VALIDATORS = [];
 
 	// create a object from scratch, of fetch it in from its table/id
-	public function __construct($conditions=null) {
+	public function __construct($table=null, $conditions=null) {
 
+		// if this has been inherited in a child class
+		if(get_class($this) != 'Polyfony\Record') {
+			// use the table parameter as conditions and ignore the conditions parameter
+			$conditions = $table ?: null;
+			// use the class name as table name
+			$table = str_replace('Models\\','',get_class($this));
+		}
 		// init the list of altered columns
 		$this->_ = [
 			// id of the record
 			'id'		=> isset($this->id) ? $this->id : null,
 			// table of the record
-			'table'		=> str_replace('Models\\','',get_class($this)),
+			'table'		=> $table ?: null,
 			// list of altered columns since the retrieval from the database
 			'altered'	=> []
 		];
@@ -27,7 +34,7 @@ class Record {
 			// if conditions is not an array
 			if(!is_array($conditions)) {
 				// we assume it is the id of the record
-				$conditions = ['id'=>$conditions];	
+				$conditions = array('id'=>$conditions);	
 			}
 			// grab that object from the database
 			$record = Database::query()
@@ -35,7 +42,6 @@ class Record {
 				->from($this->_['table'])
 				->where($conditions)
 				->execute();
-
 			// if the record is found
 			if($record) {
 				// clone the found record
@@ -46,7 +52,7 @@ class Record {
 			else {
 				// throw a 404 Not found Exception
 				Throw new Exception(
-					"new Models\\".get_class($this)." : No matching record in table {$this->_['table']}", 
+					"new Models\\".get_class($this)." : {$this->_['table']} object not found in the database", 
 					404
 				);
 			}
