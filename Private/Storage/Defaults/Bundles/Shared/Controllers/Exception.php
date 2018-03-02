@@ -26,18 +26,18 @@ class ExceptionController extends Polyfony\Controller {
 		}
 		// error occured normally
 		else {
-			// proper title
-			pf\Response::setMetas(array(
-				'title'=> $this->Exception->getMessage()
-			));
-			
-			pf\Response::set([
-				'css'	=>[
+			// proper title and assets
+			pf\Response\HTML::set([
+				'metas'		=>[
+					'title'=> $this->Exception->getMessage()
+				],
+				'scripts'	=>[
+					'//code.jquery.com/jquery-3.3.1.slim.min.js',
+					'//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'
+				],
+				'links'		=>[
 					'//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css',
 					'//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'
-				],
-				'js'	=>[
-					'//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js'
 				]
 			]);
 			
