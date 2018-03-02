@@ -85,17 +85,17 @@ class Router {
 	}
 
 	// new syntax for mapping routes
-	public static function post(string $url, string $to, $route_name = null) :\Route {	
+	public static function post(string $url, string $to, $route_name = null) :Route {	
 		return self::map($url, $to, $route_name, 'post');
 	}
 
 	// new syntax for mapping routes
-	public static function delete(string $url, string $to, $route_name = null) :\Route {	
+	public static function delete(string $url, string $to, $route_name = null) :Route {	
 		return self::map($url, $to, $route_name, 'delete');
 	}
 
 	// new syntax for mapping routes
-	public static function put(string $url, string $to, $route_name = null) :\Route {	
+	public static function put(string $url, string $to, $route_name = null) :Route {	
 		return self::map($url, $to, $route_name, 'put');
 	}
 
