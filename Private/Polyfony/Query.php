@@ -560,6 +560,9 @@ class Query {
 		if($this->Object == '\Models\\') {
 			$this->Object = '\Polyfony\\Record';
 		}
+
+		// tweak for Microsoft SQL Server
+		$this->Object = str_replace('"','', $this->Object);
 		
 		// fetch all results as objects
 		$this->Result = $this->Prepared->fetchAll(PDO::FETCH_CLASS, $this->Object);

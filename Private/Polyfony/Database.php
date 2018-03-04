@@ -48,6 +48,10 @@ class Database {
 			case 'odbc':
 				$dsn = self::configureForODBC();
 			break;
+
+			case 'sqlsrv':
+				$dsn = self::configureForSQLServer();
+			break;
 			
 			default:
 				// causes exception
@@ -132,6 +136,21 @@ class Database {
 
 		// return the dsn
 		return 'odbc:' . self::$_config['database'];
+	}
+
+	private static function configureForSQLServer() :string {
+
+		// configure 
+		self::$_config['quote'] = '"';
+		self::$_config['nulls'] = [
+			'query'		=>'DESCRIBE "*table*"',
+			'column'	=>'Null',
+			'true'		=>'YES',
+			'false'		=>'NO',
+		];
+
+		// return the dsn
+		return 'sqlsrv:Server='.self::$_config['hostname'].';Database=' . self::$_config['database'];
 	}
 
 	// instanciate a new query object
