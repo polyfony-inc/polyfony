@@ -168,32 +168,37 @@ class Security {
 			Config::get('security','salt') . $string . Config::get('security','salt')
 		));
 	}
+
+	// return the account
+	public static function getAccount() :\Models\Accounts {
+		return self::$_account;
+	}
 	
-	// manually check for a specific level
+	// OLD SHORTCUT for Security->getAccount->hasLevel()
 	public static function hasLevel(int $level=null) :bool {
 		// if we have said level
-		return self::get('id_level', 100) <= $level;
+		return $this->getAccount->hasLevel($level);
 	}
 	
-	// manually check for a specific module
+	// OLD SHORTCUT for Security->getAccount->hasModule()
 	public static function hasModule(string $module=null) :bool {
 		// if module is in our credentials
-		return in_array($module, self::get('modules_array', array()));
+		return $this->getAccount->hasModule($module);
 	}
 
-	// check if the user has been authenticated
-	public static function isAuthenticated() :bool {
-		// return the current status
-		return self::$_granted;
-	}
-	
-	// get a specific credential
+	// OLD SHORTCUT for Security->getAccount->get($something)
 	public static function get(string $credential, $default=null) {
 		// return said credential or default if not authenticated or credential does not exist
 		return(
 			self::$_account && self::$_account->get($credential) ? 
 			self::$_account->get($credential) : $default
 		);
+	}
+
+	// check if the user has been authenticated
+	public static function isAuthenticated() :bool {
+		// return the current status
+		return self::$_granted;
 	}
 
 	// return the user agent truncate to prevent database filling by huge faked user agent

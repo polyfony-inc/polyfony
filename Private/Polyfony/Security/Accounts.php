@@ -141,6 +141,14 @@ class Accounts extends \Polyfony\Record {
 
 	}
 
+	public function hasLevel(int $level=null) :bool {
+		return !is_empty($this->get('id_level')) && $this->get('id_level') < $level;
+	}
+
+	public function hasModule(string $module=null) :bool {
+		return in_array($module, $this->get('modules_array'));
+	}
+
 
 }
 

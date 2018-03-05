@@ -11,57 +11,47 @@ class Record {
 	const VALIDATORS = [];
 
 	// create a object from scratch, of fetch it in from its table/id
-	public function __construct($table=null, $conditions=null) {
+	public function __construct($conditions_to_find_the_record=null) {
 
-		// if this has been inherited in a child class
-		if(get_class($this) != 'Polyfony\Record') {
-			// use the table parameter as conditions and ignore the conditions parameter
-			$conditions = $table ?: null;
-			// use the class name as table name
-			$table = str_replace('Models\\','',get_class($this));
-		}
 		// init the list of altered columns
 		$this->_ = [
 			// id of the record
 			'id'		=> isset($this->id) ? $this->id : null,
 			// table of the record
-			'table'		=> $table ?: null,
+			'table'		=> get_class($this) != 'Polyfony\Record' ? 
+				str_replace('Models\\','',get_class($this)) : null,
 			// list of altered columns since the retrieval from the database
 			'altered'	=> []
 		];
 		// if conditions are provided
-		if($conditions !== null) {
-			// if conditions is not an array
-			if(!is_array($conditions)) {
-				// we assume it is the id of the record
-				$conditions = array('id'=>$conditions);	
-			}
-			// grab that object from the database
-			$record = Database::query()
-				->select()->first()
-				->from($this->_['table'])
-				->where($conditions)
-				->execute();
-			// if the record is found
-			if($record) {
-				// clone the found record
-				$this->replicate($record);
-				// return self
-				return($this);	
-			}
-			else {
-				// throw a 404 Not found Exception
-				Throw new Exception(
-					"new Models\\".get_class($this)." : {$this->_['table']} object not found in the database", 
-					404
-				);
-			}
+		if($conditions_to_find_the_record !== null) {
+			// we instanciate ourself from an existing database record
+			$this->__constructFromExistingRecord($conditions_to_find_the_record);
 		}
 		// return self
-		return($this);
+		return $this;
 		
 	}
 	
+	private function __constructFromExistingRecord($conditions) :void {
+
+		// if conditions is not an array, we assume it is the id of the record
+		$conditions = is_array($conditions) ? $conditions : ['id'=>$conditions];
+		// grab that object from the database
+		$record = self::_select()->first()->where($conditions)->execute();
+		// if we didn't find the record
+		if(!$record) {
+			// throw a 404 Not found Exception
+			Throw new Exception(
+				"new Models\\{$this->_['table']} : Object not found in the database", 
+				404
+			);
+		}
+		// clone the found record
+		$this->replicate($record);
+
+	}
+
 	private function replicate($clone) {
 		// for each attribute
 		foreach(get_object_vars($clone) as $attribute => $value) {
@@ -155,13 +145,8 @@ class Record {
 		$attributes = $altered ? $this->_['altered'] : array_keys(get_object_vars($this));
 		// for each attribute of this object
 		foreach($attributes as $attribute){
-			// if the attribute is internal
-			if($attribute == '_') {
-				// skip it
-				continue;
-			}
-			// normal attribute
-			else {
+			// if the attribute is not internal
+			if($attribute != '_') {
 				// convert or not
 				$array[$attribute] = $raw ? $this->get($attribute,true) : $this->get($attribute,false);
 			}
@@ -195,30 +180,25 @@ class Record {
 	}
 	
 	// update or create
-	public function save() {
+	public function save() :bool {
 		
 		// if an id already exists
 		if($this->_['id']) {
 			// we can update and return the number of affected rows (0 on error, 1 on success)
-			$updated = Database::query()
-				->update($this->_['table'])
+			return (bool) self::_update()
 				->set($this->__toArray(true, true))
 				->where(['id'=>$this->_['id']])
 				->execute();
-			// if update went well
-			return $updated ? true : false;
 		}
 		// this is a new record
 		else {
 			// try to insert it
-			$inserted = Database::query()
-				->insert($this->__toArray(true, true))
-				->into($this->_['table'])
-				->execute();
+			$inserted_object_id = self::create($this->__toArray(true, true));
 			// if insertion succeeded clone ourselves and return true
-			if($inserted) {
+			if($inserted_object_id) {
 				// replicate
-				$this->replicate($inserted);
+				//$this->replicate($inserted_object_id);
+				$this->_['id'] = $inserted_object_id;
 				// return success
 				return true;
 			}
@@ -239,9 +219,7 @@ class Record {
 			Throw new Exception(get_class($this).'->delete() : cannot delete a record without table and id', 400);
 		}
 		// if it went well
-		return (bool) Database::query()
-			->delete()
-			->from($this->_['table'])
+		return (bool) self::_delete()
 			->where(['id'=>$this->_['id']])
 			->execute();
 	}
@@ -291,12 +269,11 @@ class Record {
 	}
 
 	// shortcut that bootstraps an update query
-	public static function _update(array $columns_and_values=[]) :Query {
+	public static function _update() :Query {
 
 		// returns a Query object, to execute, or to complement with some more parameters
 		return Database::query()
-			->update(self::tableName())
-			->set($columns_and_values);
+			->update(self::tableName());
 
 	}
 

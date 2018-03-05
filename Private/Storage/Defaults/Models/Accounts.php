@@ -34,16 +34,6 @@ class Accounts extends \Polyfony\Security\Accounts {
 	// what we mean by recent authentication failure (3 days)
 	const RECENT_FAILURE = 259200;
 
-
-	public function hasModule($searched_module) :bool {
-
-		return in_array(
-			$searched_module, 
-			$this->get('modules_arrray')
-		);
-
-	}
-
 	public function enable() :self {
 
 		return $this->set('IS_ENABLED', '1');
