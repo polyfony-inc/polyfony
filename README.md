@@ -258,27 +258,43 @@ Before calling the action `preAction()` will be called on the controller. *You c
 after the real action has been be called `postAction()` will be called on the controller. *You can declare one, or ommit it.*
 
 
-* The following route will match a GET request to /about-us/ 
+* The following route will match a GET request to /about-us/  
 It will call `Private/Bundles/Pages/Controllers/Static.php->aboutUsAction();`
 
 ```php
 Router::get('/about-us/', 'Pages/Static@aboutUs');
 ```
 
-* The following route will match a request of any method (GET,POST...) to /admin/{edit,update,delete,create}/ and /admin/
+* The following route will match a request of any method (GET,POST...) to /admin/{edit,update,delete,create}/ and /admin/  
 It will call `Private/Bundles/Admin/Controllers/Main.php->{action}Action();`
 
 ```php
 Router::map('/admin/:action/:id/', 'Admin/Main@{action}')
-	->where(['action'=>['edit','update','delete','create']]);
+	->where([
+		'action'=>[
+			// action must be one of the following four
+			'in_array'=>['edit','update','delete','create']
+		],
+		'id'=>[
+			// id has to be a numeric value
+			'is_numeric', 		
+			// id can't be 0
+			'!in_array'=>[0] 	
+		]
+	]);
 ```
 
-###### You can restrict parameters further, passing :
-* an array of allowed value (it will also match no value)
-* a regex (it will also match no value)
-* a boolean true (it will match anything but a missing value)
-
 *Route can also be generated dynamically, over database iterations.*
+
+###### URL Parameters constraints
+* "in_array" => [allowed values]
+* "!in_array" => [disalowed values]
+* "preg_match" => "regex-to-match"
+* "!preg_match" => "regex-not-to-match"
+* "is_numeric"
+* "!is_numeric" 
+*If multiple constraints are declared, they all have to match.*  
+
 
 ### Environments
 

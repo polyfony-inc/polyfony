@@ -126,6 +126,7 @@ class Router {
 	
 	// update the current route after forwarding
 	public static function setCurrentRoute(Route $route) :void {
+		
 		// update the matched route
 		self::$_match = $route;
 	}
@@ -177,94 +178,32 @@ class Router {
 	 * @return boolean
 	 */
 	private static function routeMatch(string $request_url, string $request_method, Route $route) :bool {
-		// if the method is set for that route, and it doesn't match
-		if($route->hasMethodAndItIsNot($request_method)) {
-			// don't even got any further
-			return false;
-		}
-		// break apart the route URL
-		$route_portions = $route->getUrlPortions();
-		
-		// we should also be breaking appart the {} symbols (new syntax)
-		// code to be produced here
 
-		// set the base part
-		$route_base = is_array($route_portions) ? $route_portions[0] : $route_portions;
-		// if the start does not match
-		if(stripos($request_url,$route_base) !== 0) {
-			// not matching
+		// if the method is set for that route, and it doesn't match
+		if(!$route->hasMethod($request_method)) {
 			return false;
 		}
-		// if the route is declared to handle some parameters
-		if(is_array($route_portions)) {			
-			// remove the base portion from the request url
-			$request_portions = str_replace($route_base,'',$request_url);
-			// if the remaining request url has parameters, explode them or return an empty array
-			$request_parameters = strstr($request_portions,'/') ? explode('/',$request_portions) : array();
-			// remove the static portion of the route url
-			unset($route_portions[0]);
-			// for clarity rename the route portions to routes parameters
-			$route_parameters = array_values($route_portions);
-			// for each parameter that the route can handle
-			foreach($route_parameters as $index => $parameter_name) {
-				// clean the parameter name
-				$parameter_name = trim($parameter_name,'/');
-				// check if it is provided in the request url
-				!isset($request_parameters[$index]) ?: Request::setUrlParameter($parameter_name,$request_parameters[$index]);
-			}
-			// for each restriction of the route, check if the parameters are matching else return false
-			foreach($route->restrictions as $parameter => $restriction) {
-				// if said parameter is set
-				if(Request::get($parameter)) {
-					// if the restriction is an array of values
-					if(is_array($restriction) && in_array(Request::get($parameter),$restriction)) {
-						// route matches
-						continue;
-					}
-					// if the restriction is a regex is has to match
-					elseif(preg_match('/^{$restriction}$/iu',Request::get($parameter))) {
-						// route matches
-						continue;	
-					}
-					// if the restriction is only to be set
-					elseif($restriction === true) {
-						// route matches
-						continue;
-					}
-					// restriction is not met
-					else {
-						// route does not match
-						return false;	
-					}
-				}
-				// parameter is not set
-				else {
-					// if it should be
-					if($restriction === true) {
-						// route does not match
-						return false;	
-					}
-				}
-			}
-			// if a trigger is defined use it to set the action
-			if($route->trigger !== null) {
-				// update dynamically the route's action or fallback to index if missing
-				$route->action = Request::get($route->trigger) ? Request::get($route->trigger) : 'index';
-			}
+		// if the url doesn't begin with the static segment or that route
+		if(!$route->hasStaticUrlSegment($request_url)) {
+			return false;
 		}
-		else {
-			// no parameters to treat (static route), check if perfect match
-			if($request_url != $route->url) {
-				// not perfectly matching
-				return false;	
-			}
-		}
-		// if we have a redirection going on
+		// if we've got a redirect, let's go for it
 		$route->redirectIfItIsOne();
-		// we got there ? then we've find out route !
+		// get a list of current request parameters, with numerical indexes
+		$indexed_request_parameters = Request::getUrlIndexedParameters($route->staticSegment);
+		// if restricttion against url parameters don't match
+		if(!$route->validatesTheseParameters($indexed_request_parameters)) {
+			return false;
+		}
+		// send the named parameters to the request class
+		$route->sendNamedParametersToRequest($indexed_request_parameters);
+		// deduce the dynamic action from the url parameters if necessary
+		$route->deduceAction();
+		// check if they match defined constraints
 		return true;
+
 	}
-	
+
 	/**
 	 * Reverse the router.
 	 *

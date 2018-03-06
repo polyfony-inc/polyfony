@@ -13,21 +13,22 @@ Polyfony\Router::get('/','Demo/Demo@welcome', 'index');
 // new syntax
 Polyfony\Router::map('/demo/:type/', 'Demo/Demo@{type}', 'demo')
 	->where([
-		'type'=>array(
-			'login',
-			'secure',
-			'disconnect',
-			'database',
-			'locales',
-			'request',
-			'response',
-			'exception',
-			'json',
-			'router',
-			'vendorBootstrap',
-			'vendorGoogle'
-		)
+		'type'=>[
+			'in_array'=>[
+				'secure',
+				'disconnect',
+				'database',
+				'locales',
+				'request',
+				'response',
+				'exception',
+				'json',
+				'router',
+				'vendorBootstrap',
+				'vendorGoogle',
+				''
+			]
+		]
 	]);
-
 
 ?>

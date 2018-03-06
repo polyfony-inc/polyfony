@@ -18,16 +18,20 @@ class Route {
 	public $trigger			= null;
 	// (optional)method to match 
 	public $method			= null;
-	// (optional) parameter restriction
-	public $restrictions	= [];
 	// (optional) redirection url
 	public $redirect		= null;
 	// (optional) redirection status code
 	public $redirectStatus 	= null;
 
+	// information deduced dynamically, for route matching
+	public $staticSegment 					= '';
+	public $indexedParameters				= [];
+	public $indexedParametersConstraints 	= [];
+	public $parametersConstraints 			= [];
+
 	// construct the route given its name
 	public function __construct(string $name = null) {
-		$this->name				= $name ?: uniqid('route-');
+		$this->name = $name ?: uniqid('route-');
 	}
 	
 	// set the url to match
@@ -82,8 +86,10 @@ class Route {
 	}
 
 	// set an associative array of contraints for the url parameters
-	public function where(array $restrictions) :self {
-		$this->restrictions = $restrictions;
+	public function where(array $parameters_constraints) :self {
+		$this->parametersConstraints = $parameters_constraints;
+		// build constraincts
+		$this->buildConstraints();
 		return $this;
 	}
 
@@ -115,13 +121,120 @@ class Route {
 			// so we use the index
 			$this->action = 'index';
 		}
+		// build route segments
+		$this->buildSegments();
 		// return the route
 		return $this;
 	}
 
-	public function hasMethodAndItIsNot(string $method) :bool {
+	private function buildConstraints() :void {
+		// flip the parameters array, to deduce each contraints index
+		$reversedIndexedParameters = array_flip($this->indexedParameters);
+		// for each of the constraints
+		foreach($this->parametersConstraints as $parameter_name => $contraint_s) {
+			// place it, in a array indexed by the parameter's position in theurl
+			$this->indexedParametersConstraints[$reversedIndexedParameters[$parameter_name]] = $contraint_s;
+		}
+		// remove named constraints, they are not useful anymore
+		$this->parametersConstraints = null;
+	}
+
+	private function buildSegments() :void {
+		// if we have parameters in the url
+		if(strstr($this->url, ':') !== false) {
+			// explode all parameters from the route
+			$list_of_parameters = explode(':', $this->url);
+			// define the static segment for that route
+			$this->staticSegment = $list_of_parameters[0];
+			// remove the first parameter, as it's the base
+			unset($list_of_parameters[0]);
+			// for each of the route parameters
+			foreach($list_of_parameters as $index => $parameter_name) {
+				// push it to the list
+				$this->indexedParameters[$index-1] = trim($parameter_name, '/');
+				
+			}
+		}
+		else {
+			$this->staticSegment = $this->url;
+		}
+	}
+
+	public function validatesTheseParameters(array $indexed_request_parameters) :bool {
+		// for each of the parameters to validate
+		foreach($indexed_request_parameters as $index => $value) {
+			// if it fails to validate
+			if(!$this->validateThisParameter($index, $value)) {
+				return false;
+			}
+		}
+		// if we got there, they all passed
+		return true;
+	}
+
+	public function validateThisParameter($parameter_index, $parameter_value) :bool {
+		// if a constraint exists for a parameter in that position
+		if(isset($this->indexedParametersConstraints[$parameter_index])) {
+			// for each of the constraints to check against
+			foreach($this->indexedParametersConstraints[$parameter_index] as $constraint_type => $constraint_value) {
+				// remove the constraint type value, if we are iterating over a value set without key
+				$constraint_type = is_numeric($constraint_type) ? null : $constraint_type;
+				// check for each constraint type
+				if($constraint_type == 'in_array' && !in_array($parameter_value, $constraint_value)) {
+					return false;
+				}
+				if($constraint_value == 'is_numeric' && !is_numeric($parameter_value)) {
+					return false;
+				}
+				if($constraint_type == '!in_array' && in_array($parameter_value, $constraint_value)) {
+					return false;
+				}
+				if($constraint_value == '!is_numeric' && is_numeric($parameter_value)) {
+					return false;
+				}
+				if($constraint_type == 'preg_match' && !preg_match($constraint_value, $parameter_value)) {
+					return false;
+				}
+				if($constraint_type == '!preg_match' && preg_match($constraint_value, $parameter_value)) {
+					return false;
+				}
+			}
+		}
+		return true;
+
+	}
+
+	public function deduceAction() :void {
+		// if no action has been defined and a trigger has
+		if(!$this->action && $this->trigger) {
+			// we deduce the action from a request parameter
+			$this->action = Request::get($this->trigger, 'index');
+		}
+	}
+
+	public function sendNamedParametersToRequest($indexed_request_parameters) :void {
+		// for each of the request parameters
+		foreach($indexed_request_parameters as $index => $parameter_value) {
+			// if the parameter exists in the route
+			if(array_key_exists($index, $this->indexedParameters)) {
+				// pass it to the request static class
+				Request::setUrlParameter($this->indexedParameters[$index], $parameter_value);	
+			}
+		}
+	}
+
+	public function hasMethod(string $method) :bool {
 		// if the method is defined, and it doesn't match
-		return $this->method && $this->method != $method;
+		return !$this->method || $this->method == $method;
+	}
+
+	public function hasStaticUrlSegment(string $url) :bool {
+		// if the route is dynamic (has parameters), and starts with the base segment  
+		// or if it matches strictly
+		return (
+			$this->indexedParameters && 
+			strpos($url, $this->staticSegment) === 0
+		) || $this->url == $url;
 	}
 
 	public function getUrlPortions() {

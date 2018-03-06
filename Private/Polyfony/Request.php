@@ -71,6 +71,12 @@ class Request {
 		
 	}
 
+	public static function getUrlIndexedParameters(string $static_segment) :array {
+
+		// get parameters indexed, for route matching purposes only
+		return explode('/', str_replace($static_segment, '', self::getUrl()));
+	}
+
 	public static function getMethod() :string {
 
 		// get the current method (used by the Router for matching routes)
