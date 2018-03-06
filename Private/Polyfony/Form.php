@@ -4,72 +4,53 @@ namespace Polyfony;
 
 class Form {
 
-	public static function input(string $name, $value='', array $attributes=[]) :Element {
-		// format the form element
-		return(new Element(
-			'input', 
-			array_merge(
-				array(
-					'type'	=>'text', 
-					'name'	=>$name, 
-					'value'	=>$value
-				), 
-				$attributes
-			)
+	private static function builder(
+		string $nature, 
+		array $pre_defined_attributes=[], 
+		array $user_defined_attributes=[]
+	) :Element {
+		return new Element($nature, array_merge(
+			$pre_defined_attributes,
+			$user_defined_attributes
 		));
+	}
+
+	private static function addCheckedAttributeIfTrue(array $attributes, bool $is_checked) :array {
+		if($is_checked) {
+			$attributes['checked'] = 'checked';
+		}
+		return $attributes;
+	}
+
+	public static function input(string $name, $value='', array $attributes=[]) :Element {
+		return self::builder('input', [
+			'type'	=>'input',
+			'name'	=>$name,
+			'value'	=>$value
+		], $attributes);
 	}
 	
 	public static function textarea(string $name, $value='', array $attributes=[]) :Element {
-		// format the form element
-		return(new Element(
-			'textarea', 
-			array_merge(
-				array(
-					'name'	=>$name, 
-					'text'	=>$value
-				),
-				$attributes
-			)
-		));
+		return self::builder('textarea', [
+			'type'=>'textarea',
+			'name'=>$name,
+			'text'=>$value
+		], $attributes);
 	}
 	
 	public static function checkbox(string $name, bool $checked=false, array $attributes=[]) :Element {
-		// if the checkbox is checked
-		if($checked) {
-			// add to the attributes
-			$attributes['checked'] = 'checked';
-		}
-		// format the form element
-		return(new Element(
-			'input', 
-			array_merge(
-				array(
-					'type'	=>'checkbox',
-					'name'	=>$name
-				), 
-				$attributes
-			)
-		));
+		return self::builder('input', [
+			'type'	=>'checkbox',
+			'name'	=>$name
+		], self::addCheckedAttributeIfTrue($attributes, $checked));
 	}
 	
 	public static function radio(string $name, $value, bool $checked=false, array $attributes=[]) :Element {
-		// if the checkbox is checked
-		if($checked) {
-			// add to the attributes
-			$attributes['checked'] = 'checked';
-		}
-		// format the form element
-		return(new Element(
-			'input', 
-			array_merge(
-				array(
-					'name'	=>$name, 
-					'type'	=>'radio',
-					'value'	=>Format::htmlSafe($value)
-				), 
-				$attributes
-			)
-		));
+		return self::builder('input', [
+			'type'	=>'radio',
+			'name'	=>$name,
+			'value'	=>$value
+		], self::addCheckedAttributeIfTrue($attributes, $checked));
 	}
 
 	public static function select(string $name, array $options=[], $value=null, array $attributes=[]) :Element {

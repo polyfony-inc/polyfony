@@ -5,9 +5,9 @@
 		This example uses the <code>Database</code> abstraction and the <code>Record</code> class.
 	</p>
 	
-	<div class="panel panel-default">
+	<div class="card">
 		<!-- Default panel contents -->
-		<div class="panel-heading">Accounts <span class="badge badge-info"><?php echo count($this->Accounts); ?></span></div>
+		<div class="card-header">Accounts <span class="badge badge-info"><?php echo count($this->Accounts); ?></span></div>
 		<table class="table">
 			<tr>
 				<th>
@@ -65,16 +65,82 @@
 			<?php endforeach; ?>
 		</table>
 	</div>
-	<p>
-		Update
-	</p>
-	<?php var_dump($this->UpdateStatus); ?>
-	<p>
-		Create
-	</p>
-	<?php var_dump($this->CreateStatus); ?>
-	<p>
-		Delete
-	</p>
-	<?php var_dump($this->DeleteStatus); ?>
+	<div class="row" style="padding-top:2em">
+		<form class="col-4" action="" method="post" class="form form-inline">
+			<?= new Polyfony\Form\Token(); ?>
+			<div class="card">
+				<h5 class="card-header">
+					Simple account edition form 
+					<button type="submit" class="btn btn-sm btn-success float-right">
+						<span class="fa fa-save"></span> 
+						Enregistrer
+					</button>
+				</h5>
+				<div class="card-body">
+					<?= Bootstrap\Alert::flash(); ?>
+					<div class="form-group row">
+						<label class="col-3 col-form-label text-right">
+							Login
+						</label>
+						<div class="col-9">
+							<?= $this->RootAccount->input(
+								'login', 
+								['type'=>'email','class'=>'form-control']
+							); ?>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-3 col-form-label text-right">
+							Level
+						</label>
+						<div class="col-9">
+							<?= $this->RootAccount->select(
+								'id_level', 
+								Models\Accounts::ID_LEVEL, 
+								['class'=>'form-control']
+							); ?>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-3 col-form-label text-right">
+							Is enabled ?
+						</label>
+						<div class="col-9">
+							<?= $this->RootAccount->select(
+								'is_enabled', 
+								Models\Accounts::IS_ENABLED, 
+								['class'=>'form-control']
+							); ?>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-3 col-form-label text-right">
+							New password (optional)
+						</label>
+						<div class="col-9">
+							<?= Polyfony\Form::input(
+								'password', null, [
+									'type'=>'password',
+									'class'=>'form-control',
+									'minlength'=>$this->MinPasswordLength
+								]
+							); ?>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-3 col-form-label text-right">
+							Last failed from Agent
+						</label>
+						<div class="col-9">
+							<?= $this->RootAccount->textarea(
+								'last_failure_agent', 
+								['class'=>'form-control']
+							); ?>
+						</div>
+					</div>
+				</div>
+			</div>
+		</form>
+		
+	</div>
 </div>

@@ -23,6 +23,11 @@ class DemoController extends pf\Controller {
 			]
 		]);
 		
+		// allow the framework to cache that page for 24 hours
+//		pf\Response::enableOutputCache(24);
+		// but forbid the browser to do so (allows us to purge the cache earlier)
+//		pf\Response::disableBrowserCache();
+
 		// get the currently browsed tab or null if none
 		// this doesn't sounds safe, using a get parameter, right ?
 		// actually it is, since the route won't match types that are not in that route's restrictions
@@ -34,12 +39,24 @@ class DemoController extends pf\Controller {
 	}
 
 	public function welcomeAction() {
-		
+
 		// view the main index/welcome page
 		$this->view('Index');
 	}
 	
 	public function indexAction() {
+
+		// allow the framework to cache that page for 24 hours
+	//	pf\Response::enableOutputCache(24);
+		// but forbid the browser to do so (allows us to purge the cache earlier)
+	//	pf\Response::disableBrowserCache();
+
+		// ($mail = new Polyfony\Mail)
+		// 	->to('someone@somewhere.com')
+		// 	->cc('someoneelse@somewhereelse.com')
+		// 	->subject('Foo')
+		// 	->body('Bar')
+		// 	->send();
 
 		// view the main demo index
 		$this->view('Demo');
@@ -238,36 +255,63 @@ class DemoController extends pf\Controller {
 	
 	public function databaseAction() {
 		
+		$this->MinPasswordLength = 6;
+
 		// retrieve specific account
 		$this->RootAccount = new Models\Accounts(1);
-		// change something
-		$this->UpdateStatus = $this->RootAccount
-			->set('last_login_date',rand(time()-1/10*time(),time()+1/10*time()))
-			->set('password',pf\Security::getPassword('toor'))
-			->save();
-		
-		// create a new account
-		$this->NewAccount = new Models\Accounts();
-		// set something
-		$this->NewAccount
-			->set('login','test')
-			->set('id_level','5')
-			->set('last_failure_date',time());
-		// save the record
-		$this->CreateStatus = $this->NewAccount->save();
-		// delete the new account
-		$this->DeleteStatus = $this->NewAccount->delete();
-		
+
+		if(pf\Request::isPost()) {
+
+			// CSRF protection
+			pf\Form\Token::enforce();
+
+			// update some fields
+			$this->RootAccount->set([
+				'login'				=>pf\Request::post('Accounts')['login'],
+				'id_level'			=>pf\Request::post('Accounts')['id_level'],
+				'is_enabled'		=>pf\Request::post('Accounts')['is_enabled'],
+				'last_failure_agent'=>pf\Request::post('Accounts')['last_failure_agent']
+			]);
+
+			if(
+				// if the password is to be updated
+				pf\Request::post('password') && 
+				// basic "password policy" would be 6 chars here
+				strlen(pf\Request::post('password')) >= $this->MinPasswordLength
+			) {
+				// update the password
+				$this->RootAccount->set([
+					// convert it to a secured hash thru the Security class
+					'password'=>pf\Security::getPassword(pf\Request::post('password'))
+				]);
+			}
+			// save it and depending on the success of the operation, put an alert in the flashbag
+			$this->RootAccount->save() ? 
+
+				(new Bootstrap\Alert([
+					'class'=>'success',
+					'message'=>'Account modified'
+				]))->save() : 
+			
+				(new Bootstrap\Alert([
+					'class'=>'danger',
+					'message'=>'Failed to modify account'
+				]))->save();
+
+		}
+
 		// demo query
-		$this->Accounts = pf\Database::query()
-			->select()
-			->from('Accounts')
-			->where(array(
-				'id_level'=>1
-			))
+		$this->Accounts = Models\Accounts::_select()
 			->limitTo(0,5)
 			->execute();
 		
+		// fully verbose/normal alternative
+		// $this->Accounts = pf\Database::query()
+		// 	->select()
+		// 	->from('Accounts')
+		// 	->limitTo(0,5)
+		// 	->execute();
+
 		// demo query from a model
 		$this->AnotherList = Models\Accounts::all();
 		$this->AnotherList = Models\Accounts::recentlyCreated();

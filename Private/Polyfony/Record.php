@@ -62,7 +62,7 @@ class Record {
 		$this->_['id'] = isset($this->id) ? $this->id : $this->_['id'];
 	}
 	
-	public function get($column, $get_it_raw = false) {
+	public function get(string $column, bool $get_it_raw = false) {
 		// return the columns or null if it does not exist		
 		return isset($this->{$column}) && strlen($this->{$column}) ? 
 			\Polyfony\Query\Convert::valueFromDatabase($column, $this->{$column}, $get_it_raw) : 
@@ -74,7 +74,7 @@ class Record {
 	}
 
 	// shortcut to generate a preconfigured HTML Form element
-	public function input($column, $options = []) {
+	public function input(string $column, array $options = []) {
 		return(Form::input(
 			$this->field($column), 
 			$this->get($column), 
@@ -83,7 +83,7 @@ class Record {
 	}
 	
 	// shortcut to generate a preconfigured HTML Form element
-	public function textarea($column, $options = []) {
+	public function textarea(string $column, array $options = []) {
 		return(Form::textarea(
 			$this->field($column), 
 			$this->get($column), 
@@ -92,7 +92,7 @@ class Record {
 	}
 	
 	// shortcut to generate a preconfigured HTML Form element
-	public function select($column, $list = [], $options = []) {
+	public function select(string $column, array $list = [], array $options = []) {
 		return(Form::select(
 			$this->field($column), 
 			$list, 
@@ -102,7 +102,7 @@ class Record {
 	}
 	
 	// shortcut to generate a preconfigured HTML Form element
-	public function checkbox($column, $options = array()) {
+	public function checkbox(string $column, array $options = []) {
 		return(Form::checkbox(
 			$this->field($column), 
 			$this->get($column), 
@@ -138,7 +138,7 @@ class Record {
 	}
 	
 	// magic
-	public function __toArray($raw = false, $altered = false) {
+	public function __toArray(bool $raw = false, bool $altered = false) {
 		// declare an empty array
 		$array = [];
 		// what to iterate on
@@ -172,7 +172,7 @@ class Record {
 		$this->id = null;
 	}
 
-	private function alter($column) {
+	private function alter(string $column) {
 		// push
 		$this->_['altered'][] = $column;
 		// deduplicate
@@ -196,8 +196,7 @@ class Record {
 			$inserted_object_id = self::create($this->__toArray(true, true));
 			// if insertion succeeded clone ourselves and return true
 			if($inserted_object_id) {
-				// replicate
-				//$this->replicate($inserted_object_id);
+				// update our id, now that we have one
 				$this->_['id'] = $inserted_object_id;
 				// return success
 				return true;
