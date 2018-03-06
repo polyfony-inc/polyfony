@@ -95,10 +95,11 @@ class Database {
 		
 		// configure
 		self::$_config['nulls'] = [
-			'query'		=>'PRAGMA table_info( *table* )',
-			'column'	=>'notnull',
-			'true'		=>'0',
-			'false'		=>'1',
+			'query'				=>'PRAGMA table_info( *table* )',
+			'column_for_name'	=>'name',
+			'column_for_value'	=>'notnull',
+			'true'				=>'0',
+			'false'				=>'1',
 		];
 
 		// return the dsn
@@ -110,10 +111,11 @@ class Database {
 		// configure 
 		self::$_config['quote'] = '"';
 		self::$_config['nulls'] = [
-			'query'		=>'DESCRIBE "*table*"',
-			'column'	=>'Null',
-			'true'		=>'YES',
-			'false'		=>'NO',
+			'query'				=>'DESCRIBE "*table*"',
+			'column_for_name'	=>'Field',
+			'column_for_value'	=>'Null',
+			'true'				=>'YES',
+			'false'				=>'NO',
 		];
 
 		// return the dsn
@@ -200,9 +202,8 @@ class Database {
 				->execute() as $column) {
 
 				// populate the list
-				$allowed_nulls[$column->get('name')] = 
-					self::$_config['nulls']['true'] == $column->get(self::$_config['nulls']['column']) ?
-						true : false;
+				$allowed_nulls[$column->get(self::$_config['nulls']['column_for_name'])] = 
+					self::$_config['nulls']['true'] == $column->get(self::$_config['nulls']['column_for_value']) ? true : false;
 
 			}
 

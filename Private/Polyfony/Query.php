@@ -561,7 +561,7 @@ class Query {
 			$this->Object = '\Polyfony\\Record';
 		}
 
-		// tweak for Microsoft SQL Server
+		// tweak for Microsoft SQL Server and MySQL
 		$this->Object = str_replace('"','', $this->Object);
 		
 		// fetch all results as objects
