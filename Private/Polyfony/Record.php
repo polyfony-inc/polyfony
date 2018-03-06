@@ -97,7 +97,7 @@ class Record {
 			$this->field($column), 
 			$list, 
 			$this->get($column), 
-			$options
+			(is_array($this->get($column)) ? array_merge(['multiple'=>'multiple'],$options) : $options)
 		));
 	}
 	
