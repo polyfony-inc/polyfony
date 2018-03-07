@@ -26,6 +26,8 @@ class ExceptionController extends Polyfony\Controller {
 		}
 		// error occured normally
 		else {
+			// reset already output data (very important, because of content-length)
+			pf\Response::setType('html-page');
 			// proper title and assets
 			pf\Response\HTML::set([
 				'metas'		=>[

@@ -19,7 +19,7 @@ class Route {
 	// (optional)method to match 
 	public $method			= null;
 	// (optional) redirection url
-	public $redirect		= null;
+	public $redirectToUrl	= null;
 	// (optional) redirection status code
 	public $redirectStatus 	= null;
 
@@ -35,93 +35,54 @@ class Route {
 	}
 	
 	// set the url to match
-	public function url(string $url = null) :self {
+	public function setUrl(string $url = null) :self {
 		$this->url = $url;
 		return $this;
 	}
 
-	public function redirectTo(string $destination_url) {
-		$this->redirect = $destination_url;
-		return $this;
-	}
-
-	public function redirectStatus(int $status) :self {
-		$this->redirectStatus = $status;
+	public function setRedirect(string $destination_url, int $redirect_status=301) {
+		$this->redirectToUrl 	= $destination_url;
+		$this->redirectStatus 	= $redirect_status;
 		return $this;
 	}
 
 	public function redirectIfItIsOne() :void {
 		// if we are a redirection
-		if($this->redirect) {
+		if($this->redirectToUrl) {
 			Response::setStatus($this->redirectStatus);
-			Response::setRedirect($this->redirect, 0);
+			Response::setRedirect($this->redirectToUrl, 0);
 			Response::setType('text');
 			Response::render(); 
 		}
 	} 
 
-	public function method(string $method = null) :self {
+	public function setMethod(string $method = null) :self {
 		$this->method = in_array(strtolower($method), Request::METHODS) ? strtolower($method) : null;
 		return $this;
-	}
-
-	// shortcut for method
-	public function get() :self {
-		return $this->method('get');
-	}
-
-	// shortcut for method
-	public function post() :self {
-		return $this->method('post');
-	}
-
-	// shortcut for method
-	public function delete() :self {
-		return $this->method('delete');
-	}
-
-	// shortcut for method
-	public function put() :self {
-		return $this->method('put');
 	}
 
 	// set an associative array of contraints for the url parameters
 	public function where(array $parameters_constraints) :self {
 		$this->parametersConstraints = $parameters_constraints;
-		// build constraincts
+		// build constraincts to ease the job of the router later on
 		$this->buildConstraints();
+		// return the route
 		return $this;
 	}
 
 	// shortcut for destination
-	public function to($merged_destination) :self {
+	public function setDestination(string $merged_destination) :self {
 		// explode the parameters
-		list($this->bundle, $controller_with_action) = explode('/', $merged_destination);
-		// if the parameters are incomplete
-		if(!$controller_with_action) {
-			// we don't allow to proceed
-			Throw new Exception('Route->to() should look like ("Bundle/Controller@method"');
-		}
-		// explode parameters further
-		list($this->controller, $action) = explode('@', $controller_with_action);
-		// if the action exists and contain a semicolon or is surounded by braquets
-		if($action && (substr($action, 0, 1) == ':' || (substr($action, 0, 1) == '{') && substr($action, -1, 1) == '}')) {
+		list($this->bundle, $this->controller, $this->action) = 
+			explode('/', str_replace('@', '/',$merged_destination));
+		// if the action is an url parameter
+		if(Route\Helper::isThisAParameterName($this->action)) {
 			// we have an action triggered by an url parameter, remove special chars, and set the trigger
-			$this->trigger = str_replace([':','{','}'],'', $action);
+			$this->trigger = trim($this->action, '{}');
 			// action is not known yet
 			$this->action = null;
 		}
-		// the action exist, and it is a regual one
-		elseif($action) {
-			// define the action
-			$this->action = $action;
-		}
-		// the action is totaly unspecified
-		else {
-			// so we use the index
-			$this->action = 'index';
-		}
-		// build route segments
+		// build route segments tp ease the job of the router later on
 		$this->buildSegments();
 		// return the route
 		return $this;
@@ -160,6 +121,7 @@ class Route {
 		}
 	}
 
+	// FOR ROUTE MATCHING
 	public function validatesTheseParameters(array $indexed_request_parameters) :bool {
 		// for each of the parameters to validate
 		foreach($indexed_request_parameters as $index => $value) {
@@ -172,6 +134,7 @@ class Route {
 		return true;
 	}
 
+	// FOR ROUTE MATCHING
 	public function validateThisParameter($parameter_index, $parameter_value) :bool {
 		// if a constraint exists for a parameter in that position
 		if(isset($this->indexedParametersConstraints[$parameter_index])) {
@@ -204,6 +167,31 @@ class Route {
 
 	}
 
+	// FOR ROUTE MATCHING
+	public function hasMethod(string $method) :bool {
+		// if the method is undefined or it doesn't match the one defined
+		return !$this->method || $this->method == $method;
+	}
+
+	// FOR ROUTE MATCHING
+	public function hasStaticUrlSegment(string $url) :bool {
+		// if the route is dynamic (has parameters), and starts with the base segment or if it matches strictly
+		return 
+			($this->indexedParameters && strpos($url, $this->staticSegment) === 0) || 
+			$this->url == $url;
+	}
+
+	public function getDestination() :array {
+		return [
+			// destination script
+			"../Private/Bundles/{$this->bundle}/Controllers/{$this->controller}.php",
+			// destination controller class
+			"{$this->controller}Controller",
+			// destination controller method
+			$this->action ? "{$this->action}Action" : 'indexAction'
+		];
+	}
+
 	public function deduceAction() :void {
 		// if no action has been defined and a trigger has
 		if(!$this->action && $this->trigger) {
@@ -223,82 +211,21 @@ class Route {
 		}
 	}
 
-	public function hasMethod(string $method) :bool {
-		// if the method is defined, and it doesn't match
-		return !$this->method || $this->method == $method;
-	}
-
-	public function hasStaticUrlSegment(string $url) :bool {
-		// if the route is dynamic (has parameters), and starts with the base segment  
-		// or if it matches strictly
-		return (
-			$this->indexedParameters && 
-			strpos($url, $this->staticSegment) === 0
-		) || $this->url == $url;
-	}
-
-	public function getUrlPortions() {
-		return strstr($this->url,':') ? explode(':',$this->url) : $this->url;
-	}
-
-	public function getDestinationScript() :string {
-		return "../Private/Bundles/{$this->bundle}/Controllers/{$this->controller}.php";
-	}
-
-	public function getDestinationControllerClass() :string {
-		return "{$this->controller}Controller";
-	}
-
-	public function getDestinationControllerMethod() :string {
-		return $this->action ? "{$this->action}Action" : 'indexAction';
-	}
-
-	public static function isThisAParameterName($unknown_string) :bool {
-		return 
-			// if we've got an old school parameter
-			substr($unknown_string, 0, 1) == ':' || 
-			(
-				// or if we've got a new syntax parameter
-				substr($unknown_string, 0, 1) == '{' && 
-				substr($unknown_string, -1, 1) == '}'
-			);
-	}
-
-	// assembles an url using provided url parameters
+	// assemble an url using provided url parameters (if any)
 	public function getAssembledUrl(
-		array $parameters=[], bool $absolute = false, bool $force_tls = false
+		array $parameters=[], bool $is_absolute = false, bool $force_tls = false
 	) :string {
-
 		// declare a variable for the assembled url
 		$url = $this->url;
-		// for each provided parameter
-		foreach($parameters as $variable => $value) {
-			// replace it in the url in both possible forms
-			$url = str_replace([":{$variable}/",'{'.$variable.'}'] , urlencode($value) . '/', $url);
+		// for each of this url's possible parameters
+		foreach($this->indexedParameters as $index => $parameter_name) {
+			// if a replacement value has been provided
+			$replacement = isset($parameters[$parameter_name]) ? $parameters[$parameter_name] . '/' : '';
+			// replace with the value in the url, or remove the parameter placeholder
+			$url = str_replace([":{$parameter_name}/",'{'.$parameter_name.'}'] , $replacement , $url);
 		}
-		// the list of all parameters present in the url
-		$all_parameters = (array) explode('/', $url);
-		// for each parameter
-		foreach($all_parameters as $index => $a_parameter) {
-			// if it starts with a semicolon or is enclosed by brackets
-			if(self::isThisAParameterName($a_parameter)) {
-				// if it has not been replaced by a value, we remove it
-				$url = str_replace("{$a_parameter}/", '', $url);
-			}
-		}
-		// define the protocol to use (use the current one, or https if it is forced)
-		$protocol = 
-			// if we are in prod and tls is to be enforced
-			((Config::isProd() && $force_tls) || 
-			// or if we already are rolling https
-			Request::getProtocol() == 'https') ? 
-			'https' : 'http';
-
-		// if we want an absolute url, prefix with the domain and with the port if the protocol is not https
-		!$absolute ?: $url = $protocol . '://' . Config::get('router', 'domain') . 
-		(Request::getPort() != 80 && $protocol == 'http' ? ':'.Request::getPort() : '') . $url;
-
-		return $url;
+		// return the assembled route with an absolute prefix if necessary
+		return $is_absolute ? Route\Helper::prefixIt($url, $force_tls) : $url;
 
 	}
 

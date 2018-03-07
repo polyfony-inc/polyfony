@@ -57,9 +57,9 @@ class Router {
 
 	}
 	
-	// NEW syntax for mapping routes
+	// new syntax for mapping routes
 	public static function map(
-		string $url = null, string $to, string $route_name = null, string $method = null
+		string $url = null, string $destination, string $route_name = null, string $method = null
 	) :Route {
 		// We cannot allow duplicate route names for reversing reasons
 		if($route_name && self::hasRoute($route_name)) {
@@ -70,9 +70,9 @@ class Router {
 		$route = new Route($route_name);
 		// configure the route
 		$route
-			->url($url)
-			->to($to)
-			->method($method);
+			->setUrl($url)
+			->setDestination($destination)
+			->setMethod($method);
 		// add it to the list of known routes
 		self::$_routes[$route->name] = $route;
 		// return the route for finer tuning
@@ -80,23 +80,23 @@ class Router {
 	}
 
 	// new syntax for mapping routes
-	public static function get(string $url, string $to, $route_name = null) :Route {
-		return self::map($url, $to, $route_name, 'get');
+	public static function get(string $url, string $destination, $route_name = null) :Route {
+		return self::map($url, $destination, $route_name, 'get');
 	}
 
 	// new syntax for mapping routes
-	public static function post(string $url, string $to, $route_name = null) :Route {	
-		return self::map($url, $to, $route_name, 'post');
+	public static function post(string $url, string $destination, $route_name = null) :Route {	
+		return self::map($url, $destination, $route_name, 'post');
 	}
 
 	// new syntax for mapping routes
-	public static function delete(string $url, string $to, $route_name = null) :Route {	
-		return self::map($url, $to, $route_name, 'delete');
+	public static function delete(string $url, string $destination, $route_name = null) :Route {	
+		return self::map($url, $destination, $route_name, 'delete');
 	}
 
 	// new syntax for mapping routes
-	public static function put(string $url, string $to, $route_name = null) :Route {	
-		return self::map($url, $to, $route_name, 'put');
+	public static function put(string $url, string $destination, $route_name = null) :Route {	
+		return self::map($url, $destination, $route_name, 'put');
 	}
 
 	// new syntax for quick redirects
@@ -105,9 +105,8 @@ class Router {
 		$route = new Route();
 		// add it to the list of known routes
 		self::$_routes[$route->name] = $route
-			->url($source_url)
-			->redirectTo($redirection_url)
-			->redirectStatus($status_code);
+			->setUrl($source_url)
+			->setRedirect($redirection_url, $status_code);
 		// return the route for finer tuning
 		return self::$_routes[$route->name];
 	}
@@ -126,7 +125,6 @@ class Router {
 	
 	// update the current route after forwarding
 	public static function setCurrentRoute(Route $route) :void {
-		
 		// update the matched route
 		self::$_match = $route;
 	}
@@ -151,7 +149,7 @@ class Router {
 			// if the route matches
 			if(self::routeMatch($request_url, $request_method, $route)) {
 				// get it
-				self::setCurrentRoute($route);
+				$matching_route = $route;
 				// stop trying
 				break;
 			}
@@ -159,12 +157,12 @@ class Router {
 		// marker
 		Profiler::releaseMarker('Router.route', 'framework');
 		// if no match is found and we don't have an error route to fallback on
-		if(!self::$_match) {
+		if(!isset($matching_route)) {
 			// throw a native exception since there is no cleaner alternative
 			Throw new Exception('Router::route() no matching route', 404);
 		}
 		// send the matching route to the dispatcher
-		self::forward(self::$_match);	
+		self::forward($matching_route);	
 		
 	}
 
@@ -220,7 +218,7 @@ class Router {
 	public static function reverse(
 		string $route_name, 
 		array $parameters = [], 
-		bool $absolute = false, 
+		bool $is_absolute = false, 
 		bool $force_tls = false
 	) :string {
 		// if the specified route doesn't exist
@@ -229,17 +227,13 @@ class Router {
 			throw new Exception("Router::reverse() : The [{$route_name}] route does not exist");
 		}
 		// return the reversed url
-		return self::$_routes[$route_name]->getAssembledUrl($parameters, $absolute, $force_tls);
+		return self::$_routes[$route_name]->getAssembledUrl($parameters, $is_absolute, $force_tls);
 	}
 	
 	public static function forward(Route $route) :void {
-		
-		// set full controller
-		$script 	= $route->getDestinationScript();
-		// set the full class
-		$class 		= $route->getDestinationControllerClass();
-		// set full method or index if none provided
-		$method 	= $route->getDestinationControllerMethod();
+
+		// get the full destination
+		list($script, $class, $method) = $route->getDestination();
 		// if script is missing from the bundle
 		if(!file_exists($script)) {
 			// new polyfony exception
