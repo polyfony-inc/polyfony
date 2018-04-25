@@ -5,7 +5,7 @@
 #### Philosophy
 Inspired by Symfony and Laravel but tailored to favour an inclination towards extreme simplicity and efficiency.  
 Compared to major PHP frameworks, Polyfony covers 95%+ of what we need most of the time, and does so using a fragment of the ressources, space, configuration files and dependencies required by major frameworks.  
-It features routing, bundles, controllers, profiler, views, ORM, environments, locales, cache, authentication, form helper, cli helper... and limitless extensibility via composer.
+It features routing, bundles, controllers, profiler, views, ORM, environments, locales, cache, authentication, form helper, CLI helper... and limitless extensibility via composer.
 
 
 #### Footprint [of an Hello World](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
@@ -14,7 +14,7 @@ It features routing, bundles, controllers, profiler, views, ORM, environments, l
 * ≤ 2.5 ms (cold)
 
 ## Requirements
-Current *hard* requirements are : Linux/MacOS/xBSD, PHP >= 7.1, ext-pdo, ext-sqlite3, ext-mbstring, ext-msgpack and a rewrite module (mod_rewrite)
+You need a POSIX compatible system (Linux/MacOS/xBSD), PHP >= 7.1 with ext-pdo, ext-sqlite3, ext-mbstring, ext-msgpack and a rewrite module for your webserver. 
 
 ## Installation
 
@@ -295,6 +295,13 @@ Router::map('/admin/:action/:id/', 'Admin/Main@{action}')
 * "!is_numeric" 
 *If multiple constraints are declared, they all have to match.*  
 
+###### Redirects declaration
+
+* The following will redirect from `/some-old-url/` to `/the-new-url/` using a 301 status code.
+```php
+Router::redirect('/some-old-url/', '/the-new-url/', [$status_code=301]);
+```
+*Those are static redirections, not rewrite rules. They cannot include dynamic parameters.*
 
 ### Environments
 
