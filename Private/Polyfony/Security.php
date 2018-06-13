@@ -177,14 +177,14 @@ class Security {
 	// OLD SHORTCUT for Security->getAccount->hasLevel()
 	public static function hasLevel(int $level=null) :bool {
 		// if we have said level
-		return self::isAuthenticated() ? 
+		return self::$_account ? 
 			self::getAccount()->hasLevel($level) : false;
 	}
 	
 	// OLD SHORTCUT for Security->getAccount->hasModule()
 	public static function hasModule(string $module=null) :bool {
 		// if module is in our credentials
-		return self::isAuthenticated() ? 
+		return self::$_account ? 
 			self::getAccount()->hasModule($module) : false;
 	}
 
@@ -198,6 +198,7 @@ class Security {
 	}
 
 	// check if the user has been authenticated
+	// this method's name might be ambiguous, it's more of an isGranted()
 	public static function isAuthenticated() :bool {
 		// return the current status
 		return self::$_granted;
