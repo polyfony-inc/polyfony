@@ -196,8 +196,8 @@ class Record {
 			$inserted_object = self::create($this->__toArray(true, true));
 			// if insertion succeeded, return true
 			if($inserted_object) {
-				// update our id, now that we have one
-				$this->_['id'] = $inserted_object->get('id');
+				// clone ourselves with what the database returneds, a full fledged object
+				$this->replicate($inserted_object);
 				// return success
 				return true;
 			}
