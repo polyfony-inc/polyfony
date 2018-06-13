@@ -193,11 +193,11 @@ class Record {
 		// this is a new record
 		else {
 			// try to insert it
-			$inserted_object_id = self::create($this->__toArray(true, true));
-			// if insertion succeeded clone ourselves and return true
-			if($inserted_object_id) {
+			$inserted_object = self::create($this->__toArray(true, true));
+			// if insertion succeeded, return true
+			if($inserted_object) {
 				// update our id, now that we have one
-				$this->_['id'] = $inserted_object_id;
+				$this->_['id'] = $inserted_object->get('id');
 				// return success
 				return true;
 			}
