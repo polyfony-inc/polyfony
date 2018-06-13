@@ -177,13 +177,15 @@ class Security {
 	// OLD SHORTCUT for Security->getAccount->hasLevel()
 	public static function hasLevel(int $level=null) :bool {
 		// if we have said level
-		return self::getAccount()->hasLevel($level);
+		return self::isAuthenticated() ? 
+			self::getAccount()->hasLevel($level) : false;
 	}
 	
 	// OLD SHORTCUT for Security->getAccount->hasModule()
 	public static function hasModule(string $module=null) :bool {
 		// if module is in our credentials
-		return self::getAccount()->hasModule($module);
+		return self::isAuthenticated() ? 
+			self::getAccount()->hasModule($module) : false;
 	}
 
 	// OLD SHORTCUT for Security->getAccount->get($something)
