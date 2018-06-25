@@ -51,7 +51,7 @@ class Token {
 	}
 
 	// this will check, upon posting the form, that it is legitimate
-	public static function enforce() :void {
+	public static function enforce(bool $prevent_redirection = false) :void {
 
 		// if the request is of type post
 		if(Request::isPost()) {
@@ -62,7 +62,7 @@ class Token {
 					Config::get('form','token_name')
 				))) {
 					// soft redirect to the previous page after a few seconds
-					Response::setRedirect(Request::server('HTTP_REFERER'), 3);
+					$prevent_redirection ?: Response::setRedirect(Request::server('HTTP_REFERER'), 3);
 					// throw an exception to prevent this action from succeeding
 					Throw new \Polyfony\Exception('Polyfony/Form/CSRF::enforce() invalid CSRF Token');
 				}
@@ -70,7 +70,7 @@ class Token {
 			// missing token
 			else {
 				// soft redirect to the previous page after a few seconds
-				Response::setRedirect(Request::server('HTTP_REFERER'), 3);
+				$prevent_redirection ?: Response::setRedirect(Request::server('HTTP_REFERER'), 3);
 				// throw an exception to prevent this action from succeeding
 				Throw new \Polyfony\Exception('Polyfony/Form/CSRF::enforce() missing CSRF Token');
 			}
