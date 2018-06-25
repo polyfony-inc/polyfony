@@ -30,15 +30,6 @@ class Captcha {
 		bool $must_fail_ocr_test = self::DEFAULT_MUST_FAIL_OCR_TEST
 	) {
 
-		// // check if the related captcha class exists
-		// if(!class_exists('Gregwar\Captcha\CaptchaBuilder')) {
-		// 	// die gracefuly
-		// 	Throw new \Polyfony\Exception(
-		// 		'to use Polyfony/Form/Token you must add "require Gregwar/Captcha" to your composer file', 
-		// 		500
-		// 	);
-		// }
-
 		// instancing a captcha will disable browser and framework caching
 		// as to prevent mismatching captcha
 		Response::disableBrowserCache();
