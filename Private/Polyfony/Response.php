@@ -134,6 +134,11 @@ class Response {
 		// enable the generated output to be cached BY THE FRAMEWORK for some time
 		self::$_outputCache = round($hours * 3600);
 	}
+
+	public static function disableOutputCache() :void {
+		// disable the caching of generated output
+		self::$_outputCache = 0;
+	}
 	
 	public static function setCharset(string $charset) :void {
 		// set the charset in meta tags and http headers

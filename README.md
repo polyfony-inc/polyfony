@@ -798,6 +798,45 @@ Polyfony\Form\Token::enforce();
 Instanciating a "Token" objet generates a unique token, stores it in the PHP SESSION and builds an html input element.  
 The static enforce method, checks if a request has been POSTed, and if so, if a token exists, and matches one stored in the session. Otherwise, throws an exception and redirects to the previous page.
 
+
+## [Captcha Protection](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyformcaptcha)
+
+A Captcha provider is available, it's a wrapper of gregwar/captcha.
+
+###### In the middle of your html form (in a View)
+
+```html
+<form action="" method="post">
+
+<!-- shows the captcha picture -->
+<?= new Polyfony\Form\Captcha(
+	5, // number of characters in the captcha (optional)
+	150, // width of the captcha, in px (optional)
+	40 // height of the captcha, in px (optional)
+); ?>
+
+<!-- shows an input to type the captcha in -->
+<?= Polyfony\Form\Captcha::input([
+	// html attributes (optional)
+	'class'=>'form-control',
+	'placeholder'=>'Type the captcha here'
+]); ?>
+
+</form>
+```
+
+###### In your controller
+
+```php
+Polyfony\Form\Captcha::enforce();
+```
+
+**That's it.** 
+
+Instanciating a "Captcha" objet generates a phrase, stores it in the PHP SESSION and builds a captcha image using gregwar/captcha builder.  
+The static enforce method, checks if a request has been POSTed, and if so, if a captcha value exists, and matches one stored in the session. Otherwise, throws an exception and redirects to the previous page.
+You can manually try/catch exception to avoid loosing what the user typed. 
+
 ## Database structure
 
 The framework has been extensively tested using SQLite, it *may* work with other engines, it defitively works without. 

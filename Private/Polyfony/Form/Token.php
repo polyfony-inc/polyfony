@@ -1,16 +1,12 @@
 <?php
-/**
- * PHP Version 5
- * String format helpers
- * @package Polyfony
- * @link https://github.com/SIB-FRANCE/Polyfony
- * @license http://www.gnu.org/licenses/lgpl.txt GNU General Public License
- * @note This program is distributed in the hope that it will be useful - WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.
- */
 
 namespace Polyfony\Form;
+use \Polyfony\Config as Config;
+use \Polyfony\Request as Request;
+use \Polyfony\Store\Session as Session;
+use \Polyfony\Keys as Keys;
+use \Polyfony\Element as Element;
+use \Polyfony\Response as Response;
 
 class Token {
 
@@ -20,13 +16,18 @@ class Token {
 	// this will instanciate a token
 	public function __construct() {
 
+		// instancing a token will disable browser and framework caching
+		// as to prevent mismatching tokens
+		Response::disableBrowserCache();
+		Response::disableOutputCache();
+
 		// a unique token will be generated, and will live in the PHP session
-		$this->value = \Polyfony\Keys::generate(
-			\Polyfony\Config::get('form','token_name') . uniqid(false,true)
+		$this->value = Keys::generate(
+			Config::get('form','token_name') . uniqid(false,true)
 		);
 
 		// store it in the current session
-		\Polyfony\Store\Session::put(\Polyfony\Config::get('form','token_name'), $this->value, true);
+		Session::put(Config::get('form','token_name'), $this->value, true);
 
 	}
 
@@ -41,9 +42,9 @@ class Token {
 	public function __toString() {
 
 		// build a hidden input html element
-		return (string) new \Polyfony\Element('input', [
+		return (string) new Element('input', [
 			'type'	=>'hidden',
-			'name'	=>\Polyfony\Config::get('form','token_name'),
+			'name'	=>Config::get('form','token_name'),
 			'value'	=>$this->value
 		]); 
 
@@ -53,13 +54,15 @@ class Token {
 	public static function enforce() :void {
 
 		// if the request is of type post
-		if(\Polyfony\Request::isPost()) {
+		if(Request::isPost()) {
 			// is a token is present
-			if(\Polyfony\Request::post(\Polyfony\Config::get('form','token_name'))) {
+			if(Request::post(Config::get('form','token_name'))) {
 				// check the provided token against our legitimate tokens
-				if(!self::isLegitimate(\Polyfony\Request::post(\Polyfony\Config::get('form','token_name')))) {
+				if(!self::isLegitimate(Request::post(
+					Config::get('form','token_name')
+				))) {
 					// soft redirect to the previous page after a few seconds
-					\Polyfony\Response::setRedirect(\Polyfony\Request::server('HTTP_REFERER'), 3);
+					Response::setRedirect(Request::server('HTTP_REFERER'), 3);
 					// throw an exception to prevent this action from succeeding
 					Throw new \Polyfony\Exception('Polyfony/Form/CSRF::enforce() invalid CSRF Token');
 				}
@@ -67,7 +70,7 @@ class Token {
 			// missing token
 			else {
 				// soft redirect to the previous page after a few seconds
-				\Polyfony\Response::setRedirect(\Polyfony\Request::server('HTTP_REFERER'), 3);
+				Response::setRedirect(Request::server('HTTP_REFERER'), 3);
 				// throw an exception to prevent this action from succeeding
 				Throw new \Polyfony\Exception('Polyfony/Form/CSRF::enforce() missing CSRF Token');
 			}
@@ -78,16 +81,15 @@ class Token {
 	private static function isLegitimate($token) :bool {
 
 		// look for that token in the current session
-		if(\Polyfony\Store\Session::has(\Polyfony\Config::get('form','token_name'))) {
+		if(Session::has(Config::get('form','token_name'))) {
 			// get it
-			$current_token = \Polyfony\Store\Session::get(\Polyfony\Config::get('form','token_name'));
+			$current_token = Session::get(Config::get('form','token_name'));
 			// if it matches
 			if($current_token === $token) {
 				// remove it
-				\Polyfony\Store\Session::remove(\Polyfony\Config::get('form','token_name'));
+				Session::remove(Config::get('form','token_name'));
 				// return true
 				return true;
-
 			}
 			else {
 				// not valid
