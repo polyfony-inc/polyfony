@@ -4,18 +4,18 @@ namespace Polyfony;
 
 class Mail {
 
-	private $title;
-	private $from;
-	private $recipients;
-	private $files;
-	private $template;
-	private $body;
-	private $subject;
-	private $variables;
-	private $format;
-	private $charset;
-	private $smtp;
-	private $mailer;
+	protected $title;
+	protected $from;
+	protected $recipients;
+	protected $files;
+	protected $template;
+	protected $body;
+	protected $subject;
+	protected $variables;
+	protected $format;
+	protected $charset;
+	protected $smtp;
+	protected $mailer;
 
 	public function __construct() {
 		// initialize
