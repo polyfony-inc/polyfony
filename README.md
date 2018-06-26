@@ -805,24 +805,22 @@ A Captcha provider is available, it's a wrapper of gregwar/captcha.
 
 ###### In the middle of your html form (in a View)
 
-```html
-<form action="" method="post">
-
-<!-- shows the captcha picture -->
+Show the captcha image itself
+```php
 <?= new Polyfony\Form\Captcha(
 	5, // number of characters in the captcha (optional)
 	150, // width of the captcha, in px (optional)
 	40 // height of the captcha, in px (optional)
 ); ?>
+```
 
-<!-- shows an input to type the captcha in -->
+Show an input to type the captcha in
+```php
 <?= Polyfony\Form\Captcha::input([
 	// html attributes (optional)
 	'class'=>'form-control',
 	'placeholder'=>'Type the captcha here'
 ]); ?>
-
-</form>
 ```
 
 ###### In your controller
@@ -835,7 +833,7 @@ Polyfony\Form\Captcha::enforce();
 
 Instanciating a "Captcha" objet generates a phrase, stores it in the PHP SESSION and builds a captcha image using gregwar/captcha builder.  
 The static enforce method, checks if a request has been POSTed, and if so, if a captcha value exists, and matches one stored in the session. Otherwise, throws an exception and redirects to the previous page.
-You can manually try/catch exception to avoid loosing what the user typed. 
+You can manually try/catch exception to avoid loosing what the user typed, in that case, use `Captcha::enforce(true)` to prevent automatic redirections. 
 
 ## Database structure
 
@@ -869,12 +867,12 @@ composer update
 
 | **Previous Feature**   | **Status**   | **Replacement**         | **How to get it**                     |
 |------------------------|--------------|-------------------------|---------------------------------------|
-| Polyfony\Notice()      | DEPRECATED   | Bootstrap\Alert()       | require sib-retail/polyfony-bootstrap |
+| Polyfony\Notice()      | DEPRECATED   | Bootstrap\Alert()       | require polyfony-inc/bootstrap        |
 | Polyfony\Thumnbail()   | DEPRECATED   | Intervention\Image()    | require intervention/image            |
 | Polyfony\HttpRequest() | DEPRECATED   | Curl\Curl()             | require php-curl-class/php-curl-class |
 | Polyfony\Filesystem()  | DEPRECATED   | Filesystem\Filesystem() | require symfony/filesystem            |
 | Polyfony\Uploader()    | DEPRECATED   | FileUpload\FileUpload() | require gargron/fileupload            |
-| Polyfony\Validate()    | DISCONTINUED | Validator\Validation()  | require symfony/validator              |
+| Polyfony\Validate()    | DISCONTINUED | Validator\Validation()  | require symfony/validator             |
 
 
 ## [Performance](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
