@@ -173,16 +173,22 @@ class HTML {
 				$pack_contents = '';
 				// for each asset
 				foreach(self::$_scripts as $index => $file) {
-					// if that file is not remote
+					// if that file is not remote we can include it in the pack
 					if(!self::isAssetPathRemote($file)) {
 						// append he contents of that file to the pack
 						$pack_contents .= " \n".file_get_contents('.'.$file);
-						// and we remove the origin from the list of script to include
-						unset(self::$_scripts[$index]);
 					}
 				}
 				// populate the cache file
 				file_put_contents($path_path, self::getMinifiedPackIfAllowed($pack_contents,  new \MatthiasMullie\Minify\JS));
+			}
+			// for each asset
+			foreach(self::$_scripts as $index => $file) {
+				// if that file is not remote it has already been included in the pack
+				if(!self::isAssetPathRemote($file)) {
+					// and we remove the origin from the list of script to include
+					unset(self::$_scripts[$index]);
+				}
 			}
 			// add the pack in addition to already existing scripts
 			self::$_scripts[] = "/Assets/Js/Cache/{$pack_name}";
