@@ -77,7 +77,7 @@ class Record {
 	public function input(string $column, array $options = []) {
 		return(Form::input(
 			$this->field($column), 
-			$this->get($column), 
+			$this->get($column, true), 
 			$options
 		));
 	}
@@ -86,7 +86,7 @@ class Record {
 	public function textarea(string $column, array $options = []) {
 		return(Form::textarea(
 			$this->field($column), 
-			$this->get($column), 
+			$this->get($column, true), 
 			$options
 		));
 	}
@@ -96,7 +96,7 @@ class Record {
 		return(Form::select(
 			$this->field($column), 
 			$list, 
-			$this->get($column), 
+			$this->get($column, true), 
 			(is_array($this->get($column)) ? array_merge(['multiple'=>'multiple'],$options) : $options)
 		));
 	}
@@ -105,7 +105,7 @@ class Record {
 	public function checkbox(string $column, array $options = []) {
 		return(Form::checkbox(
 			$this->field($column), 
-			$this->get($column), 
+			$this->get($column, true), 
 			$options
 		));
 	}
@@ -127,6 +127,12 @@ class Record {
 				get_class($this), 
 				$column_or_array, 
 				$value
+			);
+			// filter the value according to the models defined filters
+			$value = \Polyfony\Record\Filter::sanitizeThisValue(
+				$column_or_array, 
+				$value,
+				get_class($this)
 			);
 			// convert the value depending on the column name
 			$this->{$column_or_array} = Query\Convert::valueForDatabase($column_or_array, $value);

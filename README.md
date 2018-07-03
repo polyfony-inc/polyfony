@@ -113,6 +113,9 @@ $account = new Models\Accounts(['login'=>'root@local.domain']);
 $account = new Models\Accounts;
 echo $account->input('login', ['type'=>'email']);
 ```
+
+**Any HTML tags in the email field will be escaped as to prevent XSS attacks**
+
 ###### Outputs
 ```html
 <input type="email" name="Accounts[login]" value="root@local.domain" />
@@ -198,12 +201,19 @@ $accounts = Database::query()
 | ->set(['picture_size'=>'24938'])             |       24938       | ->get('picture_size',true) | string '24938'            |
 
 
+#### XSS Protection
+
+Invoking ->get() on any other columns will automatically escape special html symbols using PHP's `FILTER_SANITIZE_FULL_SPECIAL_CHARS`  as to prevent XSS attacks. 
+In situation where you actually want the raw data from the database, add `true` as a second parameter as such `$object->get('column_name', true);` to retrieve the data "as is". 
+Calling Format::htmlSafe() anywhere in your code will provide you with the same escaping features. 
+
+
 #### Data validators
 
 **Data validation should be managed by the developer with `symfony/validator`, `respect/validation`, `wixel/gump`, or similar packages.** 
 That being said, there is a very basic *(and optional)* built-in validator, to prevent corrupted data from entering the database while manipulating objects.
 
-To enforce it, declare a `VALIDATORS` constant array in your model, each key being a column, and each value being a regex, or an array of allowed vallues.
+To enforce it, declare a `VALIDATORS` constant array in your model, each key being a column, and each value being a regex, or an array of allowed values.
 
 * Example
 
@@ -236,6 +246,58 @@ Models\Accounts extends Polyfony\Security\Accounts {
 The validation occurs when `->set()` is invoked and will throw exceptions. 
 
 Note that you don't have to include `NULL` or `EMPTY` values in your validators to allow them. `NULL/NOT NULL` are to be configured in your database, so that the framework knows which column can, and cannot be null.
+
+**Please be aware that doing a batch ->update (aka : not using distinct objects/Records) on a table will circumvent those validators**
+
+
+#### Data filtering 
+
+Data filtering and sanitizing can be used *in addition* or *instead* of data validators.
+While validators throw exception when invalid data is encountered, data filters will clean up the data, so that it matches the expected nature of said data. 
+
+To enforce data filtering, declare a `FILTERS` constant array in your model, each key being a column, and each value being a filter name, or an array of filters names that will be applied one after the other. 
+
+* Example 
+
+```php
+
+// an imaginary group model, that represent a group of people
+Models\Groups extends Polyfony\Record {
+
+	const FILTERS = [
+		// replaces , with a dot and removes everything except 0-9 + - .
+		'group_monthly_allowance'	=> 'numeric', 
+		// trim spaces, removes any special chars and capitalize each words
+		'group_name'				=> ['trim','text','ucwords'], 
+		// removes any special chars and capitalize each words
+		'group_manager_name'		=> ['text','strtoupper'], 
+		// cleanup an email address
+		'group_manager_email'		=> 'email' 
+	];
+
+}
+```
+
+The filtering occurs when `->set()` is invoked, and after the validations (if any). 
+
+##### List of available filters
+
+| Filter name    | What that filter does                                            |
+|----------------|------------------------------------------------------------------|
+| strtoupper     | applies mb_strtoupper()                                          |
+| strtolower     | applies mb_strtolower()                                          |
+| ucfirst        | applies ucfirst()                                                |
+| ucwords        | applies ucwords()                                                |
+| trim           | applies trim()                                                   |
+| numeric        | replaces coma with dot then applies FILTER_SANITIZE_NUMBER_FLOAT |
+| integer        | applies FILTER_SANITIZE_NUMBER_INT                               |
+| phone          | removes anything but 0 to 9 the plus sign and parenthesis        |
+| email          | applies FILTER_SANITIZE_EMAIL                                    |
+| text           | replaces ' with ’ then removes < > & " \ /                       |
+| slug           | applies Polyfony/Format::slug()                                  |
+| length{4-4096} | applies mb_substr()                                              |
+
+**Please be aware that doing a batch ->update (aka : not using distinct objects/Records) on a table will circumvent those validators**
 
 
 ### [Router](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyrouter)

@@ -5,11 +5,11 @@ namespace Polyfony;
 class Format {
 
 	// file or folder name that is safe for the filesystem
-	public static function fsSafe($string) :string {
+	public static function fsSafe($string, $replacement_symbol = '-') :string {
 		// remove any symbol that does not belong in a file name of folder name
-		return(str_replace(array(
-				'..','/','\\',':','@','$','?','*','<','>','&','(',')','{','}',',','%','`','\'','#'), 
-				'-', 
+		return(str_replace(
+				['..','/','\\',':','@','$','?','*','<','>','&','(',')','{','}',',','%','`','\'','#'], 
+				$replacement_symbol, 
 				$string
 			)
 		);
@@ -21,27 +21,27 @@ class Format {
 		return(json_encode($string));
 	}
 	
-	// screen safe
+	// safe for outputing in html tag or html attribute
 	public static function htmlSafe($string) :string {
 		// just remove html entities
 		return(filter_var($string, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
 	}
 
 	// human size
-	public static function size($integer, $precision=1) :string {
+	public static function size(int $integer, int $precision=1) :string {
 		// declare units
-		$unit = array('b','Ko','Mo','Go','To','Po');
+		$unit = ['b','Ko','Mo','Go','To','Po'];
 		// make human readable
 		return(round($integer/pow(1024, ($i=floor(log($integer, 1024)))), $precision) . ' ' . $unit[$i]);
 	}
 	
 	// relative date
-	public static function date($timestamp) :string {
+	public static function date(int $timestamp = null) :string {
 
 		// if no timestamp is provided
 		if(!$timestamp) {
 			// there is no conversion to do at all
-			return('');
+			return '';
 		}
 		// compute the delta between now and then
 		$delta 		= intval($timestamp - time());
@@ -55,12 +55,12 @@ class Format {
 	}
 	
 	// neutral duration
-	public static function duration($seconds, $precision = 0) :string {
+	public static function duration(int $seconds = null, int $precision = 0) :string {
 
 		// if no timestamp is provided
 		if(!$seconds) {
 			// there is no conversion to do at all
-			return('');
+			return '';
 		}
 		// list of deltas by period
 		$deltas[1] = array(60, Locales::get('minute'));
@@ -92,7 +92,7 @@ class Format {
 	}
 
 	// phone number
-	public static function phone($phone) {
+	public static function phone($phone) :string {
 		// remove all spaces from the number
 		$phone = str_replace(' ', '', $phone);
 		// remove all symbols except + and ()
@@ -117,7 +117,7 @@ class Format {
 	}
 	
 	// human amount
-	public static function amount($integer, $precision=1) {
+	public static function amount($integer, int $precision=1) {
 		// declare units
 		$unit = array('','K','M','Md','Bn','Bd');
 		// make human readable
@@ -125,7 +125,7 @@ class Format {
 	}
 
 	// classic slug
-	public static function slug($string) {
+	public static function slug($string) :string {
 		// accentuated characters
 		$with = preg_split("//u", "àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ _'", -1, PREG_SPLIT_NO_EMPTY);
 		// equivalent characters without accents
@@ -152,7 +152,7 @@ class Format {
 	}
 	
 	// truncate to a certain length
-	public static function truncate($string, $length=16) {
+	public static function truncate($string, int $length=16) {
 		// if string is longer than authorized truncate, else do nothing
 		return(
 			strlen($string) > $length ? 
@@ -189,7 +189,7 @@ class Format {
 	}
 
 	// will clean the value of anything but 0-9 and minus preserve sign return integer
-	public static function integer($value) {
+	public static function integer($value) :int {
 		if(strrpos($value, '.')) {
 			$value = str_replace(',', '' , $value);
 		}
@@ -200,7 +200,7 @@ class Format {
 	}
 	
 	// will clean the value of anything but 0-9\.- preserve sign return float
-	public static function float($value, $precision = 2) :float {
+	public static function float($value, int $precision = 2) :float {
 		if(strrpos($value, '.')) {
 			$value = str_replace(',', '' , $value);
 		}

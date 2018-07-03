@@ -36,10 +36,10 @@ class Convert {
 			// if the value is set
 			$value = date('d/m/Y', $raw_value);
 		}
-		// not a magic column_name
+		// not a magic column name
 		else {
-			// return as is
-			$value = $raw_value;
+			// we secure it against XSS
+			$value = \Polyfony\Format::htmlSafe($raw_value);
 		}
 		// return the converted (or not) value
 		return $value;
