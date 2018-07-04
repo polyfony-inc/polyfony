@@ -5,6 +5,13 @@ namespace Polyfony\Record;
 
 class Validator {
 
+	const VALIDATORS_TO_ATTRIBUTES = [
+		FILTER_VALIDATE_EMAIL	=>['type'=>'email'],
+		FILTER_VALIDATE_FLOAT	=>['type'=>'number'],
+		FILTER_VALIDATE_INT		=>['type'=>'number'],
+		FILTER_VALIDATE_URL		=>['type'=>'url']
+	];
+
 	public static function isThisValueAcceptable(
 		string $table_name, 
 		string $class_name, 
@@ -52,9 +59,14 @@ class Validator {
 
 	}
 
+	public static function getValidatorForColumn(string $column, string $class_name) {
+		// get the validator if any
+		return isset($class_name::VALIDATORS[$column]) ? $class_name::VALIDATORS[$column] : null;
+	}
+
 	private static function doesUserDefinedValidatorFail($value=null, string $column, string $class_name) :bool {
 		// get the validator
-		$validator = isset($class_name::VALIDATORS[$column]) ? $class_name::VALIDATORS[$column] : null;
+		$validator = self::getValidatorForColumn($column, $class_name);
 		// deduce the passing/failing status
 		return 
 			// if the value is not null

@@ -11,11 +11,14 @@ class Form extends Aware {
 		// attriutes deduced from filters
 		$filters_attributes = self::deduceAttributesFromFilters($column);
 
+		// attriutes deduced from filters
+		$validators_attributes = self::deduceAttributesFromValidators($column);
+
 		// attributes deduced from the database
 		$database_attributes = self::deduceAttributesFromDatabase($column);	
 
 		// return the deduced attributes
-		return $filters_attributes + $database_attributes;
+		return $filters_attributes + $validators_attributes + $database_attributes;
 
 	}
 
@@ -39,6 +42,25 @@ class Form extends Aware {
 				}
 			}
 		}
+
+		return $attributes;
+
+	}
+
+	private function deduceAttributesFromValidators(string $column) {
+
+		// default attributes
+		$attributes = [];
+
+		// get validator that could exist for that column
+		// and which could provide hints as to the data type to expect
+		$validator = Validator::getValidatorForColumn($column, get_class($this));
+
+		// if specific attributes exist for this filter
+		if(isset(Validator::VALIDATORS_TO_ATTRIBUTES[$validator])) {
+			// get its associated form attributes
+			$attributes += Validator::VALIDATORS_TO_ATTRIBUTES[$validator];
+		} 
 
 		return $attributes;
 
