@@ -963,6 +963,16 @@ composer update
 | Polyfony\Validate()    | DISCONTINUED | Validator\Validation()  | require symfony/validator             |
 
 
+## Release history
+
+| Version   | Major change                                                                                                                                                             |   |
+|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---|
+| 2.0-alpha | Major rewrite from 1.x new folder structure, routes syntax, new helpers, new configuration files, MVC architecture, database entries are instanciated as Record objects. |   |
+| 2.0       | Database entries now are instanciated as Models\{TableName} that inherit the Record class                                                                                |   |
+| 2.1       | PHP 7.2 support, composer support, new debugging tools are introduced (Profiler), deprecation of old helpers                                                             |   |
+| 2.2       | Old routes syntax have been dropped, redirections are now supported directly in routes declaration                                                                       |   |
+| 2.3       | XSS escaping as default for all Record->get(), Filters are now supported, Validators are enhanced   
+
 ## [Performance](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
 Polyfony has been designed to be fast, no compromise (> 2000 req/s). 
 If implementating a « convenience » tool/function into the framework was to cost a global bump in execution time, it is either implemented in a more efficient manner, or not implemented at all.

@@ -1,3 +1,4 @@
+Public/Assets/*
 Private/Binaries/*
 Private/Bundles/*
 Private/Config/*
@@ -8,5 +9,4 @@ Private/Storage/Database/*
 Private/Storage/Logs/*
 Private/Storage/Store/*
 Private/Vendor/*
-Public/Assets/*
 composer.lock
