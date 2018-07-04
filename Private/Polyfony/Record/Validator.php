@@ -51,7 +51,7 @@ class Validator {
 	private static function doesNullableConstraintFail($value=null, string $column, array $allowed_nulls) :bool {
 
 		return 
-			$allowed_nulls[$column] == false && 
+			$allowed_nulls[$column] === false && 
 			(
 				is_null($value) || 
 				strlen($value) === 0
