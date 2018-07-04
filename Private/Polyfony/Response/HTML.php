@@ -291,7 +291,7 @@ class HTML {
 	}
 
 	// minify the packed content if it's allowed, otherwise return is at is
-	private static function getMinifiedPackIfAllowed(string $pack_contents, $packer_object=false) :string {
+	private static function getMinifiedPackIfAllowed(string $pack_contents, object $packer_object=null) :string {
 		// if we are allowed to minify
 		return \Polyfony\Config::get('response','minify') ? 
 			($packer_object)->add($pack_contents)->minify() : 

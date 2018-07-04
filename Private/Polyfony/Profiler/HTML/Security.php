@@ -29,7 +29,7 @@ class Security {
 
 	}
 
-	public static function getComponent(array $data) : \Bootstrap\Dropdown {
+	public static function getComponent() : \Bootstrap\Dropdown {
 
 		// SECURITY
 		$security_dropdown = new \Bootstrap\Dropdown();

@@ -5,7 +5,7 @@
 	<h4>
 		Core features
 	</h4>
-	<a class="btn btn-warning btn-md" href="/demo/login/" role="button"/>Login form</a> 
+	<a class="btn btn-warning btn-md" href="/login/" role="button"/>Login form</a> 
 	<a class="btn btn-warning btn-md" href="/demo/secure/" role="button"/>Secured page</a> 
 	<a class="btn btn-warning btn-md" href="/demo/locales/" role="button"/>Locales object</a> 
 	<a class="btn btn-warning btn-md" href="/demo/database/" role="button"/>Database object</a> 

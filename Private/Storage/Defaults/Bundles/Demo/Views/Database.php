@@ -115,6 +115,20 @@
 					</div>
 					<div class="form-group row">
 						<label class="col-3 col-form-label text-right">
+							Account expires on (optional)
+						</label>
+						<div class="col-9">
+							<?= $this->RootAccount->input(
+								'account_expiration_date', [
+									'type'=>'date',
+									'placeholder'=>'DD/MM/YYYY',
+									'class'=>'form-control'
+								]
+							); ?>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-3 col-form-label text-right">
 							New password (optional)
 						</label>
 						<div class="col-9">
@@ -124,17 +138,6 @@
 									'class'=>'form-control',
 									'minlength'=>$this->MinPasswordLength
 								]
-							); ?>
-						</div>
-					</div>
-					<div class="form-group row">
-						<label class="col-3 col-form-label text-right">
-							Last failed from Agent
-						</label>
-						<div class="col-9">
-							<?= $this->RootAccount->textarea(
-								'last_failure_agent', 
-								['class'=>'form-control']
 							); ?>
 						</div>
 					</div>

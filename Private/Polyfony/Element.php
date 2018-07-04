@@ -39,7 +39,7 @@ class Element {
 	}
 
 	// set the style for the tag
-	public function setStyle(array $css_properties=[], bool $append=true) {
+	public function setStyle(array $css_properties=[]) :self {
 		// init the style attribute is it didn't exist already
 		isset($this->attributes['style']) ?: $this->attributes['style'] = '';
 		// for each of the css properties

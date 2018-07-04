@@ -59,7 +59,7 @@ class Routing {
 
 	}
 
-	public static function getFooter(\Bootstrap\Dropdown $routing_dropdown, $route) :\Bootstrap\Dropdown {
+	public static function getFooter(\Bootstrap\Dropdown $routing_dropdown, \Polyfony\Route $route) :\Bootstrap\Dropdown {
 
 		$routing_dropdown->addDivider();
 		$routing_dropdown->addItem([
@@ -79,7 +79,7 @@ class Routing {
 
 	}
 
-	public static function getComponent(array $data) :\Bootstrap\Dropdown {
+	public static function getComponent() :\Bootstrap\Dropdown {
 
 		// ROUTING
 		$route = \Polyfony\Router::getCurrentRoute();

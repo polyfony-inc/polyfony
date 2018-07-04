@@ -41,7 +41,6 @@ class Emails {
 				$title_prefix			= new \Polyfony\Element('strong', 	['text'=>"Email #{$emails_count} ",'class'=>'text-danger']);
 				$title 					= new \Polyfony\Element('span', 	['text'=>$debug_data['subject']]);
 				$parameters_container 	= new \Polyfony\Element('div', 		['style'=>'padding-top:0px']);
-				$parameters 			= new \Polyfony\Element('code', 	['class'=>'text-success','text'=>'']);
 
 				$emails[$emails_count] = $card
 					->adopt($title_container

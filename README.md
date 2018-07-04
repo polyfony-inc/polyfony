@@ -185,8 +185,8 @@ $accounts = Database::query()
 
 #### Magic columns
 
-* Columns ending with `_date`, `_on`, `_at` will be converted from `DD/MM/AAAA` to a timestamp and vice-versa
-* Columns ending with `_datetime` will be converted from `DD/MM/AAAA HH:mm` to a timestamp and vice-versa
+* Columns ending with `_date`, `_on`, `_at` will be converted from `DD/MM/YYYY` to a timestamp and vice-versa
+* Columns ending with `_datetime` will be converted from `DD/MM/YYYY HH:mm` to a timestamp and vice-versa
 * Columns ending with `_array` will be converted and stored as json, then restored to their original type
 * Columns ending with `_size` will be converted from bytes to human readable size
 

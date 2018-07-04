@@ -1,6 +1,7 @@
 <?php
 
 namespace Polyfony\Query;
+use Polyfony\Exception as Exception;
 
 class Convert {
 

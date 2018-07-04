@@ -45,7 +45,7 @@ class Profiler {
 				self::releaseMarker($element['name']);
 			}
 		}
-//		var_dump(self::$_stack);die();
+
 		// end time and end memory
 		self::$_endTime		= microtime(true);
 		self::$_totalTime	= self::$_endTime - self::$_startTime;

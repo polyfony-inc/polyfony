@@ -280,10 +280,10 @@ class DemoController extends pf\Controller {
 
 			// update some fields
 			$this->RootAccount->set([
-				'login'				=>pf\Request::post('Accounts')['login'],
-				'id_level'			=>pf\Request::post('Accounts')['id_level'],
-				'is_enabled'		=>pf\Request::post('Accounts')['is_enabled'],
-				'last_failure_agent'=>pf\Request::post('Accounts')['last_failure_agent']
+				'login'						=>pf\Request::post('Accounts')['login'],
+				'id_level'					=>pf\Request::post('Accounts')['id_level'],
+				'is_enabled'				=>pf\Request::post('Accounts')['is_enabled'],
+				'account_expiration_date'	=>pf\Request::post('Accounts')['account_expiration_date']
 			]);
 
 			if(
