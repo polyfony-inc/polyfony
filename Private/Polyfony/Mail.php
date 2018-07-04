@@ -204,8 +204,6 @@ class Mail {
 		// marker
 		$id_marker = Profiler::setMarker(null, 'email', ['Email'=>$this]);
 
-		// if we have triggers for an alternate SMTP relay, and and alternative SMTP relay server defined
-		$this->enforceAlternativeRelay();
 		// configure the php mailer object
 		$this->configurePHPMailer();
 		// configure environment specifics parameters/options
@@ -255,41 +253,6 @@ class Mail {
 		// return the sending status
 		return $is_sent;
 
-	}
-
-	// --------------------------------------------------------
-	// - depending on the presence of an alternate smtp relay -
-	// --- we may alter the configuration of the SMTP server --
-	// --------------------------------------------------------
-	private function enforceAlternativeRelay() {
-		
-		if(
-			// if triggers are set
-			Config::get('mail','alternative_triggers') &&
-			// and an alternative smtp relay is also set
-			Config::get('mail','alternative_smtp_host')
-		) {
-			// for each and EVERY recipients that might receive this email
-			foreach($this->getMergedRecipients() as $email => $name) {
-				// for each of the possible triggers
-				foreach(Config::get('mail', 'alternative_triggers') as $needle) {
-					// if there is at least a simple partial case match (insensitive, and no regex allowed)
-					if(stripos($email, $needle) !== false) {
-						// apply the alternative configuration for this mail object
-						$this->smtp = [
-							'host'	=> Config::get('mail', 'alternative_smtp_host'),
-							'user'	=> Config::get('mail', 'alternative_smtp_user'),
-							'pass'	=> Config::get('mail', 'alternative_smtp_pass')
-						];
-					}
-				}
-			}
-		}
-
-	}
-
-	private function getMergedRecipients() :array {
-		return array_merge($this->recipients['to'], $this->recipients['cc'], $this->recipients['bcc']);
 	}
 
 	private function configurePHPMailer() {

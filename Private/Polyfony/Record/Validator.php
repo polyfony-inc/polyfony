@@ -54,7 +54,7 @@ class Validator {
 			$allowed_nulls[$column] == false && 
 			(
 				is_null($value) || 
-				$value === ''
+				strlen($value) === 0
 			);
 
 	}
@@ -69,8 +69,10 @@ class Validator {
 		$validator = self::getValidatorForColumn($column, $class_name);
 		// deduce the passing/failing status
 		return 
-			// if the value is not null
+			// if the value is not null (nullability is checked elsewhere)
 			!is_null($value) && 
+			// if the value is not empty (nullability is checked elsewhere)
+			strlen($value) !== 0 && 
 			// and a validator exists
 			!is_null($validator) && 
 			(
