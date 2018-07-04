@@ -44,7 +44,7 @@ class Accounts extends \Polyfony\Record {
 	// this methods should be moved to Models\Accounts but that would break backward compatiblity
 	public function hasFailedLoginAttemptsRecentFrom(string $remote_address) :bool {
 		return 
-			$this->get('last_failure_origin') == $remote_address &&
+			$this->get('last_failure_origin', true) == $remote_address &&
 			$this->get('last_failure_date', true) > time() - Conf::get('security', 'waiting_duration');
 	}
 	
@@ -54,15 +54,15 @@ class Accounts extends \Polyfony\Record {
 		// this ensures that the session key has not been moved to another computer
 		// they won't match if the remote address, or the user agent has changed
 		return Sec::getSignature(
-				$this->get('login') . $this->get('password') . $this->get('session_expiration_date', true)
-			) === $this->get('session_key');
+				$this->get('login', true) . $this->get('password', true) . $this->get('session_expiration_date', true)
+			) === $this->get('session_key', true);
 
 	}
 
 	// this methods should be moved to Models\Accounts but that would break backward compatiblity
 	public function extendLoginBan() :void {
 		// log the action
-		Log::warning("Account {$this->get('login')} got its ban period extended due to wrong password");
+		Log::warning("Account {$this->get('login', true)} got its ban period extended due to wrong password");
 		// updathe the account
 		$this->set([
 			'last_failure_date'		=>time(),
@@ -84,7 +84,7 @@ class Accounts extends \Polyfony\Record {
 		$session_expiration = time() + ( Conf::get('security', 'session_duration') * 3600 );
 		
 		// generate a session key with its expiration, the login, the password, the ip, the user agent
-		$session_signature = Sec::getSignature($this->get('login').$this->get('password').$session_expiration);
+		$session_signature = Sec::getSignature($this->get('login', true).$this->get('password', true).$session_expiration);
 
 		// if we manage to open the session properly
 		return 

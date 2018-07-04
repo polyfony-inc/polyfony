@@ -30,6 +30,24 @@ class Filter {
 		'length4096'=>'length4096'
 	];
 
+	const FILTERS_TO_ATTRIBUTES = [
+		'email'		=>['type'=>'email'],
+		'phone'		=>['type'=>'tel'],
+		'integer'	=>['type'=>'number'],
+		'numeric'	=>['type'=>'number'],
+		'length4'	=>['maxlength'=>'4'],
+		'length8'	=>['maxlength'=>'8'],
+		'length16'	=>['maxlength'=>'16'],
+		'length32'	=>['maxlength'=>'32'],
+		'length64'	=>['maxlength'=>'64'],
+		'length128'	=>['maxlength'=>'128'],
+		'length256'	=>['maxlength'=>'256'],
+		'length512'	=>['maxlength'=>'512'],
+		'length1024'=>['maxlength'=>'1024'],
+		'length2048'=>['maxlength'=>'2048'],
+		'length4096'=>['maxlength'=>'4096']
+	];
+
 	public static function sanitizeThisValue(string $column, $value=null, string $class_name) {
 		// get the filter
 		$filters = self::getFiltersForColumn($column, $class_name);
@@ -47,11 +65,10 @@ class Filter {
 		return $value;
 	}
 
-	private static function getFiltersForColumn(string $column, string $class_name) {
-
+	public static function getFiltersForColumn(string $column, string $class_name) {
 
 		// get the filters if any
-		$filters = defined("$class_name::FILTERS") && isset($class_name::FILTERS[$column]) ? $class_name::FILTERS[$column] : null;
+		$filters = isset($class_name::FILTERS[$column]) ? $class_name::FILTERS[$column] : null;
 		// if filters were found, convert them to an array, or return null
 		return $filters ? 
 			is_array($filters) ? $filters : [$filters] : 

@@ -208,12 +208,12 @@ In situation where you actually want the raw data from the database, add `true` 
 Calling Format::htmlSafe() anywhere in your code will provide you with the same escaping features. 
 
 
-#### Data validators
+### Data validators
 
 **Data validation should be managed by the developer with `symfony/validator`, `respect/validation`, `wixel/gump`, or similar packages.** 
 That being said, there is a very basic *(and optional)* built-in validator, to prevent corrupted data from entering the database while manipulating objects.
 
-To enforce it, declare a `VALIDATORS` constant array in your model, each key being a column, and each value being a regex, or an array of allowed values.
+To enforce it, declare a `VALIDATORS` constant array in your model, each key being a column, and each value being a regex, an array of allowed values or a standard PHP filter name (ex. `FILTER_VALIDATE_IP`).
 
 * Example
 
@@ -235,11 +235,17 @@ Models\Accounts extends Polyfony\Security\Accounts {
 	];
 
 	const VALIDATORS = [
-		'login'		=> '/^\S+@\S+\.\S+$/', // validate an email as login
-		'id_level'	=> self::ID_LEVEL // validate any key from the const id_level
-		'is_enabled'=> self::IS_ENABLED // validate 0 or 1
-	];
 
+		// using PHP's built in validators
+		'login'					=>FILTER_VALIDATE_EMAIL, 
+		'last_login_origin'		=>FILTER_VALIDATE_IP,
+		'last_failure_origin'	=>FILTER_VALIDATE_IP,
+
+		// using arrays
+		'is_enabled'=>self::IS_ENABLED,
+		'id_level'	=>self::ID_LEVEL
+
+	];
 }
 ```
 
@@ -250,7 +256,7 @@ Note that you don't have to include `NULL` or `EMPTY` values in your validators 
 **Please be aware that doing a batch ->update (aka : not using distinct objects/Records) on a table will circumvent those validators**
 
 
-#### Data filtering 
+### Data filtering 
 
 Data filtering and sanitizing can be used *in addition* or *instead* of data validators.
 While validators throw exception when invalid data is encountered, data filters will clean up the data, so that it matches the expected nature of said data. 
@@ -296,6 +302,26 @@ The filtering occurs when `->set()` is invoked, and after the validations (if an
 | text           | replaces ' with ’ then removes < > & " \ /                       |
 | slug           | applies Polyfony/Format::slug()                                  |
 | length{4-4096} | applies mb_substr()                                              |
+
+**An added benefit of those filters is that your inputs and textarea automatically get the right html attributes.** 
+
+Check out the following Model, View and HTML output.
+
+```php
+class User extends Polyfony\Record {
+	const FILTERS = [
+		'user_login'=>['email','length128']
+	];
+}
+```
+```php
+<?= (new Models\Users())->input('user_login'); ?>
+```
+```html
+<input name="Users[user_login]" type="email" maxlength="128" value="" />
+```
+
+Your input also gets a `required="required"` attribute if the column cannot be null. This is deduced from the database schema.
 
 **Please be aware that doing a batch ->update (aka : not using distinct objects/Records) on a table will circumvent those validators**
 

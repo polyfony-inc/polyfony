@@ -15,20 +15,30 @@ class Accounts extends \Polyfony\Security\Accounts {
 	];
 
 	const ID_LEVEL = [
-
 		0	=> 'God',
 		1	=> 'Admin',
 		5	=> 'SuperUser',
 		20	=> 'User',
-
 	];
 
 	const VALIDATORS = [
 
-//		'login'		=>'/^\S+@\S+\.\S+$/', // commented out because the demo uses simply "root" as login
+		// using PHP's built in validators
+		'login'					=>FILTER_VALIDATE_EMAIL, 
+		'last_login_origin'		=>FILTER_VALIDATE_IP,
+		'last_failure_origin'	=>FILTER_VALIDATE_IP,
+
+		// using arrays
 		'is_enabled'=>self::IS_ENABLED,
 		'id_level'	=>self::ID_LEVEL
 
+	];
+
+	const FILTERS = [
+
+		// chained filters
+		'login'=>['email','length256'],
+		
 	];
 
 	// what we mean by recent authentication failure (3 days)

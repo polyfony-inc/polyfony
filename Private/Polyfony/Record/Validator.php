@@ -30,11 +30,11 @@ class Validator {
 				400
 			);
 		}
-		// check if a user define validator exists for that column, and if it fails to pass it
+		// check if a user defined validator exists for that column, and if it fails to pass it
 		if(self::doesUserDefinedValidatorFail($value, $column, $class_name))  {
 			// throw a useful exception
 			Throw new \Polyfony\Exception(
-				"{$class_name}->set({$column}) : does not conform to the regex, or is not in array of allowed values",
+				"{$class_name}->set({$column}) : does not conform to the regex, PHP Filter, or is not in array of allowed values",
 				400
 			);
 		}
@@ -62,6 +62,8 @@ class Validator {
 			// and a validator exists
 			!is_null($validator) && 
 			(
+				// if the validator is an int, then it's a FILTER_VALIDATE
+				(is_int($validator) && !filter_var($value, $validator)) || 
 				// if the validator is a string, then it's a regex, check if the values matches
 				(is_string($validator) && !preg_match($validator, $value)) || 
 				// or if the validator is an array, check if the value is a key of that array
