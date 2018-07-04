@@ -8,7 +8,7 @@ use \Polyfony\Keys as Keys;
 use \Polyfony\Element as Element;
 use \Polyfony\Response as Response;
 
-class Token {
+class Token extends Integrity {
 
 	// the actual value of the token
 	private $value 	= null;
@@ -52,56 +52,13 @@ class Token {
 
 	// this will check, upon posting the form, that it is legitimate
 	public static function enforce(bool $prevent_redirection = false) :void {
-
-		// if the request is of type post
-		if(Request::isPost()) {
-			// is a token is present
-			if(Request::post(Config::get('form','token_name'))) {
-				// check the provided token against our legitimate tokens
-				if(!self::isLegitimate(Request::post(
-					Config::get('form','token_name')
-				))) {
-					// soft redirect to the previous page after a few seconds
-					$prevent_redirection ?: Response::setRedirect(Request::server('HTTP_REFERER'), 3);
-					// throw an exception to prevent this action from succeeding
-					Throw new \Polyfony\Exception('Polyfony/Form/CSRF::enforce() invalid CSRF Token');
-				}
-			}
-			// missing token
-			else {
-				// soft redirect to the previous page after a few seconds
-				$prevent_redirection ?: Response::setRedirect(Request::server('HTTP_REFERER'), 3);
-				// throw an exception to prevent this action from succeeding
-				Throw new \Polyfony\Exception('Polyfony/Form/CSRF::enforce() missing CSRF Token');
-			}
-		}
-
-	}
-
-	private static function isLegitimate($token) :bool {
-
-		// look for that token in the current session
-		if(Session::has(Config::get('form','token_name'))) {
-			// get it
-			$current_token = Session::get(Config::get('form','token_name'));
-			// if it matches
-			if($current_token === $token) {
-				// remove it
-				Session::remove(Config::get('form','token_name'));
-				// return true
-				return true;
-			}
-			else {
-				// not valid
-				return false;
-			}
-		}
-		// invalid token
-		else {
-			// return false
-			return false;
-		}
-
+		// actually enforce using the inherited enforce method
+		self::enforceFor(
+			Config::get('form','token_name'), 
+			$prevent_redirection, [
+				'missing'=>'Polyfony/Form/Token::enforce() missing Token (CSRF)',
+				'invalid'=>'Polyfony/Form/Token::enforce() invalid Token (CSRF)'
+		]);
 	}
 	
 }

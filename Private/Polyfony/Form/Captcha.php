@@ -12,7 +12,7 @@ use \Polyfony\Form as Form;
 
 
 // This class is only a wrapper for Gregwar/Captcha 
-class Captcha {
+class Captcha extends Integrity {
 
 	const DEFAULT_LENGTH = 6;
 	const DEFAULT_WIDTH = 150;
@@ -76,55 +76,13 @@ class Captcha {
 
 	// this will check, upon posting the form, that it is legitimate
 	public static function enforce(bool $prevent_redirection = false) :void {
-
-		// if the request is of type post
-		if(Request::isPost()) {
-			// is a captcha is present
-			if(Request::post(Config::get('form','captcha_name'))) {
-				// check the provided captcha against our legitimate tokens
-				if(!self::isLegitimate(Request::post(
-					Config::get('form','captcha_name')
-				))) {
-					// soft redirect to the previous page after a few seconds
-					$prevent_redirection ?: Response::setRedirect(Request::server('HTTP_REFERER'), 3);
-					// throw an exception to prevent this action from succeeding
-					Throw new \Polyfony\Exception('Polyfony/Form/Captcha::enforce() wrong Captcha');
-				}
-			}
-			// missing captcha
-			else {
-				// soft redirect to the previous page after a few seconds
-				$prevent_redirection ?: Response::setRedirect(Request::server('HTTP_REFERER'), 3);
-				// throw an exception to prevent this action from succeeding
-				Throw new \Polyfony\Exception('Polyfony/Form/Captcha::enforce() missing Captcha');
-			}
-		}
-
-	}
-
-	private static function isLegitimate($captcha) :bool {
-
-		// look for that captcha in the current session
-		if(Session::has(Config::get('form','captcha_name'))) {
-			// get it
-			$current_token = Session::get(Config::get('form','captcha_name'));
-			// if it matches
-			if($current_token === $captcha) {
-				// remove it
-				Session::remove(Config::get('form','captcha_name'));
-				// return true
-				return true;
-			}
-			else {
-				// not valid
-				return false;
-			}
-		}
-		// invalid captcha
-		else {
-			// return false
-			return false;
-		}
+		// actually enforce using the inherited enforce method
+		self::enforceFor(
+			Config::get('form','captcha_name'), 
+			$prevent_redirection, [
+				'missing'=>'Polyfony/Form/Captcha::enforce() missing Captcha',
+				'invalid'=>'Polyfony/Form/Captcha::enforce() invalid Captcha'
+		]);
 
 	}
 	
