@@ -7,12 +7,14 @@ class Record extends Record\Form {
 	// get a truncated field, that is safe to place in a HTML document
 	public function tget(string $column, int $length=32) {
 		// we get the raw value, truncate it, and escape it afterwards
-		return Format::htmlSafe(
-			Format::truncate(
-				$this->get($column, true),
-				0, $length
-			)
-		);
+		return strlen($this->get($column, true)) > $length ? 
+			Format::htmlSafe(
+				Format::truncate(
+					$this->get($column, true),
+					0, $length
+				)
+			) : 
+			$this->get($column);
 	}
 
 	// put the record into the trash
