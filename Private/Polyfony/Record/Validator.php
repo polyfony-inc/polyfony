@@ -71,10 +71,10 @@ class Validator {
 		return 
 			// if the value is not null (nullability is checked elsewhere)
 			!is_null($value) && 
-			// if the value is not empty (nullability is checked elsewhere)
-			strlen($value) !== 0 && 
-			// and a validator exists
+			// if a validator exists
 			!is_null($validator) && 
+			// and the value is not empty (nullability is checked elsewhere)
+			strlen($value) !== 0 && 
 			(
 				// if the validator is an int, then it's a FILTER_VALIDATE
 				(is_int($validator) && !filter_var($value, $validator)) || 
