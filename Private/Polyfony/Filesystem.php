@@ -175,7 +175,7 @@ class Filesystem {
 
 	}
 
-	public static function mkdir(string $path, string $mask = '0777', bool $override_chroot = false) :bool {
+	public static function mkdir(string $path, $mask = 0777, bool $override_chroot = false) :bool {
 
 		// this is now deprecated, will probably be removed in a future release
 		trigger_error(
@@ -240,7 +240,7 @@ class Filesystem {
 
 	}
 
-	public static function chmod(string $path, string $mask, bool $override_chroot = false) :bool {
+	public static function chmod(string $path, $mask, bool $override_chroot = false) :bool {
 
 		// this is now deprecated, will probably be removed in a future release
 		trigger_error(
