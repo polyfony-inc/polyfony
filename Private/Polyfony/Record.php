@@ -11,7 +11,7 @@ class Record extends Record\Form {
 			Format::htmlSafe(
 				Format::truncate(
 					$this->get($column, true),
-					0, $length
+					$length
 				)
 			) : 
 			$this->get($column);
