@@ -48,16 +48,23 @@ class Integrity {
 
 		// look for that token_or_captcha in the current session
 		if(Session::has($variable)) {
-			// get it
-			$current_token_or_captcha = Session::get($variable);
 			// if it matches
-			if($current_token_or_captcha === Request::post($variable)) {
+			if(
+				(string) Session::get($variable) === 
+				(string) strtolower(Request::post($variable))
+			) {
 				// remove it
 				Session::remove($variable);
 				// return true
 				return true;
 			}
 			else {
+				// log the failure
+				\Polyfony\Logger::warning(
+					'Form/Integrity check failed for '.$variable. 
+					' ('.Request::post($variable).' provided and '.
+					Session::get($variable).' was expected)'
+				);
 				// not valid
 				return false;
 			}

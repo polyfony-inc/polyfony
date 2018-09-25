@@ -50,23 +50,33 @@ class Exception extends \Exception {
 		
 	}
 	
+	public static function convertTraceToHtml(
+		array $trace
+	) :string {
+
+		$stack = '<div class="card-body">';
+
+		foreach($trace as $index => $call) {
+			// in case the stack element is not from an object
+			$class 	= isset($call['class']) ? $call['class'] : '';
+			$type 	= isset($call['type']) ? $call['type'] : '';
+			// shorten the file path to lower cognitive load
+			$file 	= str_replace('/var/www/', '', $call['file']); 
+			// format a clean call
+			$stack .= 
+			"<span class=\"lead\">{$index} {$class}<strong>{$type}{$call['function']}</strong></span> ";
+			$stack .= 
+			"<span class=\"badge bg-warning text-black\">@line {$call['line']}</span> in <span class=\"text-secondary\">{$file}</span><br />";
+		}
+
+		return "$stack</div>";
+
+	}
+	
 	private function __toHtml() {
 		
-		// container
-		$this->cleanStack = '<pre class="xdebug-var-dump">';
-		// for each call
-		foreach($this->getTrace() as $index => $call) {
-			// in case the stack element is not from an object
-			$call['class'] = isset($call['class']) ? $call['class'] : '';
-			$call['type'] = isset($call['type']) ? $call['type'] : '';
-			// format a clean call
-			$this->cleanStack .= "{$index} <b>{$call['class']}</b>{$call['type']}{$call['function']} ";
-			$this->cleanStack .= "<span class=\"label label-default\">@line {$call['line']}</span> in <small>{$call['file']}</small><br />";
-		}
-		// end of container
-		$this->cleanStack .= '</pre>';
-		// return the formatted exeption
-		return($this->cleanStack);
+		// return the formatted trace
+		return(self::convertTraceToHtml($this->getTrace()));
 		
 	}
 	

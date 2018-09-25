@@ -54,7 +54,10 @@ class Validator {
 			$allowed_nulls[$column] === false && 
 			(
 				is_null($value) || 
-				strlen($value) === 0
+				(
+					!is_array($value) &&  
+					strlen($value) === 0
+				)
 			);
 
 	}

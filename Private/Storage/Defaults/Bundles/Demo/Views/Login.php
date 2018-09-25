@@ -23,7 +23,7 @@
 							]); ?>
 						</div>
 						<div class="col-6">
-							<?= new Polyfony\Form\Captcha(); ?>
+							<?= new Polyfony\Form\Captcha(4); ?>
 						</div>
 					</div>
 				</div>

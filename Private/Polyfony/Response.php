@@ -201,6 +201,16 @@ class Response {
 
 	// set raw content
 	public static function setContent($content) :void {
+		//  make sure that the file exists
+		if(self::getType() == 'file' && !file_exists($content)) {
+			// change back the response type
+			self::setType('html');
+			// stop the execution
+			Throw new Exception(
+				"Response::setContent() The file [$content] does not exist", 
+				404
+			);
+		}
 		// remove any bufferred output
 		self::clean();
 		// replace direclty

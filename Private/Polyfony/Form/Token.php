@@ -22,9 +22,9 @@ class Token extends Integrity {
 		Response::disableOutputCache();
 
 		// a unique token will be generated, and will live in the PHP session
-		$this->value = Keys::generate(
+		$this->value = strtolower(Keys::generate(
 			Config::get('form','token_name') . uniqid(false,true)
-		);
+		));
 
 		// store it in the current session
 		Session::put(Config::get('form','token_name'), $this->value, true);

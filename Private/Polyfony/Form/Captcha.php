@@ -45,7 +45,7 @@ class Captcha extends Integrity {
 
 
 		// // store it in the current session
-		Session::put(Config::get('form','captcha_name'), $this->getValue(), true);
+		Session::put(Config::get('form','captcha_name'), (string) $this->getValue(), true);
 
 	}
 

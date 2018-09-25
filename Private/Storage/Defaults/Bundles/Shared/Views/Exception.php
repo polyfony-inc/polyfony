@@ -1,4 +1,11 @@
-<?php use Polyfony as pf; ?>
+<?php 
+use Polyfony as pf; 
+use Polyfony\Locales as Loc;
+use Polyfony\Format as Fmt;
+use Polyfony\Request as Req;
+use Polyfony\Config as Cfg;
+use Polyfony\Security as Sec;
+?>
 <style type="text/css">
 	.row {
 		padding-top: 2em;
@@ -6,9 +13,10 @@
 	.card {
 		margin-top: 20px; 
 		display: none;
+		line-height: 24px;
 	}
-	.card-body {
-		padding-bottom: 0;
+	strong {
+		font-weight: bold;
 	}
 </style>
 <div class="container-fluid">
@@ -16,53 +24,51 @@
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8">	
 			<h1>
 				<span class="<?= $this->icon; ?>"></span> 
-				<?php echo pf\Locales::get($this->Exception->getMessage()); ?>
+				<?= Loc::get($this->Exception->getMessage()); ?>
 			</h1>
 			<div class="">
 				<a href="#" class="btn btn-warning" onclick="reportIncident()">
 					<span class="fa fa-send"></span> 
-					<?php echo pf\Locales::get('Envoyer cet incident à l\'équipe technique'); ?> 
+					<?= Loc::get('Envoyer cet incident à l\'équipe technique'); ?> 
 				</a> 
 				<a href="#" class="btn btn-outline-secondary" onclick="document.getElementById('trace').style.display='block';">
-					<?php echo pf\Locales::get('Détails techniques'); ?> 
+					<?= Loc::get('Détails techniques'); ?> 
 					<span class="fa fa-caret-down"></span>
 				</a>
 			</div>
 			<div class="card" id="trace">
-				<div class="card-body">
-					<?php echo $this->Trace ?: null; ?>
-				</div>
+				<?= Polyfony\Exception::convertTraceToHtml($this->Exception->getTrace()); ?>
 			</div>
 <textarea id="dump" style="display:none;">
-Date : <?php echo date('r'); ?> 
-URL : <?php echo pf\Format::htmlSafe(pf\Request::getUrl()); ?>
+Error : <?= $this->Exception->getMessage(); ?>
 
-REFERER : <?php echo pf\Format::htmlSafe(pf\Request::server('HTTP_REFERER')); ?>
+Code : <?= $this->Exception->getCode(); ?>
 
-Domain : <?php echo pf\Config::get('router','domain'); ?>
+Date : <?= date('r'); ?> 
+URL : <?= Fmt::htmlSafe(Req::getUrl()); ?>
 
-Agent : <?php echo pf\Format::htmlSafe(pf\Request::server('HTTP_USER_AGENT')); ?>
+Method : <?= Req::isPost() ? 'POST' : 'GET'; ?>
 
-Method : <?php echo pf\Request::isPost() ? 'POST' : 'GET'; ?>
+REFERER : <?= Fmt::htmlSafe(Req::server('HTTP_REFERER', 'None')); ?>
 
-IP : <?php echo pf\Format::htmlSafe(pf\Request::server('REMOTE_ADDR')); ?>
+Domain : <?= Cfg::get('router','domain'); ?>
 
-Protocol : <?php echo pf\Request::getProtocol(); ?>
+Agent : <?= Fmt::htmlSafe(Req::server('HTTP_USER_AGENT')); ?>
 
-User : <?php echo pf\Security::get('id'); ?>
+IP : <?= Fmt::htmlSafe(Req::server('REMOTE_ADDR')); ?>
 
-Error : <?php echo $this->Exception->getCode(); ?> <?php echo $this->Exception->getMessage(); ?>
+Protocol : <?= Req::getProtocol(); ?>
+
+User : <?= Sec::get('id'); ?>
 
 Trace : 
-<?php echo $this->Exception->getTraceAsString(); ?>
+<?= $this->Exception->getTraceAsString(); ?>
 </textarea>
 <script type="text/javascript">
 function reportIncident() {
 
-	var tech_support_mail = '<?php echo pf\Config::get('mail','tech_support_mail'); ?>';
-
-	var link = "mailto:"+tech_support_mail
-	+ "?subject=" + escape("Exception (<?php echo pf\Config::get('router','domain'); ?>)")
+	var link = "mailto:"+'<?= Cfg::get('mail','tech_support_mail'); ?>'
+	+ "?subject=" + escape("Exception (<?= Cfg::get('router','domain'); ?>) - <?= $this->Exception->getMessage(); ?>")
 	+ "&body=" + escape(document.getElementById('dump').value);
 
 	window.location.href = link;
