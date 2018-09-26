@@ -1,7 +1,10 @@
 <?php
 
 use Polyfony as pf;
-
+use Polyfony\Config as Config;
+Use Polyfony\Response as Response;
+use Polyfony\Locales as Locales;
+use Polyfony\Store as Store;
 // new example class to realize tests
 class ExceptionController extends Polyfony\Controller {
 	
@@ -9,60 +12,68 @@ class ExceptionController extends Polyfony\Controller {
 	public function exceptionAction() {
 		
 		// get the exception
-		$this->Exception = pf\Store\Request::get('exception');
-
+		$this->Exception = Store\Request::get('exception');
 		// error occured while requesting something else than html
-		if(!in_array(pf\Response::getType(), array('html','html-page'))) {
+		if(!in_array(
+			Response::getType(), 
+			['html','html-page']
+		)) {
 			// change the type to plaintext
-			pf\Response::setType('text');
+			Response::setType('text');
 			// set the stack a string
-			pf\Response::setContent(
+			Response::setContent(
 				$this->Exception->getCode() . "\n".
 				$this->Exception->getMessage() . "\n".
 				$this->Exception
 			);
 			// render as is
-			pf\Response::render();
+			Response::render();
 		}
 		// error occured normally
 		else {
+			// disable space removal for the trace stack
+			Config::set('response','minify', 0);
 			// reset already output data (very important, because of content-length)
-			pf\Response::setType('html-page');
+			Response::setType('html-page');
 			// proper title and assets
-			pf\Response\HTML::set([
+			Response\HTML::set([
 				'metas'		=>[
-					'title'=> $this->Exception->getMessage()
+					'title'=> $this->Exception->getCode() . ', ' . 
+						Locales::get($this->Exception->getMessage())
 				],
 				'scripts'	=>[
 					'//code.jquery.com/jquery-3.3.1.slim.min.js',
-					'//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.bundle.min.js'
+					'//stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js'
 				],
 				'links'		=>[
-					'//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css',
-					'//maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'
+					'//stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css',
+					'//use.fontawesome.com/releases/v5.3.1/css/all.css'
 				]
 			]);
 			
-			// disable space removal for the trace stack
-			pf\Config::set('response','minify', 0);
-			
-			// set the title or the error
-			$this->Title = $this->Exception->getCode() . ', ' . pf\Locales::get($this->Exception->getMessage());
-			
-			// add a bootstrap table view the view, with the full trace !
-			$this->Trace = $this->Exception;
-			
 			// error is of type forbidden/bad request
-			if($this->Exception->getCode() >= 400 && $this->Exception->getCode() <= 403) {
+			if(
+				$this->Exception->getCode() >= 400 && 
+				$this->Exception->getCode() <= 403
+			) {
 				$this->icon = 'fa fa-ban';
 			}
 			// error is of type internal error
-			elseif($this->Exception->getCode() >= 500 && $this->Exception->getCode() <= 599) {
+			elseif(
+				$this->Exception->getCode() >= 500 && 
+				$this->Exception->getCode() <= 599
+			) {
 				$this->icon = 'fa fa-bug';
+			}
+			// error is not found
+			elseif(
+				$this->Exception->getCode() == 404
+			) {
+				$this->icon = 'fa fa-exclamation-circle';
 			}
 			// any other type of errors
 			else {
-				$this->icon = 'fa fa-warning';
+				$this->icon = 'fa fa-exclamation-triangle';
 			}
 
 			// pass to the exception view
