@@ -12,7 +12,8 @@ class HTML {
 		'view'		=>'success', 
 		'database'	=>'danger', 
 		'email'		=>'warning', 
-		'user'		=>'info'
+		'user'		=>'info',
+		'log'		=>'info'
 	];
 
 	public static function getContainer() :\Polyfony\Element {
@@ -43,6 +44,7 @@ class HTML {
 			->adopt(HTML\Routing::getComponent	($data))
 			->adopt(HTML\Queries::getComponent	($data))
 			->adopt(HTML\Emails::getComponent	($data))
+			->adopt(HTML\Logs::getComponent		($data))
 			->adopt(HTML\Security::getComponent	($data));
 
 	}

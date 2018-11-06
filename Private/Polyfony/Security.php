@@ -36,8 +36,10 @@ class Security {
 		// and now we check if we are granted access
 		self::$_granted ?: 
 			self::refuse(
-				(!$module && !$level ? 'You are not authenticated' :  'You do not have sufficient permissions'), 
-				403, false, (!$module && !$level)
+				(!$module && !$level ? 
+					'You are not authenticated' :  
+					'You do not have sufficient permissions'
+				), 403, false, true
 			);
 				
 	}

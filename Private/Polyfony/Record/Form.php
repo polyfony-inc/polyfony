@@ -6,23 +6,27 @@ use Polyfony\Element as Element;
 class Form extends Aware {
 
 	// if filters or validators exist, we can apply default attributes
-	private function deduceAttributes(string $column) {
+	private function deduceAttributes(string $column) :array {
 
 		// attriutes deduced from filters
-		$filters_attributes = self::deduceAttributesFromFilters($column);
-
+		$filters_attributes 	= self::deduceAttributesFromFilters($column);
 		// attriutes deduced from filters
-		$validators_attributes = self::deduceAttributesFromValidators($column);
-
+		$validators_attributes 	= self::deduceAttributesFromValidators($column);
 		// attributes deduced from the database
-		$database_attributes = self::deduceAttributesFromDatabase($column);	
+		$database_attributes 	= self::deduceAttributesFromDatabase($column);	
+		// attributes deduced from the column's content
+		$contents_attributes 	= self::deduceAttributesFromContents($column);	
 
 		// return the deduced attributes
-		return $filters_attributes + $validators_attributes + $database_attributes;
+		return 
+			$filters_attributes + 
+			$validators_attributes + 
+			$database_attributes + 
+			$contents_attributes;
 
 	}
 
-	private function deduceAttributesFromFilters(string $column) {
+	private function deduceAttributesFromFilters(string $column) :array {
 
 		// default attributes
 		$attributes = [];
@@ -47,7 +51,7 @@ class Form extends Aware {
 
 	}
 
-	private function deduceAttributesFromValidators(string $column) {
+	private function deduceAttributesFromValidators(string $column) :array {
 
 		// default attributes
 		$attributes = [];
@@ -57,7 +61,7 @@ class Form extends Aware {
 		$validator = Validator::getValidatorForColumn($column, get_class($this));
 
 		// if specific attributes exist for this filter
-		if(isset(Validator::VALIDATORS_TO_ATTRIBUTES[$validator])) {
+		if(!is_array($validator) && isset(Validator::VALIDATORS_TO_ATTRIBUTES[$validator])) {
 			// get its associated form attributes
 			$attributes += Validator::VALIDATORS_TO_ATTRIBUTES[$validator];
 		} 
@@ -66,7 +70,7 @@ class Form extends Aware {
 
 	}
 
-	private function deduceAttributesFromDatabase(string $column) {
+	private function deduceAttributesFromDatabase(string $column) :array {
 
 		// default attributes
 		$attributes = [];
@@ -79,6 +83,22 @@ class Form extends Aware {
 		if(!$allowed_nulls[$column]) {
 			// add the requried attribute
 			$attributes['required'] = 'required';
+		}
+		
+
+		return $attributes;
+
+	}
+
+	private function deduceAttributesFromContents(string $column) :array {
+
+		// default attributes
+		$attributes = [];
+
+		// if the column contents is an array
+		if(is_array($this->get($column))) {
+			// add the multiple attribute
+			$attributes['multiple'] = 'multiple';
 		}
 
 		return $attributes;
@@ -108,21 +128,24 @@ class Form extends Aware {
 	}
 	
 	// shortcut to generate a preconfigured HTML Form element
-	public function select(string $column, array $list = [], array $options = []) :Element {
+	public function select(
+		string $column, 
+		array $list = [], 
+		array $options = []
+	) :Element {
 		return \Polyfony\Form::select(
 			$this->field($column), 
 			$list, 
 			$this->get($column), 
-			// MERGE OPTION WITH DECUDED ATTRIBUTES 
-			// FROM NULLABLE (required=required)
-			(is_array($this->get($column)) ? 
-				array_merge(['multiple'=>'multiple'],$options) : $options
-			)
+			array_merge(self::deduceAttributes($column), $options)
 		);
 	}
 	
 	// shortcut to generate a preconfigured HTML Form element
-	public function checkbox(string $column, array $options = []) :Element {
+	public function checkbox(
+		string $column, 
+		array $options = []
+	) :Element {
 		return \Polyfony\Form::checkbox(
 			$this->field($column), 
 			$this->get($column), 

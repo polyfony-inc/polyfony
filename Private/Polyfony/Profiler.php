@@ -13,11 +13,17 @@ class Profiler {
 	protected static $_totalMemory;
 	
 	// handles different portions of execution times
-	protected static $_stack = array();
+	protected static $_stack = [];
 
 	// users of ressources
 	const USERS = [
-		'framework', 'controller', 'view', 'database', 'email', 'user'
+		'framework', 
+		'controller', 
+		'view', 
+		'database', 
+		'email', 
+		'user',
+		'log'
 	];
 
 	// important parameters to look for
@@ -53,7 +59,12 @@ class Profiler {
 		
 	}
 	
-	public static function setMarker($name=null, $user=null, $additional_infos=[], $force=false) {
+	public static function setMarker(
+		?string $name = null, 
+		?string $user = null, 
+		?array 	$additional_infos = [], 
+		bool 	$force = false
+	) :string {
 		// profiler is disabled (forcing allows markers to be set before the configuration is made available)
 		if (!Config::get('profiler', 'enable') && !$force) {
 			return false;
@@ -75,7 +86,10 @@ class Profiler {
 		return $name;
 	}
 
-	public static function releaseMarker($name, $force=false) :void {
+	public static function releaseMarker(
+		string 	$name, 
+		?bool 	$force = false
+	) :void {
 
 		if(
 			(

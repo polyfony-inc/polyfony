@@ -13,6 +13,18 @@ class ExceptionController extends Polyfony\Controller {
 		
 		// get the exception
 		$this->Exception = Store\Request::get('exception');
+		// if the exception is not a 404 or a 403 (the most common and non important)
+		if(
+			$this->Exception->getCode() < 401 || 
+			$this->Exception->getCode() > 404
+		) {
+			// log the exception
+			Logger::critical(
+				$this->Exception->getCode() . ' '.
+				$this->Exception->getMessage(), 
+				$this->Exception->getTrace()
+			);
+		}
 		// error occured while requesting something else than html
 		if(!in_array(
 			Response::getType(), 

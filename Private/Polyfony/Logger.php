@@ -2,32 +2,82 @@
 
 namespace Polyfony;
 
+use \Models\Logs as Logs;
+
 class Logger {
 	
+	// plaintext names for each levels
+	const DEBUG 	= 0;
+	const INFO 		= 1;
+	const NOTICE 	= 2;
+	const WARNING 	= 3;
+	const CRITICAL 	= 4;
+
 	// list of level of log messages available
-	private static $_levels = array( 0 => 'info', 1 => 'notice', 2 => 'warning', 3 => 'critical' );
+	const LEVELS = [
+		0 => 'debug',
+		1 => 'info', 
+		2 => 'notice', 
+		3 => 'warning',
+		4 => 'critical'
+	];
 
-	public static function info($message = null) {
+	// css classes
+	const CLASSES = [
+		0 => 'primary',
+		1 => 'info', 
+		2 => 'info', 
+		3 => 'warning',
+		4 => 'danger'
+	];
+
+	const MIN_LEVEL_FOR_EMAIL_NOTIFICATION = 3;
+
+	public static function debug(
+		$message 	= null, 
+		$context 	= null
+	) :void {
 		// forward to the logging method
-		self::log(0, $message);
+		self::log(self::DEBUG, $message, $context);
 	}
 
-	public static function notice($message = null) {
+	public static function info(
+		$message 	= null, 
+		$context 	= null
+	) :void {
 		// forward to the logging method
-		self::log(1, $message);
+		self::log(self::INFO, $message, $context);
 	}
 
-	public static function warning($message = null) {
+	public static function notice(
+		$message 	= null, 
+		$context 	= null
+	) :void {
 		// forward to the logging method
-		self::log(2, $message);
+		self::log(self::NOTICE, $message, $context);
 	}
 
-	public static function critical($message = null) {
+	public static function warning(
+		$message 	= null, 
+		$context 	= null
+	) :void {
 		// forward to the logging method
-		self::log(3, $message);
+		self::log(self::WARNING, $message, $context);
 	}
 
-	private static function log($level, $message) {
+	public static function critical(
+		$message 	= null, 
+		$context 	= null
+	) :void {
+		// forward to the logging method
+		self::log(self::CRITICAL, $message, $context);
+	}
+
+	private static function log(
+		int $level, 
+		$message, 
+		$context = null
+	) :void {
 
 		// if the logger is enabled
 		if(Config::get('logger', 'enable')) {
@@ -35,9 +85,10 @@ class Logger {
 			// prepare the log record with all elements necessary
 			$log = array(
 				'date'			=> date('d/m/y H:i:s'),
-				'level'			=> self::$_levels[$level],
+				'level'			=> self::LEVELS[$level],
 				'id_level'		=> $level,
 				'message'		=> $message,
+				'context'		=> $context,
 				'creation_date'	=> time(),
 				'login'			=> Security::get('login'),
 				'bundle'		=> Router::getCurrentRoute()->bundle,
@@ -48,58 +99,83 @@ class Logger {
 				'agent'			=> Format::truncate(Request::server('HTTP_USER_AGENT'), 256)
 			);
 
+			// if the profiler is enabled
+			if(Config::get('profiler', 'enable')) {
+				// send the log event to the profiler
+				try { self::toProfiler($log); } 
+				catch (Exception $e) {}
+			}
+
 			// if we want to log to a file
-			if(Config::get('logger', 'type') == 'file' && Config::get('logger', 'path')) {
+			if(
+				Config::get('logger', 'type') == 'file' && 
+				Config::get('logger', 'path')
+			) {
 				// format a new line for the log file
-				try { self::toFile($log); } catch (Exception $e) {}
+				try { self::toFile($log); } 
+				catch (Exception $e) {}
 				
 			}
 
 			// if we want to log to the database
 			if(Config::get('logger', 'type') == 'database') {
 				// insert record in the database
-				try { self::toDatabase($log); } catch (Exception $e) {}
+				try { self::toDatabase($log); } 
+				catch (Exception $e) {}
 			}
 
-			// an email reporting address is set and level is above 2
-			if(Config::get('logger', 'mail') && $level > 2) {
+			// an email reporting address is set and level is above 3
+			if(Config::get('logger', 'mail') && $level > self::MIN_LEVEL_FOR_EMAIL_NOTIFICATION) {
 				// send an email notice
-				try { self::toMail($log); } catch (Exception $e) { echo $e; }
+				try { self::toMail($log); } 
+				catch (Exception $e) { echo $e; }
 			}
 
 		}
 
 	}
 
-	private static function toFile($log) {
+	private static function toProfiler(	array $log ) :void {
+
+		// place a marker and auto release
+		Profiler::releaseMarker(
+				Profiler::setMarker(
+				$log['message'],
+				'log',
+				$log
+			)
+		);
+
+	}
+
+	private static function toFile(	array $log ) :void {
+		// add the context to the message
+		$log['message'] .= ' '.json_encode($log['context']);
 		// format the log
-		unset($log['creation_date'], $log['id_level']);
+		unset($log['creation_date'], $log['id_level'], $log['context']);
+		// add the debug informations
 		// and save it
 		file_put_contents(Config::get('logger', 'path'), implode("\t", $log) . "\n", FILE_APPEND);
 	}
 
-	private static function toDatabase($log) {
-		// format the log
-		unset($log['date'], $log['level']);
+	private static function toDatabase(	array $log ) :void {
+		// add the context to the message
+		$log['message'] .= ' '.json_encode($log['context']);
+		// remove useless element
+		unset($log['date'], $log['level'], $log['context']);
 		// and insert it
-		Database::query()
-		->insert($log)
-		->into('Logs')
-		->execute();
+		Logs::create($log);
 	}
 
-	private static function toMail($log) {
-		// format the log
-		$body	 = var_export($log, true);
-		$subject = 'Logger::' . self::$_levels[$log['id_level']] . "({$log['message']})";
-		// and send it
-		$mail = new Mail();
-		$mail->to(Config::get('logger', 'mail'));
-		$mail->title('Logger');
-		$mail->format('text');
-		$mail->subject($subject);
-		$mail->body($body);
-		$mail->send();
+	private static function toMail(	array $log ) :void {
+		// format and send and email with the log element
+		(new Mail())
+			->to(Config::get('logger', 'mail'))
+			->title('Logger')
+			->format('text')
+			->subject(ucfirst(self::LEVELS[$log['id_level']]) . " : {$log['message']}")
+			->body(var_export($log, true))
+			->send();
 	}
 	
 }

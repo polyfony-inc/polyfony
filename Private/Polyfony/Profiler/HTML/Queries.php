@@ -34,7 +34,7 @@ class Queries {
 				$title_prefix			= new \Polyfony\Element('strong', 	['text'=>"Query #{$queries_count} ",'class'=>'text-danger']);
 				$title 					= new \Polyfony\Element('span', 	['text'=>$element['informations']['Query']->getQuery()]);
 				$parameters_container 	= new \Polyfony\Element('div', 		['style'=>'padding-top:0px']);
-				$parameters 			= new \Polyfony\Element('code',		['class'=>'text-success','text'=>json_encode($element['informations']['Query']->getValues(),JSON_PRETTY_PRINT)]);
+				$parameters 			= new \Polyfony\Element('code',		['class'=>'text-success','html'=>self::getFormattedParameters($element)]);
 
 				$queries[$queries_count] = $card
 					->adopt($execution_memory)
@@ -67,6 +67,20 @@ class Queries {
 
 		return $queries_modal;
 
+	}
+
+	public static function getFormattedParameters(array $element) : string {
+
+		return nl2br(
+			str_replace(
+				' ',
+				'&nbsp;',
+				json_encode(
+					$element['informations']['Query']->getValues(),
+					JSON_PRETTY_PRINT
+				)
+			)
+		);
 	}
 
 }
