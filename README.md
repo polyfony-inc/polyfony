@@ -932,6 +932,25 @@ The database's structure is available by dumping the SQLite Database `Private/St
 The PDO driver can be changed to `MySQL`, `Postgres` or `ODBC` in `Private/Config/Config.ini`. **There is no `Query` object support for Postgres and ODBC.**
 
 
+## Logging 
+
+The framework exposes a **Logger class**, with the following **static** methods
+* `debug(string $message, ?mixed $context) :void`
+* `info(string $message, ?mixed $context) :void`
+* `notice(string $message, ?mixed $context) :void`
+* `warning(string $message, ?mixed $context) :void`
+* `critial(string $message, ?mixed $context) :void`
+
+The logs can be sent to a file, or to your database (see `Config.ini [logger][mail]`).
+Critital message can also be send automatically via email (see `Config.ini [logger][type]`.  
+Logged message/objects/array are also automatically be made immediately available in the Profiler. 
+
+Example
+```php
+Logger::notice('Something not too worrying just happened');
+Logger::debug('Someone did something', $some_kind_of_object);
+Logger::critical('Failed to contact remote API', $api_handler);
+```
 
 ## Updating the framework
 
