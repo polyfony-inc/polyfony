@@ -5,6 +5,7 @@ use Polyfony\Config as Config;
 Use Polyfony\Response as Response;
 use Polyfony\Locales as Locales;
 use Polyfony\Store as Store;
+use Polyfony\Logger as Logger;
 // new example class to realize tests
 class ExceptionController extends Polyfony\Controller {
 	

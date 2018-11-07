@@ -5,15 +5,36 @@
 	<h4>
 		Core features
 	</h4>
-	<a class="btn btn-warning btn-md" href="/login/" role="button"/>Login form</a> 
-	<a class="btn btn-warning btn-md" href="/demo/secure/" role="button"/>Secured page</a> 
-	<a class="btn btn-warning btn-md" href="/demo/locales/" role="button"/>Locales object</a> 
-	<a class="btn btn-warning btn-md" href="/demo/database/" role="button"/>Database object</a> 
-	<a class="btn btn-warning btn-md" href="/demo/response/" role="button"/>Response object</a> 
-	<a class="btn btn-warning btn-md" href="/demo/request/" role="button"/>Request object</a> 
-	<a class="btn btn-warning btn-md" href="/demo/router/" role="button"/>Router object</a> 
-	<a class="btn btn-warning btn-md" href="/demo/exception/" role="button"/>Exception</a> 
-	<a class="btn btn-warning btn-md" href="/demo/json/" role="button"/>JSON</a><br /><br />
+	<a class="btn btn-warning btn-md" href="/login/" role="button"/>
+		<strong>Login</strong> form
+	</a> 
+	<a class="btn btn-warning btn-md" href="/demo/secure/" role="button"/>
+		<strong>Secured</strong> page
+	</a> 
+	<a class="btn btn-warning btn-md" href="/demo/locales/" role="button"/>
+		<strong>Locales</strong> object
+	</a> 
+	<a class="btn btn-warning btn-md" href="/demo/database/" role="button"/>
+		<strong>Database</strong> object
+	</a> 
+	<a class="btn btn-warning btn-md" href="/demo/response/" role="button"/>
+		<strong>Response</strong> object
+	</a> 
+	<a class="btn btn-warning btn-md" href="/demo/request/" role="button"/>
+		<strong>Request</strong> object
+	</a> 
+	<a class="btn btn-warning btn-md" href="/demo/router/" role="button"/>
+		<strong>Router</strong> object
+	</a> 
+	<a class="btn btn-warning btn-md" href="/demo/logs/" role="button"/>
+		<strong>Logs</strong> object
+	</a> 
+	<a class="btn btn-warning btn-md" href="/demo/exception/" role="button"/>
+		<strong>Exception</strong>
+	</a> 
+	<a class="btn btn-warning btn-md" href="/demo/json/" role="button"/>
+		<strong>JSON</strong>
+	</a><br /><br />
 	<h4>
 		Vendor packages that are "<code>suggested</code>" with Polyfony 
 	</h4>

@@ -8,8 +8,10 @@ use Polyfony\Element as Element;
 use Polyfony\Router as Router;
 use Polyfony\Form as Form;
 use Polyfony\Config as Config;
+use Polyfony\Logger as Logger;
 use Polyfony\Form\Captcha as Captcha;
 use Polyfony\Form\Token as Token;
+use Models\Accounts as Accounts;
 
 // new example class to realize tests
 class DemoController extends pf\Controller {
@@ -265,13 +267,38 @@ class DemoController extends pf\Controller {
 	public function localesAction() {
 		$this->view('Locales');		
 	}
+
+	public function logsAction() {
+
+		Logger::debug('This is a log event that will not be logged in Prod, using default parameters');
+
+		Logger::info('This is a generic purpose info level log');
+
+		Logger::notice(
+			'Creating a dummy account, but without saving it', 
+			(new Accounts)
+				->set(['login'=>'test@test.com'])
+		);
+
+		Logger::warning(
+			'Kind of serious log event, such as someone trying to log in with a wrong password',
+			908729038
+		);
+
+		Logger::critical(
+			'Now a hardcore serious issue',
+			[['tri','fon','lehérisson'],['flip','flap','lagirafe']]
+		);
+
+		$this->view('Logs');		
+	}
 	
 	public function databaseAction() {
 		
 		$this->MinPasswordLength = 6;
 
 		// retrieve specific account
-		$this->RootAccount = new Models\Accounts(1);
+		$this->RootAccount = new Accounts(1);
 
 		if(Request::isPost()) {
 
@@ -314,7 +341,7 @@ class DemoController extends pf\Controller {
 		}
 
 		// demo query
-		$this->Accounts = Models\Accounts::_select()
+		$this->Accounts = Accounts::_select()
 			->limitTo(0,5)
 			->execute();
 		
@@ -326,10 +353,10 @@ class DemoController extends pf\Controller {
 		// 	->execute();
 
 		// demo query from a model
-		$this->AnotherList = Models\Accounts::all();
-		$this->AnotherList = Models\Accounts::recentlyCreated();
-		$this->AnotherList = Models\Accounts::disabled();
-		$this->AnotherList = Models\Accounts::withErrors();
+		$this->AnotherList = Accounts::all();
+		$this->AnotherList = Accounts::recentlyCreated();
+		$this->AnotherList = Accounts::disabled();
+		$this->AnotherList = Accounts::withErrors();
 		
 		// simple view	
 		$this->view('Database');		

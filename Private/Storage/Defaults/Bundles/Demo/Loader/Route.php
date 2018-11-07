@@ -23,6 +23,7 @@ Polyfony\Router::map('/demo/:type/', 'Demo/Demo@{type}', 'demo')
 				'response',
 				'exception',
 				'json',
+				'logs',
 				'router',
 				'vendorBootstrap',
 				'vendorGoogle',

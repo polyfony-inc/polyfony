@@ -79,31 +79,19 @@ class Logger {
 		$context = null
 	) :void {
 
-		// if the logger is enabled
-		if(Config::get('logger', 'enable')) {
+		// if the logger is enabled and the log event level is supposed to be logged
+		if(
+			Config::get('logger', 'enable') && 
+			$level >= Config::get('logger', 'level')
+		) {
 
-			// prepare the log record with all elements necessary
-			$log = array(
-				'date'			=> date('d/m/y H:i:s'),
-				'level'			=> self::LEVELS[$level],
-				'id_level'		=> $level,
-				'message'		=> $message,
-				'context'		=> $context,
-				'creation_date'	=> time(),
-				'login'			=> Security::get('login'),
-				'bundle'		=> Router::getCurrentRoute()->bundle,
-				'controller'	=> Router::getCurrentRoute()->controller,
-				'method'		=> Request::isPost() ? 'post' : 'get',
-				'url'			=> Format::truncate(Request::getUrl(), 256),
-				'ip'			=> Format::truncate(Request::server('REMOTE_ADDR'), 15),
-				'agent'			=> Format::truncate(Request::server('HTTP_USER_AGENT'), 256)
-			);
+			// format the log event
+			$log = self::formatLogMessage($level, $message, $context);
 
 			// if the profiler is enabled
 			if(Config::get('profiler', 'enable')) {
 				// send the log event to the profiler
-				try { self::toProfiler($log); } 
-				catch (Exception $e) {}
+				try { self::toProfiler($log); } catch (Exception $e) {}
 			}
 
 			// if we want to log to a file
@@ -112,26 +100,50 @@ class Logger {
 				Config::get('logger', 'path')
 			) {
 				// format a new line for the log file
-				try { self::toFile($log); } 
-				catch (Exception $e) {}
-				
+				try { self::toFile($log); } catch (Exception $e) {}
 			}
 
 			// if we want to log to the database
 			if(Config::get('logger', 'type') == 'database') {
 				// insert record in the database
-				try { self::toDatabase($log); } 
-				catch (Exception $e) {}
+				try { self::toDatabase($log); } catch (Exception $e) {}
 			}
 
 			// an email reporting address is set and level is above 3
-			if(Config::get('logger', 'mail') && $level > self::MIN_LEVEL_FOR_EMAIL_NOTIFICATION) {
+			if(
+				Config::get('logger', 'mail') && 
+				$level > self::MIN_LEVEL_FOR_EMAIL_NOTIFICATION
+			) {
 				// send an email notice
-				try { self::toMail($log); } 
-				catch (Exception $e) { echo $e; }
+				try { self::toMail($log); } catch (Exception $e) {}
 			}
 
 		}
+
+	}
+
+	// format a log message with proper context and additionnal informations
+	private static function formatLogMessage(
+		int $level, 
+		$message, 
+		$context = null
+	) :array {
+
+		return [
+			'date'			=> date('d/m/y H:i:s'),
+			'level'			=> self::LEVELS[$level],
+			'id_level'		=> $level,
+			'message'		=> $message,
+			'context'		=> $context,
+			'creation_date'	=> time(),
+			'login'			=> Security::get('login'),
+			'bundle'		=> Router::getCurrentRoute()->bundle,
+			'controller'	=> Router::getCurrentRoute()->controller,
+			'method'		=> Request::isPost() ? 'post' : 'get',
+			'url'			=> Format::truncate(Request::getUrl(), 256),
+			'ip'			=> Format::truncate(Request::server('REMOTE_ADDR'), 15),
+			'agent'			=> Format::truncate(Request::server('HTTP_USER_AGENT'), 256)
+		];
 
 	}
 

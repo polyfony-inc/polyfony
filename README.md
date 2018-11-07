@@ -935,15 +935,18 @@ The PDO driver can be changed to `MySQL`, `Postgres` or `ODBC` in `Private/Confi
 ## Logging 
 
 The framework exposes a **Logger class**, with the following **static** methods
-* `debug(string $message, ?mixed $context) :void`
-* `info(string $message, ?mixed $context) :void`
-* `notice(string $message, ?mixed $context) :void`
-* `warning(string $message, ?mixed $context) :void`
-* `critial(string $message, ?mixed $context) :void`
+* `debug(string $message, ?mixed $context) :void` (level 0)
+* `info(string $message, ?mixed $context) :void` (level 1)
+* `notice(string $message, ?mixed $context) :void` (level 2)
+* `warning(string $message, ?mixed $context) :void` (level 3)
+* `critial(string $message, ?mixed $context) :void` (level 4)
 
-The logs can be sent to a file, or to your database (see `Config.ini [logger][mail]`).
-Critital message can also be send automatically via email (see `Config.ini [logger][type]`.  
-Logged message/objects/array are also automatically be made immediately available in the Profiler. 
+The logs can be sent to a file, or to your database (see `Config.ini [logger][type]`). 
+The minimum level to log is configurable (see `Config.ini [logger][level]`) by default, `Dev` environement is configured to log from the `0` level, `Prod` environment is configured to log from the `1` level.
+Critital level logs (`4`) can also be sent automatically via email (see `Config.ini [logger][mail]`. 
+
+**Logged message/objects/array are also automatically made available in the Profiler** 
+
 
 Example
 ```php
