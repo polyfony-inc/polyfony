@@ -155,7 +155,7 @@ class Router {
 			}
 		}
 		// marker
-		Profiler::releaseMarker('Router.route', 'framework');
+		Profiler::releaseMarker('Router.route');
 		// if no match is found and we don't have an error route to fallback on
 		if(!isset($matching_route)) {
 			// throw a native exception since there is no cleaner alternative

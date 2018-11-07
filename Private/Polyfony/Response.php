@@ -79,7 +79,7 @@ class Response {
 		// set the default type
 		self::setType(			Config::get('response', 'default_type'));
 		// marker
-		Profiler::releaseMarker('Response.init', 'framework');
+		Profiler::releaseMarker('Response.init');
 		
 	}
 

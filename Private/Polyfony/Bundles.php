@@ -24,7 +24,7 @@ class Bundles {
 		Router::includeBundlesRoutes(self::$_routes);
 
 		// marker
-		Profiler::releaseMarker('Bundles.init', 'framework');
+		Profiler::releaseMarker('Bundles.init');
 
 	}
 	
