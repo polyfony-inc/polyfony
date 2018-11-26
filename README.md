@@ -147,12 +147,10 @@ Models\Accounts::create([
 ###### Retrieve the `login` and `id` of 5 accounts with `id_level` 1 that logged in, in the last 24h
 ```php
 // demo query
-$accounts = Database::query()
-	->select(array('login','id'))
-	->from('Accounts')
-	->where(array(
+$accounts = Accounts::_select(['login','id'])
+	->where([
 		'id_level'=>1
-	))
+	])
 	->whereHigherThan('last_login_date',time()+24*3600)
 	->limitTo(0,5)
 	->execute();
@@ -315,7 +313,7 @@ class User extends Polyfony\Record {
 }
 ```
 ```php
-<?= (new Models\Users())->input('user_login'); ?>
+<?= (new Models\Users->input('user_login'); ?>
 ```
 ```html
 <input name="Users[user_login]" type="email" maxlength="128" value="" />
@@ -685,7 +683,7 @@ Store\Database
 Store\Memcache
 Store\Request
 ```
-The last on stores your key-value only for the time of the current request.
+The last one stores your key-value only for the time of the current request.
 Some of those engines have more capabilities than others, but all implement the basic interface and can store both variables, arrays, or raw data.
 
 ### [Bundle configurations](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonyconfig)
@@ -1000,7 +998,7 @@ Polyfony has been designed to be fast, no compromise (> 2000 req/s).
 If implementating a « convenience » tool/function into the framework was to cost a global bump in execution time, it is either implemented in a more efficient manner, or not implemented at all.
 
 ## Security
-The codebase is small, straightforward and abundantly commented. It's audited using SensioInsight, RIPS, and Sonar.
+The codebase is small, straightforward and abundantly commented. It's audited using SensioInsight, CodeClimate, RIPS, and Sonar.
 
 ## Coding Standard
 Polyfony2 follows the PSR-0, PSR-1, PSR-4 coding standards. It does not respect PSR-2, as tabs are used for indentation.

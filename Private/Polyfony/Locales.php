@@ -120,17 +120,26 @@ class Locales {
 		
 	}
 	
-	public static function get($key, $language=null) {
+	public static function get($key, $language=null, ?array $variables=[]) {
 	
 		// if locales are not loaded yet
 		self::$_locales !== null ?: self::init();
-		
 		// if forced language is set
 		$language = $language !== null ? $language : self::$_language;
-		
 		// return the key in the right local or turn the key if the locale does not exist
-		return(isset(self::$_locales[$language][$key]) ? self::$_locales[$language][$key] : $key);
-		
+		$localized_string = isset(self::$_locales[$language][$key]) ? 
+			self::$_locales[$language][$key] : $key;
+		// replace each variables
+		foreach($variables as $variable_key => $variable_value) {
+			$localized_string = str_replace(
+				$variable_key, 
+				self::get($variable_value, $language), 
+				$localized_string
+			);
+		}
+		// returned the consolidated locale 
+		return $localized_string;
+
 	}
 	
 }

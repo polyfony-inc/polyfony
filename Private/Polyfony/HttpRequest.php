@@ -21,9 +21,16 @@ class HttpRequest {
 	private $data;
 	private $cookies;
 	private $response;
+	private $throwException;
 	
 	// the constructor
-	public function __construct($url='/', $method='GET', $timeout=60, $retry=3) {
+	public function __construct(
+		string 	$url 				= null, 
+		string 	$method 			= 'GET', 
+		int 	$timeout 			= 60, 
+		int 	$removed_feature 	= 0,
+		bool 	$throwException 	= false
+	) {
 
 		// this is now deprecated, will probably be removed in a future release
 		trigger_error(
@@ -35,89 +42,125 @@ class HttpRequest {
 		$this->url 				= $url;
 		$this->method 			= $method;
 		$this->timeout 			= $timeout;
-		$this->retry 			= $retry;
-		$this->data 			= array();
-		$this->cookies 			= array();
+		$this->data 			= [];
+		$this->cookies 			= [];
 
 		// response initialization
-		$this->response 		= array(
+		$this->response 		= [
 			'success'	=> false,
-			'headers'	=> array(),
+			'headers'	=> [],
 			'content'	=> null
-		);
+		];
 
 		// new curl instance
 		$this->curl 			= curl_init();
 
 	}
 
+	public function throwException(
+		bool $do_we_throw_exception = true
+	) :self {
+		// set directly
+		$this->throwException = $do_we_throw_exception;
+		// return self
+		return $this;
+	}
+
 	// set the destination url
-	public function url($url) {
+	public function url($url) :self {
 		// set directly the url
 		$this->url = $url;
 		// return self
-		return($this);
+		return $this;
 	}
 
 	// set a get/post parameter
-	public function data($key, $value=null) {
-		// set a value
-		$this->data[$key] = $value;
+	public function data($key, $value=null) :self {
+		// if we have an array of data
+		if(is_array($key)) {
+			// for each of those
+			foreach($key as $index => $value) {
+				// set them
+				$this->data($index, $value);
+			}
+		}
+		else {
+			// set a value
+			$this->data[$key] = $value;
+		}
 		// return self
-		return($this);
+		return $this;
 	}
 
 	// set a file to be posted
-	public function file($key, $path) {
-		// add to the list of files
-		$this->data[$key] = '@'.$path;
+	public function file($key, $path=null) :self {
+		// if we have an array of data
+		if(is_array($key)) {
+			// for each of those
+			foreach($key as $index => $path) {
+				// set them
+				$this->file($index, $path);
+			}
+		}
+		else {
+			// add to the list of files
+			$this->data[$key] = '@'.$path;
+		}
 		// return self
-		return($this);
+		return $this;
 	}
 
 	// set a cookie
-	public function cookie($key, $value) {
-		// set directly a header association
-		$this->cookies[$key] = $value;
+	public function cookie($key, $value) :self {
+		// if we have an array of data
+		if(is_array($key)) {
+			// for each of those
+			foreach($key as $index => $value) {
+				// set them
+				$this->cookie($index, $value);
+			}
+		}
+		else {
+			// add to the list of files
+			$this->cookie[$key] = '@'.$value;
+		}
 		// return self
-		return($this);
+		return $this;
 	}
 
 	// set the method for this request
-	public function method($method) {
+	public function method(string $method) :self {
 		// set the method with case conversion
 		$this->method = strtoupper($method);
 		// return self
-		return($this);
+		return $this;
 	}
 
 	// set the timeout
-	public function timeout($seconds) {
+	public function timeout(int $seconds) :self {
 		// set the timeout
-		$this->timeout = intval($seconds);
+		$this->timeout = $seconds;
 		// return self
-		return($this);
+		return $this;
 	}
 
 	// get shortcut
-	public function get() {
+	public function get() :bool {
 		// set the method
 		$this->method('GET');
 		// send the request
-		return($this->send());
+		return $this->send();
 	}
 
 	// post shortcut
-	public function post() {
+	public function post() :bool {
 		// set the method
 		$this->method('POST');
 		// send the request
-		return($this->send());
+		return $this->send();
 	}
 
-	// build and send the request
-	public function send() {
-
+	private function initializeCurl() :void {
 		// if the method is post
 		if($this->method == 'POST') {
 			// set the post data
@@ -151,39 +194,48 @@ class HttpRequest {
 			// set the cookies
 			curl_setopt($this->curl, CURLOPT_COOKIE, trim($cookies,';'));
 		}
+	}
+
+	private function configureCurl() :void {
 		// bugfix for expectation failed errors
-		curl_setopt($this->curl, CURLOPT_HTTPHEADER, array('Expect:'));
+		curl_setopt($this->curl, CURLOPT_HTTPHEADER, 		['Expect:']);
 		// impersonate the current user agent
-		curl_setopt($this->curl, CURLOPT_USERAGENT, Request::server('HTTP_USER_AGENT'));
+		curl_setopt($this->curl, CURLOPT_USERAGENT, 		Request::server('HTTP_USER_AGENT'));
 		// set the url
-		curl_setopt($this->curl, CURLOPT_URL, $this->url);
+		curl_setopt($this->curl, CURLOPT_URL, 				$this->url);
 		// set the timeout for this request
-		curl_setopt($this->curl, CURLOPT_CONNECTTIMEOUT, $this->timeout);
+		curl_setopt($this->curl, CURLOPT_CONNECTTIMEOUT, 	$this->timeout);
 		// get the response as a string
-		curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, true); 
+		curl_setopt($this->curl, CURLOPT_RETURNTRANSFER, 	true); 
 		// allow curl to follow redirects
-		curl_setopt($this->curl, CURLOPT_FOLLOWLOCATION, true);
+		curl_setopt($this->curl, CURLOPT_FOLLOWLOCATION, 	true);
 		// soften SSL rules
-		curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, false); 
+		curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, 	false); 
 		// soften SSL rules
-		curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, false);  
+		curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, 	false);  
 		// require the response headers
-		curl_setopt($this->curl, CURLOPT_HEADER, true);
+		curl_setopt($this->curl, CURLOPT_HEADER, 			true);
 		// limit the number of redirections
-		curl_setopt($this->curl, CURLOPT_MAXREDIRS, 5);
+		curl_setopt($this->curl, CURLOPT_MAXREDIRS, 		5);
+	}
+
+	private function executeCurl() {
+		// set a marker id
+		$marker_id = 'HttpRequest.'.uniqid();
+		// place the marker
+		Profiler::setMarker($marker_id, 'user');
 		// send the actual http request and put the content at its rightful place
 		$response = curl_exec($this->curl); 
 		// set the response status
 		$this->response['success'] = $response ? true : false;
-		// if the request failed and we still have some retry
-		if(!$this->response['success'] && $this->retry > 0) {
-			// sleep for a while
-			sleep(2);
-			// decrement
-			$this->retry -= 1;
-			// try again
-			$this->send();
-		}
+		// release the marker
+		Profiler::releaseMarker($marker_id);
+		// return the response
+		return $response;
+	}
+
+	private function parseCurl($response) :bool {
+
 		// if request succeeded
 		if($this->response['success']) {
 			// get the size of the headers
@@ -192,10 +244,9 @@ class HttpRequest {
 			$this->response['headers'] = substr($response, 0, $header_size);
 			// get body portion from the response
 			$this->response['content'] = substr($response, $header_size);
-			// remove the raw response
-			unset($response, $header_size);
 			// success now depends on more than just getting a response, we need a 200 OK
-			$this->response['success'] = stripos($this->response['headers'],'200 OK') !== false ? true : false;
+			$this->response['success'] = stripos($this->response['headers'],'200 OK') !== false ? 
+				true : false;
 			// format the headers properly
 			$this->response['headers'] = explode("\n",$this->response['headers']);
 			// for each header
@@ -210,48 +261,86 @@ class HttpRequest {
 					unset($this->response['headers'][$index]);
 				}
 			}
+			// if the response was compressed
+			if($this->getHeader('content-encoding') == 'gzip') {
+				// decode gzip
+				$this->response['content'] = gzdecode($this->response['content']);
+			}
+		}
+		// exception handling base on status code this time
+		if(!$this->response['success']) {
+			// if we are allowed to throw exception
+			if($this->throwException) {
+				// throw an exception describing the issue
+				Throw new Exception(
+				//	'The remote request failed ('.$this->getHeader(0).')', 
+					'The HttpRequest to '.$this->url.' #'.
+					Keys::generate($this).' failed ('.$this->getHeader(0).')', 
+					502
+				);
+			}
+			// we are not allowed to throw exception, simply log
+			else {
+				Logger::warning(
+					'The HttpRequest to '.$this->url.' #'.
+					Keys::generate($this).' failed ('.$this->getHeader(0).')', 
+					$this->getBody()
+				);
+			}
+			
 		}
 		// return the request status as boolean
-		return($this->response['success']);
+		return $this->response['success'];
+
 	}
 
-	public function getBody($raw = false) {
-		// if we want the raw response
-		if($raw) {
-			// return as is
-			return($this->response['content']);
-		}
-		elseif(stripos($this->getHeader('content-type'),'application/json') === 0) {
+	// build and send the request
+	public function send() :bool {
+
+		// initialize
+		$this->initializeCurl();
+		$this->configureCurl();
+		
+		// run & parse
+		return $this->parseCurl($this->executeCurl());
+		
+	}
+
+	public function getBody(bool $raw = false) {
+		// if we got json
+		if(stripos($this->getHeader('content-type'),'application/json') === 0 && !$raw) {
 			// decode and return 
-			return(json_decode($this->response['content'], true));
+			return json_decode($this->response['content'], true);
 		}
-		elseif(stripos($this->getHeader('content-type'),'application/xml') === 0) {
+		// if we got xml
+		elseif(stripos($this->getHeader('content-type'),'application/xml') === 0 && !$raw) {
 			// decode and return 
-			return(new \SimpleXMLElement($this->response['content']));
+			return new \SimpleXMLElement($this->response['content']);
 		}
 		// the content does not require transformation
 		else {
 			// return as is
-			return($this->getBody(true));
+			return $this->response['content'];
 		}
 	}
 
 	// get a specific response header
-	public function getHeader($key) {
+	public function getHeader(string $key) {
 		// return the header of null if missing
-		return(isset($this->response['headers'][$key]) ? $this->response['headers'][$key] : null);
+		return isset($this->response['headers'][$key]) ? 
+			$this->response['headers'][$key] : null;
 	}
 
 	// get directly the type of the response
-	public function getType() {
+	public function getType() :?string {
 		// return the content type of the reponse or null
-		return($this->getHeader('Content-Type') ?: null);
+		return $this->getHeader('Content-Type') ?: null;
 	}
 
 	// get the status of the response
-	public function getStatus() {
+	public function getStatus() :bool {
 		// return the status of the request as a boolean
-		return($this->response['success']);
+		return $this->response['success'];
 	}
 
 }
