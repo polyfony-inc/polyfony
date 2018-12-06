@@ -52,6 +52,8 @@ class Response {
 		'json'		=>'application/json',
 		'file'		=>'application/octet-stream',
 		'csv'		=>'text/csv',
+		'xls'		=>'application/vnd.ms-excel',
+		'xlsx'		=>'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 		'xml'		=>'text/xml',
 		'js'		=>'text/javascript',
 		'css'		=>'text/css',
@@ -296,6 +298,22 @@ class Response {
 			$headers['Content-Type'] = $content_type;
 			// detect the modification time of the file
 			self::$_modification = filemtime(self::$_content);
+		}
+		// elseif the type is a csv (from an array)
+		elseif(self::$_type == 'csv') {
+			// transform into a proper csv file (we could get the vnd... as returned argument)
+			list(
+				self::$_content, 
+				self::$_charset
+			) = Response\CSV::buildAndGetDocument(self::$_content);
+		}
+		elseif(self::$_type == 'xlsx') {
+			// transform into a proper xlsx file
+			self::$_content = Response\XLSX::buildAndGetDocument(self::$_content);
+		}
+		elseif(self::$_type == 'xls') {
+			// transform into a proper xls file
+			self::$_content = Response\XLS::buildAndGetDocument(self::$_content);
 		}
 		// in case we are outputing html in any form and obfucation is enabled
 		if(Config::get('response', 'minify') && in_array(self::$_type, array('html', 'html-page'))) {

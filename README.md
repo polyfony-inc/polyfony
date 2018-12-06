@@ -612,8 +612,8 @@ Response\HTML::setLinks([
 ```php
 Response\HTML::setScripts([
 	'//code.jquery.com/jquery-3.3.1.slim.min.js'
-	'/Assets/js/myfile.js'
-])
+	'Shared/myfile.js' // this will import directly from the Bundle/Shared/Assets/Js folder
+]) 
 ```
 
 ###### to add a meta tag
@@ -624,6 +624,47 @@ Response\HTML::setMetas(['google-site-verification'=>'google-is-watching-you'])
 
 Anything that is common to **all** responses, you will find in `Response`.
 **As `links`, `scripts`, and `metas` are specific to HTML `Response`s, those are set in the subnamespace  `Response\HTML`** 
+
+
+#### To output a spreadsheet
+
+You can either output 
+* CSV
+* XLS (Requires phpoffice/spreadsheet)
+* XLSX (Requires phpoffice/spreadsheet) 
+
+```php
+Response::setType('xlsx'); // xls or csv
+Response::setContent([
+	['A','B','C'],
+	[1,2,3],
+	[4,5,6]
+]);
+// Response::setContent(Models\Accounts::_select()->execute());
+Response::download('Accounts.xlsx');
+```
+
+Note that arrays of objects from the database will automatically be converted to arrays.
+
+#### In the case of CSV files
+You can pass (optional) options thru the global configuration.
+
+```ini
+
+[response]
+csv_delimiter = ','
+csv_encloser = '"'
+```
+
+#### In the case of XLSX files
+You can pass an (optional) compatibility option thru the global configuration.
+
+```ini
+
+[phpoffice]
+office_2003_compatibility = 1
+```
+
 
 ###### To cache the result of a reponse (all output type will be cached except `file`)
 *Note that cache has to be enabled in your ini configuration, posted `Request` are not cached, errors `Response` neither.*

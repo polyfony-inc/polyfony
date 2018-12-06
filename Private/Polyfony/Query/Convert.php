@@ -108,6 +108,17 @@ class Convert {
         return([$quote_symbol . $column . $quote_symbol, $placeholder]);
 	}
 
+	public static function convertArrayOfObjectsToPlainArray(array $content) :array {
+		// for each line of the array
+		foreach($content as $index => $something) {
+			// deduce the columns intelligently depending if it's an object or not
+			$content[$index] = is_object($something) ? 
+				array_values($something->__toArray()) : $something;
+		}
+		// returned the enhanced array
+		return $content;
+	}
+
 
 }
 
