@@ -308,7 +308,7 @@ class Query {
 				// secure the column name
 				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
 				// save the condition
-				$this->Conditions[] = "{$this->Operator} ( {$column} <> :{$placeholder} )";
+				$this->Conditions[] = "{$this->Operator} ( {$column} <> :{$placeholder} OR {$column} IS NULL )";
 				// save the value
 				$this->Values[":{$placeholder}"] = $value;
 			}
