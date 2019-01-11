@@ -164,6 +164,8 @@ class Security {
 		Response::setRedirect(Session::get('previously_requested_url'));
 		// remove the temporary url
 		Session::remove('previously_requested_url');
+		// force render now (to prevent further directs)
+		Response::render();
 	}
 	
 	// internal method for generating unique signatures
