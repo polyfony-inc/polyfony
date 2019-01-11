@@ -149,6 +149,11 @@ class Accounts extends \Polyfony\Record {
 		return in_array($module, $this->get('modules_array'));
 	}
 
+	public function setPassword(string $plaintext_password) :self {
+		return $this->set([
+			'password'=>Sec::getPassword($plaintext_password)
+		]);
+	}
 
 }
 

@@ -11,9 +11,10 @@
 
 namespace Polyfony;
 use Polyfony\Store\Cookie as Cook;
+use Polyfony\Store\Session as Session;
 
 class Security {
-	
+
 	// default is not granted
 	protected static $_granted = false;
 	protected static $_account = null;
@@ -138,6 +139,8 @@ class Security {
 			self::$_account = $account;
 			// set the most basic authentication block as being true/passed
 			self::$_granted = true;
+			// if we have an url in the session, redirect to it (and remove it)
+			!Session::has('previously_requested_url') ?: self::redirectToThePreviouslyRequestedUrl();
 		}
 		
 	}
@@ -150,8 +153,17 @@ class Security {
 		!$logout ?: Cook::remove(Config::get('security','cookie'));
 		// we will redirect to the login page
 		!$redirect ?: Response::setRedirect(Config::get('router','login_route'), 3);
+		// save the desired url for further redirection later on
+		Session::put('previously_requested_url', Request::getUrl()); 
 		// trhow a polyfony exception that by itself will stop the execution with maybe a nice exception handler
 		Throw new Exception($message, $code);
+	}
+
+	protected static function redirectToThePreviouslyRequestedUrl() :void {
+		// define the redirection
+		Response::setRedirect(Session::get('previously_requested_url'));
+		// remove the temporary url
+		Session::remove('previously_requested_url');
 	}
 	
 	// internal method for generating unique signatures
