@@ -154,7 +154,7 @@ class Security {
 		// we will redirect to the login page
 		!$redirect ?: Response::setRedirect(Config::get('router','login_route'), 3);
 		// save the desired url for further redirection later on
-		Session::put('previously_requested_url', Request::getUrl()); 
+		Session::put('previously_requested_url', Request::getUrl(), true); 
 		// trhow a polyfony exception that by itself will stop the execution with maybe a nice exception handler
 		Throw new Exception($message, $code);
 	}
