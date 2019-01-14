@@ -420,6 +420,13 @@ class Response {
 		self::render();
 	}
 
+	public static function previous(?int $redirection_after_delay = 0) :void {
+		// set the redirection to the previous page
+		self::setRedirect(Request::server('HTTP_REFERER'), $redirection_after_delay);
+		// prevent further instruction processing
+		self::render();
+	}
+
 }
 
 ?>
