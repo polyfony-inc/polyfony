@@ -26,13 +26,14 @@ use Polyfony\Security as Sec;
 				<span class="<?= $this->icon; ?>"></span> 
 				<?= Loc::get($this->Exception->getMessage()); ?>
 			</h1>
+			<?php if($this->Exception->getCode() < 401 || $this->Exception->getCode() > 404): ?>
 			<div class="">
 				<a href="#" class="btn btn-warning" onclick="reportIncident()">
 					<span class="fa fa-send"></span> 
-					<?= Loc::get('Envoyer cet incident à l\'équipe technique'); ?> 
+					<?= Loc::get('Send_event_to_tech_support'); ?> 
 				</a> 
 				<a href="#" class="btn btn-outline-secondary" onclick="document.getElementById('trace').style.display='block';">
-					<?= Loc::get('Détails techniques'); ?> 
+					<?= Loc::get('Technical_details'); ?> 
 					<span class="fa fa-caret-down"></span>
 				</a>
 			</div>
@@ -64,6 +65,7 @@ User : <?= Sec::get('id'); ?>
 Trace : 
 <?= $this->Exception->getTraceAsString(); ?>
 </textarea>
+<?php endif; ?>
 <script type="text/javascript">
 function reportIncident() {
 

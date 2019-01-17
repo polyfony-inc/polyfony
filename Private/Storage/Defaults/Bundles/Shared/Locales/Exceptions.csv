@@ -1,0 +1,10 @@
+key	fr	en
+Send_event_to_tech_support	Envoyer à l'équipe technique	Report to tech team
+Technical_details	Détails techniques	Technical details
+You do not have sufficient permissions	Vous n'êtes pas identifié ou n'avez pas les privilèges suffisants	You are not logged-in or don't have enough privileges
+Account does not exist or is disabled	Ce compte n'existe pas ou est désactivé (Veuillez vérifier que votre email est saisi correctement)	This account does not exist or is disabled (Please check that your email address has been entered correctly)
+Wrong password	Mot de passe incorrect (Veuillez le vérifier ou, le ré-initialiser)	Incorrect password (Please check it or reset it)
+Polyfony/Form/Token::enforce() missing Token (CSRF)	Le jeton de sécurité du formulaire est absent	The security token is missing
+Polyfony/Form/Token::enforce() invalid Token (CSRF)	Le formulaire que vous avez utilisé a expiré, veuillez recharger la page et essayer à nouveau.	The form you used has expired, please reload the page and try again.
+Polyfony/Form/Captcha::enforce() invalid Captcha	Le cryptograme visuel est incorrect	The captacha is invalid
+Polyfony/Form/Captcha::enforce() missing Captcha	Le cryptograme visuel est manquant	The captcha is missing
