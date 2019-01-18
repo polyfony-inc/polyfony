@@ -604,7 +604,7 @@ class Query {
 		// actions of type SELECT & first element
 		if($this->Action == 'SELECT' && $this->First) {
 			$this->Result = isset($this->Result[0]) ? 
-				$this->Result[0] : false;
+				$this->Result[0] : null;
 		}
 	}
 

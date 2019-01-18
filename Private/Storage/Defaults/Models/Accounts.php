@@ -59,44 +59,34 @@ class Accounts extends \Polyfony\Security\Accounts {
 	// retrieve all accounts
 	public static function all() :array {
 
-		return pf\Database::query()
-			->select()
-			->from('Accounts')
+		return self::_select()
 			->execute();
 
 	}
 
 	// that have been created recenlty
 	public static function recentlyCreated($maximum=5) :array {
-		return(\Polyfony\Database::query()
-			->select()
-			->from('Accounts')
-			->orderBy(array('creation_date'=>'DESC'))
+		return self::_select()
+			->orderBy(['creation_date'=>'DESC'])
 			->limitTo(0,$maximum)
-			->execute()
-		);
+			->execute();
 	}
 	
 	// that are disabled
 	public static function disabled() :array {
-		return(\Polyfony\Database::query()
-			->select()
-			->from('Accounts')
-			->where(array('IS_ENABLED'=>'0'))
-			->execute()
-		);
+		return self::_select()
+			->where(['IS_ENABLED'=>'0'])
+			->execute();
 	}
 
 	// accounts that have had issues login in recently
 	public static function withErrors() :array {
 
-		return pf\Database::query()
-			->select()
-			->from('Accounts')
+		return self::_select()
 			->whereNotEmpty('last_failure_date')
 			->whereHigherThan('last_failure_date', time() - self::RECENT_FAILURE )
 			->limitTo(0, 10)
-			->orderBy(array('last_failure_date'=>'DESC'))
+			->orderBy(['last_failure_date'=>'DESC'])
 			->execute();
 
 	}
