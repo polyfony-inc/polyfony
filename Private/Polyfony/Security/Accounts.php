@@ -9,7 +9,7 @@ use Polyfony\Store\Cookie as Cook;
 class Accounts extends \Polyfony\Record {
 
 	// this methods should be moved to Models\Accounts but that would break backward compatiblity
-	public static function getFirstEnabledWithLogin(string $posted_login) {
+	public static function getFirstEnabledWithLogin(string $posted_login) :?Accounts {
 		return \Models\Accounts::_select()
 			->first()
 			->where([
@@ -19,7 +19,7 @@ class Accounts extends \Polyfony\Record {
 			->execute();
 	}
 
-	public static function getFirstEnabledWithNonExpiredSession(string $session_key) {
+	public static function getFirstEnabledWithNonExpiredSession(string $session_key) :?Accounts {
 		return \Models\Accounts::_select()
 			->first()
 			->where([
