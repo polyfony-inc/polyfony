@@ -170,6 +170,8 @@ $accounts = Accounts::_select(['login','id'])
 ->whereEmpty() 			// '' or NULL
 ->whereNotNull() 		// NOT NULL
 ->whereNull() 			// NULL
+->whereGreaterThan() 	// < $value
+->whereLessThan() 		// > $value
 ```
 
 #### Options

@@ -3,66 +3,7 @@
 namespace Polyfony;
 use \PDO;
 
-class Query {
-	
-	// internal attributes
-	protected	$Query;
-	protected	$Values;
-	protected	$Prepared;
-	protected	$Success;
-	protected	$Result;
-	protected	$Action;
-	protected	$Hash;
-	protected	$Quote;
-	
-	// attributes to build a query
-	protected	$Table;
-	protected	$Selects;
-	protected	$Joins;
-	protected	$Operator;
-	protected	$Conditions;
-	protected	$Updates;
-	protected	$Inserts;
-	protected	$Groups;
-	protected	$Order;
-	protected	$Limit;
-
-	// instanciate a new query
-	public function __construct($quote = '') {
-
-		// set the query as being empty for now
-		$this->Query		= null;
-		// set an array to store all values to pass to the prepared query
-		$this->Values		= [];
-		// set the PDO prepare object
-		$this->Prepared		= null;
-		// set the status of the query
-		$this->Success		= false;
-		// set the option to return all results, not only the first
-		$this->First 		= false;
-		// set the result as being empty for no
-		$this->Result		= null;
-		// set the main action (INSERT, UPDATE, DELETE, SELECT or QUERY in case of passthru)
-		$this->Action		= null;
-		// set the unique hash of the query for caching purpose
-		$this->Hash			= null;
-		// set the quote symbol (if any to use for columns)
-		$this->Quote 		= $quote;
-
-		// initialize attributes
-		$this->Object		= 'Record';
-		$this->Table		= null;
-		$this->Operator		= 'AND';
-		$this->Selects		= [];
-		$this->Joins		= [];
-		$this->Conditions	= [];
-		$this->Updates		= [];
-		$this->Inserts		= [];
-		$this->Groups		= [];
-		$this->Order		= [];
-		$this->Limit		= [];
-		
-	}
+class Query extends Query\Conditions {
 	
 	// debugging methods (for the Profiler)
 	public function getQuery() {
@@ -74,7 +15,11 @@ class Query {
 	}
 
 	// passrthu a query with values if needed
-	public function query($query, $values=null, $table=null) {
+	public function query(
+		string $query, 
+		$values=null, 
+		$table=null
+	) {
 		// set the main action
 		$this->action('QUERY');
 		// set the table
@@ -116,61 +61,54 @@ class Query {
 	}
 	
 	// first main method
-	public function select($array=null) {
+	public function select(array $array=[]) {
 		// set the main action
 		$this->action('SELECT');
-		// if the argument passed is an array of columns
-		if(is_array($array)) {
-			// for each column
-			foreach($array as $function_or_index_or_column => $column) {
-				// secure the column name
-				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column, true);
-				// if the key is function_or_index_or_column
-				if(is_numeric($function_or_index_or_column)) {
-					// just select the column
-					$this->Selects[] = $column;
-				}
-				// the key contains a dot, we are trying to create a alias
-				elseif(stripos($function_or_index_or_column, '.') !== false) {
-					// secure the column
-					list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$function_or_index_or_column);
-					// select the column and create an alias
-					$this->Selects[] = "{$column} AS {$placeholder}";
-				}
-				// the key is a SQL function
-				else {
-					// secure the function
-					list($function) = Query\Convert::columnToPlaceholder($this->Quote ,$function_or_index_or_column);
-					// select the column using a function
-					$this->Selects[] = "{$function}({$column}) AS {$function}_{$placeholder}";
-				}
-
-			}	
-		}
-		// return self to the next method
-		return $this;
-	}
-	
-	// alias of update
-	public function set($columns_and_values) {
-		// if provided conditions are an array
-		if(is_array($columns_and_values)) {
-			// for each provided strict condition
-			foreach($columns_and_values as $column => $value) {
-				// secure the column name
-				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-				// save the condition
-				$this->Updates[] = "{$column} = :{$placeholder}";
-				// save the value (converted if necessary)
-				$this->Values[":{$placeholder}"] = Query\Convert::valueForDatabase($column,$value);
+		// for each column
+		foreach($array as $function_or_index_or_column => $column) {
+			// secure the column name
+			list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column, true);
+			// if the key is function_or_index_or_column
+			if(is_numeric($function_or_index_or_column)) {
+				// just select the column
+				$this->Selects[] = $column;
+			}
+			// the key contains a dot, we are trying to create a alias
+			elseif(stripos($function_or_index_or_column, '.') !== false) {
+				// secure the column
+				list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$function_or_index_or_column);
+				// select the column and create an alias
+				$this->Selects[] = "{$column} AS {$placeholder}";
+			}
+			// the key is a SQL function
+			else {
+				// secure the function
+				list($function) = Query\Convert::columnToPlaceholder($this->Quote ,$function_or_index_or_column);
+				// select the column using a function
+				$this->Selects[] = "{$function}({$column}) AS {$function}_{$placeholder}";
 			}
 		}
 		// return self to the next method
 		return $this;
 	}
 	
+	// alias of update
+	public function set(array $columns_and_values) {
+		// for each provided strict condition
+		foreach($columns_and_values as $column => $value) {
+			// secure the column name
+			list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
+			// save the condition
+			$this->Updates[] = "{$column} = :{$placeholder}";
+			// save the value (converted if necessary)
+			$this->Values[":{$placeholder}"] = Query\Convert::valueForDatabase($column,$value);
+		}
+		// return self to the next method
+		return $this;
+	}
+	
 	// second main method
-	public function update($table) {
+	public function update(string $table) {
 		// set the main action
 		$this->action('UPDATE');
 		// set the destination table
@@ -180,20 +118,17 @@ class Query {
 	}
 	
 	// insert data
-	public function insert($columns_and_values) {
+	public function insert(array $columns_and_values) {
 		// set the main action
 		$this->action('INSERT');
-		// check if we have an array
-		if(is_array($columns_and_values)) {
-			// for each column and value
-			foreach($columns_and_values as $column => $value) {
-				// secure the column name
-				list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-				// push the column
-				$this->Inserts[] = $column;
-				// check for automatic conversion and push in place
-				$this->Values[] = Query\Convert::valueForDatabase($column, $value);
-			}
+		// for each column and value
+		foreach($columns_and_values as $column => $value) {
+			// secure the column name
+			list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
+			// push the column
+			$this->Inserts[] = $column;
+			// check for automatic conversion and push in place
+			$this->Values[] = Query\Convert::valueForDatabase($column, $value);
 		}
 		// return self to the next method
 		return $this;
@@ -208,7 +143,7 @@ class Query {
 	}
 	
 	// select the table
-	public function from($table) {
+	public function from(string $table) {
 		// set the table
 		list($this->Table) = Query\Convert::columnToPlaceholder($this->Quote ,$table);	
 		// return self to the next method
@@ -216,7 +151,7 @@ class Query {
 	}
 	
 	// set the type of object that we want to be instanciated
-	public function object($class) {
+	public function object(string $class) {
 		// set the main action
 		$this->Object = $class;
 		// return self to the next method
@@ -224,7 +159,11 @@ class Query {
 	}
 
 	// select another table to join on (implicit INNER JOIN)
-	public function join($table, $match, $against) {
+	public function join(
+		string $table, 
+		string $match, 
+		string $against
+	) {
 		// secure parameters
 		list($table) 	= Query\Convert::columnToPlaceholder($this->Quote ,$table);
 		list($match) 	= Query\Convert::columnToPlaceholder($this->Quote ,$match);
@@ -236,7 +175,11 @@ class Query {
 	}
 
 	// select another table to join on (LEFT JOIN)
-	public function leftJoin($table, $match, $against) {
+	public function leftJoin(
+		string $table, 
+		string $match, 
+		string $against
+	) {
 		// secure parameters
 		list($table) 	= Query\Convert::columnToPlaceholder($this->Quote ,$table);
 		list($match) 	= Query\Convert::columnToPlaceholder($this->Quote ,$match);
@@ -248,7 +191,11 @@ class Query {
 	}
 
 	// select another table to join on (RIGHT JOIN)
-	public function rightJoin($table, $match, $against) {
+	public function rightJoin(
+		string $table, 
+		string $match, 
+		string $against
+	) {
 		// secure parameters
 		list($table) 	= Query\Convert::columnToPlaceholder($this->Quote ,$table);
 		list($match) 	= Query\Convert::columnToPlaceholder($this->Quote ,$match);
@@ -260,7 +207,7 @@ class Query {
 	}
 	
 	// add into for inserts
-	public function into($table) {
+	public function into(string $table) {
 		// set the table
 		list($this->Table) = Query\Convert::columnToPlaceholder($this->Quote ,$table);
 		// return self to the next method
@@ -281,235 +228,38 @@ class Query {
 		return $this;
 	}
 	
-	// add a condition
-	public function where($conditions) {
-		// if provided conditions are an array
-		if(is_array($conditions)) {
-			// for each provided strict condition
-			foreach($conditions as $column => $value) {
-				// secure the column name
-				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-				// save the condition
-				$this->Conditions[] = "{$this->Operator} ( {$column} = :{$placeholder} )";
-				// save the value
-				$this->Values[":{$placeholder}"] = $value;
-			}
-		}
-		// return self to the next method
-		return $this;
-	}
-
-	// add a condition
-	public function whereNot($conditions) {
-		// if provided conditions are an array
-		if(is_array($conditions)) {
-			// for each provided strict condition
-			foreach($conditions as $column => $value) {
-				// secure the column name
-				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-				// save the condition
-				$this->Conditions[] = "{$this->Operator} ( {$column} <> :{$placeholder} OR {$column} IS NULL )";
-				// save the value
-				$this->Values[":{$placeholder}"] = $value;
-			}
-		}
-		// return self to the next method
-		return $this;
-	}
-	
-	// shortcuts
-	public function whereStartsWith($conditions) {
-		// if provided conditions are an array
-		if(is_array($conditions)) {
-			// for each provided strict condition
-			foreach($conditions as $column => $value) {
-				// secure the column name
-				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-				// save the condition
-				$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
-				// save the value
-				$this->Values[":{$placeholder}"] = "{$value}%";
-			}
-		}
-		// return self to the next method
-		return $this;
-	}
-	public function whereEndsWith($conditions) {
-		// if provided conditions are an array
-		if(is_array($conditions)) {
-			// for each provided strict condition
-			foreach($conditions as $column => $value) {
-				// secure the column name
-				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-				// save the condition
-				$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
-				// save the value
-				$this->Values[":{$placeholder}"] = "%$value";
-			}
-		}
-		// return self to the next method
-		return $this;
-	}
-	public function whereContains($conditions) {
-		// if provided conditions are an array
-		if(is_array($conditions)) {
-			// for each provided strict condition
-			foreach($conditions as $column => $value) {
-				// secure the column name
-				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-				// save the condition
-				$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
-				// save the value
-				$this->Values[":{$placeholder}"] = "%{$value}%";
-			}
-		}
-		// return self to the next method
-		return $this;
-	}
-	public function whereMatch($conditions) {	
-		// if provided conditions are an array
-		if(is_array($conditions)) {
-			// for each provided strict condition
-			foreach($conditions as $column => $value) {
-				// secure the column name
-				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-				// save the condition
-				$this->Conditions[] = "{$this->Operator} ( {$column} MATCH :{$placeholder} )";
-				// save the value
-				$this->Values[":{$placeholder}"] = $value;
-			}
-		}
-		// return self to the next method
-		return $this;
-	}
-	public function whereHigherThan($conditions) {
-		// if provided conditions are an array
-		if(is_array($conditions)) {
-			// for each provided strict condition
-			foreach($conditions as $column => $value) {
-				// secure the column name
-				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-				// save the condition
-				$this->Conditions[] = "{$this->Operator} ( {$column} > :{$placeholder} )";
-				// save the value
-				$this->Values[":{$placeholder}"] = $value;
-			}
-		}
-		// return self to the next method
-		return $this;
-	}
-	public function whereLowerThan($conditions) {
-		// if provided conditions are an array
-		if(is_array($conditions)) {
-			// for each provided strict condition
-			foreach($conditions as $column => $value) {
-				// secure the column name
-				list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-				// save the condition
-				$this->Conditions[] = "{$this->Operator} ( {$column} < :{$placeholder} )";
-				// save the value
-				$this->Values[":{$placeholder}"] = $value;
-			}
-		}
-		// return self to the next method
-		return $this;
-	}
-	public function whereBetween($column, $lower, $higher) {
-		// if lower or higher is numeric
-		if(is_numeric($lower) && is_numeric($higher)) {
-			// secure the column name
-			list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-			// save the condition
-			$this->Conditions[] = "{$this->Operator} ( {$column} BETWEEN :min_{$placeholder} AND :max_{$placeholder} )";
-			// add the min value
-			$this->Values[":min_{$placeholder}"] = $lower;
-			// add the max value
-			$this->Values[":max_{$placeholder}"] = $higher;
-		}
-		// min and max are not numeric
-		else { Throw new Exception('Query->whereBetween() : Min or max values must be numbers'); }
-		// return self to the next method
-		return $this;
-	}
-	public function whereEmpty($column) {
-		// secure the column name
-		list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-		// save the condition
-		$this->Conditions[] = "{$this->Operator} ( {$column} == :empty_{$placeholder} OR {$column} IS NULL )";
-		// add the empty value
-		$this->Values[":empty_{$placeholder}"] = '';
-		// return self to the next method
-		return $this;
-	}
-	public function whereNotEmpty($column) {
-		// secure the column name
-		list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-		// save the condition
-		$this->Conditions[] = "{$this->Operator} ( {$column} <> :empty_{$placeholder} AND {$column} IS NOT NULL )";
-		// add the empty value
-		$this->Values[":empty_{$placeholder}"] = '';
-		// return self to the next method
-		return $this;
-	}
-	public function whereNull($column) {
-		// secure the column name
-		list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-		// save the condition
-		$this->Conditions[] = "{$this->Operator} ( {$column} IS NULL )";
-		// add the empty value
-		$this->Values[":empty_{$placeholder}"] = '';
-		// return self to the next method
-		return $this;
-	}
-	public function whereNotNull($column) {
-		// secure the column name
-		list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-		// save the condition
-		$this->Conditions[] = "{$this->Operator} ( {$column} IS NOT NULL )";
-		// return self to the next method
-		return $this;
-	}
 	// add an order clause
-	public function orderBy($columns_and_direction) {
-		// if the parameter is an array
-		if(is_array($columns_and_direction)) {
-			// for each given parameter
-			foreach($columns_and_direction as $column => $direction) {
-				// if the direction is not valid force ASC
-				$direction == 'ASC' || $direction == 'DESC' ?: $direction = 'ASC';
-				// secure the column name
-				list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-				// push it
-				$this->Order[] = "{$column} $direction";
-			}
+	public function orderBy(array $columns_and_direction) {
+		// for each given parameter
+		foreach($columns_and_direction as $column => $direction) {
+			// if the direction is not valid force ASC
+			$direction == 'ASC' || $direction == 'DESC' ?: $direction = 'ASC';
+			// secure the column name
+			list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
+			// push it
+			$this->Order[] = "{$column} $direction";
 		}
 		// return self to the next method
 		return $this;
 	}
 	
 	// add a group clause
-	public function groupBy($columns) {
-		// if the parameter is an array
-		if(is_array($columns)) {
-			// for each given parameter
-			foreach($columns as $column) {
-				// secure the column name
-				list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
-				// push it
-				$this->Groups[] = $column;
-			}
+	public function groupBy(array $columns) {
+		// for each given parameter
+		foreach($columns as $column) {
+			// secure the column name
+			list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
+			// push it
+			$this->Groups[] = $column;
 		}
 		// return self to the next method
 		return $this;
 	}
 	
 	// add a limit clause
-	public function limitTo($from,$until) {
-		// if both parameters are numric
-		if(is_numeric($from) && is_numeric($until)) {
-			// build the limit to 
-			$this->Limit = array($from, $until);
-		}
+	public function limitTo(int $from, int $until) {
+		// build the limit to 
+		$this->Limit = array($from, $until);
 		// return self to the next method
 		return $this;
 	}
