@@ -214,7 +214,7 @@ class Conditions extends Base {
 			// for each condition
 			foreach($conditions as $column) {
 				// add the condition
-				$this->whereEmpty($column);
+				$this->whereNotEmpty($column);
 			}
 		}
 		else {
