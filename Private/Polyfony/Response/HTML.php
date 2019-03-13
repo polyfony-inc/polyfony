@@ -123,7 +123,7 @@ class HTML {
 		// for each available meta
 		foreach(self::$_metas as $name => $content) {
 			// add the formated the meta
-			$metas .= '<meta name="'.$name.'" value="'.\Polyfony\Format::htmlSafe($content).'" />';
+			$metas .= '<meta name="'.$name.'" content="'.\Polyfony\Format::htmlSafe($content).'" />';
 		}
 		return $metas;
 
