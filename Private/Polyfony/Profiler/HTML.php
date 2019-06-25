@@ -20,6 +20,9 @@ class HTML {
 
 		return new \Polyfony\Element('div', [
 			'id'	=>'pfProfiler',
+			'class'	=>[
+				'd-print-none'
+			],
 			'style'	=>[
 				'position'			=>'fixed',
 				'z-index'			=>1400,

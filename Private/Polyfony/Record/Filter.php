@@ -2,10 +2,14 @@
 
 
 namespace Polyfony\Record;
+use Polyfony\Format as Format;
 
 class Filter {
 
 	const FILTERS_TO_METHODS_MAP = [
+		'capslock30'=>'toUppercaseSafe30Percent',
+		'capslock50'=>'toUppercaseSafe50Percent',
+		'capslock70'=>'toUppercaseSafe70Percent',
 		'strtoupper'=>'toUpperCase',
 		'strtolower'=>'toLowerCase',
 		'ucfirst'	=>'toFirstUppercase',
@@ -147,7 +151,34 @@ class Filter {
 	}
 
 	private static function toSlug($value) {
-		return \Polyfony\Format::slug($value);
+		return Format::slug($value);
+	}
+
+	private static function toUppercaseSafe30Percent(
+		$value
+	) :string {
+		return Format::uppercaseSafe(
+			$value, 
+			0.3
+		);
+	}
+
+	private static function toUppercaseSafe50Percent(
+		$value
+	) :string {
+		return Format::uppercaseSafe(
+			$value, 
+			0.5
+		);
+	}
+
+	private static function toUppercaseSafe70Percent(
+		$value
+	) :string {
+		return Format::uppercaseSafe(
+			$value, 
+			0.7
+		);
 	}
 
 	private static function length($value, int $length) {

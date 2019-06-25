@@ -200,6 +200,30 @@ $accounts = Accounts::_select(['login','id'])
 | ->set(['picture_size'=>'24938'])             |       24938       | ->get('picture_size')      | string '24.4 Ko'          |
 | ->set(['picture_size'=>'24938'])             |       24938       | ->get('picture_size',true) | string '24938'            |
 
+You add easily add elements to the end of an `_array` column. 
+Assuming you have a `Process` **object**/table, which has a `events_array` **attribute**/column.
+
+```php
+// create a new Process object
+(new Process)
+	// push an event into the events_array object
+	->push('events_array', [
+		// this array is arbitrary, you are free to push anything into the column
+		'date'			=>time(),
+		'is_important'	=>false,
+		'message'		=>'Something just happened !'
+	])
+	// your can also ommit the _array, the framework will find the right column
+	->push('events', [
+		// this array is arbitrary, you are free to push anything into the column
+		'date'			=>time(),
+		'is_important'	=>true,
+		'message'		=>'Something dubious just occured !'
+	])
+	->save();
+
+```
+
 
 #### XSS Protection
 
@@ -288,22 +312,26 @@ The filtering occurs when `->set()` is invoked, and after the validations (if an
 
 ##### List of available filters
 
-| Filter name    | What that filter does                                            |
-|----------------|------------------------------------------------------------------|
-| strtoupper     | applies mb_strtoupper()                                          |
-| strtolower     | applies mb_strtolower()                                          |
-| ucfirst        | applies ucfirst()                                                |
-| ucwords        | applies ucwords()                                                |
-| trim           | applies trim()                                                   |
-| numeric        | replaces coma with dot then applies FILTER_SANITIZE_NUMBER_FLOAT |
-| integer        | applies FILTER_SANITIZE_NUMBER_INT                               |
-| phone          | removes anything but 0 to 9 the plus sign and parenthesis        |
-| email          | applies FILTER_SANITIZE_EMAIL                                    |
-| text           | replaces ' with ’ then removes < > & " \ /                       |
-| slug           | applies Polyfony/Format::slug()                                  |
-| length{4-4096} | applies mb_substr()                                              |
+| Filter name        | What that filter does                                                |
+|--------------------|----------------------------------------------------------------------|
+| strtoupper         | applies mb_strtoupper()                                              |
+| strtolower         | applies mb_strtolower()                                              |
+| ucfirst            | applies ucfirst()                                                    |
+| ucwords            | applies ucwords()                                                    |
+| trim               | applies trim()                                                       |
+| numeric            | replaces coma with dot then applies FILTER_SANITIZE_NUMBER_FLOAT     |
+| integer            | applies FILTER_SANITIZE_NUMBER_INT                                   |
+| phone              | removes anything but 0 to 9 the plus sign and parenthesis            |
+| email              | applies FILTER_SANITIZE_EMAIL                                        |
+| text               | replaces ' with ’ then removes < > & " \ /                           |
+| slug               | applies Polyfony/Format::slug()                                      |
+| length{4-4096}     | applies mb_substr()                                                  |
+| capslock{30,50,70} | applies ucfirst(mb_strtolower()) if the uppercase ratio exceeds XX % |
 
-**An added benefit of those filters is that your inputs and textarea automatically get the right html attributes.** 
+The `capslock30`, `capslock50` and `capslock70` don't affect the data if it has a low enough uppercase ratio. 
+This filter allows for nicer and cleaner databases, it has been designed for older people who enjoy the *FUCK YEAH CAPS LOCK !!* lifestyle. 
+	
+**An added benefit of using model's filters is that your inputs and textarea automatically get the right html attributes and types.** 
 
 Check out the following Model, View and HTML output.
 
@@ -1028,13 +1056,14 @@ composer update
 
 ## Release history
 
-| Version   | Major change                                                                                                                                                             |   |
-|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---|
-| 2.0-alpha | Major rewrite from 1.x new folder structure, routes syntax, new helpers, new configuration files, MVC architecture, database entries are instanciated as Record objects. |   |
-| 2.0       | Database entries now are instanciated as Models/{TableName} that inherit the Record class                                                                                |   |
-| 2.1       | PHP 7.2 support, composer support, new debugging tools are introduced (Profiler), deprecation of old helpers                                                             |   |
-| 2.2       | Old routes syntax have been dropped, redirections are now supported directly in routes declaration                                                                       |   |
-| 2.3       | XSS escaping as default for all Record->get(), Filters are now supported, Validators are enhanced   
+| Version   | Major change                                                                                                                                                             |
+|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 2.0-alpha | Major rewrite from 1.x new folder structure, routes syntax, new helpers, new configuration files, MVC architecture, database entries are instanciated as Record objects. |
+| 2.0       | Database entries now are instanciated as Models/{TableName} that inherit the Record class                                                                                |
+| 2.1       | PHP 7.2 support, composer support, new debugging tools are introduced (Profiler), deprecation of old helpers                                                             |
+| 2.2       | Old routes syntax have been dropped, redirections are now supported directly in routes declaration                                                                       |
+| 2.3       | XSS escaping as default for all Record->get(), Filters are now supported, Validators are enhanced                                                                        |
+| 2.4       | Query->first() used to return false when no result were found, it now returns null.                                                                                      |
 
 ## [Performance](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
 Polyfony has been designed to be fast, no compromise (> 2000 req/s). 

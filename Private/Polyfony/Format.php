@@ -5,7 +5,10 @@ namespace Polyfony;
 class Format {
 
 	// file or folder name that is safe for the filesystem
-	public static function fsSafe($string, $replacement_symbol = '-') :string {
+	public static function fsSafe(
+		$string, 
+		$replacement_symbol = '-'
+	) :string {
 		// remove any symbol that does not belong in a file name of folder name
 		return(str_replace(
 				['..','/','\\',':','@','$','?','*','<','>','&','(',')','{','}',',','%','`','\'','#'], 
@@ -16,19 +19,67 @@ class Format {
 	}
 
 	// string that is safe for javascript variable
-	public static function jsSafe($string) :string {
+	public static function jsSafe(
+		$string
+	) :string {
 		// escape all single quotes
 		return(json_encode($string));
 	}
 	
 	// safe for outputing in html tag or html attribute
-	public static function htmlSafe($string) :string {
+	public static function htmlSafe(
+		$string
+	) :string {
 		// just remove html entities
 		return(filter_var($string, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
 	}
 
+	// safe from uppercase abuse
+	public static function uppercaseSafe(
+		string $string,
+		float $maximum_tolerated_uppercare_ratio = 0.33
+	) :string {
+
+		// if we have no length, don't even bother (to prevent division by 0)
+		if(!strlen($string)) {
+			// return an empty string
+			return '';
+		}
+
+		// count the length of the whole original string
+		$total_letters = strlen($string);
+
+		// convert the whole string to lowercase
+		$lowercase_string = mb_strtolower($string);
+
+		// count the number of uppercase letters
+		$uppercase_letters = 
+			strlen($lowercase_string) - similar_text(
+				$string, 
+				$lowercase_string
+			);
+
+		// compute the uppercase ratio
+		$uppercase_ratio = round(
+			$uppercase_letters / $total_letters , 
+			2
+		);
+
+		return 
+			// if the maximum tolerated uppercase ratio is exceeded
+			$uppercase_ratio > $maximum_tolerated_uppercare_ratio ? 
+				// clean it up
+				ucfirst(mb_strtolower($string)) : 
+				// of return it as is
+				$string;
+
+	}
+
 	// human size
-	public static function size(int $integer, int $precision=1) :string {
+	public static function size(
+		int $integer, 
+		int $precision=1
+	) :string {
 		// declare units
 		$unit = ['b','Ko','Mo','Go','To','Po'];
 		// make human readable
@@ -36,7 +87,9 @@ class Format {
 	}
 	
 	// relative date
-	public static function date(int $timestamp = null) :string {
+	public static function date(
+		int $timestamp = null
+	) :string {
 
 		// if no timestamp is provided
 		if(!$timestamp) {
@@ -55,7 +108,10 @@ class Format {
 	}
 	
 	// neutral duration
-	public static function duration(int $seconds = null, int $precision = 0) :string {
+	public static function duration(
+		int $seconds = null, 
+		int $precision = 0
+	) :string {
 
 		// if no timestamp is provided
 		if(!$seconds) {
@@ -92,7 +148,9 @@ class Format {
 	}
 
 	// phone number
-	public static function phone($phone) :string {
+	public static function phone(
+		$phone
+	) :string {
 		// remove all spaces from the number
 		$phone = str_replace(' ', '', $phone);
 		// remove all symbols except + and ()
@@ -117,7 +175,10 @@ class Format {
 	}
 	
 	// human amount
-	public static function amount($integer, int $precision=1) {
+	public static function amount(
+		$integer, 
+		int $precision=1
+	) {
 		// declare units
 		$unit = array('','K','M','Md','Bn','Bd');
 		// make human readable
@@ -125,13 +186,31 @@ class Format {
 	}
 
 	// classic slug
-	public static function slug($string) :string {
+	public static function slug(
+		$string
+	) :string {
 		// accentuated characters
-		$with = preg_split("//u", "àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ _'", -1, PREG_SPLIT_NO_EMPTY);
+		$with = preg_split(
+			"//u", 
+			"àáâãäçèéêëìíîïñòóôõöùúûüýÿÀÁÂÃÄÇÈÉÊËÌÍÎÏÑÒÓÔÕÖÙÚÛÜÝ _'", 
+			-1, 
+			PREG_SPLIT_NO_EMPTY
+		);
 		// equivalent characters without accents
-		$without = preg_split("//u", "aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY---", -1, PREG_SPLIT_NO_EMPTY);
+		$without = preg_split(
+			"//u", 
+			"aaaaaceeeeiiiinooooouuuuyyAAAAACEEEEIIIINOOOOOUUUUY---", 
+			-1, 
+			PREG_SPLIT_NO_EMPTY
+		);
 		// replace accents and lowercase the string
-		$string 	= strtolower(str_replace($with, $without, $string));
+		$string = strtolower(
+			str_replace(
+				$with, 
+				$without, 
+				$string
+			)
+		);
 		// replace all but 0-9 a-z remove triples/doubles and trim the edges
 		return(
 			trim(
@@ -146,13 +225,20 @@ class Format {
 	}
 	
 	// create a link
-	public static function link(string $string, string $url='#', array $attributes=[]) :Element {
+	public static function link(
+		string $string, 
+		string $url='#', 
+		array $attributes=[]
+	) :Element {
 		// build the actual link
-		return(new Element('a', array_merge(array('href'=>$url, 'text'=>$string), $attributes)));
+		return new Element('a', array_merge(['href'=>$url, 'text'=>$string], $attributes));
 	}
 	
 	// truncate to a certain length
-	public static function truncate($string, int $length=16) {
+	public static function truncate(
+		$string, 
+		int $length=16
+	) {
 		// if string is longer than authorized truncate, else do nothing
 		return(
 			strlen($string) > $length ? 
@@ -162,7 +248,11 @@ class Format {
 	}
 	
 	// will wrap a portion of text in another
-	public static function wrap($text, $phrase, $wrapper = '<strong class="highlight">\\1</strong>') {
+	public static function wrap(
+		$text, 
+		$phrase, 
+		$wrapper = '<strong class="highlight">\\1</strong>'
+	) {
 		if(empty($text)) {
 			return '';
 		}
@@ -183,13 +273,17 @@ class Format {
 	}
 	
 	// remove all formatting and invisible symbols to get the shortest possible string
-	public static function minify($string) {
+	public static function minify(
+		$string
+	) {
 		// remove all formatting symbols and double spaces	
 		return(str_replace('  ', ' ', str_replace(array("\t", "\n", "\r"), '', $string)));
 	}
 
 	// will clean the value of anything but 0-9 and minus preserve sign return integer
-	public static function integer($value) :int {
+	public static function integer(
+		$value
+	) :int {
 		if(strrpos($value, '.')) {
 			$value = str_replace(',', '' , $value);
 		}
@@ -200,7 +294,10 @@ class Format {
 	}
 	
 	// will clean the value of anything but 0-9\.- preserve sign return float
-	public static function float($value, int $precision = 2) :float {
+	public static function float(
+		$value, 
+		int $precision = 2
+	) :float {
 		if(strrpos($value, '.')) {
 			$value = str_replace(',', '' , $value);
 		}
@@ -213,7 +310,11 @@ class Format {
 	}
 
 	// convert an array to a csv
-	public static function csv(array $array, string $separator = "\t", string $encapsulate_cells = '"') :string {
+	public static function csv(
+		array $array, 
+		string $separator = "\t", 
+		string $encapsulate_cells = '"'
+	) :string {
 
 		// declare our csv
 		$csv = '';
@@ -222,7 +323,11 @@ class Format {
 			// for each cell of that line
 			foreach($cells as $cell) {
 				// protect the cell's value, encapsulate it, and separate it,
-				$csv .= $encapsulate_cells . str_replace($encapsulate_cells, '\\'.$encapsulate_cells, $cell) . $encapsulate_cells . $separator;
+				$csv .= 
+					$encapsulate_cells . 
+					str_replace($encapsulate_cells, '\\'.$encapsulate_cells, $cell) . 
+					$encapsulate_cells . 
+					$separator;
 			}
 			// skip to the next line
 			$csv .= "\n";

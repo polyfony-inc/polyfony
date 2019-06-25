@@ -18,7 +18,9 @@ class Aware {
 	const FILTERS = [];
 
 	// create a object from scratch, of fetch it in from its table/id
-	public function __construct($conditions_to_find_the_record=null) {
+	public function __construct(
+		$conditions_to_find_the_record = null
+	) {
 
 		// init the list of altered columns
 		$this->_ = [
@@ -69,14 +71,26 @@ class Aware {
 		$this->_['id'] = isset($this->id) ? $this->id : $this->_['id'];
 	}
 	
-	public function get(string $column, bool $get_it_raw = false) {
+	public function get(
+		string $column, 
+		bool $get_it_raw = false
+	) {
 		// return the columns or null if it does not exist		
-		return isset($this->{$column}) && strlen($this->{$column}) ? 
-			Convert::valueFromDatabase($column, $this->{$column}, $get_it_raw) : 
-			null;
+		return 
+			isset($this->{$column}) && 
+			strlen($this->{$column}) ? 
+				Convert::valueFromDatabase(
+					$column, 
+					$this->{$column}, 
+					$get_it_raw
+				) : 
+				null;
 	}
 	
-	public function set($column_or_array, $value = null) {
+	public function set(
+		$column_or_array, 
+		$value = null
+	) {
 		// if we want to set a batch of values
 		if(is_array($column_or_array)) {
 			// for each value to set
@@ -101,26 +115,59 @@ class Aware {
 				get_class($this)
 			);
 			// convert the value depending on the column name
-			$this->{$column_or_array} = Convert::valueForDatabase($column_or_array, $value);
+			$this->{$column_or_array} = Convert::valueForDatabase(
+				$column_or_array, 
+				$value
+			);
 			// update the altered list
 			$this->alter($column_or_array);
 		}
 		// return self
 		return($this);
 	}
+
+	// add an element to the end of a magic array column
+	public function push(
+		string $column_name, 
+		$array_or_value
+	) :self {
+
+		// remove the _array extension (if any) and add it back
+		$column_name = str_replace('_array', '', $column_name) . '_array';
+
+		// get the column's value
+		$column_s_array = (array) $this->get($column_name);
+
+		// push the new value(s) in it
+		array_push(
+			$column_s_array, 
+			$array_or_value
+		);
+
+		// push the array or value to the end of the column's array
+		return $this->set([$column_name => $column_s_array]);
+
+	}
 	
 	// magic
-	public function __toArray(bool $raw = false, bool $altered = false) {
+	public function __toArray(
+		bool $raw = false, 
+		bool $altered = false
+	) {
 		// declare an empty array
 		$array = [];
 		// what to iterate on
-		$attributes = $altered ? $this->_['altered'] : array_keys(get_object_vars($this));
+		$attributes = $altered ? 
+			$this->_['altered'] : 
+			array_keys(get_object_vars($this));
 		// for each attribute of this object
 		foreach($attributes as $attribute){
 			// if the attribute is not internal
 			if($attribute != '_') {
 				// convert or not
-				$array[$attribute] = $raw ? $this->get($attribute,true) : $this->get($attribute,false);
+				$array[$attribute] = $raw ? 
+					$this->get($attribute,true) : 
+					$this->get($attribute,false);
 			}
 		}
 		return $array;
@@ -144,7 +191,9 @@ class Aware {
 		$this->id = null;
 	}
 
-	private function alter(string $column) {
+	private function alter(
+		string $column
+	) {
 		// push
 		$this->_['altered'][] = $column;
 		// deduplicate
@@ -158,14 +207,24 @@ class Aware {
 		if($this->_['id']) {
 			// we can update and return the number of affected rows (0 on error, 1 on success)
 			return (bool) self::_update()
-				->set($this->__toArray(true, true))
+				->set(
+					$this->__toArray(
+						true, 
+						true
+					)
+				)
 				->where(['id'=>$this->_['id']])
 				->execute();
 		}
 		// this is a new record
 		else {
 			// try to insert it
-			$inserted_object = self::create($this->__toArray(true, true));
+			$inserted_object = self::create(
+				$this->__toArray(
+					true, 
+					true
+				)
+			);
 			// if insertion succeeded, return true
 			if($inserted_object) {
 				// clone ourselves with what the database returneds, a full fledged object
@@ -185,9 +244,16 @@ class Aware {
 	// delete
 	public function delete() {
 		// if id or table if missing
-		if(!$this->_['table'] || !$this->_['id']) {
+		if(
+			!$this->_['table'] || 
+			!$this->_['id']
+		) {
 			// throw an exception
-			Throw new Exception(get_class($this).'->delete() : cannot delete a record without table and id', 400);
+			Throw new Exception(
+				get_class($this).
+				'->delete() : cannot delete a record without table and id', 
+				400
+			);
 		}
 		// if it went well
 		return (bool) self::_delete()
@@ -202,7 +268,9 @@ class Aware {
 	}
 	
 	// shortcut to insert an element
-	public static function create(array $columns_and_values=[]) {
+	public static function create(
+		array $columns_and_values=[]
+	) {
 
 		return Database::query()
 			->insert($columns_and_values)
@@ -212,7 +280,9 @@ class Aware {
 	}
 
 	// shortcut that bootstraps a select query
-	public static function _select(array $select=[]) :Query {
+	public static function _select(
+		array $select=[]
+	) :Query {
 
 		// returns a Query object, to execute, or to complement with some more parameters
 		return Database::query()
