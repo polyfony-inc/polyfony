@@ -402,6 +402,56 @@ Router::map('/admin/:action/:id/', 'Admin/Main@{action}')
 
 *Route can also be generated dynamically, over database iterations.*
 
+```php
+// assuming you have a Pages table containing, well, pages. 
+// those would have an "url" column that define the absolute url of the page.
+// you should replace the _select with a cachable method in the model though.
+foreach(Pages::_select(['url'])->execute() as $page) {
+
+	// map that url to a single "Pages" controller 
+	// that resides in a "Site" bundle
+	Router::get(
+		$page->get('url'),
+		'Site/Pages@view'
+	);
+
+}
+
+```
+
+then, in `Bundles/Site/Controllers/Pages.php` 
+
+```php
+class PagesController extends Controller {
+
+	public function viewAction() {
+
+		// retrieve your webpage from the database
+		// using not it's id, but it's url column value !
+		$page = new Pages(['url'=>Request::getUrl()])
+
+		// maybe set the title and description using that database object
+		Response\HTML::set(
+			'metas'=>[
+				'title'			=>$page->get('title'),
+				'description'	=>$page->get('description')
+			]
+		);
+
+		// put the contents in $this, so that your view can use it
+		$this->contents = $page->get('contents');
+
+		// and pass it to the view
+		$this->view('Pages/FromTheDatabase');
+
+	}
+
+}
+
+```
+
+
+
 ###### URL Parameters constraints
 * "in_array" => [allowed values]
 * "!in_array" => [disalowed values]
@@ -1059,11 +1109,13 @@ composer update
 | Version   | Major change                                                                                                                                                             |
 |-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 2.0-alpha | Major rewrite from 1.x new folder structure, routes syntax, new helpers, new configuration files, MVC architecture, database entries are instanciated as Record objects. |
-| 2.0       | Database entries now are instanciated as Models/{TableName} that inherit the Record class                                                                                |
+| 2.0       | Better ORM, Database entries now are instanciated as Models/{TableName} that inherit the Record class                                                                    |
 | 2.1       | PHP 7.2 support, composer support, new debugging tools are introduced (Profiler), deprecation of old helpers                                                             |
 | 2.2       | Old routes syntax have been dropped, redirections are now supported directly in routes declaration                                                                       |
 | 2.3       | XSS escaping as default for all Record->get(), Filters are now supported, Validators are enhanced                                                                        |
 | 2.4       | Query->first() used to return false when no result were found, it now returns null.                                                                                      |
+| 2.5       | Query->get() shortcut for ->first()->execute(), enhanced Profiler. Console shortcut                                                                                      |
+| 3.0       | Heavy Emails refactoring, tests support via PHPUnit, Jobs support                                                                                                        |
 
 ## [Performance](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
 Polyfony has been designed to be fast, no compromise (> 2000 req/s). 

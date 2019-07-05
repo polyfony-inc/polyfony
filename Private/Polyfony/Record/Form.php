@@ -3,7 +3,7 @@
 namespace Polyfony\Record;
 use Polyfony\Element as Element;
 
-class Form extends Aware {
+class Form extends Accessor {
 
 	// if filters or validators exist, we can apply default attributes
 	private function deduceAttributes(string $column) :array {

@@ -47,7 +47,7 @@ class Aware {
 		// if conditions is not an array, we assume it is the id of the record
 		$conditions = is_array($conditions) ? $conditions : ['id'=>$conditions];
 		// grab that object from the database
-		$record = self::_select()->first()->where($conditions)->execute();
+		$record = self::_select()->where($conditions)->get();
 		// if we didn't find the record
 		if(!$record) {
 			// throw a 404 Not found Exception
@@ -70,7 +70,28 @@ class Aware {
 		// replicate the id if it is available
 		$this->_['id'] = isset($this->id) ? $this->id : $this->_['id'];
 	}
-	
+
+	// magic
+	public function __clone() {
+		// set all columns as altered
+		$this->_['altered'] = array_keys(get_object_vars($this));
+		// remove the hidden column
+		unset($this->_['altered'][0]);
+		// remove the hidden id, so that the object is recognized as absent from the database
+		$this->_['id'] = null;
+		// remove the id attribute too
+		$this->id = null;
+	}
+
+	private function alter(
+		string $column
+	) {
+		// push
+		$this->_['altered'][] = $column;
+		// deduplicate
+		$this->_['altered'] = array_unique($this->_['altered']);
+	}
+
 	public function get(
 		string $column, 
 		bool $get_it_raw = false
@@ -86,7 +107,7 @@ class Aware {
 				) : 
 				null;
 	}
-	
+
 	public function set(
 		$column_or_array, 
 		$value = null
@@ -114,90 +135,21 @@ class Aware {
 				$value,
 				get_class($this)
 			);
-			// convert the value depending on the column name
-			$this->{$column_or_array} = Convert::valueForDatabase(
+			// convert the value depending on the column name and set it
+			$converted_value_ready_for_updating = Convert::valueForDatabase(
 				$column_or_array, 
 				$value
 			);
-			// update the altered list
-			$this->alter($column_or_array);
-		}
-		// return self
-		return($this);
-	}
-
-	// add an element to the end of a magic array column
-	public function push(
-		string $column_name, 
-		$array_or_value
-	) :self {
-
-		// remove the _array extension (if any) and add it back
-		$column_name = str_replace('_array', '', $column_name) . '_array';
-
-		// get the column's value
-		$column_s_array = (array) $this->get($column_name);
-
-		// push the new value(s) in it
-		array_push(
-			$column_s_array, 
-			$array_or_value
-		);
-
-		// push the array or value to the end of the column's array
-		return $this->set([$column_name => $column_s_array]);
-
-	}
-	
-	// magic
-	public function __toArray(
-		bool $raw = false, 
-		bool $altered = false
-	) {
-		// declare an empty array
-		$array = [];
-		// what to iterate on
-		$attributes = $altered ? 
-			$this->_['altered'] : 
-			array_keys(get_object_vars($this));
-		// for each attribute of this object
-		foreach($attributes as $attribute){
-			// if the attribute is not internal
-			if($attribute != '_') {
-				// convert or not
-				$array[$attribute] = $raw ? 
-					$this->get($attribute,true) : 
-					$this->get($attribute,false);
+			// if there's actually something that has changed
+			if($this->{$column_or_array} != $converted_value_ready_for_updating) {
+				// update the value
+				$this->{$column_or_array} = $converted_value_ready_for_updating;
+				// update the altered list
+				$this->alter($column_or_array);
 			}
 		}
-		return $array;
-	}
-	
-	// magic
-	public function __toString() {
-		// a string to sybolize this record
-		return $this->_['id'] ? $this->_['id'] : 0;
-	}
-
-	// magic
-	public function __clone() {
-		// set all columns as altered
-		$this->_['altered'] = array_keys(get_object_vars($this));
-		// remove the hidden column
-		unset($this->_['altered'][0]);
-		// remove the hidden id, so that the object is recognized as absent from the database
-		$this->_['id'] = null;
-		// remove the id attribute too
-		$this->id = null;
-	}
-
-	private function alter(
-		string $column
-	) {
-		// push
-		$this->_['altered'][] = $column;
-		// deduplicate
-		$this->_['altered'] = array_unique($this->_['altered']);
+		// return self
+		return $this;
 	}
 	
 	// update or create
@@ -266,7 +218,37 @@ class Aware {
 		// removed the namespace from the class name
 		return str_replace('Models\\','',get_called_class());
 	}
-	
+
+	// magic
+	public function __toArray(
+		bool $raw = false, 
+		bool $altered = false
+	) {
+		// declare an empty array
+		$array = [];
+		// what to iterate on
+		$attributes = $altered ? 
+			$this->_['altered'] : 
+			array_keys(get_object_vars($this));
+		// for each attribute of this object
+		foreach($attributes as $attribute){
+			// if the attribute is not internal
+			if($attribute != '_') {
+				// convert or not
+				$array[$attribute] = $raw ? 
+					$this->get($attribute,true) : 
+					$this->get($attribute,false);
+			}
+		}
+		return $array;
+	}
+
+	// magic
+	public function __toString() {
+		// a string to sybolize this record
+		return $this->_['id'] ? $this->_['id'] : 0;
+	}
+
 	// shortcut to insert an element
 	public static function create(
 		array $columns_and_values=[]
@@ -280,6 +262,8 @@ class Aware {
 	}
 
 	// shortcut that bootstraps a select query
+	// PHP doesn't yet allow to have static method and object methods with the same name
+	// that's why we have to prefix them if an underscore 
 	public static function _select(
 		array $select=[]
 	) :Query {
@@ -292,6 +276,8 @@ class Aware {
 	}
 
 	// shortcut that bootstraps an update query
+	// PHP doesn't yet allow to have static method and object methods with the same name
+	// that's why we have to prefix them if an underscore
 	public static function _update() :Query {
 
 		// returns a Query object, to execute, or to complement with some more parameters
@@ -301,6 +287,8 @@ class Aware {
 	}
 
 	// shortcut that bootstraps a delete query
+	// PHP doesn't yet allow to have static method and object methods with the same name
+	// that's why we have to prefix them if an underscore
 	public static function _delete() :Query {
 
 		// returns a Query object, to execute, or to complement with some more parameters

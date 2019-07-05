@@ -25,17 +25,19 @@ class Emails {
 
 	}
 
-	private static function getEmails($stack) :array {
+	private static function getEmailsAndTheirDuration($stack) :array {
 
 		$emails = [];
 		$emails_count = 0;
+		$emails_duration = 0;
 
 		foreach($stack as $element) {
 
 			if($element['user'] == 'email') {
 				++$emails_count;
-				$debug_data = $element['informations']['Email']->getDebugData();
-				$recipients = self::getRecipients($debug_data);
+				$emails_duration 	+= $element['duration']*1000;
+				$debug_data 		= $element['informations']['Email']->getDebugData();
+				$recipients 		= self::getRecipients($debug_data);
 				$card 					= new \Polyfony\Element('div', 		['style'=>'border-bottom:solid 1px #efefef;padding-bottom:12px;margin-bottom:12px;overflow:hidden;']);
 				$title_container 		= new \Polyfony\Element('span', 	['class'=>'text-dark','style'=>'padding-right:20px;']);
 				$title_prefix			= new \Polyfony\Element('strong', 	['text'=>"Email #{$emails_count} ",'class'=>'text-danger']);
@@ -51,17 +53,19 @@ class Emails {
 			}
 
 		}
-		return $emails;
+		return [$emails, $emails_duration];
 
 	}
 
 	public static function getComponent(array $data) :\Bootstrap\Modal {
 
-		$emails = self::getEmails($data['stack']);
+		list($emails, $emails_duration) = self::getEmailsAndTheirDuration($data['stack']);
 		$emails_modal = new \Bootstrap\Modal();
 		$emails_modal
 			->setTrigger([
-				'html'	=>' Emails <span class="badge badge-light">'.count($emails).'</span>',
+				'html'	=>' Emails <span class="badge badge-light">'.count($emails).
+					' <span class="text-secondary" style="font-weight:lighter;">in <strong>' . 
+					round($emails_duration, 1) .'</strong> ms</span></span>',
 				'class'	=>'btn btn-warning',
 				'style'	=>'margin-left:10px'
 			], 'fa fa-envelope')

@@ -2,7 +2,7 @@
 	"name":"polyfony-inc/polyfony",
 	"description":"Polyfony is a simple and powerfull PHP micro-framework",
 	"keywords": ["lightweight", "fast", "php", "framework"],	
-	"version":"2.4.5",
+	"version":"2.5.0",
 	"license":"GPL-3.0-only",
 	"type":"project",
 	"authors":[
@@ -51,6 +51,7 @@
 			"cp Private/Storage/Defaults/Config/* Private/Config/",
 			"cp Private/Storage/Defaults/Models/* Private/Models/",
 			"cp Private/Storage/Defaults/Database/Polyfony.db Private/Storage/Database/Polyfony.db",
+			"ln -s Private/Binaries/Console console",
 			"chmod -R 777 Private/Storage",
 			"chmod -R 777 Public/Assets"
 		]

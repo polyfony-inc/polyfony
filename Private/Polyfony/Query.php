@@ -264,6 +264,15 @@ class Query extends Query\Conditions {
 		return $this;
 	}
 
+	// return only the first result, and does it right now
+	public function get() :?Record {
+		// all in one 
+		return $this
+			->first()
+			->execute();
+
+	}
+
 	// return only the first result
 	public function first() {
 		// return only the first record

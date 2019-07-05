@@ -1,6 +1,7 @@
 <?php
 
 namespace Polyfony\Profiler\HTML;
+use Polyfony\Element as Element;
 
 class Timing {
 
@@ -38,7 +39,7 @@ class Timing {
 			// trick for database queris
 			$elem = self::applySpecificNaming($elem);
 			// the actual bar/stack element
-			$timing_body[] = new \Polyfony\Element('div', [
+			$timing_body[] = new Element('div', [
 				'style'	=>[
 					'min-height'	=>'6px',
 					'height'		=>"{$height}px",
@@ -51,7 +52,7 @@ class Timing {
 				'class'	=>"bg-{$class}"
 			]);
 			// then label/details for that bar/stack element
-			$timing_body[] = new \Polyfony\Element('div', [
+			$timing_body[] = new Element('div', [
 				'style'	=>[
 					'font-size'		=>'11px',
 					'margin-left'	=>"{$relative_start_percent}%",
@@ -59,8 +60,8 @@ class Timing {
 				],
 				'class'	=>"text-{$class}",
 				'html'	=> 
-					(new \Polyfony\Element('strong', ['text'=>$elem['name']])) . ' ' .
-					(new \Polyfony\Element('i', ['text'=>"{$readable_duration} {$readable_memory}"]))
+					(new Element('strong', ['text'=>$elem['name']])) . ' ' .
+					(new Element('i', ['text'=>"{$readable_duration} {$readable_memory}"]))
 			]);
 		}
 
@@ -76,17 +77,17 @@ class Timing {
 
 		// the general legend for the waterfall graphics
 		$legend=[];
-		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-secondary',	'text'=>'Framework']);
-		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-primary',	'text'=>'Controllers']);
-		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-success',	'text'=>'Views']);
-		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-danger',	'text'=>'Database']);
-		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-warning',	'text'=>'Emails']);
-		$legend[] = new \Polyfony\Element('span',['class'=>'badge badge-info',		'text'=>'User defined']);
+		$legend[] = new Element('span',['class'=>'badge badge-secondary',	'text'=>'Framework']);
+		$legend[] = new Element('span',['class'=>'badge badge-primary',	'text'=>'Controllers']);
+		$legend[] = new Element('span',['class'=>'badge badge-success',	'text'=>'Views']);
+		$legend[] = new Element('span',['class'=>'badge badge-danger',	'text'=>'Database']);
+		$legend[] = new Element('span',['class'=>'badge badge-warning',	'text'=>'Emails']);
+		$legend[] = new Element('span',['class'=>'badge badge-info',		'text'=>'User defined']);
 
 		$timing_modal
 			->setTrigger([
 				'html'	=>' Execution time '.
-				(new \Polyfony\Element('span',[
+				(new Element('span',[
 					'class'=>'badge badge-light',
 					'text'=>round($data['time'], 3) . ' sec'
 				])),
