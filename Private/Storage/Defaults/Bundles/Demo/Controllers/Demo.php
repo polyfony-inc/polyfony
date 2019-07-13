@@ -61,7 +61,15 @@ class DemoController extends pf\Controller {
 	//	Response::enableOutputCache(24);
 		// but forbid the browser to do so (allows us to purge the cache earlier)
 	//	Response::disableBrowserCache();
-
+// Accounts::create([
+// 	'id'=>1,
+// 	'id_level'=>1,
+// 	'password'=>Security::getPassword('toor'),
+// 	'modules_array'=>[],
+// 	'is_enabled'=>1,
+// 	'login'=>'root@domain.local',
+// 	'creation_date'=>time()
+// ]);
 		// view the main demo index
 		$this->view('Demo');
 	

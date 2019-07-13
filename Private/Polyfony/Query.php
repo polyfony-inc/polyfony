@@ -2,7 +2,7 @@
  
 namespace Polyfony;
 use \PDO;
-use Query\Convert as Convert;
+use Polyfony\Query\Convert as Convert;
 
 class Query extends Query\Conditions {
 	

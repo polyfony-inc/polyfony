@@ -35,8 +35,8 @@ class Emails extends Record {
 					'user' => Config::get('email', 'smtp_user'),
 					'pass' => Config::get('email', 'smtp_pass')
 				]
-			])
-			->removeUnusedPlaceholders();
+			]);
+			//->removeUnusedPlaceholders();
 
 	}
 
@@ -192,18 +192,18 @@ class Emails extends Record {
 
 	}
 
-	private function removeUnusedPlaceholders() :self {
+	// private function removeUnusedPlaceholders() :self {
 
-		// replace unused placeholder with nothing
-		return $this->set([
-			'body'=> preg_replace(
-				'/{{([A-Za-z0-9_])+}}/gi',
-				'',
-				$this->get('body', true)
-			)
-		]);
+	// 	// replace unused placeholder with nothing
+	// 	return $this->get('body') ? $this->set([
+	// 		'body'=> preg_replace(
+	// 			'/{{([A-Za-z0-9_])+}}/gi',
+	// 			'',
+	// 			$this->get('body', true)
+	// 		)
+	// 	]);
 
-	}
+	// }
 
 	public function getError() {
 		// return the textual representation for the last error
