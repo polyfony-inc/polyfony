@@ -5,8 +5,7 @@
 #### Philosophy
 Inspired by Symfony and Laravel but tailored to favour an inclination towards extreme simplicity and efficiency.  
 Compared to major PHP frameworks, Polyfony covers 95%+ of what we need most of the time, and does so using a fragment of the ressources, space, configuration files and dependencies required by major frameworks.  
-It features routing, bundles, controllers, profiler, views, ORM, environments, locales, cache, authentication, form helper, CLI helper... and limitless extensibility via composer.
-
+It features routing, bundles, controllers, profiler, views, ORM, tests, caches, locales, events, authentication, environments, form helper, CLI helper... and extensibility via composer.
 
 #### Footprint [of an Hello World](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
 * ≤ 300 Ko of disk space *(35% of comment lines)*
@@ -23,15 +22,9 @@ You need a POSIX compatible system (Linux/MacOS/xBSD), PHP >= 7.1 with ext-pdo, 
 ```
 composer create-project --stability=dev polyfony-inc/polyfony your-project-folder
 ```
-*--stability=dev allows you to git pull later on*
+*--stability=dev is mandatory since we don't publish releases*
 
-###### Configure LigHTTPd
-```
-server.document-root 	= "/var/www/your-project-folder/Public/"
-url.rewrite-once 		= ("^(?!/Assets/).*" => "/?")
-```
-
-###### or NginX
+###### NginX configuration
 ```
 root /var/www/your-project-folder/Public
 location / {
@@ -39,119 +32,108 @@ location / {
 }
 ```
 
-###### or Apache
+###### LigHTTPd configuration
+```
+server.document-root 	= "/var/www/your-project-folder/Public/"
+url.rewrite-once 		= ("^(?!/Assets/).*" => "/?")
+```
+
+###### Apache configuration
 ```
 DocumentRoot "/var/www/your-project-folder/Public/"
 ```
 
-## No learning curve
+## Almost no learning required
 
-This *readme.md* file should be enough to get you started, you can also browse the `Private/Bundles/Demo/` bundle.
-As the framework classes are static, everything is **always available, everywhere** thru simple and natural naming. There's no verbose namespace inclusions, no extensive functions parameters passing. 
-
+This *readme.md* file should be enough to get you started, you can also browse the `Private/Bundles/Demo/` bundle and browse the Framework's source code.
+As the framework classes are static, everything is **always available, everywhere** thru simple and natural naming.
 
 *The code bellow assumes you are prefixing the `Polyfony` namespace before each call.*
 
 ### [Request](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyrequest)
 
-###### retrieve an url parameter
 ```php
-Request::get('format');
-```
+// retrieve an url parameter
+Request::get('blog_post_id');
 
-###### retrieve a posted field named `search`
-```php
-Request::post('search');
-```
+// retrieve a posted field named `search_expression`
+Request::post('search_expression');
 
-###### retrieve a file
-```php
+// retrieve a posted file
 Request::files('attachment_document');
-```
 
-###### retrieve a request header
-```php
+// retrieve a request header
 Request::header('Accept-Encoding');
-```
 
-###### check if the method is post
-```php
+// retrieve the user agent
+Request::server('HTTP_USER_AGENT');
+
+// check if the method is post (returns a boolean)
 Request::isPost();
-```
 
-###### check if the request is done using ajax
-```php
+// check if the request is done using ajax (returns a boolean)
 Request::isAjax();
-```
 
-###### check if the request is done thru TLS/SSL
-```php
+// check if the request is done thru TLS/SSL (returns a boolean)
 Request::isSecure();
-```
 
-###### check if the request is from the command line
-```php
+// check if the request is from the command line (returns a boolean)
 Request::isCli();
 ```
 
 ### [Database](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyquery)
 
-Examples bellow assume a table named `Accounts` exists in the database.
+Polyfony provides self-aware entities, in a similar way to an *ActiveRecord* (RubyOnRails) or an *Eloquent* object.
 
-###### Retrieve a single account by its ID
-```php
-$account = new Models\Accounts(1);
+Examples bellow assume a table named `Pages` exists in the database.
+The `Models\Pages` file has the following minimum amount of code.
+
+```php 
+namespace Models;
+class Pages extends \Polyfony\Record {}
 ```
 
-###### Retrieve a single account by its `login`
 ```php
-$account = new Models\Accounts(['login'=>'root@local.domain']);
-```
+// Retrieve a database entity by its ID, here, the id 67
+$webpage = new Pages(67);
 
-###### Retrieve a single record by its ID and generate an input to change a property
-```php
-$account = new Models\Accounts;
-echo $account->input('login', ['type'=>'email']);
-```
+// Retrieve another database entity by its `url` column
+$webpage = new Pages(['url'=>'/my-awesome-vegan-burger-recipe/']);
 
-**Any HTML tags in the email field will be escaped as to prevent XSS attacks**
+// Retrieve a single record by its ID and generate an input to change it's title property, with a custom css class
+// note that any html in the title field will be escaped in the <input> to prevent XSS
+// returns <input type="etextmail" name="Pages[title]" value="My awesome Vegan burger recipe is so yummy" />
+(new Pages(67))
+	->input('title', ['class'=>'form-control']);
 
-###### Outputs
-```html
-<input type="email" name="Accounts[login]" value="root@local.domain" />
-```
-
-###### Create an account, populate and insert it
-```php
-(new Models\Accounts)
+// Create an new page, populate and save it
+(new Pages)
 	->set([
-		'login'				=> 'test',
-		'id_level'			=> 1,
-		'last_login_date'	=> '18/04/1995', // magic column
-		'modules_array'		=> ['MOD_BOOKS', 'MOD_USERS', 'MOD_EXAMPLE'], // magic column
-		'password'			=> Security::getPassword('test')
+		'url'				=> '/veganaise-c-est-comme-de-la-mayonnaise-mais-vegan/',
+		'title'				=> 'I\'m running out of ideas...',
+		'description'		=> 'Meta descriptions get less and less important with Google\'s newest algorithms',
+		'creation_date'		=> '18/04/1995', // this gets converted to a unixepoch automagically
+		'modification_date'	=> time(), 
+		'contents'			=> 'Meh...',
+		'categories_array'	=> ['Cooking', 'Organic'], // this get's saved as json automagically
+		'id_creator'		=> Security::getAccount()->get('id') // assuming you are logged in
 	])
 	->save();
 
-```
-
-###### Alternatively, you can also create an account this way
-```php
-Models\Accounts::create([
-	'login'		=>'test',
-	'id_level'	=>1
+// Alternatively, you can also create an entity this way
+Pages::create([
+	'url'		=>'...',
+	'title'		=>'...',
 	// more columns and values...
 ]);
-```
 
-###### Retrieve the `login` and `id` of 5 accounts with `id_level` 1 that logged in, in the last 24h
-```php
-// demo query
-$accounts = Accounts::_select(['login','id'])
-	->where([
-		'id_level'=>1
-	])
-	->whereHigherThan('last_login_date',time()+24*3600)
+// Retrieve the `title` and `id` of 5 pages that have the `Organic` category, 
+// that have been modified in the last week, 
+// and that have been created by user's id 7.
+$pages = Pages::_select(['title','id'])
+	->whereContains(['categories_array'=>'Organic'])
+	->whereGreaterThan('modification_date', time() - 7*24*3600)
+	->where(['id_creator'=>7])
 	->limitTo(0,5)
 	->execute();
 ```
@@ -159,18 +141,18 @@ $accounts = Accounts::_select(['login','id'])
 #### Parameters
 
 ```php
-->where()				// == $value
+->where()			// == $value
 ->whereNot()			// <> $value
 ->whereBetween()		// BETWEEN $min_value AND $max_value
 ->whereMatch()			// MATCH column AGAINST $value
 ->whereContains()		// % $value %
-->whereEndWith()		// % $value
+->whereEndsWith()		// % $value
 ->whereStartsWith() 		// $value %
 ->whereNotEmpty() 		// <> '' and NOT NULL
 ->whereEmpty() 			// '' or NULL
 ->whereNotNull() 		// NOT NULL
 ->whereNull() 			// NULL
-->whereGreaterThan() 	// < $value
+->whereGreaterThan() 		// < $value
 ->whereLessThan() 		// > $value
 ```
 
@@ -277,7 +259,7 @@ The validation occurs when `->set()` is invoked and will throw exceptions.
 
 Note that you don't have to include `NULL` or `EMPTY` values in your validators to allow them. `NULL/NOT NULL` are to be configured in your database, so that the framework knows which column can, and cannot be null.
 
-**Please be aware that doing a batch ->update (aka : not using distinct objects/Records) on a table will circumvent those validators**
+**Please be aware that doing a batch ->update (aka : not using distinct objects/Records) on a table will circumvent those validators. This will get fixed in a later version.**
 
 
 ### Data filtering 
@@ -351,12 +333,13 @@ class User extends Polyfony\Record {
 
 Your input also gets a `required="required"` attribute if the column cannot be null. This is deduced from the database schema.
 
-**Please be aware that doing a batch ->update (aka : not using distinct objects/Records) on a table will circumvent those validators**
+**Please be aware that doing a batch ->update (aka : not using distinct objects/Records) on a table will circumvent those validators. This will get fixed in a later version.**
 
 
 ### [Router](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyrouter)
 
 **A route maps an URL to an `Action`, which resides in a `Controller`, which resides in a `Bundle`**  
+An `Action` is a *method*, a `Controller` is a *class*, a `Bundle` is a *folder*. 
 Routes are to be declared in each bundle's `Loader` directory, in a file called `Route.php`
 
 *Example : `Private/Bundles/{BundleName}/Loader/Route.php`*
@@ -370,25 +353,25 @@ Routes are to be declared in each bundle's `Loader` directory, in a file called 
 * be a parameter of the url (as with the first example. The action would be the 2nd parameter `{what}`)
 * be ommited. In that case an `indexAction` is called. If it doesn't exist, `defaultAction()` will be called, if it doesn't exist an exception is thrown.
 
-Before calling the action `preAction()` will be called on the controller. *You can declare one, or ommit it.*  
-after the real action has been be called `postAction()` will be called on the controller. *You can declare one, or ommit it.*
+Before calling the desired action a `preAction()` method will be called on the controller. *You can declare one, or ommit it.*  
+after the desired action has been be called, a `postAction()` method will be called on the controller. *You can declare one, or ommit it.*
 
 
 * The following route will match a GET request to /about-us/  
-It will call `Private/Bundles/Pages/Controllers/Static.php->aboutUsAction();`
-
 ```php
 Router::get('/about-us/', 'Pages/Static@aboutUs');
 ```
+It will call `Private/Bundles/Pages/Controllers/Static.php->aboutUsAction();`
+
 
 * The following route will match a request of any method (GET,POST...) to /admin/{edit,update,delete,create}/ and /admin/  
-It will call `Private/Bundles/Admin/Controllers/Main.php->{action}Action();`
-
 ```php
-Router::map('/admin/:action/:id/', 'Admin/Main@{action}')
+Router::map('/admin/:section/:id/', 'Admin/Main@{section}')
 	->where([
-		'action'=>[
-			// action must be one of the following four
+		'section'=>[
+			// section must be one of the following four
+			// though you can ommit this, a wrong section value will trigger a defaultAction() on the controller
+			// which means an exception if you have not declared it.
 			'in_array'=>['edit','update','delete','create']
 		],
 		'id'=>[
@@ -399,6 +382,7 @@ Router::map('/admin/:action/:id/', 'Admin/Main@{action}')
 		]
 	]);
 ```
+It will call `Private/Bundles/Admin/Controllers/Main.php->{section}Action();`
 
 *Route can also be generated dynamically, over database iterations.*
 
@@ -659,7 +643,7 @@ Response::setType('text')
 ###### to output json
 ```php
 Response::setType('json')
-Response::setContent(array('example'))
+Response::setContent(['example'])
 Response::render()
 ```
 
@@ -826,71 +810,101 @@ Config::get($group, $key);
 ```
 
 
-### [Mail](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonymail)
+### [EMails](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonymail)
 
-###### Mail are very simple to use and built over PHPMailer
-
-```php
-$mail = new Mail();
-$status = $mail
-	->to($email [, $name=null])
-	->cc($email [, $name=null])
-	->bcc($email [, $name=null])
-	->format($format[html,text])
-	->file($path)
-	->from($email, $name)
-	->subject($subject)
-	->body($body)
-	->send($save=true)
-```
+Emails are very simple to use and built over PHPMailer. 
+They extend `Record` object, so there are normal database entries that have a few more methods, and they can be sent !
 
 ```php
-boolean $status
-string $mail->error()
+(new Models\Emails)
+	->set([
+		'charset'	=>'utf8', 			// (get its defaults from Config.ini)
+		'format'	=>'text', 			// (get its defaults from Config.ini)
+		'from_name'	=>'Me me me', 		// (get its defaults from Config.ini)
+		'from_email'=>'me@myself.com', 	// (get its defaults from Config.ini)
+		'subject'	=>'Hello !',
+		'body'		=>'Hello again ?',
+		'reply_to'	=>'foo@bar.com',		// fake column
+		'to'		=>'email@domain.com', 	// fake column
+		'bcc'		=>'email2@domain.com', 	// fake column
+		'cc'		=>[ 					// fake column
+			'email1'=>'name1',
+			'email2'=>'name2'
+		],
+		'files_array'=>[
+			'../Private/Storage/Data/something.pdf'=>'Something.pdf'
+		]
+	])
+	->send([bool $save=false])				// instead of ->send() you can ->save(), to send it later
 ```
 
-###### Mail with a template using smtp
+An email that fails to send, but has ->send(true) will end up in the Emails table. You can send it later.
+It's `creation_date` column will be filled, but it will have an empty `sending_date` column, making it really easy to retry later.
 
 ```php
-$mail = new Mail();
-$status = $this->Mail
-	->smtp($host, $user, $pass)
-	->to('text@email.com', 'Name')
-	->format('text')
-	->subject($subject)
-	->template($path)
-	->set($key1, $value2)
-	->set($key1, $value2)
-	->send($save=true)
+(new Emails(267)) // assuming its id is 267
+	->send()
 ```
 
-The template uses variables named `__{$variable}__` ex:
+Even though `->save()` isn't explicitely called, nor is `->send(true)`, 
+since the email has been retrieved from the database, upon sending, it's sending_date column will be updated and **it will be saved**. 
+
+
+###### Using templates
+
+```php
+(new Models\Emails)
+	->set([
+		'template'	=>'../Private/Storage/Data/Templates/Demo-Email.html',
+		'subject'	=>'Another passionnating subject',
+		'to'		=>[
+			'email@domain.com'	=>'Jack',
+			'email2@domain2.com'=>'Jill'
+		],
+		'body'		=>[
+			'something'			=>'that I want replaced by this text',
+			'something-else'	=>'that I also want replaced'
+		]
+	])
+	->send(true)
+	->isSent() ? do_something() : do_something_else();
+```
+
+Templates use variables enclosed with double braquets `{{variable_name}}`, example 
 
 ```html
 <body>
-	<div>__message__</div>
+	<h1>
+		{{something}}
+	</h1>
+	<p>
+		{{something-else}}
+	</p>
 </body>
 ```
 
-```php
-$mail->set('message','My example')
-```
+get's transformed into
 
 ```html
 <body>
-	<div>My example</div>
+	<div>
+		that I want replaced by this text
+	</div>
+	<p>
+		that I also want replaced
+	</p>
 </body>
 ```
 
-If the mail format is html, your value will be escaped automatically
+Beware of inserting non-validated user inputs into emails.
+
 
 ### [Element](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonyelement)
 
 ###### Create an HTML tag (similar to mootools' Element)
 
 ```php
-$image = new Element('img',array('src'=>'/img/demo.png'))->set('alt','test');
-echo $image;
+<?= Element('img',['src'=>'/img/demo.png'])->set('alt','test'); ?>
 ```
 ```html
 <img src="/img/demo.png" alt="test" />
@@ -899,7 +913,7 @@ echo $image;
 ###### Create an HTML element with an opening and a closing tag 
 
 ```php
-$quote = new Element('quote',array('text'=>'Assurément, les affaires humaines ne méritent pas le grand sérieux'));
+$quote = new Element('quote',['text'=>'Assurément, les affaires humaines ne méritent pas le grand sérieux']);
 $quote->adopt($image);
 ```
 ```html
@@ -913,31 +927,31 @@ Setting `value` will escape its html so will with setting `text`.
 ###### Form helper allow you to build and preset form elements, ex.
 
 ```php
-echo Form::input($name[, $value=null [, $options=array()]]);
+<?= Form::input($name[, $value=null [, $options=[]]]); ?>
 ```
 
 ###### This will build a two element select (with the class `form-control`), and preset Peach.
 
 ```php
-echo Form::select('sample', array( 0 => 'Apple', 1 => 'Peach' ), 1, array('class'=>'form-control'));
+<?= Form::select('sample', [] 0 => 'Apple', 1 => 'Peach' ], 1, ['class'=>'form-control']); ?>
 ```
 
 ###### This will build a select element with optgroups.
 *Note that optgroup are replaced by a matching locale (if any), and values are also replaced by matching locale (if any).*
 
 ```php
-echo Form::select('sample', array(
-	'food'=>array(
+<?= Form::select('sample', [
+	'food'=>[
 		0 => 'Cheese',
 		1 => 'Houmus',
 		2 => 'Mango'
-	),
-	'not_food'=>array(
+	],
+	'not_food'=>[
 		3 => 'Dog',
 		4 => 'Cow',
 		5 => 'Lizard'
-	)
-), 3)
+	]
+], 3); ?>
 ```
 ```html
 <select name="sample">
@@ -959,10 +973,10 @@ Shortcuts are available from objects that extends the `Record` class (ex: your M
 
 ###### retrieve an account from its id
 ```php
-$account = new Accounts(1);
-$account->set('login', 'mylogin@example.com')
-
-echo $account->input('login', array('data-validators'=>'required'));
+<?= (new Accounts(1))
+	->set('login', 'mylogin@example.com')
+	->input('login', ['data-validators'=>'required']); 
+?>
 ```
 ```html
 <input type="text" name="Accounts[login]" value="mylogin@example.com" data-validators="required"/>
@@ -1045,7 +1059,7 @@ You can manually try/catch exception to avoid loosing what the user typed, in th
 ## Database structure
 
 The framework has been extensively tested using SQLite, it *may* work with other engines, it defitively works without. 
-Without, you'd just loose `Security`, the `Mail` storage feature, the `Store\Database` engine and the `Logger`'s database feature.
+Without, you'd just loose `Security`, the `Emails` storage feature, the `Store\Database` engine and the `Logger`'s database feature.
 
 The database's structure is available by dumping the SQLite Database `Private/Storage/Database/Polyfony.db`.
 The PDO driver can be changed to `MySQL`, `Postgres` or `ODBC` in `Private/Config/Config.ini`. **There is no `Query` object support for Postgres and ODBC.**
@@ -1091,17 +1105,16 @@ git stash apply
 composer update
 ```
 
-
 ## Deprecated and discontinued features 
 
 | **Previous Feature**   | **Status**   | **Replacement**         | **How to get it**                     |
 |------------------------|--------------|-------------------------|---------------------------------------|
-| Polyfony\Notice()      | DEPRECATED   | Bootstrap\Alert()       | require polyfony-inc/bootstrap        |
-| Polyfony\Thumnbail()   | DEPRECATED   | Intervention\Image()    | require intervention/image            |
 | Polyfony\HttpRequest() | DEPRECATED   | Curl\Curl()             | require php-curl-class/php-curl-class |
 | Polyfony\Filesystem()  | DEPRECATED   | Filesystem\Filesystem() | require symfony/filesystem            |
 | Polyfony\Uploader()    | DEPRECATED   | FileUpload\FileUpload() | require gargron/fileupload            |
 | Polyfony\Validate()    | DISCONTINUED | Validator\Validation()  | require symfony/validator             |
+| Polyfony\Thumnbail()   | DISCONTINUED | Intervention\Image()    | require intervention/image            |
+| Polyfony\Notice()      | DISCONTINUED | Bootstrap\Alert()       | require polyfony-inc/bootstrap        |
 
 
 ## Release history
@@ -1114,8 +1127,8 @@ composer update
 | 2.2       | Old routes syntax have been dropped, redirections are now supported directly in routes declaration                                                                       |
 | 2.3       | XSS escaping as default for all Record->get(), Filters are now supported, Validators are enhanced                                                                        |
 | 2.4       | Query->first() used to return false when no result were found, it now returns null.                                                                                      |
-| 2.5       | Query->get() shortcut for ->first()->execute(), enhanced Profiler. Console shortcut                                                                                      |
-| 3.0       | Heavy Emails refactoring, tests support via PHPUnit, Jobs support                                                                                                        |
+| 2.5       | Query->get() shortcut for ->first()->execute(), enhanced Profiler, Console shortcut                                                                                      |
+| 2.6       | Emails refactoring, Tests support via PHPUnit support, Events support                                                                                                    |
 
 ## [Performance](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
 Polyfony has been designed to be fast, no compromise (> 2000 req/s). 
@@ -1125,4 +1138,4 @@ If implementating a « convenience » tool/function into the framework was to co
 The codebase is small, straightforward and abundantly commented. It's audited using SensioInsight, CodeClimate, RIPS, and Sonar.
 
 ## Coding Standard
-Polyfony2 follows the PSR-0, PSR-1, PSR-4 coding standards. It does not respect PSR-2, as tabs are used for indentation.
+Polyfony follows the PSR-0, PSR-1, PSR-4 coding standards. It does not respect PSR-2, as tabs are used for indentation.

@@ -2,7 +2,7 @@
 	"name":"polyfony-inc/polyfony",
 	"description":"Polyfony is a simple and powerfull PHP micro-framework",
 	"keywords": ["lightweight", "fast", "php", "framework"],	
-	"version":"2.5.0",
+	"version":"2.6.0",
 	"license":"GPL-3.0-only",
 	"type":"project",
 	"authors":[
@@ -21,7 +21,8 @@
 		"gregwar/captcha": "^1.1",
 		"polyfony-inc/google": "dev-master",
 		"polyfony-inc/bootstrap": "dev-master",
-		"polyfony-inc/console": "dev-master"
+		"polyfony-inc/console": "dev-master",
+		"phpunit/phpunit": "^8.2"
 	},
 	"suggest": {
 		"phpoffice/phpspreadsheet": "^1.5",
@@ -41,6 +42,8 @@
 	},
 	"autoload": {
 		"psr-4": {
+			"Tests\\": "Private/Tests",
+			"Helpers\\": "Private/Helpers",
 			"Models\\": "Private/Models",
 			"Polyfony\\": "Private/Polyfony"
 		}
@@ -50,6 +53,7 @@
 			"cp -R Private/Storage/Defaults/Bundles/* Private/Bundles/",
 			"cp Private/Storage/Defaults/Config/* Private/Config/",
 			"cp Private/Storage/Defaults/Models/* Private/Models/",
+			"cp Private/Storage/Defaults/Tests/* Private/Tests/",
 			"cp Private/Storage/Defaults/Database/Polyfony.db Private/Storage/Database/Polyfony.db",
 			"ln -s Private/Binaries/Console console",
 			"chmod -R 777 Private/Storage",

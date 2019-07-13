@@ -96,7 +96,7 @@ class Logger {
 
 			// if we want to log to a file
 			if(
-				Config::get('logger', 'type') == 'file' && 
+				Config::get('logger', 'driver') == 'file' && 
 				Config::get('logger', 'path')
 			) {
 				// format a new line for the log file
@@ -104,18 +104,18 @@ class Logger {
 			}
 
 			// if we want to log to the database
-			if(Config::get('logger', 'type') == 'database') {
+			if(Config::get('logger', 'driver') == 'database') {
 				// insert record in the database
 				try { self::toDatabase($log); } catch (Exception $e) {}
 			}
 
 			// an email reporting address is set and level is above 3
 			if(
-				Config::get('logger', 'mail') && 
+				Config::get('logger', 'email') && 
 				$level > self::MIN_LEVEL_FOR_EMAIL_NOTIFICATION
 			) {
 				// send an email notice
-				try { self::toMail($log); } catch (Exception $e) {}
+				try { self::toEmail($log); } catch (Exception $e) {}
 			}
 
 		}
@@ -147,7 +147,7 @@ class Logger {
 
 	}
 
-	private static function toProfiler(	array $log ) :void {
+	private static function toProfiler( array $log ) :void {
 
 		// place a marker and auto release
 		Profiler::releaseMarker(
@@ -160,7 +160,7 @@ class Logger {
 
 	}
 
-	private static function toFile(	array $log ) :void {
+	private static function toFile( array $log ) :void {
 		// add the context to the message
 		$log['message'] .= ' '.json_encode($log['context']);
 		// format the log
@@ -170,7 +170,7 @@ class Logger {
 		file_put_contents(Config::get('logger', 'path'), implode("\t", $log) . "\n", FILE_APPEND);
 	}
 
-	private static function toDatabase(	array $log ) :void {
+	private static function toDatabase( array $log ) :void {
 		// add the context to the message
 		$log['message'] .= ' '.json_encode($log['context']);
 		// remove useless element
@@ -179,14 +179,15 @@ class Logger {
 		Logs::create($log);
 	}
 
-	private static function toMail(	array $log ) :void {
+	private static function toEmail( array $log ) :void {
 		// format and send and email with the log element
-		(new Mail())
-			->to(Config::get('logger', 'mail'))
-			->title('Logger')
-			->format('text')
-			->subject(ucfirst(self::LEVELS[$log['id_level']]) . " : {$log['message']}")
-			->body(var_export($log, true))
+		(new Emails)
+			->set([
+				'to' 		=> Config::get('logger', 'email'),
+				'format' 	=> 'text',
+				'subject' 	=> ucfirst(self::LEVELS[$log['id_level']]) . " : {$log['message']}",
+				'body' 		=> var_export($log, true),
+			])
 			->send();
 	}
 	

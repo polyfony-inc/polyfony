@@ -27,7 +27,7 @@ class Base {
 	protected	$Limit;
 
 	// instanciate a new query
-	public function __construct($quote = '') {
+	public function __construct(string $quote = '') {
 
 		// set the query as being empty for now
 		$this->Query		= null;

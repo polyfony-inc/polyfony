@@ -54,8 +54,8 @@ class Security {
 		// then close the session
 		self::$_account->closeSession();
 
-		// and redirect to the exit route or fallback to the login route
-		Response::setRedirect(Config::get('router', 'exit_route') ?: Config::get('router', 'login_route'));
+		// and redirect to the exit url or fallback to the login url
+		Response::setRedirect(Config::get('router', 'exit_url') ?: Config::get('router', 'login_url'));
 
 		// render the response
 		Response::render();
@@ -152,7 +152,7 @@ class Security {
 		// remove any existing session cookie
 		!$logout ?: Cook::remove(Config::get('security','cookie'));
 		// we will redirect to the login page
-		!$redirect ?: Response::setRedirect(Config::get('router','login_route'), (Request::isPost() ? 3 : 0));
+		!$redirect ?: Response::setRedirect(Config::get('router','login_url'), (Request::isPost() ? 3 : 0));
 		// save the desired url for further redirection later on
 		Request::isAjax() ?: Session::put('previously_requested_url', Request::getUrl(), true); 
 		// trhow a polyfony exception that by itself will stop the execution with maybe a nice exception handler

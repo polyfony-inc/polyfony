@@ -6,7 +6,7 @@ class Conditions extends Base {
 
 	// whereIdenticalTo
 	// add a condition
-	public function where(array $conditions) {
+	public function where(array $conditions) :self {
 		// for each provided strict condition
 		foreach($conditions as $column => $value) {
 			// secure the column name
@@ -26,7 +26,7 @@ class Conditions extends Base {
 
 	// where NotIdenticalTo
 	// add a condition
-	public function whereNot(array $conditions) {
+	public function whereNot(array $conditions) :self {
 		// for each provided strict condition
 		foreach($conditions as $column => $value) {
 			// secure the column name
@@ -44,7 +44,7 @@ class Conditions extends Base {
 	}
 	
 
-	public function whereStartsWith(array $conditions) {
+	public function whereStartsWith(array $conditions) :self {
 		// for each provided strict condition
 		foreach($conditions as $column => $value) {
 			// secure the column name
@@ -62,7 +62,7 @@ class Conditions extends Base {
 	}
 
 
-	public function whereEndsWith(array $conditions) {
+	public function whereEndsWith(array $conditions) :self {
 		// for each provided strict condition
 		foreach($conditions as $column => $value) {
 			// secure the column name
@@ -80,7 +80,7 @@ class Conditions extends Base {
 	}
 
 
-	public function whereContains(array $conditions) {
+	public function whereContains(array $conditions) :self {
 		// for each provided strict condition
 		foreach($conditions as $column => $value) {
 			// secure the column name
@@ -98,7 +98,7 @@ class Conditions extends Base {
 	}
 
 
-	public function whereMatch(array $conditions) {	
+	public function whereMatch(array $conditions) :self {	
 		// for each provided strict condition
 		foreach($conditions as $column => $value) {
 			// secure the column name
@@ -116,11 +116,11 @@ class Conditions extends Base {
 	}
 
 	// legacy alias
-	public function whereHigherThan(array $conditions) {
+	public function whereHigherThan(array $conditions) :self {
 		return $this->whereGreaterThan($conditions);
 	}
 
-	public function whereGreaterThan(array $conditions) {
+	public function whereGreaterThan(array $conditions) :self {
 		// for each provided strict condition
 		foreach($conditions as $column => $value) {
 			// secure the column name
@@ -138,11 +138,11 @@ class Conditions extends Base {
 	}
 
 	// legacy alias
-	public function whereLowerThan(array $conditions) {
+	public function whereLowerThan(array $conditions) :self {
 		return $this->whereLessThan($conditions);
 	}
 
-	public function whereLessThan(array $conditions) {
+	public function whereLessThan(array $conditions) :self {
 		// for each provided strict condition
 		foreach($conditions as $column => $value) {
 			// secure the column name
@@ -164,7 +164,7 @@ class Conditions extends Base {
 		string $column, 
 		float $lower, 
 		float $higher
-	) {
+	) :self {
 		// secure the column name
 		list(
 			$column, 
@@ -182,7 +182,7 @@ class Conditions extends Base {
 
 	// this should be renamed whereBlank
 	// we are still supporting NON-array parameter, this will be removed at some point in time
-	public function whereEmpty($conditions) {
+	public function whereEmpty($conditions) :self {
 		// if provided conditions are an array
 		if(is_array($conditions)) {
 			// for each condition
@@ -208,7 +208,7 @@ class Conditions extends Base {
 
 	// this should be renamed whereNotBlank
 	// we are still supporting NON-array parameter, this will be removed at some point in time
-	public function whereNotEmpty($conditions) {
+	public function whereNotEmpty($conditions) :self {
 		// if provided conditions are an array
 		if(is_array($conditions)) {
 			// for each condition
@@ -234,7 +234,7 @@ class Conditions extends Base {
 
 	// this should only accept arrays... 
 	// this behavior is not coherent with the rest of the class
-	public function whereNull($column) {
+	public function whereNull($column) :self {
 		// secure the column name
 		list(
 			$column, 
@@ -250,7 +250,7 @@ class Conditions extends Base {
 
 	// this should only accept arrays... 
 	// this behavior is not coherent with the rest of the class
-	public function whereNotNull($column) {
+	public function whereNotNull($column) :self {
 		// secure the column name
 		list($column) = Convert::columnToPlaceholder($this->Quote ,$column);
 		// save the condition

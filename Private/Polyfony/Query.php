@@ -2,6 +2,7 @@
  
 namespace Polyfony;
 use \PDO;
+use Query\Convert as Convert;
 
 class Query extends Query\Conditions {
 	
@@ -14,22 +15,9 @@ class Query extends Query\Conditions {
 		return $this->Values;
 	}
 
-	// passrthu a query with values if needed
-	public function query(
-		string $query, 
-		$values=null, 
-		$table=null
-	) {
-		// set the main action
-		$this->action('QUERY');
-		// set the table
-		$this->Table = $table;
-		// set the query
-		$this->Query = $query;
-		// set the array of values
-		$this->Values = $values;
+	public function detectActionAndTable() {
 		// detetect the action
-		$action = substr($query, 0, 6);
+		$action = substr($this->Query, 0, 6);
 		// if action can alter a table (INSERT, UPDATE, DELETE)
 		if(in_array($action, array('INSERT', 'UPDATE', 'DELETE', 'SELECT'))) {
 			// in case of INSERT
@@ -56,6 +44,24 @@ class Query extends Query\Conditions {
 			// clean the table name from any quotes
 			$this->Table = trim($this->Table, '\'/"`');
 		}
+	}
+
+	// passrthu a query with values if needed
+	public function query(
+		string $query, 
+		$values=null, 
+		$table=null
+	) {
+		// set the main action
+		$this->action('QUERY');
+		// set the table
+		$this->Table = $table;
+		// set the query
+		$this->Query = $query;
+		// set the array of values
+		$this->Values = $values;
+		// // detetect the action
+		$this->detectActionAndTable();
 		// return self to the next method
 		return $this;
 	}
@@ -67,7 +73,10 @@ class Query extends Query\Conditions {
 		// for each column
 		foreach($array as $function_or_index_or_column => $column) {
 			// secure the column name
-			list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column, true);
+			list(
+				$column, 
+				$placeholder
+			) = Convert::columnToPlaceholder($this->Quote ,$column, true);
 			// if the key is function_or_index_or_column
 			if(is_numeric($function_or_index_or_column)) {
 				// just select the column
@@ -76,14 +85,14 @@ class Query extends Query\Conditions {
 			// the key contains a dot, we are trying to create a alias
 			elseif(stripos($function_or_index_or_column, '.') !== false) {
 				// secure the column
-				list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$function_or_index_or_column);
+				list($column) = Convert::columnToPlaceholder($this->Quote ,$function_or_index_or_column);
 				// select the column and create an alias
 				$this->Selects[] = "{$column} AS {$placeholder}";
 			}
 			// the key is a SQL function
 			else {
 				// secure the function
-				list($function) = Query\Convert::columnToPlaceholder($this->Quote ,$function_or_index_or_column);
+				list($function) = Convert::columnToPlaceholder($this->Quote ,$function_or_index_or_column);
 				// select the column using a function
 				$this->Selects[] = "{$function}({$column}) AS {$function}_{$placeholder}";
 			}
@@ -97,11 +106,11 @@ class Query extends Query\Conditions {
 		// for each provided strict condition
 		foreach($columns_and_values as $column => $value) {
 			// secure the column name
-			list($column, $placeholder) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
+			list($column, $placeholder) = Convert::columnToPlaceholder($this->Quote ,$column);
 			// save the condition
 			$this->Updates[] = "{$column} = :{$placeholder}";
 			// save the value (converted if necessary)
-			$this->Values[":{$placeholder}"] = Query\Convert::valueForDatabase($column,$value);
+			$this->Values[":{$placeholder}"] = Convert::valueForDatabase($column,$value);
 		}
 		// return self to the next method
 		return $this;
@@ -112,7 +121,7 @@ class Query extends Query\Conditions {
 		// set the main action
 		$this->action('UPDATE');
 		// set the destination table
-		list($this->Table) = Query\Convert::columnToPlaceholder($this->Quote ,$table);
+		list($this->Table) = Convert::columnToPlaceholder($this->Quote ,$table);
 		// return self to the next method
 		return $this;
 	}
@@ -124,18 +133,18 @@ class Query extends Query\Conditions {
 		// for each column and value
 		foreach($columns_and_values as $column => $value) {
 			// secure the column name
-			list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
+			list($column) = Convert::columnToPlaceholder($this->Quote ,$column);
 			// push the column
 			$this->Inserts[] = $column;
 			// check for automatic conversion and push in place
-			$this->Values[] = Query\Convert::valueForDatabase($column, $value);
+			$this->Values[] = Convert::valueForDatabase($column, $value);
 		}
 		// return self to the next method
 		return $this;
 	}
 	
 	// delete data from a table
-	public function delete() {
+	public function delete() :self {
 		// set the main action
 		$this->action('DELETE');
 		// return self to the next method
@@ -143,15 +152,15 @@ class Query extends Query\Conditions {
 	}
 	
 	// select the table
-	public function from(string $table) {
+	public function from(string $table) :self {
 		// set the table
-		list($this->Table) = Query\Convert::columnToPlaceholder($this->Quote ,$table);	
+		list($this->Table) = Convert::columnToPlaceholder($this->Quote ,$table);	
 		// return self to the next method
 		return $this;
 	}
 	
 	// set the type of object that we want to be instanciated
-	public function object(string $class) {
+	public function object(string $class) :self {
 		// set the main action
 		$this->Object = $class;
 		// return self to the next method
@@ -163,11 +172,11 @@ class Query extends Query\Conditions {
 		string $table, 
 		string $match, 
 		string $against
-	) {
+	) :self {
 		// secure parameters
-		list($table) 	= Query\Convert::columnToPlaceholder($this->Quote ,$table);
-		list($match) 	= Query\Convert::columnToPlaceholder($this->Quote ,$match);
-		list($against) 	= Query\Convert::columnToPlaceholder($this->Quote ,$against);
+		list($table) 	= Convert::columnToPlaceholder($this->Quote ,$table);
+		list($match) 	= Convert::columnToPlaceholder($this->Quote ,$match);
+		list($against) 	= Convert::columnToPlaceholder($this->Quote ,$against);
 		// push the join condition
 		$this->Joins[] = "JOIN {$table} ON {$match} = {$against}";
 		// return self to the next method
@@ -179,11 +188,11 @@ class Query extends Query\Conditions {
 		string $table, 
 		string $match, 
 		string $against
-	) {
+	) :self {
 		// secure parameters
-		list($table) 	= Query\Convert::columnToPlaceholder($this->Quote ,$table);
-		list($match) 	= Query\Convert::columnToPlaceholder($this->Quote ,$match);
-		list($against) 	= Query\Convert::columnToPlaceholder($this->Quote ,$against);
+		list($table) 	= Convert::columnToPlaceholder($this->Quote ,$table);
+		list($match) 	= Convert::columnToPlaceholder($this->Quote ,$match);
+		list($against) 	= Convert::columnToPlaceholder($this->Quote ,$against);
 		// push the join condition
 		$this->Joins[] = "LEFT JOIN {$table} ON {$match} = {$against}";
 		// return self to the next method
@@ -195,11 +204,11 @@ class Query extends Query\Conditions {
 		string $table, 
 		string $match, 
 		string $against
-	) {
+	) :self {
 		// secure parameters
-		list($table) 	= Query\Convert::columnToPlaceholder($this->Quote ,$table);
-		list($match) 	= Query\Convert::columnToPlaceholder($this->Quote ,$match);
-		list($against) 	= Query\Convert::columnToPlaceholder($this->Quote ,$against);
+		list($table) 	= Convert::columnToPlaceholder($this->Quote ,$table);
+		list($match) 	= Convert::columnToPlaceholder($this->Quote ,$match);
+		list($against) 	= Convert::columnToPlaceholder($this->Quote ,$against);
 		// push the join condition
 		$this->Joins[] = "RIGHT JOIN {$table} ON {$match} = {$against}";
 		// return self to the next method
@@ -207,21 +216,21 @@ class Query extends Query\Conditions {
 	}
 	
 	// add into for inserts
-	public function into(string $table) {
+	public function into(string $table) :self {
 		// set the table
-		list($this->Table) = Query\Convert::columnToPlaceholder($this->Quote ,$table);
+		list($this->Table) = Convert::columnToPlaceholder($this->Quote ,$table);
 		// return self to the next method
 		return $this;
 	}
 	
-	public function addAnd() {
+	public function addAnd() :self {
 		// set the AND
 		$this->Operator = 'AND';
 		// return self to the next method
 		return $this;
 	}
 	
-	public function addOr() {
+	public function addOr() :self {
 		// set the OR
 		$this->Operator = 'OR';		
 		// return self to the next method
@@ -229,13 +238,15 @@ class Query extends Query\Conditions {
 	}
 	
 	// add an order clause
-	public function orderBy(array $columns_and_direction) {
+	public function orderBy(
+		array $columns_and_direction
+	) :self {
 		// for each given parameter
 		foreach($columns_and_direction as $column => $direction) {
 			// if the direction is not valid force ASC
 			$direction == 'ASC' || $direction == 'DESC' ?: $direction = 'ASC';
 			// secure the column name
-			list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
+			list($column) = Convert::columnToPlaceholder($this->Quote ,$column);
 			// push it
 			$this->Order[] = "{$column} $direction";
 		}
@@ -244,11 +255,11 @@ class Query extends Query\Conditions {
 	}
 	
 	// add a group clause
-	public function groupBy(array $columns) {
+	public function groupBy(array $columns) :self {
 		// for each given parameter
 		foreach($columns as $column) {
 			// secure the column name
-			list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$column);
+			list($column) = Convert::columnToPlaceholder($this->Quote ,$column);
 			// push it
 			$this->Groups[] = $column;
 		}
@@ -257,7 +268,7 @@ class Query extends Query\Conditions {
 	}
 	
 	// add a limit clause
-	public function limitTo(int $from, int $until) {
+	public function limitTo(int $from, int $until) :self {
 		// build the limit to 
 		$this->Limit = array($from, $until);
 		// return self to the next method
@@ -274,7 +285,7 @@ class Query extends Query\Conditions {
 	}
 
 	// return only the first result
-	public function first() {
+	public function first() :self {
 		// return only the first record
 		$this->First = true;
 		// artificially restrict the number of results to one
@@ -411,7 +422,7 @@ class Query extends Query\Conditions {
 			// if the table is missing
 			if(!$this->Table) { Throw new Exception('Query->buildQuery() : No table to update'); }
 			// if there is nothing to update
-			if(!count($this->Updates)) { Throw new Exception('Query->buildQuery() : No columns to update'); }
+			if(!count($this->Updates)) { Throw new Exception('Query->buildQuery() : No changes have been made, no columns to update'); }
 			// assemble the updates
 			$this->Updates = implode(', ', $this->Updates);
 			// prepare the update query
@@ -464,14 +475,21 @@ class Query extends Query\Conditions {
 			$this->Action = $action_name;
 		}
 		// an action has already been set, this is impossible
-		else { Throw new Exception("Query->action({$action_name}) : An incompatible action already exists : {$this->Action}"); }
+		else { Throw new Exception(
+			"Query->action({$action_name}) : An incompatible action already exists : {$this->Action}"
+		); }
     }
 
     private function throwExceptionOn(string $occured_on) {
     	// prepare informations to be thrown
-		$exception_infos = implode(":",\Polyfony\Database::handle()->ErrorInfo()).":$this->Query";
+		$exception_infos = implode(
+			":",
+			\Polyfony\Database::handle()->ErrorInfo()
+		).":$this->Query";
 		// throw an exception
-		Throw new Exception("Query->{$occured_on}() failed because : {$exception_infos}");
+		Throw new Exception(
+			"Query->{$occured_on}() failed because : {$exception_infos}"
+		);
     }
 	
 }

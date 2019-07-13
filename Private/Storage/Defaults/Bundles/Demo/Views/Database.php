@@ -1,3 +1,4 @@
+<?php use Polyfony\Locales as Locales; ?>
 <div class="jumbotron" style="padding:45px;">
 	<h1>Database</h1>
 	<p>
@@ -33,7 +34,7 @@
 				<tr>
 					<td>
 						<code>
-							<?= $record->tget('login',8); ?>
+							<?= $record->tget('login',16); ?>
 						</code>
 					</td>
 					<td>
@@ -65,19 +66,26 @@
 			<?php endforeach; ?>
 		</table>
 	</div>
-	<div class="row" style="padding-top:2em">
+	<div class="row justify-content-center" style="padding-top:2em">
 		<form class="col-4" action="" method="post" class="form form-inline">
+
 			<?= new Polyfony\Form\Token(); ?>
+
 			<div class="card">
+
 				<h5 class="card-header">
 					Simple account edition form 
+					
 					<button type="submit" class="btn btn-sm btn-success float-right">
 						<span class="fa fa-save"></span> 
-						Enregistrer
+						<?= Locales::get('Save'); ?>
 					</button>
+
 				</h5>
 				<div class="card-body">
+
 					<?= Bootstrap\Alert::flash(); ?>
+
 					<div class="form-group row">
 						<label class="col-3 col-form-label text-right">
 							Login

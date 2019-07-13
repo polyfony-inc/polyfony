@@ -7,7 +7,12 @@ class Emails {
 	private static function getRecipients($debug_data) :array {
 
 		$recipients = [];
-		$types_of_recipients = ['to'=>'dark','cc'=>'secondary','bcc'=>'secondary'];
+		$types_of_recipients = [
+			'to'		=>'primary',
+			'cc'		=>'secondary',
+			'bcc'		=>'dark',
+			'reply_to'	=>'warning'
+		];
 
 		foreach($types_of_recipients as $recipient_type => $recipient_class) {
 

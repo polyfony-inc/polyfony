@@ -1,8 +1,10 @@
 Public/Assets/*
+Public/.phpunit*
 Private/Binaries/*
 Private/Bundles/*
 Private/Config/*
 Private/Models/*
+Private/Tests/*
 Private/Storage/Cache/*
 Private/Storage/Data/*
 Private/Storage/Database/*
@@ -10,3 +12,4 @@ Private/Storage/Logs/*
 Private/Storage/Store/*
 Private/Vendor/*
 composer.lock
+console

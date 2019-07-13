@@ -6,10 +6,17 @@ use Polyfony\Exception as Exception;
 class Convert {
 
 	// convert a value comming from the database, to its original type
-	public static function valueFromDatabase($column_name, $raw_value, $get_it_raw=false) {
+	public static function valueFromDatabase(
+		$column_name, 
+		$raw_value, 
+		$get_it_raw=false
+	) {
 
 		// if we want the raw result ok, but exclude arrays that can never be gotten raw
-		if($get_it_raw === true && substr($column_name,-6,6) != '_array') {
+		if(
+			$get_it_raw === true && 
+			substr($column_name,-6,6) != '_array'
+		) {
 			// return as is
 			$value = $raw_value;
 		}
@@ -87,7 +94,11 @@ class Convert {
 			// date format in unknown, and does not look like a timestamp
 			elseif(!is_numeric($value)) {
 				// we can't allow such weird data get into the _date column
-				Throw new Exception('Query->secure() : Wrong data type for magic date field '.$column);
+				Throw new Exception(
+					'Query->secure() : Wrong data type for magic date field '.
+					$column,
+					400
+				);
 			}
 		}
 		// return the value (transformed or not)
@@ -100,15 +111,25 @@ class Convert {
 		string $column, 
 		$allow_wildcard = false
 	) :array {
-        // apply the secure regex for the column name
-        $column = preg_replace(($allow_wildcard ? '/[^a-zA-Z0-9_\.\*]/' : '/[^a-zA-Z0-9_\.]/'), '', $column);    
-        // cleanup the placeholder
-        $placeholder = str_replace(['.', '*'], '_', strtolower($column)); 
-        // return cleaned column
-        return([$quote_symbol . $column . $quote_symbol, $placeholder]);
+		// apply the secure regex for the column name
+		$column = preg_replace(
+			(
+				$allow_wildcard ? 
+					'/[^a-zA-Z0-9_\.\*]/' : 
+					'/[^a-zA-Z0-9_\.]/'
+			), 
+			'', 
+			$column
+		);    
+		// cleanup the placeholder
+		$placeholder = str_replace(['.', '*'], '_', strtolower($column)); 
+		// return cleaned column
+		return([$quote_symbol . $column . $quote_symbol, $placeholder]);
 	}
 
-	public static function convertArrayOfObjectsToPlainArray(array $content) :array {
+	public static function convertArrayOfObjectsToPlainArray(
+		array $content
+	) :array {
 		// for each line of the array
 		foreach($content as $index => $something) {
 			// deduce the columns intelligently depending if it's an object or not

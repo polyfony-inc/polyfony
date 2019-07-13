@@ -374,6 +374,8 @@ class Response {
 	}
 
 	public static function render() :void {
+		// trigger the beforeRender event
+		Events::trigger('beforeRender');
 		// if no content is set yet we garbage collect
 		self::$_content = self::$_content ?: self::clean();
 		// set the current protocol of fallback to HTTP 1.1 and set the status code plus message
@@ -389,6 +391,10 @@ class Response {
 		echo self::getContent();
 		// if cache is enabled and page is cachable
 		self::isCachable() === false ?: self::cache(); 
+		// flush the cache to release the output an allow events processing
+		fastcgi_finish_request();
+		// trigger the associated event
+		Events::trigger('onTerminate');
 		// it ends here
 		exit;
 		

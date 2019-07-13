@@ -14,6 +14,9 @@
 	<a class="btn btn-warning btn-md" href="/demo/locales/" role="button"/>
 		<strong>Locales</strong> object
 	</a> 
+	<a class="btn btn-warning btn-md" href="/demo/emails/" role="button"/>
+		<strong>Emails</strong> object
+	</a> 
 	<a class="btn btn-warning btn-md" href="/demo/database/" role="button"/>
 		<strong>Database</strong> object
 	</a> 

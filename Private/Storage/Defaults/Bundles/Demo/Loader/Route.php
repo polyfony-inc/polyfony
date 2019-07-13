@@ -11,25 +11,23 @@ Polyfony\Router::get('/','Demo/Demo@welcome', 'index');
 
 
 // new syntax
-Polyfony\Router::map('/demo/:type/', 'Demo/Demo@{type}', 'demo')
-	->where([
-		'type'=>[
-			'in_array'=>[
-				'secure',
-				'disconnect',
-				'database',
-				'locales',
-				'request',
-				'response',
-				'exception',
-				'json',
-				'logs',
-				'router',
-				'vendorBootstrap',
-				'vendorGoogle',
-				''
-			]
-		]
-	]);
+Polyfony\Router::map('/demo/:category/', 'Demo/Demo@{category}', 'demo')
+->where([
+	'category'=>['in_array'=>[
+		'',
+		'secure',
+		'locales',
+		'emails',
+		'database',
+		'response',
+		'request',
+		'router',
+		'logs',
+		'exception',
+		'json',
+		'vendorBootstrap',
+		'vendorGoogle'
+	]]
+]);
 
 ?>

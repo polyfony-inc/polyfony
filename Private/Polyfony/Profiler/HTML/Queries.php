@@ -82,9 +82,11 @@ class Queries {
 			str_replace(
 				' ',
 				'&nbsp;',
-				json_encode(
-					$element['informations']['Query']->getValues(),
-					JSON_PRETTY_PRINT
+				htmlentities(
+					json_encode(
+						$element['informations']['Query']->getValues(),
+						JSON_PRETTY_PRINT
+					)
 				)
 			)
 		);
