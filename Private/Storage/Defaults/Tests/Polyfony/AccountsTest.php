@@ -19,6 +19,10 @@ final class AccountsTest extends TestCase
 	protected function setUp(): void {
 		// purge the database
 		Accounts::_delete()->execute();
+		self::createDemoAccount();
+	}
+
+	public static function createDemoAccount() :void {
 		// create fixtures
 		Accounts::create([
 			'id'			=>1,
@@ -33,6 +37,8 @@ final class AccountsTest extends TestCase
 
 	protected function tearDown(): void {
 
+		Accounts::_delete()->execute();
+		self::createDemoAccount();
 
 	}
 

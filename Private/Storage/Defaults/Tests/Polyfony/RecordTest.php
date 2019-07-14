@@ -5,28 +5,54 @@ namespace Tests\Polyfony;
 
 use PHPUnit\Framework\TestCase;
 use Models;
+use Models\Emails as Emails;
+use Models\Accounts as Accounts;
+use Polyfony\Security as Security;
 
 // those tests need to stricter and less dumb
 final class RecordTest extends TestCase
 {
 	protected function setUp(): void {
-		// purge the database
+		
+		// purge emails as they'll be used to test
+		Emails::_delete()->execute();
 
 		// create fixtures
+		Emails::create(QueryTest::first_email);
+
+		// purge emails as they'll be used to test
+		Accounts::_delete()->execute();
+
+		// create fixtures
+		AccountsTest::createDemoAccount();
 
 	}
 
-	public function testSetString(): void {
+	protected function tearDown(): void {
+
+		// purge emails aferwards
+		Emails::_delete()->execute();
+
+		// purge emails aferwards
+		Accounts::_delete()->execute();
+
+		// but re-create one
+		AccountsTest::createDemoAccount();
+
+	}
+
+
+	// public function testSetString(): void {
 		
-	}
+	// }
 
-	public function testSetInteger(): void {
+	// public function testSetInteger(): void {
 		
-	}
+	// }
 
-	public function testSetFloat(): void {
+	// public function testSetFloat(): void {
 		
-	}
+	// }
 
 	// public function testPush(): void {
 	// 	$this->assertEquals(
@@ -46,26 +72,26 @@ final class RecordTest extends TestCase
         );
 	}
 
-	public function testSetSize(): void {
+	// public function testSetSize(): void {
 		
-	}
+	// }
 
 	public function testSetDate(): void {
 		$this->assertEquals(
-            'XX/XX/XXXX',
+            '17/01/1970',
             (new Models\Emails(1))
             	->set(['creation_date'=>1400000])
             	->get('creation_date')
         );
 	}
 
-	public function testGetHtmlSafe(): void {
+	// public function testGetHtmlSafe(): void {
 		
-	}
+	// }
 
-	public function testClass(): void {
+	// public function testClass(): void {
 		
-	}
+	// }
 
 	public function testIncrement(): void {
 		$this->assertEquals(
@@ -91,7 +117,7 @@ final class RecordTest extends TestCase
 		$this->expectException(\Polyfony\Exception::class);
         (new Models\Accounts)->set(['login'=>'root']);
         $this->assertEquals(
-            (new Models\Accounts(['login'=>'julien.arnaud@sib-retail.com']))
+            (new Models\Accounts(['login'=>'foo.bar@awesomemails.com']))
             	->get('login', true),
             (new Models\Accounts(1))->get('login', true)
         );
@@ -107,9 +133,9 @@ final class RecordTest extends TestCase
         );
 	}
 
-	public function testIntegerValidator(): void {
-		// FILTER_VALIDATE_INT
-	}
+	// public function testIntegerValidator(): void {
+	// 	// FILTER_VALIDATE_INT
+	// }
 
 	public function testArrayValidator() :void {
 		$this->expectException(\Polyfony\Exception::class);
@@ -117,25 +143,25 @@ final class RecordTest extends TestCase
         	->set(['id_level'=>76]);
 	}
 
-	public function testCaplockFilter(): void {
+	// public function testCaplockFilter(): void {
 		
-	}
+	// }
 
-	public function testPhoneFilter(): void {
+	// public function testPhoneFilter(): void {
 		
-	}
+	// }
 
-	public function testSlugFilter(): void {
+	// public function testSlugFilter(): void {
 		
-	}
+	// }
 
-	public function testNumericFilter(): void {
+	// public function testNumericFilter(): void {
 		
-	}
+	// }
 
-	public function testIntegerFilter(): void {
+	// public function testIntegerFilter(): void {
 		
-	}
+	// }
 
 }
 

@@ -58,18 +58,24 @@ class DemoController extends pf\Controller {
 	public function indexAction() {
 
 		// allow the framework to cache that page for 24 hours
-	//	Response::enableOutputCache(24);
+		//	Response::enableOutputCache(24);
 		// but forbid the browser to do so (allows us to purge the cache earlier)
-	//	Response::disableBrowserCache();
-// Accounts::create([
-// 	'id'=>1,
-// 	'id_level'=>1,
-// 	'password'=>Security::getPassword('toor'),
-// 	'modules_array'=>[],
-// 	'is_enabled'=>1,
-// 	'login'=>'root@domain.local',
-// 	'creation_date'=>time()
-// ]);
+		//	Response::disableBrowserCache();
+
+		// if you need to manually create accounts
+		// before having  built a CRUD for accounts
+		// feel free to create them as bellow
+		
+		// Accounts::create([
+		// 	'id'			=>1,
+		// 	'id_level'		=>1,
+		// 	'is_enabled'	=>1,
+		// 	'login'			=>'root@domain.local',
+		// 	'password'		=>Security::getPassword('toor'),
+		// 	'modules_array'	=>[],
+		// 	'creation_date'	=>time()
+		// ]);
+
 		// view the main demo index
 		$this->view('Demo');
 	
@@ -83,6 +89,7 @@ class DemoController extends pf\Controller {
 			// prevent double-posting
 			Token::enforce();
 
+			// create a new email object
 			(new Models\Emails)
 				->set([
 					'to'			=>Request::post('to_email'), // this is validated by PHPMailer
@@ -93,7 +100,7 @@ class DemoController extends pf\Controller {
 					'charset'		=>'utf-8',
 					'files_array'	=>['../README.md'=>'README.md']
 				])
-				->save() ? // this instanciated and save basic bootstrap alerts
+				->save() ? // this instanciates and save basic bootstrap alerts
 					(new OK) : 
 					(new KO); 
 
@@ -145,7 +152,6 @@ class DemoController extends pf\Controller {
 		$this->Id 		= Security::get('id');
 		$this->Login 	= Security::get('login');
 		$this->Level 	= Security::get('id_level');
-		$this->Modules 	= implode(', ',Security::get('modules_array'));
 
 		// normal view
 		$this->view('Secure');

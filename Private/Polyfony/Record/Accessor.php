@@ -17,13 +17,13 @@ class Accessor extends Aware {
 		return $this->set([
 			$column_name => 
 				// if the incremented value doesn't exceed the maximum
-				(int) $this->get($column_name) + 1 <= $maximum_value || 
+				(int) $this->get($column_name, true) + 1 <= $maximum_value || 
 				// of if we don't have a maximum_value defined
 				is_null($maximum_value) ? 
 					// increment it
-					(int) $this->get($column_name) + 1 : 
+					(int) $this->get($column_name, true) + 1 : 
 					// keep as is
-					$this->get($column_name)
+					$this->get($column_name, true)
 		]);
 
 	}
@@ -37,11 +37,11 @@ class Accessor extends Aware {
 		return $this->set([
 			$column_name => 
 				// if the incremented value doesn't exceed the maximum
-				(int) $this->get($column_name) - 1 >= $minimum_value ? 
+				(int) $this->get($column_name, true) - 1 >= $minimum_value ? 
 					// increment it
-					(int) $this->get($column_name) - 1 : 
+					(int) $this->get($column_name, true) - 1 : 
 					// keep as is
-					$this->get($column_name)
+					$this->get($column_name, true)
 		]);
 
 	}

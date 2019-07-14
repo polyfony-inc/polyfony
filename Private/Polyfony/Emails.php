@@ -4,6 +4,13 @@ namespace Polyfony;
 
 class Emails extends Record {
 
+	const recipients_types_to_phpmailer_methods = [
+		'to'		=>'addRecipient',
+		'cc'		=>'addcc',
+		'bcc'		=>'addBcc',
+		'reply_to'	=>'addReplyTo'
+	];
+
 	public $creation_date		= null;
 	public $sending_date		= null;
 	public $body 				= '';
@@ -108,42 +115,47 @@ class Emails extends Record {
 			// for each column that has to be set
 			foreach($columns as $column => $value) {
 				// if we want to set a variable
-				if(
-					$column == 'body' && 
-					is_array($value)
-				) {
-					$this->setVariables($value);
-				}
-				elseif($column == 'template') {
-					$this->setTemplate($value);
-				}
-				elseif($column == 'smtp') {
-					$this->setSMTP($value);
-				}
-				elseif($column == 'to') {
-					$this->setRecipient('to', $value);
-				}
-				elseif($column == 'reply_to') {
-					$this->setRecipient('reply_to', $value);
-				}
-				elseif($column == 'cc') {
-					$this->setRecipient('cc', $value);
-				}
-				elseif($column == 'bcc') {
-					$this->setRecipient('bcc', $value);
-				}
-				else {
-					// otherwise set it normally
-					parent::set([$column=>$value]);
-				}
+				$this->setIncludingFakeColumns($column, $value);
 			}
 		}
 		else {
+			// if we want to set a variable
 			parent::set($columns, $ignored_value);
 		}
 		// and still, return ourselves for chaining
 		return $this;
 
+	}
+
+	// this is not to be called directly
+	// it's only used to simplify the ->set() method
+	private function setIncludingFakeColumns(
+		string $column, 
+		$value
+	) :void {
+		// if the body is an array, we assume it's a list of variables
+		if($column == 'body' && is_array($value)) {
+			$this->setVariables($value);
+		}
+		// allow to set the template 
+		elseif($column == 'template') {
+			$this->setTemplate($value);
+		}
+		// allow to change the smtp
+		elseif($column == 'smtp') {
+			$this->setSMTP($value);
+		}
+		// recipients settings
+		elseif(in_array(
+			$column, 
+			['to','cc','bcc','reply_to']
+		)) {
+			$this->setRecipient($column, $value);
+		}
+		else {
+			// otherwise set it normally
+			parent::set([$column=>$value]);
+		}
 	}
 
 	private function setTemplate(string $template_path) :self {
@@ -330,42 +342,25 @@ class Emails extends Record {
 
 	// this applies options that are only used in development, or only in production  
 	private function configurePHPMailerRecipients() :void {
-
-		// set the recipients
-		foreach(
-			$this->getRecipients('to') as $email => $name
-		) {
-			// add to the mailer as actual recipients or as header (hidden)
-			Config::isProd() ? 
-				$this->_['mailer']->addAddress($email, $name) : 
-				$this->_['mailer']->addCustomHeader('X-To', $email . ' ' . $name);
-		}
-		// set the carbon copy recipients
-		foreach(
-			$this->getRecipients('cc') as $email => $name
-		) {
-			// add to the mailer as actual recipients or as header (hidden)
-			Config::isProd() ? 
-				$this->_['mailer']->addCC($email, $name) : 
-				$this->_['mailer']->addCustomHeader('X-Cc', $email . ' ' . $name);
-		}
-		// set the hidden recipients
-		foreach(
-			$this->getRecipients('bcc') as $email => $name
-		) {
-			// add to the mailer as actual recipients or as header (hidden)
-			Config::isProd() ? 
-				$this->_['mailer']->addBCC($email, $name) : 
-				$this->_['mailer']->addCustomHeader('X-Bcc', $email . ' ' . $name);
-		}
-		// set the reply-to recipients
-		foreach(
-			$this->getRecipients('reply_to') as $email => $name
-		) {
-			// add to the mailer as actual recipients or as header (hidden)
-			Config::isProd() ? 
-				$this->_['mailer']->addReplyTo($email, $name) : 
-				$this->_['mailer']->addCustomHeader('X-Reply-To', $email . ' ' . $name);
+		// for each category of recipients
+		foreach($this->getRecipients() as $category => $recipients) {
+			// for each recipients in this category
+			foreach($recipients as $email => $name) {
+				// add to the mailer as actual recipients or as header (hidden)
+				Config::isProd() ? 
+					$this
+						->_['mailer']
+						->self::recipients_types_to_phpmailer_methods[$category](
+							$email, 
+							$name
+					) : 
+					$this
+						->_['mailer']
+						->addCustomHeader(
+							'X-'.ucfirst($category), 
+							$email . ' ' . $name
+					);
+			}
 		}
 		// if we are in the development enviroment
 		if(Config::isDev()) {

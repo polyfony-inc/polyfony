@@ -22,7 +22,8 @@ You need a POSIX compatible system (Linux/MacOS/xBSD), PHP >= 7.1 with ext-pdo, 
 ```
 composer create-project --stability=dev polyfony-inc/polyfony your-project-folder
 ```
-*--stability=dev is mandatory since we don't publish releases*
+*--stability=dev is mandatory since we don't publish releases yet* 
+Pretty much all the dependencies that get installed by composer are only required by PHPUnit.
 
 ###### NginX configuration
 ```

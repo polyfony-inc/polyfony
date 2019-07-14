@@ -25,6 +25,7 @@ Polyfony\Router::map('/demo/:category/', 'Demo/Demo@{category}', 'demo')
 		'logs',
 		'exception',
 		'json',
+		'disconnect',
 		'vendorBootstrap',
 		'vendorGoogle'
 	]]

@@ -6,7 +6,7 @@
 	</p>
 	<p>
 		id <code><?php echo $this->Id; ?></code>, level <code><?php echo $this->Level; ?></code>, 
-		login <code><?php echo $this->Login; ?></code>, modules <code><?php echo $this->Modules; ?></code>
+		login <code><?php echo $this->Login; ?></code></code>
 	</p>
 	<p>
 		To close your session, <a href="/demo/disconnect/">just click here</a>

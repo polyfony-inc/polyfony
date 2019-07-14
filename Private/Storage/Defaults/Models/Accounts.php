@@ -15,10 +15,10 @@ class Accounts extends \Polyfony\Security\Accounts {
 	];
 
 	const ID_LEVEL = [
-		0	=> 'God',
+		0	=> 'Developer',
 		1	=> 'Admin',
-		5	=> 'SuperUser',
-		20	=> 'User',
+		5	=> 'Power User',
+		20	=> 'Normal User',
 	];
 
 	const VALIDATORS = [
@@ -27,17 +27,21 @@ class Accounts extends \Polyfony\Security\Accounts {
 		'login'					=>FILTER_VALIDATE_EMAIL, 
 		'last_login_origin'		=>FILTER_VALIDATE_IP,
 		'last_failure_origin'	=>FILTER_VALIDATE_IP,
-
+		'creation_date'			=>FILTER_VALIDATE_INT,
 		// using arrays
-		'is_enabled'=>self::IS_ENABLED,
-		'id_level'	=>self::ID_LEVEL
+		'is_enabled'			=>self::IS_ENABLED,
+		'id_level'				=>self::ID_LEVEL
 
 	];
 
 	const FILTERS = [
 
 		// chained filters
-		'login'=>['email','length256'],
+		'login' => [
+			'email',
+			'strtolower',
+			'length256'
+		],
 		
 	];
 
@@ -46,13 +50,13 @@ class Accounts extends \Polyfony\Security\Accounts {
 
 	public function enable() :self {
 
-		return $this->set('IS_ENABLED', '1');
+		return $this->set(['is_enabled'=>'1']);
 
 	}
 
 	public function disable() :self {
 
-		return $this->set('IS_ENABLED', '0');
+		return $this->set(['is_enabled'=>'0']);
 
 	}
 
@@ -65,32 +69,47 @@ class Accounts extends \Polyfony\Security\Accounts {
 	}
 
 	// that have been created recenlty
-	public static function recentlyCreated($maximum=5) :array {
+	public static function recentlyCreated(
+		int $limit_to = 5
+	) :array {
 		return self::_select()
 			->orderBy(['creation_date'=>'DESC'])
-			->limitTo(0,$maximum)
+			->limitTo(0, $limit_to)
 			->execute();
 	}
 	
 	// that are disabled
 	public static function disabled() :array {
 		return self::_select()
-			->where(['IS_ENABLED'=>'0'])
+			->where(['is_enabled'=>'0'])
 			->execute();
 	}
 
-	// accounts that have had issues login in recently
-	public static function withErrors() :array {
+	// accounts that have had issues loging-in in recently
+	public static function withErrors(
+		int $recently = self::RECENT_FAILURE
+	) :array {
 
 		return self::_select()
-			->whereNotEmpty('last_failure_date')
-			->whereHigherThan('last_failure_date', time() - self::RECENT_FAILURE )
+			->whereNotEmpty(
+				['last_failure_date']
+			)
+			->whereHigherThan(
+				['last_failure_date'=> time() - $recently]
+			)
+			->orderBy(
+				['last_failure_date'=>'DESC']
+			)
 			->limitTo(0, 10)
-			->orderBy(['last_failure_date'=>'DESC'])
 			->execute();
 
 	}
 
+	public function getLevel() :string {
+
+		return self::ID_LEVEL[$this->get('id_level')];
+
+	}
 
 }
 
