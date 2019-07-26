@@ -5,9 +5,9 @@ namespace Polyfony;
 class Emails extends Record {
 
 	const recipients_types_to_phpmailer_methods = [
-		'to'		=>'addRecipient',
-		'cc'		=>'addcc',
-		'bcc'		=>'addBcc',
+		'to'		=>'addAddress',
+		'cc'		=>'addCC',
+		'bcc'		=>'addBCC',
 		'reply_to'	=>'addReplyTo'
 	];
 
@@ -346,11 +346,13 @@ class Emails extends Record {
 		foreach($this->getRecipients() as $category => $recipients) {
 			// for each recipients in this category
 			foreach($recipients as $email => $name) {
+				// deduce the proper add recipient method
+				$addRecipientMethod = self::recipients_types_to_phpmailer_methods[$category];
 				// add to the mailer as actual recipients or as header (hidden)
 				Config::isProd() ? 
 					$this
 						->_['mailer']
-						->self::recipients_types_to_phpmailer_methods[$category](
+						->$addRecipientMethod(
 							$email, 
 							$name
 					) : 
