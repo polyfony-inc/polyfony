@@ -393,6 +393,8 @@ class Response {
 		self::isCachable() === false ?: self::cache(); 
 		// flush the cache to release the output an allow events processing
 		fastcgi_finish_request();
+		// release any ongoing session so that onTerminate event aren't locking
+		session_write_close();
 		// trigger the associated event
 		Events::trigger('onTerminate');
 		// it ends here
