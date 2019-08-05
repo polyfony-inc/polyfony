@@ -423,11 +423,11 @@ class PagesController extends Controller {
 			]
 		);
 
-		// put the contents in $this, so that your view can use it
-		$this->contents = $page->get('contents');
-
-		// and pass it to the view
-		$this->view('Pages/FromTheDatabase');
+		// and pass your variables to the view
+		$this->view('Pages/FromTheDatabase', [
+			'title'		=>$page->get('title'),
+			'contents'	=>$page->get('contents')
+		]);
 
 	}
 

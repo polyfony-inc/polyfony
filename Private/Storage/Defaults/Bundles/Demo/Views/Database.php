@@ -1,6 +1,10 @@
 <?php use Polyfony\Locales as Locales; ?>
 <div class="jumbotron" style="padding:45px;">
-	<h1>Database</h1>
+
+	<h1>
+		Database
+	</h1>
+	
 	<p>
 		Retrieve and iterate over database records.<br />
 		This example uses the <code>Database</code> abstraction and the <code>Record</code> class.
@@ -16,67 +20,12 @@
 
 					Accounts 
 					<span class="badge badge-info">
-						<?= count($this->Accounts); ?>	
+						<?= count($accounts); ?>	
 					</span>
 				</div>
-				
-				<table class="table">
-					<tr>
-						<th>
-							Login
-						</th>
-						<th>
-							Session expiration (raw)
-						</th>
-						<th>
-							Session expiration (relative)
-						</th>
-						<th>
-							Session expiration
-						</th>
-						<th>
-							Level
-						</th>
-						<th>
-							Last login date
-						</th>
-					</tr>
-					<?php foreach($this->Accounts as $record): ?>
-						<tr>
-							<td>
-								<code>
-									<?= $record->tget('login',16); ?>
-								</code>
-							</td>
-							<td>
-								<code>
-									<?= $record->get('session_expiration_date',true); ?>
-								</code>
-							</td>
-							<td>
-								<code>
-									<?= Polyfony\Format::date($record->get('session_expiration_date',true)); ?>
-								</code>
-							</td>
-							<td>
-								<span class="label label-warning">
-									<?= $record->get('session_expiration_date'); ?>
-								</span>
-							</td>
-							<td>
-								<?= $record->getLevel(); ?>
-								(<code>
-									<?= $record->get('id_level'); ?>
-								</code>) 
-							</td>
-							<td>
-								<span class="label label-success">
-									<?= $record->get('last_login_date'); ?>
-								</span>
-							</td>
-						</tr>
-					<?php endforeach; ?>
-				</table>
+			
+				<?php $this->view('Database/Table', ['accounts'=>$accounts]); ?>
+
 			</div>
 		</div>
 
@@ -104,7 +53,7 @@
 							Login
 						</label>
 						<div class="col-9">
-							<?= $this->RootAccount->input(
+							<?= $rootAccount->input(
 								'login', 
 								['class'=>'form-control']
 							); ?>
@@ -116,7 +65,7 @@
 							Level
 						</label>
 						<div class="col-9">
-							<?= $this->RootAccount->select(
+							<?= $rootAccount->select(
 								'id_level', 
 								Models\Accounts::ID_LEVEL, 
 								['class'=>'form-control']
@@ -129,7 +78,7 @@
 							Is enabled ?
 						</label>
 						<div class="col-9">
-							<?= $this->RootAccount->select(
+							<?= $rootAccount->select(
 								'is_enabled', 
 								Models\Accounts::IS_ENABLED, 
 								['class'=>'form-control']
@@ -142,7 +91,7 @@
 							Account expires on (optional)
 						</label>
 						<div class="col-9">
-							<?= $this->RootAccount->input(
+							<?= $rootAccount->input(
 								'account_expiration_date', [
 									'type'			=>'date',
 									'placeholder'	=>'DD/MM/YYYY',
@@ -161,7 +110,7 @@
 								'password', null, [
 									'type'		=>'password',
 									'class'		=>'form-control',
-									'minlength'	=>$this->MinPasswordLength
+									'minlength'	=>$minimumPasswordLength
 								]
 							); ?>
 						</div>

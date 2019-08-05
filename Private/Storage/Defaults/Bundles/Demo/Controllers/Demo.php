@@ -107,9 +107,9 @@ class DemoController extends pf\Controller {
 		}
 
 		// get the list of all emails stored in the database
-		$this->emails = Models\Emails::search();
-
-		$this->view('Emails');
+		$this->view('Emails', [
+			'emails'=>Models\Emails::search()
+		]);
 
 	}
 
@@ -195,10 +195,13 @@ class DemoController extends pf\Controller {
 	
 	public function databaseAction() {
 		
-		$this->MinPasswordLength = 6;
+		// this should obviously be a constant of the Accounts class
+		$minimumPasswordLength = 6;
 
 		// retrieve specific account
-		$this->RootAccount = new Accounts(1);
+		// in this case, by it's id
+		// but you could also pass ['login'=>'root@domain.com'] to retrieve it
+		$rootAccount = new Accounts(1);
 
 		if(Request::isPost()) {
 
@@ -206,7 +209,7 @@ class DemoController extends pf\Controller {
 			Token::enforce();
 
 			// update some fields
-			$this->RootAccount->set([
+			$rootAccount->set([
 				'login'						=>Request::post('Accounts')['login'],
 				'id_level'					=>Request::post('Accounts')['id_level'],
 				'is_enabled'				=>Request::post('Accounts')['is_enabled'],
@@ -214,7 +217,7 @@ class DemoController extends pf\Controller {
 			]);
 
 			// in trusted cases you can do
-			// $this->RootAccount->set(Request::post('Accounts'));
+			// $rootAccount->set(Request::post('Accounts'));
 			// which updates all columns
 			// though this should be kept for super admins, and you could overide the id and a bunch of stuff.
 			// an alternative to that is defining a setSafely()
@@ -224,49 +227,39 @@ class DemoController extends pf\Controller {
 				// if the password is to be updated
 				Request::post('password') && 
 				// basic "password policy" would be 6 chars here
-				strlen(Request::post('password')) >= $this->MinPasswordLength
+				strlen(Request::post('password')) >= $minimumPasswordLength
 			) {
 				// update the password
-				$this->RootAccount->set([
+				$rootAccount->set([
 					// convert it to a secured hash thru the Security class
 					'password'=>Security::getPassword(Request::post('password'))
 				]);
 			}
 			// save it and depending on the success of the operation, put an alert in the flashbag
-			$this->RootAccount->save() ? 
+			$rootAccount->save() ? 
 
-				(new Bootstrap\Alert([
-					'class'=>'success',
-					'message'=>'Account modified'
+				(new Alert([
+					'class'		=>'success',
+					'message'	=>'Account modified'
 				]))->save() : 
 			
-				(new Bootstrap\Alert([
-					'class'=>'danger',
-					'message'=>'Failed to modify account'
+				(new Alert([
+					'class'		=>'danger',
+					'message'	=>'Failed to modify account'
 				]))->save();
 
 		}
-
-		// demo query
-		$this->Accounts = Accounts::_select()
-			->limitTo(0,5)
-			->execute();
-		
-		// fully verbose/normal alternative
-		// $this->Accounts = pf\Database::query()
-		// 	->select()
-		// 	->from('Accounts')
-		// 	->limitTo(0,5)
-		// 	->execute();
-
-		// demo query from a model
-		$this->AnotherList = Accounts::all();
-		$this->AnotherList = Accounts::recentlyCreated();
-		$this->AnotherList = Accounts::disabled();
-		$this->AnotherList = Accounts::withErrors();
 		
 		// simple view	
-		$this->view('Database');		
+		$this->view('Database', [
+			'minimumPasswordLength'		=>$minimumPasswordLength,
+			'rootAccount'				=>$rootAccount,
+			'accounts'					=>Accounts::_select()->limitTo(0,5)->execute(),
+			'allAccounts'				=>Accounts::all(),
+			'recentlyCreatedAccounts'	=>Accounts::recentlyCreated(),
+			'disabledAccounts'			=>Accounts::disabled(),
+			'accountsWithErrors'		=>Accounts::withErrors()
+		]);		
 	}
 	
 	public function responseAction() {
