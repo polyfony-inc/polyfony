@@ -47,17 +47,17 @@ class Request {
 		self::$_signature = self::isPost() ? sha1(self::$_url.json_encode($_POST)) : sha1(self::$_url);
 
 		// set globals
-		self::$_get		= isset($_GET)				? $_GET				: array();
-		self::$_post	= isset($_POST)				? $_POST			: array();
-		self::$_server	= isset($_SERVER)			? $_SERVER			: array();
-		self::$_files	= isset($_FILES)			? $_FILES			: array();
-		self::$_argv	= isset($_SERVER['argv'])	? $_SERVER['argv']	: array();
+		self::$_get		= isset($_GET)				? $_GET				: [];
+		self::$_post	= isset($_POST)				? $_POST			: [];
+		self::$_server	= isset($_SERVER)			? $_SERVER			: [];
+		self::$_files	= isset($_FILES)			? $_FILES			: [];
+		self::$_argv	= isset($_SERVER['argv'])	? $_SERVER['argv']	: [];
 
 		// set the headers with a FPM fix
 		function_exists('getallheaders') ? self::$_headers = getallheaders() : self::setHeaders();
 
-		// remove globals
-		unset($_GET, $_POST, $_SERVER, $_FILES);
+		// if not in CLI remove superglobals
+		if(!self::isCli()) { unset($_GET, $_POST, $_SERVER, $_FILES); }
 
 		// marker
 		Profiler::releaseMarker('Request.init', true);
