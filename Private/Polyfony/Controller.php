@@ -36,7 +36,7 @@ class Controller {
 		// set bundle in which the view is
 		$view_bundle = 
 			$bundle_or_variables && is_string($bundle_or_variables) ? 
-			$bundle : Router::getCurrentRoute()->bundle;
+			$bundle_or_variables : Router::getCurrentRoute()->bundle;
 
 		// build the path for that view
 		$view_path = "../Private/Bundles/{$view_bundle}/Views/{$view_name}.php";
