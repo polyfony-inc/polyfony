@@ -142,8 +142,10 @@ class Aware {
 			);
 			// if there's actually something that has changed
 			if(
-				isset($this->{$column_or_array}) && 
-				$this->{$column_or_array} != $converted_value_ready_for_updating
+				(
+					isset($this->{$column_or_array}) && 
+					$this->{$column_or_array} != $converted_value_ready_for_updating
+				) || !isset($this->{$column_or_array})
 			) {
 				// update the value
 				$this->{$column_or_array} = $converted_value_ready_for_updating;
