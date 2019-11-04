@@ -154,7 +154,7 @@ class Security {
 		// we will redirect to the login page
 		!$redirect ?: Response::setRedirect(Config::get('router','login_url'), (Request::isPost() ? 3 : 0));
 		// save the desired url for further redirection later on
-		Request::isAjax() ?: Session::put('previously_requested_url', Request::getUrl(), true); 
+		Request::isAjax() || Request::isPost() ?: Session::put('previously_requested_url', Request::getUrl(), true); 
 		// trhow a polyfony exception that by itself will stop the execution with maybe a nice exception handler
 		Throw new Exception($message, $code);
 	}
