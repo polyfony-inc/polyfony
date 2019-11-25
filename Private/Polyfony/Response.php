@@ -281,7 +281,7 @@ class Response {
 		elseif(self::$_type == 'json') {
 			// add the profiler if required
 			self::$_content = Config::get('profiler', 'enable') && is_array(self::$_content) ? 
-				array_merge(self::$_content, Profiler::getArray()) : 
+				array_replace(self::$_content, Profiler::getArray()) : 
 				self::$_content;
 			// encode the content to json
 			self::$_content = json_encode(self::$_content);

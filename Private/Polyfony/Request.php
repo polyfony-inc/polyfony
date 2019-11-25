@@ -47,11 +47,11 @@ class Request {
 		self::$_signature = self::isPost() ? sha1(self::$_url.json_encode($_POST)) : sha1(self::$_url);
 
 		// set globals
-		self::$_get		= isset($_GET)				? $_GET				: [];
-		self::$_post	= isset($_POST)				? $_POST			: [];
-		self::$_server	= isset($_SERVER)			? $_SERVER			: [];
-		self::$_files	= isset($_FILES)			? $_FILES			: [];
-		self::$_argv	= isset($_SERVER['argv'])	? $_SERVER['argv']	: [];
+		self::$_get		=& $_GET;
+		self::$_post	=& $_POST;
+		self::$_server	=& $_SERVER;
+		self::$_files	=& $_FILES;
+		self::$_argv	=& $_SERVER['argv'];
 
 		// set the headers with a FPM fix
 		function_exists('getallheaders') ? self::$_headers = getallheaders() : self::setHeaders();
