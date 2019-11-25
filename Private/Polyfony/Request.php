@@ -56,9 +56,6 @@ class Request {
 		// set the headers with a FPM fix
 		function_exists('getallheaders') ? self::$_headers = getallheaders() : self::setHeaders();
 
-		// if not in CLI remove superglobals
-		if(!self::isCli()) { unset($_GET, $_POST, $_SERVER, $_FILES); }
-
 		// marker
 		Profiler::releaseMarker('Request.init', true);
 
