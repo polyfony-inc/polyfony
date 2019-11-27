@@ -401,17 +401,21 @@ class DemoController extends pf\Controller {
 		echo new Element('p', ['text'=>'Please note that if you get errors, it is because you should provide a Google API key.']);
 		// address geocoder
 		$address = 'Arc de triomphe, Paris';
-		echo new Element('code', ['text'=>"Google\Position::address('{$address}')"]);
+		echo new Element('code', ['text'=>"(Google\Geocoder)->setAddress('{$address}')->getPosition()"]);
 		var_dump(
-			Google\Position::address($address)
+			(new Google\Geocoder)
+				->setAddress($address)
+				->getPosition()
 		);
 		
 		echo new Element('hr');
 
 		// reverse geocoder
-		echo new Element('code', ['text'=>"Google\Position::reverse('48.873','2.292')"]);
+		echo new Element('code', ['text'=>"(Google\Geocoder)->setPosition('48.873','2.292')->getAddress()"]);
 		var_dump(
-			Google\Position::reverse(48.873,2.292)
+			(new Google\Geocoder)
+				->setPosition(48.873,2.292)
+				->getAddress()
 		);
 
 		echo new Element('hr');
