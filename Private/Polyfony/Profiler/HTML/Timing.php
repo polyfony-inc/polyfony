@@ -86,12 +86,15 @@ class Timing {
 
 		$timing_modal
 			->setTrigger([
-				'html'	=>' Execution time '.
+				'html'	=>' Execution '.
 				(new Element('span',[
 					'class'=>'badge badge-light',
-					'text'=>round($data['time'], 3) . ' sec'
+					'html'=> round($data['time'], 3) . ' sec' . 
+					'<span class="text-secondary" style="font-weight:lighter;"> and <strong>'.
+					\Polyfony\Format::size(memory_get_peak_usage())
+					.'</strong></span>'
 				])),
-				'class'	=>'btn btn-primary'
+				'class'	=>'btn btn-primary' . (\Polyfony\Config::get('profiler','use_small_buttons') ? ' btn-sm' : '')
 			], 'fa fa-stopwatch')
 			->setTitle([
 				'html'=>' &nbsp;Execution stack'
