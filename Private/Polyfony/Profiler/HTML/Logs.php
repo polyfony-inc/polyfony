@@ -60,7 +60,7 @@ class Logs {
 		return (new \Bootstrap\Modal('large'))
 			->setTrigger([
 				'html'	=>' Logs <span class="badge badge-light">'.count($logs).'</span>',
-				'class'	=>'btn btn-secondary',
+				'class'	=>'btn btn-secondary' . (\Polyfony\Config::get('profiler','use_small_buttons') ? ' btn-sm' : ''),
 				'style'	=>'margin-left:10px'
 			], 'fas fa-exclamation-circle')
 			->setTitle(	['html'=>' &nbsp;Logs'], 'fas fa-exclamation-circle')

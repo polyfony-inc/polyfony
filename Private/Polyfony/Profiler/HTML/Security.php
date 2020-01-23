@@ -36,7 +36,7 @@ class Security {
 		$security_dropdown
 			->setTrigger([
 				'text'	=>' ' . (\Polyfony\Security::get('login') ? \Polyfony\Security::get('login') : 'n/a'),
-				'class'	=>'btn btn-light',
+				'class'	=>'btn btn-light' . (\Polyfony\Config::get('profiler','use_small_buttons') ? ' btn-sm' : ''),
 				'style'	=>'margin-left:10px'
 			], 'fa fa-user-circle');
 		

@@ -1,31 +1,26 @@
 <?php
 
 namespace Polyfony\Profiler\HTML;
+use Polyfony\Element as Element;
 
 class Routing {
 
 	public static function getHeader(\Bootstrap\Dropdown $routing_dropdown) :\Bootstrap\Dropdown {
 
 		$routing_dropdown->addItem([
-			'html'=>'<strong>Status</strong> '.(\Polyfony\Response::getStatus() >= 200 && \Polyfony\Response::getStatus() < 300 ? 
-			new \Polyfony\Element('span',['class'=>'badge badge-success','text'=>\Polyfony\Response::getStatus()]) : 
-			new \Polyfony\Element('span',['class'=>'badge badge-warning','text'=>\Polyfony\Response::getStatus()])
-			)
-		]);
-		$routing_dropdown->addItem([
 			'html'=>'<strong>SSL/TLS</strong> '.(\Polyfony\Request::isSecure() ? 
-			new \Polyfony\Element('span',['class'=>'badge badge-success','text'=>'Yes']) :
-			new \Polyfony\Element('span',['class'=>'badge badge-warning','text'=>'No']) 
+			new Element('span',['class'=>'badge badge-success','text'=>'Yes']) :
+			new Element('span',['class'=>'badge badge-warning','text'=>'No']) 
 			)
 		]);
 		$routing_dropdown->addItem([
-			'html'=>'<strong>Method</strong> '.			(new \Polyfony\Element('span',['class'=>'badge badge-primary','text'=>strtoupper(\Polyfony\Request::getMethod())]))
+			'html'=>'<strong>Method</strong> '.			(new Element('span',['class'=>'badge badge-primary','text'=>strtoupper(\Polyfony\Request::getMethod())]))
 		]);
 		$routing_dropdown->addItem([
-			'html'=>'<strong>Environment</strong> '.	(new \Polyfony\Element('span',['class'=>'badge badge-primary','text'=>\Polyfony\Config::isProd() ? 'Prod' : 'Dev']))
+			'html'=>'<strong>Environment</strong> '.	(new Element('span',['class'=>'badge badge-primary','text'=>\Polyfony\Config::isProd() ? 'Prod' : 'Dev']))
 		]);
 		$routing_dropdown->addItem([
-			'html'=>'<strong>PHP Version</strong> '.	(new \Polyfony\Element('code',['class'=>'','text'=>phpversion()]))
+			'html'=>'<strong>PHP Version</strong> '.	(new Element('code',['class'=>'','text'=>phpversion()]))
 		]);
 
 		return $routing_dropdown;
@@ -37,20 +32,20 @@ class Routing {
 		$routing_dropdown->addDivider();
 		foreach(\Polyfony\Request::getUrlParameters() as $parameter => $value) {
 			$routing_dropdown->addItem([
-				'html'=>new \Polyfony\Element('code',[
+				'html'=>new Element('code',[
 					'html'=>
-						(new \Polyfony\Element('strong', 	['text'=>$parameter.':'])) . 
-						(new \Polyfony\Element('span', 		['text'=>$value]))
+						(new Element('strong', 	['text'=>$parameter.':'])) . 
+						(new Element('span', 		['text'=>$value]))
 				])
 			]);
 		}
 		$routing_dropdown->addDivider();
 		foreach(\Polyfony\Profiler::IMPORTANT_PHP_INI as $parameter) {
 			$routing_dropdown->addItem([
-				'html'=>new \Polyfony\Element('code',[
+				'html'=>new Element('code',[
 					'html'=>
-						(new \Polyfony\Element('strong', 	['text'=>$parameter.':'])) . 
-						(new \Polyfony\Element('span', 		['text'=>ini_get($parameter)]))
+						(new Element('strong', 	['text'=>$parameter.':'])) . 
+						(new Element('span', 		['text'=>ini_get($parameter)]))
 				])
 			]);
 		}
@@ -63,32 +58,49 @@ class Routing {
 
 		$routing_dropdown->addDivider();
 		$routing_dropdown->addItem([
-			'html'=>'<strong>Route</strong> '.		(new \Polyfony\Element('code',['text'=>$route->name]))
+			'html'=>'<strong>Route</strong> '.		(new Element('code',['text'=>$route->name]))
 		]);
 		$routing_dropdown->addItem([
-			'html'=>'<strong>Bundle</strong> '.		(new \Polyfony\Element('code',['text'=>$route->bundle]))
+			'html'=>'<strong>Bundle</strong> '.		(new Element('code',['text'=>$route->bundle]))
 		]);
 		$routing_dropdown->addItem([
-			'html'=>'<strong>Controller</strong> '.	(new \Polyfony\Element('code',['text'=>$route->controller]))
+			'html'=>'<strong>Controller</strong> '.	(new Element('code',['text'=>$route->controller]))
 		]);
 		$routing_dropdown->addItem([
-			'html'=>'<strong>Action</strong> '.		(new \Polyfony\Element('code',['text'=>$route->action]))
+			'html'=>'<strong>Action</strong> '.		(new Element('code',['text'=>$route->action]))
 		]);
 
 		return $routing_dropdown;
 
 	}
 
+	private static function getStatusLabel() :Element {
+		return 
+			\Polyfony\Response::getStatus() >= 200 && 
+			\Polyfony\Response::getStatus() < 300 ? 
+				new Element('span',[
+					'class'=>'badge badge-success',
+					'text'=>\Polyfony\Response::getStatus()
+				]) : 
+				new Element('span',[
+					'class'=>'badge badge-warning',
+					'text'=>\Polyfony\Response::getStatus()
+				]);
+	}
+
 	public static function getComponent() :\Bootstrap\Dropdown {
 
 		// ROUTING
 		$route = \Polyfony\Router::getCurrentRoute();
-		$full_route = " {$route->bundle}/{$route->controller}@<strong>{$route->action}</strong>";
+
+		$full_route = 
+			" " . self::getStatusLabel() . 
+			" {$route->bundle}/{$route->controller}@<strong>{$route->action}</strong>";
 		$routing_dropdown = new \Bootstrap\Dropdown();
 		$routing_dropdown
 			->setTrigger([
 				'html'	=>$full_route,
-				'class'	=>'btn btn-light',
+				'class'	=>'btn btn-light' . (\Polyfony\Config::get('profiler','use_small_buttons') ? ' btn-sm' : ''),
 				'style'	=>'margin-left:10px'
 			], 'fa fa-code-branch');
 

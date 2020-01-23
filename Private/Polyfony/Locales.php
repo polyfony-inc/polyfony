@@ -7,6 +7,8 @@ class Locales {
 	protected static $_locales = null;
 	protected static $_language = null;
 	
+	protected static $_load_time = 0;
+
 	public static function init() {
 
 		// if the language is not set already we detect it
@@ -16,6 +18,13 @@ class Locales {
 		
 	}
 	
+	public static function getStatistics() :array {
+		return [
+			'locales_count'	=>self::$_locales ? count(self::$_locales[Config::get('locales','default')]) : 0,
+			'load_time'		=>self::$_load_time
+		];
+	}
+
 	private static function detect() {
 		
 		// if the store has a language cookie and that language is valid
@@ -56,6 +65,10 @@ class Locales {
 	
 	private static function load() {
 		
+		// only if profiler enabled
+		if(Config::get('profiler', 'enable')) {
+			$start = microtime(true);
+		}
 		// load locales
 		self::$_locales = array();
 		// for each locale file available
@@ -68,6 +81,10 @@ class Locales {
 		}
 		// save the freshly loaded locales to the cache
 		Cache::put('Locales',self::$_locales,true);
+		// only if profiler enabled
+		if(Config::get('profiler', 'enable')) {
+			self::$_load_time = microtime(true) - $start;
+		}
 		
 	}
 	

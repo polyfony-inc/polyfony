@@ -43,10 +43,11 @@ class HTML {
 		// assemble the profiler
 		return (self::getContainer())
 			->adopt(HTML\Timing::getComponent	($data))
-			->adopt(HTML\Memory::getComponent	($data))
 			->adopt(HTML\Routing::getComponent	($data))
 			->adopt(HTML\Queries::getComponent	($data))
 			->adopt(HTML\Emails::getComponent	($data))
+			->adopt(HTML\Cache::getComponent	($data))
+			->adopt(HTML\Locales::getComponent	($data))
 			->adopt(HTML\Logs::getComponent		($data))
 			->adopt(HTML\Security::getComponent	($data));
 

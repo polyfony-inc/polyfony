@@ -71,7 +71,7 @@ class Emails {
 				'html'	=>' Emails <span class="badge badge-light">'.count($emails).
 					' <span class="text-secondary" style="font-weight:lighter;">in <strong>' . 
 					round($emails_duration, 1) .'</strong> ms</span></span>',
-				'class'	=>'btn btn-warning',
+				'class'	=>'btn btn-warning' . (\Polyfony\Config::get('profiler','use_small_buttons') ? ' btn-sm' : ''),
 				'style'	=>'margin-left:10px'
 			], 'fa fa-envelope')
 			->setTitle(	['html'=>' &nbsp;Emails'], 'fa fa-envelope')

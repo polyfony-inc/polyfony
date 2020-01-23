@@ -66,7 +66,7 @@ class Queries {
 					' Queries <span class="badge badge-light">'.count($queries).
 					' <span class="text-secondary" style="font-weight:lighter;">in <strong>' . 
 					round($queries_duration, 1) .'</strong> ms</span></span>',
-				'class'	=>'btn btn-danger',
+				'class'	=>'btn btn-danger' . (\Polyfony\Config::get('profiler','use_small_buttons') ? ' btn-sm' : ''),
 				'style'	=>'margin-left:10px'
 			], 'fa fa-database')
 			->setTitle(	['html'=>' &nbsp;Queries'], 'fa fa-database')
