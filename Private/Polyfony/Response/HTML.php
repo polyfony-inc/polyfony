@@ -268,9 +268,7 @@ class HTML {
 			// if the file does not exist
 			!file_exists($pack_path) || 
 			// or if we're not allowed to use cached items
-			!\Polyfony\Config::get('response','cache') ||
-			// of if the request explicitely disallows that
-			!\Polyfony\Request::isCacheAllowed();
+			!\Polyfony\Config::get('response','cache');
 	}
 
 	// assets path converter

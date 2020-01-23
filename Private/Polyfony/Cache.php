@@ -4,6 +4,24 @@ namespace Polyfony;
 
 class Cache {
 
+	// number of cache hits
+	private static $hits_count = 0;
+	// number of cache misses
+	private static $misses_count = 0;
+	// elapsed time putting into the cache
+	private static $cache_in_time = 0;
+	// elapsed time retrieving from cache
+	private static $cache_out_time = 0;
+
+	public static function getStatistics() :array {
+		return [
+			'hits_count'	=>self::$hits_count,
+			'misses_count'	=>self::$misses_count,
+			'cache_in_time'	=>self::$cache_in_time,
+			'cache_out_time'=>self::$cache_out_time,
+		];
+	}
+
 	private static function path($variable) :string {
 
 		// secure the variable name
@@ -34,6 +52,7 @@ class Cache {
 		}
 		// file doesn't even exist
 		else {
+			// we don't have that element
 			return false;
 		}
 
@@ -47,12 +66,22 @@ class Cache {
 			// throw an exception
 			Throw new \Polyfony\Exception("{$variable} already exists in the store.");
 		}
+		// only if the profiler is enabled
+		if(Config::get('profiler','enable')) {
+			// feed the statistics
+			self::$misses_count++;
+			$start = microtime(true);
+		}
 		// store it
 		file_put_contents(self::path($variable), msgpack_pack($value));
 		// compute the expiration time or set to a year by default
 		$lifetime = $lifetime ? time() + $lifetime : time() + 365 * 24 * 3600;
 		// alter the modification time
 		touch(self::path($variable), $lifetime);
+		// only if the profiler is enabled
+		if(Config::get('profiler','enable')) {
+			self::$cache_in_time += microtime(true) - $start;
+		}
 		// return status
 		return(self::has($variable));
 		
@@ -60,15 +89,25 @@ class Cache {
 	
 
 	public static function get(string $variable) {
-		
+
 		// doesn't exist in the store
 		if(!self::has($variable)) {
 			// throw an exception
 			Throw new \Polyfony\Exception("{$variable} does not exist in the store.");
 		}
-		
-		// return it
-		return(msgpack_unpack(file_get_contents(self::path($variable))));
+		// only if the profiler is enabled
+		if(Config::get('profiler','enable')) {
+			// feed the statistics
+			self::$hits_count++;
+			$start = microtime(true);
+		}
+		// get it, unpack it 
+		$cache_item = msgpack_unpack(file_get_contents(self::path($variable)));
+		// only if the profiler is enabled
+		if(Config::get('profiler','enable')) {
+			self::$cache_out_time += microtime(true) - $start;
+		}
+		return $cache_item;
 		
 	}
 	
