@@ -105,7 +105,7 @@ $webpage = new Pages(['url'=>'/my-awesome-vegan-burger-recipe/']);
 // note that any html in the title field will be escaped in the <input> to prevent XSS
 // returns <input type="etextmail" name="Pages[title]" value="My awesome Vegan burger recipe is so yummy" />
 (new Pages(67))
-	->input('title', ['class'=>'form-control']);
+	->input('title', ['class'=>'form-control']);
 
 // Create an new page, populate and save it
 (new Pages)
@@ -564,9 +564,11 @@ By default, some markers are placed in key places (around every `Database` queri
 
 If your `Response` is of type `json`, then the `Profiler` ìnformations will be merged with your `Response` as an array.
 
-![Profiler Demo1](https://i.imgur.com/rQoVmD3.png)
+![Profiler Demo1](https://i.imgur.com/DDrZqBu.png)
 
-![Profiler Demo2](https://i.imgur.com/z4ohjVx.png)
+![Profiler Demo2](https://i.imgur.com/x7EyKMF.png)
+
+![Profiler Demo3](https://i.imgur.com/DClz03j.png)
 
 ### [Locales](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonylocales)
 
@@ -811,7 +813,7 @@ Config::get($group, $key);
 ```
 
 
-### [EMails](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonymail)
+### [Emails](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonymail)
 
 Emails are very simple to use and built over PHPMailer. 
 They extend `Record` object, so there are normal database entries that have a few more methods, and they can be sent !
