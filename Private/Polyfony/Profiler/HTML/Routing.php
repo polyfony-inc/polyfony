@@ -5,29 +5,42 @@ use Polyfony\Element as Element;
 
 class Routing {
 
-	public static function getHeader(\Bootstrap\Dropdown $routing_dropdown) :\Bootstrap\Dropdown {
+	public static function getHeader(
+		\Bootstrap\Dropdown $routing_dropdown
+	) :\Bootstrap\Dropdown {
 
-		$routing_dropdown->addItem([
-			'html'=>'<strong>SSL/TLS</strong> '.(\Polyfony\Request::isSecure() ? 
-			new Element('span',['class'=>'badge badge-success','text'=>'Yes']) :
-			new Element('span',['class'=>'badge badge-warning','text'=>'No']) 
-			)
-		]);
-		$routing_dropdown->addItem([
-			'html'=>'<strong>Method</strong> '.			(new Element('span',['class'=>'badge badge-primary','text'=>strtoupper(\Polyfony\Request::getMethod())]))
-		]);
-		$routing_dropdown->addItem([
-			'html'=>'<strong>Environment</strong> '.	(new Element('span',['class'=>'badge badge-primary','text'=>\Polyfony\Config::isProd() ? 'Prod' : 'Dev']))
-		]);
-		$routing_dropdown->addItem([
-			'html'=>'<strong>PHP Version</strong> '.	(new Element('code',['class'=>'','text'=>phpversion()]))
-		]);
+		return $routing_dropdown
+			->addItem([
+				'html'=>'<strong>SSL/TLS</strong> '.(\Polyfony\Request::isSecure() ? 
+				new Element('span',['class'=>'badge badge-success','text'=>'Yes']) :
+				new Element('span',['class'=>'badge badge-warning','text'=>'No']) 
+				)
+			])
+			->addItem([
+				'html'=>'<strong>Method</strong> '.	(new Element('span',[
+					'class'=>'badge badge-primary',
+					'text'=>strtoupper(\Polyfony\Request::getMethod())
+				]))
+			])
+			->addItem([
+				'html'=>'<strong>Environment</strong> '.(new Element('span',[
+					'class'=>'badge badge-primary',
+					'text'=>\Polyfony\Config::isProd() ? 'Prod' : 'Dev'
+				]))
+			])
+			->addItem([
+				'html'=>'<strong>PHP Version</strong> '. (new Element('code',[
+					'class'=>'',
+					'text'=>phpversion()
+				]))
+			]);
 
-		return $routing_dropdown;
 
 	}
 
-	public static function getBody(\Bootstrap\Dropdown $routing_dropdown) :\Bootstrap\Dropdown {
+	public static function getBody(
+		\Bootstrap\Dropdown $routing_dropdown
+	) :\Bootstrap\Dropdown {
 
 		$routing_dropdown->addDivider();
 		foreach(\Polyfony\Request::getUrlParameters() as $parameter => $value) {
@@ -54,23 +67,33 @@ class Routing {
 
 	}
 
-	public static function getFooter(\Bootstrap\Dropdown $routing_dropdown, \Polyfony\Route $route) :\Bootstrap\Dropdown {
+	public static function getFooter(
+		\Bootstrap\Dropdown $routing_dropdown, 
+		\Polyfony\Route $route
+	) :\Bootstrap\Dropdown {
 
-		$routing_dropdown->addDivider();
-		$routing_dropdown->addItem([
-			'html'=>'<strong>Route</strong> '.		(new Element('code',['text'=>$route->name]))
-		]);
-		$routing_dropdown->addItem([
-			'html'=>'<strong>Bundle</strong> '.		(new Element('code',['text'=>$route->bundle]))
-		]);
-		$routing_dropdown->addItem([
-			'html'=>'<strong>Controller</strong> '.	(new Element('code',['text'=>$route->controller]))
-		]);
-		$routing_dropdown->addItem([
-			'html'=>'<strong>Action</strong> '.		(new Element('code',['text'=>$route->action]))
-		]);
-
-		return $routing_dropdown;
+		return $routing_dropdown
+			->addDivider()
+			->addItem([
+				'html'=>'<strong>Route</strong> '.(new Element('code',[
+					'text'=>$route->name
+				]))
+			])
+			->addItem([
+				'html'=>'<strong>Bundle</strong> '.(new Element('code',[
+					'text'=>$route->bundle
+				]))
+			])
+			->addItem([
+				'html'=>'<strong>Controller</strong> '.(new Element('code',[
+					'text'=>$route->controller
+				]))
+			])
+			->addItem([
+				'html'=>'<strong>Action</strong> '.	(new Element('code',[
+					'text'=>$route->action
+				]))
+			]);
 
 	}
 
