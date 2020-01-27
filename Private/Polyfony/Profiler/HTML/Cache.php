@@ -3,76 +3,108 @@
 namespace Polyfony\Profiler\HTML;
 use Polyfony\Element as Element;
 use Polyfony\Format as Format;
+use Bootstrap\Dropdown as Dropdown;
 
 class Cache {
 
 	private static $statistics = [];
 
-	public static function getBody(\Bootstrap\Dropdown $cache_dropdown) :\Bootstrap\Dropdown {
-
-		$cache_dropdown->addHeader(['text'=>'Hits']);
-		$cache_dropdown->addItem([
-			'html'=>
-				'<strong>Count</strong> ' . 
-				(new Element('span',[
-					'class'=>'badge badge-success',
-					'text'=>self::$statistics['hits_count']
-				]))
-		]);
-		$cache_dropdown->addItem([
-			'html'=>
-				'<strong>Time</strong> ' . 
-				(new Element('span',[
-					'class'=>'badge badge-light',
-					'text'=>round(self::$statistics['cache_out_time']*1000, 1). ' ms'
-				]))
-		]);
-		$cache_dropdown->addDivider();
-		$cache_dropdown->addHeader(['text'=>'Misses']);
-		$cache_dropdown->addItem([
-			'html'=>
-				'<strong>Count</strong> ' . 
-				(new Element('span',[
-					'class'=>'badge badge-warning',
-					'text'=>self::$statistics['misses_count']
-				]))
-		]);
-		$cache_dropdown->addItem([
-			'html'=>
-				'<strong>Time</strong> ' . 
-				(new Element('span',[
-					'class'=>'badge badge-light',
-					'text'=>round(self::$statistics['cache_in_time']*1000, 1). ' ms'
-				]))
-		]);
-		$cache_dropdown->addDivider();
-		$cache_dropdown->addHeader(['text'=>'Caches']);
-		$cache_dropdown->addItem([
-			'html'=>
-				'<strong>Request</strong> ' . 
-				(\Polyfony\Request::isCacheAllowed() ? 
-					new Element('span', ['class'=>'badge badge-success','text'=>'Allowed']) : 
-					new Element('span', ['class'=>'badge badge-warning','text'=>'Disallowed']))
-		]);
-		$cache_dropdown->addItem([
-			'html'=>
-				'<strong>Response</strong> ' . 
-				(\Polyfony\Config::get('response','cache') ? 
-					new Element('span', ['class'=>'badge badge-success','text'=>'Allowed']) : 
-					new Element('span', ['class'=>'badge badge-warning','text'=>'Disallowed']))
-		]);
+	private static function getBodyHits(
+		Dropdown $cache_dropdown
+	) :Dropdown {
 		
+		return $cache_dropdown
+			->addHeader(['text'=>'Hits'])
+			->addItem(Locales::createItem(
+				'Count',
+				'success',
+				self::$statistics['hits_count']
+			))
+			->addItem(Locales::createItem(
+				'Time',
+				'light',
+				round(
+					self::$statistics['cache_out_time']*1000, 
+					1
+				). ' ms'
+			))
+			->addDivider();
+	} 
 
-		return $cache_dropdown;
+	private static function getBodyMisses(
+		Dropdown $cache_dropdown
+	) :Dropdown {
+
+		return $cache_dropdown
+			->addHeader(['text'=>'Misses'])
+			->addItem(Locales::createItem(
+				'Count',
+				'warning',
+				self::$statistics['misses_count']
+			))
+			->addItem(Locales::createItem(
+				'Time',
+				'light',
+				round(
+					self::$statistics['cache_in_time']*1000, 
+					1
+				). ' ms'
+			))
+			->addDivider();
 
 	}
 
-	public static function getComponent() :\Bootstrap\Dropdown {
+	private static function getBodyMisc(
+		Dropdown $cache_dropdown
+	) :Dropdown {
+
+		return $cache_dropdown
+			->addHeader(['text'=>'Caches'])
+			->addItem([
+				'html'=>
+					'<strong>Request</strong> ' . 
+					(\Polyfony\Request::isCacheAllowed() ? 
+						new Element('span', [
+							'class'=>'badge badge-success',
+							'text'=>'Allowed'
+						]) : 
+						new Element('span', [
+							'class'=>'badge badge-warning',
+							'text'=>'Disallowed'
+						]))
+			])
+			->addItem([
+				'html'=>
+					'<strong>Response</strong> ' . 
+					(\Polyfony\Config::get('response','cache') ? 
+						new Element('span', [
+							'class'=>'badge badge-success',
+							'text'=>'Allowed'
+						]) : 
+						new Element('span', [
+							'class'=>'badge badge-warning',
+							'text'=>'Disallowed'
+						]))
+			]);
+
+	}
+
+	public static function getBody(
+		Dropdown $cache_dropdown
+	) :Dropdown {
+
+		$cache_dropdown = self::getBodyHits($cache_dropdown);
+		$cache_dropdown = self::getBodyMisses($cache_dropdown);
+		$cache_dropdown = self::getBodyMisc($cache_dropdown);
+
+		return $cache_dropdown;
+	}
+
+	public static function getComponent() :Dropdown {
 
 		self::$statistics = \Polyfony\Cache::getStatistics();
 
-		$cache_dropdown = new \Bootstrap\Dropdown();
-		$cache_dropdown
+		return self::getBody((new Dropdown)
 			->setTrigger([
 				'html'	=>' Cache ' . 
 					(new Element('span',[
@@ -82,13 +114,9 @@ class Cache {
 						round(self::$statistics['cache_out_time']*1000, 1)
 						.' ms</strong></span>'
 					])),
-				'class'	=>'btn btn-info' . (\Polyfony\Config::get('profiler','use_small_buttons') ? ' btn-sm' : ''),
+				'class'	=>'btn btn-cache' . (\Polyfony\Config::get('profiler','use_small_buttons') ? ' btn-sm' : ''),
 				'style'	=>'margin-left:10px'
-			], 'fa fa-fighter-jet');
-
-		$cache_dropdown = self::getBody($cache_dropdown);
-		
-		return $cache_dropdown;
+			], 'fa fa-fighter-jet'));
 
 	}
 

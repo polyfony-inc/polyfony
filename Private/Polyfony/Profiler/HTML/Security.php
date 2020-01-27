@@ -1,22 +1,29 @@
 <?php
 
 namespace Polyfony\Profiler\HTML;
+use Bootstrap\Dropdown as Dropdown;
+use Polyfony\Element as Element;
 
 class Security {
 
-	public static function getBody(\Bootstrap\Dropdown $security_dropdown) : \Bootstrap\Dropdown {
+	public static function getBody(
+		Dropdown $security_dropdown
+	) : Dropdown {
 
-		$user = new \Polyfony\Element('code', ['text'=>\Polyfony\Security::get('login')]);
+		$user = new Element('code', ['text'=>\Polyfony\Security::get('login')]);
 		$security_dropdown->addItem([
 			'html'=>"<strong>User</strong> {$user}"
 		]);
-		$level = new \Polyfony\Element('span', ['class'=>'badge badge-primary','text'=>\Polyfony\Security::get('id_level')]);
+		$level = new Element('span', [
+			'class'=>'badge badge-primary',
+			'text'=>\Polyfony\Security::get('id_level')
+		]);
 		$security_dropdown->addItem([
 			'html'=>"<strong>Level</strong> {$level}"
 		]);
 		$modules = [];
 		foreach((array) \Polyfony\Security::get('modules_array') as $module) {
-			$modules[] = new \Polyfony\Element('span', ['class'=>'badge badge-primary','text'=>$module]);
+			$modules[] = new Element('span', ['class'=>'badge badge-primary','text'=>$module]);
 		}
 		$modules = implode(' ', $modules);
 		$security_dropdown->addItem([
@@ -29,25 +36,30 @@ class Security {
 
 	}
 
-	public static function getComponent() : \Bootstrap\Dropdown {
+	public static function getComponent() : Dropdown {
 
 		// SECURITY
-		$security_dropdown = new \Bootstrap\Dropdown();
-		$security_dropdown
+		$security_dropdown = (new Dropdown)
 			->setTrigger([
 				'text'	=>' ' . (\Polyfony\Security::get('login') ? \Polyfony\Security::get('login') : 'n/a'),
-				'class'	=>'btn btn-light',
+				'class'	=>'btn btn-security' . (\Polyfony\Config::get('profiler','use_small_buttons') ? ' btn-sm' : ''),
 				'style'	=>'margin-left:10px'
 			], 'fa fa-user-circle');
 		
 
 		$security_dropdown = self::getBody($security_dropdown);
 
-		$loggedin = new \Polyfony\Element('span', ['text'=>\Polyfony\Security::get('last_login_date'),'class'=>'badge badge-secondary']);
+		$loggedin = new Element('span', [
+			'text'=>\Polyfony\Security::get('last_login_date'),
+			'class'=>'badge badge-secondary'
+		]);
 		$security_dropdown->addItem([
 			'html'=>"<strong>Logged</strong> {$loggedin}"
 		]);
-		$expiration = new \Polyfony\Element('span', ['text'=>\Polyfony\Security::get('session_expiration_date'),'class'=>'badge badge-secondary']);
+		$expiration = new Element('span', [
+			'text'=>\Polyfony\Security::get('session_expiration_date'),
+			'class'=>'badge badge-secondary'
+		]);
 		$security_dropdown->addItem([
 			'html'=>"<strong>Expires</strong> {$expiration}"
 		]);

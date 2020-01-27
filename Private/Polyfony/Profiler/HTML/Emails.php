@@ -7,7 +7,12 @@ class Emails {
 	private static function getRecipients($debug_data) :array {
 
 		$recipients = [];
-		$types_of_recipients = ['to'=>'dark','cc'=>'secondary','bcc'=>'secondary'];
+		$types_of_recipients = [
+			'to'		=>'primary',
+			'cc'		=>'secondary',
+			'bcc'		=>'dark',
+			'reply_to'	=>'warning'
+		];
 
 		foreach($types_of_recipients as $recipient_type => $recipient_class) {
 
@@ -40,7 +45,7 @@ class Emails {
 				$recipients 		= self::getRecipients($debug_data);
 				$card 					= new \Polyfony\Element('div', 		['style'=>'border-bottom:solid 1px #efefef;padding-bottom:12px;margin-bottom:12px;overflow:hidden;']);
 				$title_container 		= new \Polyfony\Element('span', 	['class'=>'text-dark','style'=>'padding-right:20px;']);
-				$title_prefix			= new \Polyfony\Element('strong', 	['text'=>"Email #{$emails_count} ",'class'=>'text-danger']);
+				$title_prefix			= new \Polyfony\Element('strong', 	['text'=>"Email #{$emails_count} ",'class'=>'text-email']);
 				$title 					= new \Polyfony\Element('span', 	['text'=>$debug_data['subject']]);
 				$parameters_container 	= new \Polyfony\Element('div', 		['style'=>'padding-top:0px']);
 
@@ -66,7 +71,7 @@ class Emails {
 				'html'	=>' Emails <span class="badge badge-light">'.count($emails).
 					' <span class="text-secondary" style="font-weight:lighter;">in <strong>' . 
 					round($emails_duration, 1) .'</strong> ms</span></span>',
-				'class'	=>'btn btn-warning',
+				'class'	=>'btn btn-email' . (\Polyfony\Config::get('profiler','use_small_buttons') ? ' btn-sm' : ''),
 				'style'	=>'margin-left:10px'
 			], 'fa fa-envelope')
 			->setTitle(	['html'=>' &nbsp;Emails'], 'fa fa-envelope')
