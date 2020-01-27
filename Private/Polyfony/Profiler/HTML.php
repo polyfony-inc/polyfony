@@ -109,7 +109,8 @@ class HTML {
 				'bottom'			=>0,
 				'left'				=>0,
 				'padding'			=>'10px',
-				'background'		=>'rgba(0,0,0,0.2)'
+				'background'		=>'rgba(0,0,0,0.2)',
+				'backdrop-filter'	=>'blur(3px)'
 			]
 		]);
 
