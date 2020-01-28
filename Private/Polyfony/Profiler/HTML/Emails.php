@@ -8,10 +8,9 @@ class Emails {
 
 		$recipients = [];
 		$types_of_recipients = [
-			'to'		=>'primary',
-			'cc'		=>'secondary',
-			'bcc'		=>'dark',
-			'reply_to'	=>'warning'
+			'to'=>'dark',
+			'cc'=>'secondary',
+			'bcc'=>'secondary'
 		];
 
 		foreach($types_of_recipients as $recipient_type => $recipient_class) {
