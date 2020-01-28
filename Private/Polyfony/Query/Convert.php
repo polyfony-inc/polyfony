@@ -109,20 +109,20 @@ class Convert {
 	public static function columnToPlaceholder(
 		string $quote_symbol, 
 		string $column, 
-		bool $allow_wildcard_and_spaces = false
+		bool $allow_symbols = false
 	) :array {
 		// apply the secure regex for the column name
 		$column = preg_replace(
 			(
-				$allow_wildcard_and_spaces ? 
-					'/[^a-zA-Z0-9_\.\* ]/' : 
+				$allow_symbols ? 
+					'/[^a-zA-Z0-9_\.\*\-\+ ]/' : 
 					'/[^a-zA-Z0-9_\.]/'
 			), 
 			'', 
 			$column
 		);    
 		// cleanup the placeholder
-		$placeholder = str_replace(['.', '*', ' '], '_', strtolower($column)); 
+		$placeholder = str_replace(['.', '*', ' ', '-', '+'], '_', strtolower($column)); 
 		// return cleaned column
 		return([$quote_symbol . $column . $quote_symbol, $placeholder]);
 	}
