@@ -76,7 +76,7 @@ class Query extends Query\Conditions {
 			// the key contains a dot, we are trying to create a alias
 			elseif(stripos($function_or_index_or_column, '.') !== false) {
 				// secure the column
-				list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$function_or_index_or_column);
+				list($column) = Query\Convert::columnToPlaceholder($this->Quote ,$function_or_index_or_column, true);
 				// select the column and create an alias
 				$this->Selects[] = "{$column} AS {$placeholder}";
 			}
