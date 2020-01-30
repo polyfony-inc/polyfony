@@ -301,19 +301,25 @@ class Query extends Query\Conditions {
 			$this->throwExceptionOn('prepare');
 		}
 		
-		foreach(
-			$this->Values 
-			as $placeholder => $value
-		) {
-			$this->Prepared->bindValue(
-				$placeholder, 
-				$value,
-				(is_int($value) ? \PDO::PARAM_INT : null)
-			);
+		// if we want automatic casting of integers
+		if(Config::get('database','cast_integers', 0)) {
+			// cast values to the right type (if possible)
+			foreach($this->Values as $placeholder => $value) {
+				is_int($value) ? 
+					$this->Prepared->bindValue(
+			 		$placeholder, $value, PDO::PARAM_INT
+			 	) : 
+					$this->Prepared->bindValue(
+			 		$placeholder, $value
+			 	);
+			}
 		}
-
+		
 		// actually execute
-		$this->Success = $this->Prepared->execute();
+		$this->Success = $this->Prepared->execute(
+			Config::get('database','cast_integers', 0) ? 
+				null : $this->Values
+		);
 		
 		// if execution failed
 		if($this->Success === false) {
