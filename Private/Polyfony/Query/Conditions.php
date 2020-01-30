@@ -162,8 +162,8 @@ class Conditions extends Base {
 
 	public function whereBetween(
 		string $column, 
-		float $lower, 
-		float $higher
+		$lower, 
+		$higher
 	) {
 		// secure the column name
 		list(

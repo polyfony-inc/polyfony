@@ -301,8 +301,19 @@ class Query extends Query\Conditions {
 			$this->throwExceptionOn('prepare');
 		}
 		
-		// execute the statement
-		$this->Success = $this->Prepared->execute($this->Values);
+		foreach(
+			$this->Values 
+			as $placeholder => $value
+		) {
+			$this->Prepared->bindValue(
+				$placeholder, 
+				$value,
+				(is_int($value) ? \PDO::PARAM_INT : null)
+			);
+		}
+
+		// actually execute
+		$this->Success = $this->Prepared->execute();
 		
 		// if execution failed
 		if($this->Success === false) {
