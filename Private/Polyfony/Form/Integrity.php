@@ -50,7 +50,9 @@ class Integrity {
 		if(Session::has($variable)) {
 			// if it matches
 			if(
-				(string) Session::get($variable) === 
+				// we do a non case-sensitive comparison, since gregwar/captcha 
+				// is bugged and doesn't handle properly caps/lowercase
+				(string) strtolower(Session::get($variable)) === 
 				(string) strtolower(Request::post($variable))
 			) {
 				// remove it
