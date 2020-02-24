@@ -50,7 +50,7 @@ class Integrity {
 		if(Session::has($variable)) {
 			// if it matches
 			if(
-				(string) Session::get($variable) === 
+				(string) strtolower(Session::get($variable)) === 
 				(string) strtolower(Request::post($variable))
 			) {
 				// remove it
