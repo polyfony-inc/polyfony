@@ -301,29 +301,46 @@ class Mail {
 
 	// this applies options that are only used in development, or only in production  
 	private function configureEnvironmentSpecifics() {
-		// if we are in production we set the actual recipients
-        if(Config::isProd()) {
-            // set the main recipients
-            foreach($this->recipients['to'] as $mail => $name) {
-                // add to the mailer
-                $this->mailer->addAddress($mail, $name);
-            }
-            // set the carbon copy recipients
-            foreach($this->recipients['cc'] as $mail => $name) {
-                // add to the mailer
-                $this->mailer->addCC($mail, $name);
-            }
-            // set the hidden recipients
-            foreach($this->recipients['bcc'] as $mail => $name) {
-                // add to the mailer
-                $this->mailer->addBCC($mail, $name);
-            }
-        }
-        // if we are in the development enviroment
-        else {
-            // add the bypass address only
-            $this->mailer->addAddress(Config::get('mail', 'bypass_mail'));
-        }
+
+		// set the main recipients
+		foreach($this->recipients['to'] as $mail => $name) {
+			// add to the mailer
+			Config::isProd() ? 
+				$this->mailer->addAddress($mail, $name) : 
+				$this->mailer
+					->addCustomHeader(
+						'X-To', 
+						$mail . ' ' . $name
+				);
+		}
+		// set the carbon copy recipients
+		foreach($this->recipients['cc'] as $mail => $name) {
+			// add to the mailer
+			Config::isProd() ? 
+				$this->mailer->addCC($mail, $name) : 
+				$this->mailer
+					->addCustomHeader(
+						'X-Cc', 
+						$mail . ' ' . $name
+				);
+		}
+		// set the hidden recipients
+		foreach($this->recipients['bcc'] as $mail => $name) {
+			// add to the mailer
+			Config::isProd() ? 
+				$this->mailer->addBCC($mail, $name) : 
+				$this->mailer
+					->addCustomHeader(
+						'X-Bcc', 
+						$mail . ' ' . $name
+				);
+		}
+
+		// if we are in the development enviroment
+		if(!Config::isProd()) {
+			// add the bypass address
+			$this->mailer->addAddress(Config::get('mail', 'bypass_mail'));
+		}
 	}
 
 }
