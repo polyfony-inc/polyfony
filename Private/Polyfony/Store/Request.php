@@ -25,7 +25,7 @@ class Request implements StoreInterface {
 	 * @return boolean           If the variable exists or not.
 	 * @static
 	 */
-	public static function has($variable) {
+	public static function has(string $variable) :bool {
 		return isset(self::$_store[$variable]);
 	}
 
@@ -40,7 +40,12 @@ class Request implements StoreInterface {
 	 * @throws Exception          If the variable already exists when we try not to overwrite it.
 	 * @static
 	 */
-	public static function put($variable, $value, $overwrite = false) {
+	public static function put(
+		string $variable, 
+		$value, 
+		bool $overwrite = false,
+		?int $lifetime = null
+	) :bool {
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (self::has($variable) && ! $overwrite) {
 			throw new \Exception("{$variable} already exists in the store.");
@@ -59,7 +64,7 @@ class Request implements StoreInterface {
 	 * @throws Exception        If the variable does not exist.
 	 * @static
 	 */
-	public static function get($variable) {
+	public static function get(string $variable) {
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (! self::has($variable)) {
 			throw new \Exception("{$variable} does not exist in the store.");
@@ -77,7 +82,7 @@ class Request implements StoreInterface {
 	 * @throws Exception        If the variable does not exist.
 	 * @static
 	 */
-	public static function remove($variable) {
+	public static function remove(string $variable) :bool {
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (! self::has($variable)) {
 			throw new \Exception("{$variable} does not exist in the store.");

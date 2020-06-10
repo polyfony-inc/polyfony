@@ -4,7 +4,7 @@ namespace Polyfony\Store;
 
 class Database implements StoreInterface {
 
-	public static function has($variable) {
+	public static function has(string $variable) :bool {
 		// if no variable is provieded
 		if(!$variable) {
 			// throw an exception by security to prevent accidental database operations
@@ -20,7 +20,12 @@ class Database implements StoreInterface {
 		);
 	}
 
-	public static function put($variable, $value=null, $overwrite=false) {
+	public static function put(
+		string $variable, 
+		$value, 
+		bool $overwrite = false,
+		?int $lifetime = null
+	) :bool {
 		// do we have that variable
 		$existing_variable = self::has($variable);
 		// variable already exist in the store and we can override it
@@ -53,7 +58,7 @@ class Database implements StoreInterface {
 
 	}
 
-	public static function get($variable) {
+	public static function get(string $variable) {
 		// doesn't exist in the store
 		if(!self::has($variable)) {
 			// return false
@@ -69,7 +74,7 @@ class Database implements StoreInterface {
 		return(unserialize($record->get('content', true)));
 	}
 
-	public static function remove($variable) {
+	public static function remove(string $variable) :bool {
 		// doesn't exist in the store
 		if(!self::has($variable)) {
 			// return false
