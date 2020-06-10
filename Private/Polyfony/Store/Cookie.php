@@ -19,7 +19,9 @@ class Cookie implements StoreInterface {
 	public static function has(
 		string $variable
 	) :bool {
-		return isset($_COOKIE[$variable]) && strlen($_COOKIE['variable']);
+		return 
+			isset($_COOKIE[$variable]) && 
+			strlen($_COOKIE[$variable]);
 	}
 
 	/**
@@ -37,9 +39,9 @@ class Cookie implements StoreInterface {
 	public static function put(
 		string $variable, 
 		$value, 
-		bool $overwrite = false, 
-		int $lifetime = null
-	) {
+		bool $overwrite = false,
+		?int $lifetime = null
+	) :bool {
 		// If it exists, and we do not want to overwrite
 		if (self::has($variable) && !$overwrite) {
 			// then throw exception
@@ -109,7 +111,7 @@ class Cookie implements StoreInterface {
 			);
 		}
 		// Remove the cookie by setting its expires in the past
-		setcookie($variable, '', time() - 3600, '/');
+		return setcookie($variable, '', time() - 3600, '/');
 	}
 }
 

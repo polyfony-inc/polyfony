@@ -81,17 +81,29 @@ class Accounts extends \Polyfony\Record {
 	public function tryOpeningSession() :bool {
 
 		// generate the expiration date
-		$session_expiration = time() + ( Conf::get('security', 'session_duration') * 3600 );
+		$session_expiration = 
+			time() + 
+			( 
+				Conf::get('security', 'session_duration') * 
+				3600 
+			);
 		
 		// generate a session key with its expiration, the login, the password, the ip, the user agent
-		$session_signature = Sec::getSignature($this->get('login', true).$this->get('password', true).$session_expiration);
+		$session_signature = Sec::getSignature(
+			$this->get('login', true).
+			$this->get('password', true).
+			$session_expiration
+		);
 
 		// if we manage to open the session properly
 		return 
 			// if the cookie creation went right
 			$this->createCookieSession($session_signature) && 
 			// and the account record updating went right too
-			$this->createDatabaseSessionUntil($session_expiration, $session_signature);
+			$this->createDatabaseSessionUntil(
+				$session_expiration, 
+				$session_signature
+			);
 
 	}
 

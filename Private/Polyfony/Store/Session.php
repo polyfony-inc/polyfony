@@ -34,7 +34,7 @@ class Session implements StoreInterface
 	 * @return boolean           If the variable exists or not.
 	 * @static
 	 */
-	public static function has($variable) {
+	public static function has($variable) :bool {
 		self::startSessionIfNeeded();
 		return isset($_SESSION[$variable]);
 	}
@@ -50,7 +50,12 @@ class Session implements StoreInterface
 	 * @throws Exception          If the variable already exists when we try not to overwrite it.
 	 * @static
 	 */
-	public static function put($variable, $value, $overwrite = false) {
+	public static function put(
+		string $variable, 
+		$value, 
+		bool $overwrite = false,
+		int $lifetime = null
+	) :bool {
 		self::startSessionIfNeeded();
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (self::has($variable) && ! $overwrite) {
@@ -70,7 +75,7 @@ class Session implements StoreInterface
 	 * @throws Exception        If the variable does not exist.
 	 * @static
 	 */
-	public static function get($variable) {
+	public static function get(string $variable) {
 		self::startSessionIfNeeded();
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (! self::has($variable)) {
@@ -89,7 +94,7 @@ class Session implements StoreInterface
 	 * @throws Exception        If the variable does not exist.
 	 * @static
 	 */
-	public static function remove($variable) {
+	public static function remove(string $variable) :bool {
 		self::startSessionIfNeeded();
 		// If it exists, and we do not want to overwrite, then throw exception
 		if (! self::has($variable)) {
