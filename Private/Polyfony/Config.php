@@ -36,7 +36,9 @@ class Config {
 
 	}
 	
-	public static function includeBundlesConfigs($bundles_configuration_files) :void {
+	public static function includeBundlesConfigs(
+		$bundles_configuration_files
+	) :void {
 		// for each of those files
 		foreach($bundles_configuration_files as $file) {
 			// include it
@@ -92,7 +94,10 @@ class Config {
 		// no cache available or enabled, we have to merge ourselves
 		else {
 			// for each configuration block that is specific
-			foreach(self::$_config[self::$_environment] as $group => $group_config) {
+			foreach(
+				self::$_config[self::$_environment] as 
+				$group => $group_config
+			) {
 				// merge the current configuration
 				self::$_config['Current'][$group] = array_merge(
 					self::$_config['Current'][$group],
@@ -105,12 +110,19 @@ class Config {
 
 	}
 	
-	public static function set(string $group, $key, $value=null) :void {
+	public static function set(
+		string $group, 
+		$key, 
+		$value=null
+	) :void {
 		// if only group + one parameters, set the whole group, else set a key of the group
 		$value !== null ? self::$_config['Current'][$group][$key] = $value : self::$_config['Current'][$group] = $key;
 	}
 	
-	public static function get(string $group, $key=null) {
+	public static function get(
+		string $group, 
+		$key=null
+	) {
 		// return the proper config
 		return($key ? 
 			// make sure the group's key exists before trying to access it
@@ -128,6 +140,17 @@ class Config {
 	public static function isProd() :bool {
 		// return boolean
 		return(self::$_environment == 'Prod');
+	}
+
+	// will convert a relative path to the application's root folder, into an absolute path
+	public static function absolutizePath(
+		string $relative_path
+	) :string {
+		return realpath(
+			Request::server('DOCUMENT_ROOT') . 
+			'/../' . 
+			$relative_path
+		);
 	}
 	
 }	

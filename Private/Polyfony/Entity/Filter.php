@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Polyfony\Record;
+namespace Polyfony\Entity;
 use Polyfony\Format as Format;
 
 class Filter {
@@ -52,7 +52,11 @@ class Filter {
 		'length4096'=>['maxlength'=>'4096']
 	];
 
-	public static function sanitizeThisValue(string $column, $value=null, string $class_name) {
+	public static function sanitizeThisValue(
+		string $column, 
+		$value=null, 
+		string $class_name
+	) {
 		// get the filter
 		$filters = self::getFiltersForColumn($column, $class_name);
 		// if a filter has been defined for that column
@@ -69,7 +73,10 @@ class Filter {
 		return $value;
 	}
 
-	public static function getFiltersForColumn(string $column, string $class_name) {
+	public static function getFiltersForColumn(
+		string $column, 
+		string $class_name
+	) {
 
 		// get the filters if any
 		$filters = isset($class_name::FILTERS[$column]) ? $class_name::FILTERS[$column] : null;

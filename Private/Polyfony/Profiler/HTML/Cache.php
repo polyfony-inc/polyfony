@@ -59,7 +59,7 @@ class Cache {
 	) :Dropdown {
 
 		return $cache_dropdown
-			->addHeader(['text'=>'Caches'])
+			->addHeader(['text'=>'Settings'])
 			->addItem([
 				'html'=>
 					'<strong>Request</strong> ' . 

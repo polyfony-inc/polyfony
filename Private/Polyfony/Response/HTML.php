@@ -12,11 +12,17 @@ class HTML {
 	protected static $_metas 	= [];
 
 	// set links for the current HTML page
-	public static function setLinks(array $links, bool $replace_existing=false) :void {
+	public static function setLinks(
+		array $links, 
+		bool $replace_existing=false
+	) :void {
 		// if we want to purge existing links
 		!$replace_existing ?: self::$_links = []; 
 		// href is the key for storing links
-		foreach($links as $href_or_index => $attributes_or_href) {
+		foreach(
+			$links as 
+			$href_or_index => $attributes_or_href
+		) {
 			// if arguments are provided
 			if(is_array($attributes_or_href)) {
 				// if we have a stylesheet
@@ -27,13 +33,19 @@ class HTML {
 					$attributes_or_href['rel'] == 'stylesheet'
 				) {
 					// also rewrite the path of assets that used relative shortcuts
-					$attributes_or_href['href'] 	= self::getPublicAssetPath($href_or_index,'Css');
+					$attributes_or_href['href'] 	= self::getPublicAssetPath(
+						$href_or_index, 
+						'Css'
+					);
 					// force the type
 					$attributes_or_href['type'] 	= 'text/css';
 					// force the rel
 					$attributes_or_href['rel'] 		= 'stylesheet';
 					// if the media key is implicit
-					array_key_exists('media', $attributes_or_href) ?: $attributes_or_href['media'] = 'all';
+					array_key_exists(
+						'media', 
+						$attributes_or_href
+					) ?: $attributes_or_href['media'] = 'all';
 					// push the slightly alternated stylesheet
 					self::$_links[$href_or_index] = $attributes_or_href;
 				}
@@ -61,7 +73,10 @@ class HTML {
 	}
 
 	// set scripts for the current HTML page
-	public static function setScripts(array $scripts, bool $replace_existing=false) :void {
+	public static function setScripts(
+		array $scripts, 
+		bool $replace_existing=false
+	) :void {
 		// if we want to purge existing scripts
 		!$replace_existing ?: self::$_scripts = [];
 		// for each script we have to set
@@ -73,7 +88,10 @@ class HTML {
 
 
 	// set metas for the current HTML page
-	public static function setMetas(array $metas, bool $replace_existing=false) :void {
+	public static function setMetas(
+		array $metas, 
+		bool $replace_existing=false
+	) :void {
 		// if we want to purge existing metas
 		!$replace_existing ?: self::$_metas = [];
 		// name is the key for storing metas
@@ -81,28 +99,53 @@ class HTML {
 	}
 
 	// shortcuts to quickly set multiple things
-	public static function set(array $assets) :void {
+	public static function set(
+		array $assets, 
+		bool $replace_existing=false
+	) :void {
 		// for each batch
-		foreach($assets as $category => $scripts_or_links_or_metas) {
+		foreach(
+			$assets as 
+			$category => $scripts_or_links_or_metas
+		) {
 			// if the batch is scripts
 			if($category == 'scripts') {
-				self::setScripts($scripts_or_links_or_metas);
+				self::setScripts(
+					$scripts_or_links_or_metas, 
+					$replace_existing
+				);
 			}
 			// if the batch is links
 			elseif($category == 'links') {
-				self::setLinks($scripts_or_links_or_metas);
+				self::setLinks(
+					$scripts_or_links_or_metas, 
+					$replace_existing
+				);
 			}
 			// if the match is metas
 			elseif($category == 'metas') {
-				self::setMetas($scripts_or_links_or_metas);
+				self::setMetas(
+					$scripts_or_links_or_metas, 
+					$replace_existing
+				);
 			}
 		}
 	}
 
 	// build an html page
-	public static function buildAndGetPage(string $content) :string {
+	public static function buildAndGetPage(
+		string $content
+	) :string {
+		
 		// initial content
-		$page = '<!doctype html><html lang="'.\Polyfony\Locales::getLanguage().'"><head><title>'.(isset(self::$_metas['title']) ? self::$_metas['title'] : '').'</title><meta http-equiv="content-type" content="text/html; charset=' . \Polyfony\Response::getCharset() . '" />';
+		$page = 
+			'<!doctype html><html lang="'.
+			\Polyfony\Locales::getLanguage().
+			'"><head><title>'.
+			(isset(self::$_metas['title']) ? self::$_metas['title'] : '').
+			'</title><meta http-equiv="content-type" content="text/html; charset=' . 
+			\Polyfony\Response::getCharset() . '" />';
+
 		// add the meta tags and the links
 		$page .= self::buildMetasTags() . self::buildLinksTags();
 		// close the head, add the body, and add the scripts
@@ -123,7 +166,9 @@ class HTML {
 		// for each available meta
 		foreach(self::$_metas as $name => $content) {
 			// add the formated the meta
-			$metas .= '<meta name="'.$name.'" content="'.\Polyfony\Format::htmlSafe($content).'" />';
+			$metas .= 
+				'<meta name="'.$name.'" content="'.
+				\Polyfony\Format::htmlSafe($content).'" />';
 		}
 		return $metas;
 
@@ -136,7 +181,10 @@ class HTML {
 		// pack and minify
 		self::packAndMinifyLinks();
 		// for each available link
-		foreach(self::$_links as $href => $attributes) {
+		foreach(
+			self::$_links as 
+			$href => $attributes
+		) {
 			// sort the attributes (compulse order needs)
 			ksort($attributes);
 			// build as base stylesheet link and merge its attributes
@@ -154,7 +202,7 @@ class HTML {
 		self::packAndMinifyScripts();
 		// for each available script
 		foreach(self::$_scripts as $src) {
-			// add the formated the meta
+			// add the formated the script
 			$scripts .= '<script type="text/javascript" src="'.$src.'"></script>';
 		}
 		return $scripts;
@@ -164,7 +212,10 @@ class HTML {
 		// if we are allowed to pack js files
 		if(self::isPackingOfTheseAssetsAllowed('js')) {
 			// generate a unique name for a pack that contains that list of scripts only
-			list($pack_name, $path_path) = self::getPackingNameAndPathFor(self::$_scripts,'Js');
+			list(
+				$pack_name, 
+				$path_path
+			) = self::getPackingNameAndPathFor(self::$_scripts,'Js');
 			// if the pack file doesn't exist yet or if we're not allowed to use cache in response
 			if(self::doesThisPackNeedRegeneration($path_path)) {
 				// create the packing directories if they don't already exist
@@ -180,7 +231,13 @@ class HTML {
 					}
 				}
 				// populate the cache file
-				file_put_contents($path_path, self::getMinifiedPackIfAllowed($pack_contents,  new \MatthiasMullie\Minify\JS));
+				file_put_contents(
+					$path_path, 
+					self::getMinifiedPackIfAllowed(
+						$pack_contents,  
+						new \MatthiasMullie\Minify\JS
+					)
+				);
 			}
 			// for each asset
 			foreach(self::$_scripts as $index => $file) {
@@ -254,16 +311,23 @@ class HTML {
 	// assets externalness detector
 	private static function isAssetPathRemote(string $asset_path) :bool {
 		// check is that asset is external to our server, or absolute (suspicously dynamic)
-		return (substr($asset_path,0,2) == '//' || substr($asset_path,0,4) == 'http');
+		return 
+			substr($asset_path,0,2) == '//' || 
+			substr($asset_path,0,4) == 'http';
 	}
 
-	private static function isPackingOfTheseAssetsAllowed(string $asset_type) :bool {
+	private static function isPackingOfTheseAssetsAllowed(
+		string $asset_type
+	) :bool {
 		// we have to be in prod, and the packing of this type of assets has to be allowed
-		return \Polyfony\Config::isProd() && \Polyfony\Config::get('response','pack_'.$asset_type) == '1';
+		return 
+			\Polyfony\Config::get('response','pack_'.$asset_type) == '1';
 	}
 
 	// if this pack needs to be generated again
-	private static function doesThisPackNeedRegeneration(string $pack_path) :bool {
+	private static function doesThisPackNeedRegeneration(
+		string $pack_path
+	) :bool {
 		return 
 			// if the file does not exist
 			!file_exists($pack_path) || 
@@ -272,14 +336,23 @@ class HTML {
 	}
 
 	// assets path converter
-	private static function getPublicAssetPath(string $asset_path, string $asset_type) :string {
+	private static function getPublicAssetPath(
+		string $asset_path, 
+		string $asset_type
+	) :string {
 		// if the asset path is absolute in any way
-		return (substr($asset_path,0,1) == '/' || substr($asset_path,0,4) == 'http') ?
+		return (
+			substr($asset_path,0,1) == '/' || 
+			substr($asset_path,0,4) == 'http'
+		) ?
 			// it is returned as is, // otherwise it is made relative to the Assets folder
 			$asset_path : "/Assets/{$asset_type}/$asset_path";
 	}
 
-	public static function getPackingNameAndPathFor(array $assets, string $asset_type) :array {
+	public static function getPackingNameAndPathFor(
+		array $assets, 
+		string $asset_type
+	) :array {
 		// generate a unique name for that list of assets, and the right extension
 		$name = \Polyfony\Keys::generate($assets).'.'.strtolower($asset_type);
 		// generate a private path to store that file
@@ -289,7 +362,10 @@ class HTML {
 	}
 
 	// minify the packed content if it's allowed, otherwise return is at is
-	private static function getMinifiedPackIfAllowed(string $pack_contents, object $packer_object=null) :string {
+	private static function getMinifiedPackIfAllowed(
+		string $pack_contents, 
+		object $packer_object=null
+	) :string {
 		// if we are allowed to minify
 		return \Polyfony\Config::get('response','minify') ? 
 			($packer_object)->add($pack_contents)->minify() : 
@@ -298,7 +374,9 @@ class HTML {
 	}
 
 	// initialize the packing of assets (directory structure)
-	public static function createPackingDirectoriesFor(string $asset_type) :void {
+	public static function createPackingDirectoriesFor(
+		string $asset_type
+	) :void {
 		// if it doesn't exist create a folder to store packed files
 		is_dir("../Private/Storage/Cache/Assets/{$asset_type}/") ?: 	
 			mkdir("../Private/Storage/Cache/Assets/{$asset_type}/", 0777, true);
@@ -308,6 +386,31 @@ class HTML {
 		// create a link from the public to the private place where caches are generated
 		is_link("./Assets/{$asset_type}/Cache") ?: 	
 			symlink("../../../Private/Storage/Cache/Assets/{$asset_type}/", "./Assets/{$asset_type}/Cache");
+	}
+
+	// push the assets using HTTP/2 
+	public static function pushAssets() :void {
+		// a list of assets, in a format suited for the Response::push() method
+		$assets = [];
+		// for each link type asset of the current webpage
+		foreach(self::$_links as $link) {
+			// if it's CSS, declare it as such
+			if($link['type'] == 'text/css') {
+				$assets[$link['href']] = 'style';
+			}
+			// if it's an image, declare it as such
+			elseif(stripos($link['type'], 'image') !== false) {
+				$assets[$link['href']] = 'image';
+			}
+		}
+		// for each script type asset of the current webpage
+		foreach(self::$_scripts as $script) {
+			// declare it as a script file
+			$assets[$script] = 'script';
+		}
+		// push all those using HTTP/2
+		\Polyfony\Response::push($assets);
+
 	}
 
 }

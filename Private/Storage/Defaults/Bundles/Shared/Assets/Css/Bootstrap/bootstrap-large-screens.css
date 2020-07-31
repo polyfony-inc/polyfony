@@ -1,0 +1,129 @@
+
+.visible-1200 {
+    display: none;
+}
+
+.visible-1600 {
+    display: none;
+}
+
+.visible-1900 {
+    display: none;
+}
+
+.visible-2200 {
+    display: none;
+}
+
+/* can be seen on 1366px wide screens, same as bootstrap 4 */
+@media only screen and (min-width: 1200px) {
+	.visible-1200 {
+	    display: initial;
+	}
+	.col-xl-12 {
+		width: 100%;
+	}
+	.col-xl-9 {
+		width: 75%;
+	}
+	.col-xl-6 {
+		width: 50%;
+	}
+	.col-xl-3 {
+		width: 25%;
+	}
+	.col-xl-2 {
+		width: 20%;
+	}
+	.col-xl-1 {
+		width: 8.3333%;
+	}
+}
+
+/* can be seen on 1680px wide screens */
+@media only screen and (min-width: 1600px) {
+	.visible-1600 {
+	    display: initial;
+	}
+	.col-xxl-1, .col-xxl-2, .col-xxl-3, .col-xxl-4, .col-xxl-5, .col-xxl-6, 
+	.col-xxl-7, .col-xxl-8, .col-xxl-9, .col-xxl-10, .col-xxl-11, .col-xxl-12 {
+        float: left;
+    }
+	.col-xxl-12 {
+		width: 100%;
+	}
+	.col-xxl-9 {
+		width: 75%;
+	}
+	.col-xxl-6 {
+		width: 50%;
+	}
+	.col-xxl-3 {
+		width: 25%;
+	}
+	.col-xxl-2 {
+		width: 20%;
+	}
+	.col-xxl-1 {
+		width: 8.3333%;
+	}
+}
+
+
+/* can be seen on 1920px wide screens */
+@media only screen and (min-width: 1900px) {
+	.visible-1900 {
+	    display: initial;
+	}
+	.col-xxxl-1, .col-xxxl-2, .col-xxxl-3, .col-xxxl-4, .col-xxxl-5, .col-xxxl-6, 
+	.col-xxxl-7, .col-xxxl-8, .col-xxxl-9, .col-xxxl-10, .col-xxxl-11, .col-xxxl-12 {
+        float: left;
+    }
+	.col-xxxl-12 {
+		width: 100%;
+	}
+	.col-xxxl-9 {
+		width: 75%;
+	}
+	.col-xxxl-6 {
+		width: 50%;
+	}
+	.col-xxxl-3 {
+		width: 25%;
+	}
+	.col-xxxl-2 {
+		width: 20%;
+	}
+	.col-xxxl-1 {
+		width: 8.3333%;
+	}
+}
+
+/* can be seen on 2560px+ wide screens */
+@media only screen and (min-width: 2200px) {
+	.visible-2200 {
+	    display: initial;
+	}
+	.col-xxxxl-1, .col-xxxxl-2, .col-xxxxl-3, .col-xxxxl-4, .col-xxxxl-5, .col-xxxxl-6, 
+	.col-xxxxl-7, .col-xxxxl-8, .col-xxxxl-9, .col-xxxxl-10, .col-xxxxl-11, .col-xxxxl-12 {
+        float: left;
+    }
+	.col-xxxxl-12 {
+		width: 100%;
+	}
+	.col-xxxxl-9 {
+		width: 75%;
+	}
+	.col-xxxxl-6 {
+		width: 50%;
+	}
+	.col-xxxxl-3 {
+		width: 25%;
+	}
+	.col-xxxxl-2 {
+		width: 20%;
+	}
+	.col-xxxxl-1 {
+		width: 8.3333%;
+	}
+}

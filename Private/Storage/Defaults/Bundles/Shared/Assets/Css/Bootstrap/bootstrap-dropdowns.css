@@ -1,0 +1,25 @@
+/* bootstrap4 dropdowns */
+#pfProfiler .dropdown-menu {
+	margin-left: 8px;
+}
+
+/* Profiler Routing */
+#pfProfiler .dropdown:nth-of-type(2) .dropdown-menu {
+	/*margin-top: -180px;*/
+	margin-top: -447px;
+}
+
+/* Profile Cache */
+#pfProfiler .dropdown:nth-of-type(5) .dropdown-menu {
+	margin-top: -290px;
+}
+
+/* Profile Locales */
+#pfProfiler .dropdown:nth-of-type(6) .dropdown-menu {
+	margin-top: -115px;
+}
+
+/* Profile Security */
+#pfProfiler .dropdown:nth-of-type(8) .dropdown-menu {
+	margin-top: -180px;
+}

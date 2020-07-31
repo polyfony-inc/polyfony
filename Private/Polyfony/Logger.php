@@ -136,7 +136,7 @@ class Logger {
 			'message'		=> $message,
 			'context'		=> $context,
 			'creation_date'	=> time(),
-			'login'			=> Security::get('login'),
+			'login'			=> Security::isAuthenticated() ? Security::getAccount()->get('login') : '',
 			'bundle'		=> Router::getCurrentRoute()->bundle,
 			'controller'	=> Router::getCurrentRoute()->controller,
 			'method'		=> Request::isPost() ? 'post' : 'get',

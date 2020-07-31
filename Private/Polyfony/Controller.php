@@ -6,24 +6,22 @@ class Controller {
 
 
 	// method to override
-	public function preAction() {
+	public function before() {
 		
 	}
 	
 	// method to override
-	public function postAction() {
+	public function after() {
 		
 	}
 
 	// method to override
-	public function indexAction() {
-		
-	}
-
-	// method to override
-	public function defaultAction() {
+	public function default() {
 		// default will throw an exception
-		throw new Exception('This action does not exist', 500);
+		Throw new Exception(
+			'This action does not exist', 
+			500
+		);
 	}
 	
 	// include a view
@@ -39,7 +37,9 @@ class Controller {
 			$bundle_or_variables : Router::getCurrentRoute()->bundle;
 
 		// build the path for that view
-		$view_path = "../Private/Bundles/{$view_bundle}/Views/{$view_name}.php";
+		$view_path = Config::absolutizePath(
+			"Private/Bundles/{$view_bundle}/Views/{$view_name}.php"
+		);
 
 		// import variables for the view
 		extract(
@@ -71,7 +71,10 @@ class Controller {
 	}
 	
 	// forward to another controller in the same bundle
-	final public function forward(string $controller, $action = null) :void {
+	final public function forward(
+		string $controller, 
+		$action = null
+	) :void {
 
 		// get the current route as a base
 		$route = Router::getCurrentRoute();

@@ -1,10 +1,11 @@
 <?php
 
-namespace Polyfony\Record;
+namespace Polyfony\Entity;
 use Polyfony\Exception as Exception;
 use Polyfony\Query\Convert as Convert;
 use Polyfony\Query as Query;
 use Polyfony\Database as Database;
+use Polyfony\Format as Format;
 
 class Accessor extends Aware {
 
@@ -68,6 +69,68 @@ class Accessor extends Aware {
 		return $this->set([$column_name => $column_s_array]);
 
 	}
+
+	// TruncatedGet
+	// truncated version of get
+	public function tget(
+		string $column, 
+		?int $length = 16,
+		?bool $raw = false
+	) :string {
+		// truncate the string if it's longer than allowed
+		$string = mb_strlen($this->get($column, true)) > $length ? 
+			Format::truncate(
+				$this->get($column, true), 
+				$length
+			) : 
+			$this->get($column, true);
+		// return it raw, or protected against html entites
+		return $raw ? 
+			$string : 
+			Format::htmlSafe($string);
+	}
+
+	
+	// LocalizedGet
+	// localized version of get
+	public function lget(
+		string $column
+	) :string {
+		// then re-protect it against html
+		return Format::htmlSafe(
+			// translate it
+			Locales::get(
+				// get it without html entites protection
+				$this->get($column, true)
+			)
+		);
+	}
+
+	// OnlySet
+	// limited version of set (certain column only will be set from the array)  
+	public function oset(
+		array $associative_array_of_value_to_set,
+		array $columns_allowed_to_be_set
+	) :self {
+
+		// for each of the column that we are allowed to set
+		foreach(
+			$columns_allowed_to_be_set as 
+			$column
+		) {
+			// if it exists, set it
+			!array_key_exists(
+				$column, 
+				$associative_array_of_value_to_set
+			) ?: $this->set([
+				$column => $associative_array_of_value_to_set[$column]
+			]);
+		}
+		// and allow chaining
+		return $this;
+
+	}
+
 
 }
 

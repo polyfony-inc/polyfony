@@ -130,7 +130,7 @@ class HTML {
 		$data = \Polyfony\Profiler::getData();
 		
 		// assemble the profiler
-		return (self::getContainer())
+		$profiler = (self::getContainer())
 			->adopt(self::getStyles())
 			->adopt(HTML\Timing::getComponent	($data))
 			->adopt(HTML\Routing::getComponent	($data))
@@ -140,6 +140,8 @@ class HTML {
 			->adopt(HTML\Locales::getComponent	($data))
 			->adopt(HTML\Logs::getComponent		($data))
 			->adopt(HTML\Security::getComponent	($data));
+
+		return $profiler;
 
 	}
 

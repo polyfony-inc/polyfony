@@ -1,6 +1,6 @@
 <?php
  
-namespace Polyfony\Record;
+namespace Polyfony\Entity;
 use Polyfony\Exception as Exception;
 use Polyfony\Query\Convert as Convert;
 use Polyfony\Query as Query;
@@ -11,6 +11,25 @@ class Aware {
 	// storing variable that does not reflect the database table structure
 	protected $_;
 	
+	// columns that are to be auto-populated
+	const AUTO_POPULATE_COLUMNS = [
+		// column that are autopopulated upon creation
+		'creation'		=>[
+			'creation_by'		=>'id_account',
+			'created_by'		=>'id_account',
+			'creation_date'		=>'time',
+			'creation_datetime'	=>'time',
+			'created_at'		=>'time',
+		],
+		// columns that are autopopulated upon modification
+		'modification'	=>[
+			'modification_by'	=>'id_account',
+			'modified_by'		=>'id_account',
+			'modification_date'	=>'time',
+			'modified_at'		=>'time',
+		]
+	];
+
 	// storing the validators
 	const VALIDATORS = [];
 
@@ -92,6 +111,39 @@ class Aware {
 		$this->_['altered'] = array_unique($this->_['altered']);
 	}
 
+	private function autoPopulate(
+		string $when
+	) :void {
+		
+		// for each column to autopopulate
+		foreach(
+			self::AUTO_POPULATE_COLUMNS[$when] as 
+			$column => $with_what
+		) {
+			// if the column exists
+			if(Database::doesColumnExist(
+				$column, 
+				$this->_['table']
+			)) {
+				// if the column is to be autopopulated with the unix epoch
+				if($with_what == 'time') {
+					$this->set([
+						$column=>time()
+					]);
+				}
+				// if the column is to be autopopulated with the current account's id
+				elseif(
+					$with_what == 'id_account' && 
+					Security::isAuthanticated()
+				) {
+					$this->set([
+						$column=>Security::getAccount()->get('id')
+					]);
+				} 
+			}
+		}
+	}
+
 	public function get(
 		string $column, 
 		bool $get_it_raw = false
@@ -162,6 +214,8 @@ class Aware {
 		
 		// if an id already exists
 		if($this->_['id']) {
+			// autopopulate
+			$this->autoPopulate('modification');
 			// we can update and return the number of affected rows (0 on error, 1 on success)
 			return (bool) self::_update()
 				->set(
@@ -175,6 +229,9 @@ class Aware {
 		}
 		// this is a new record
 		else {
+			// autopopulate both columnset
+			$this->autoPopulate('creation');
+			$this->autoPopulate('modification');
 			// try to insert it
 			$inserted_object = self::create(
 				$this->__toArray(

@@ -49,7 +49,7 @@ class Base {
 		$this->Quote 		= $quote;
 
 		// initialize attributes
-		$this->Object		= 'Record';
+		$this->Object		= 'Entity';
 		$this->Table		= null;
 		$this->Operator		= 'AND';
 		$this->Selects		= [];

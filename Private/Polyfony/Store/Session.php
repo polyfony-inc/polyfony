@@ -20,6 +20,8 @@ class Session implements StoreInterface
 
 		// if no session has been initiated yet
 		if(session_status() == PHP_SESSION_NONE) {
+			// we name it
+			session_name(\Polyfony\Config::get('store', 'cookie'));
 			// we have to start one
 			session_start();
 		}

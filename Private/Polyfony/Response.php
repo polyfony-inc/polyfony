@@ -185,7 +185,7 @@ class Response {
 	public static function setType(string $type) :void {
 		
 		// remove previously output(ed?) data on change of type
-		ob_clean();
+		ob_get_contents() ? ob_clean() : '';
 		// if the type is allowed we update the current type
 		!array_key_exists($type, self::TYPES) ?: self::$_type = $type;
 		// add the header
@@ -269,13 +269,14 @@ class Response {
 	}
 	
 	private static function formatContent() :void {
-		
 		// base headers
 		$headers = [];
 		// case of html page
 		if(self::$_type == 'html-page') {
 			// build and get an html page
 			self::$_content = Response\HTML::buildAndGetPage(self::$_content);
+			// automatically push assets if allowed to
+			!Config::get('response', 'push_assets') ?: Response\HTML::pushAssets();
 		}
 		// elseif the type is json
 		elseif(self::$_type == 'json') {
@@ -368,9 +369,28 @@ class Response {
 
 	}
 
+	// push an asset using HTTP/2
+	public static function push(
+		array $assets_uris_and_types
+	) :void {
+		$pushable_assets = [];
+		// for each asset to push
+		foreach(
+			$assets_uris_and_types as 
+			$uri => $type
+		) {
+			// add the proper header to push that asset
+			$pushable_assets[] = '<'.$uri.'>; rel=preload; as='.$type.'; crossorigin';
+		}
+		// actually set the proper header with all links
+		self::setHeaders([
+			'Link'=> implode(', ', $pushable_assets)
+		]);
+	}
+
 	public static function clean() :string {
 		// clean the reponse
-		return(ob_get_clean());
+		return ob_get_clean();
 	}
 
 	public static function render() :void {
@@ -379,7 +399,10 @@ class Response {
 		// if no content is set yet we garbage collect
 		self::$_content = self::$_content ?: self::clean();
 		// set the current protocol of fallback to HTTP 1.1 and set the status code plus message
-		header(Request::server('SERVER_PROTOCOL', 'HTTP/1.1') . ' ' . self::$_status . ' ' . self::CODES[self::$_status]);
+		header(
+			Request::server('SERVER_PROTOCOL', 'HTTP/1.1') . ' ' . 
+			self::$_status . ' ' . self::CODES[self::$_status]
+		);
 		// format the content
 		self::formatContent();
 		// for each header

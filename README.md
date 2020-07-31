@@ -15,6 +15,11 @@ It features routing, bundles, controllers, profiler, views, ORM, tests, caches, 
 ## Requirements
 You need a POSIX compatible system (Linux/MacOS/xBSD), PHP >= 7.1 with ext-pdo, ext-sqlite3, ext-mbstring, ext-msgpack and a rewrite module for your webserver. 
 
+## Disclaimer
+If you are considering using this framework instead of a major and well supported framework such as Laravel, there is something very wrong with your decision making process and/or project assesment. 
+
+In almost every case, using mainstream framework would be a better choice.
+
 ## Installation
 
 ###### To download & preconfigure the framework in *your-project-folder*
@@ -25,7 +30,7 @@ composer create-project --stability=dev polyfony-inc/polyfony your-project-folde
 *--stability=dev is mandatory since we don't publish releases yet* 
 Pretty much all the dependencies that get installed by composer are only required by PHPUnit.
 
-###### NginX configuration
+###### NginX [configuration](https://github.com/AnnoyingTechnology/nginx-configuration-template/blob/master/conf.d/services/polyfony2.conf)
 ```
 root /var/www/your-project-folder/Public
 location / {
@@ -91,7 +96,7 @@ The `Models\Pages` file has the following minimum amount of code.
 
 ```php 
 namespace Models;
-class Pages extends \Polyfony\Record {}
+class Pages extends \Polyfony\Entity {}
 ```
 
 ```php
@@ -101,7 +106,7 @@ $webpage = new Pages(67);
 // Retrieve another database entity by its `url` column
 $webpage = new Pages(['url'=>'/my-awesome-vegan-burger-recipe/']);
 
-// Retrieve a single record by its ID and generate an input to change it's title property, with a custom css class
+// Retrieve a single Entity by its ID and generate an input to change it's title property, with a custom css class
 // note that any html in the title field will be escaped in the <input> to prevent XSS
 // returns <input type="etextmail" name="Pages[title]" value="My awesome Vegan burger recipe is so yummy" />
 (new Pages(67))
@@ -163,7 +168,7 @@ $pages = Pages::_select(['title','id'])
 ->orderBy()				// associative array ('column'=>'ASC')
 ->limitTo()				// $start, $end
 ->groupBy()				// ?
-->first()				// return the first record instead of an array of records
+->first()				// return the first Entity instead of an array of Entities
 ```
 
 #### Magic columns
@@ -207,6 +212,14 @@ Assuming you have a `Process` **object**/table, which has a `events_array` **att
 
 ```
 
+#### Entities accessors
+
+Entites have basic `->set([$column=>$value])` and `->get($column, $bymypass_html_entities_protection=false)` methods.
+In addition, there are 
+
+* `->oset($associative_array, $columns_to_actualy_set)` "OnlySet", certain columns
+* `->lget($column)` "LocalizedGet", will attempt to use a locale for the returned value
+* `->tget($column, $length)` "TruncatedGet", will truncate a returned value exceeding the length
 
 #### XSS Protection
 
@@ -227,7 +240,7 @@ To enforce it, declare a `VALIDATORS` constant array in your model, each key bei
 ```php
 
 Models\Accounts extends Polyfony\Security\Accounts {
-// Normal model classes extend Polyfony\Record. 
+// Normal model classes extend Polyfony\Entity. 
 // Accounts extends an intermediate (but transparent) class that adds authentication logic.
 
 	const ID_LEVEL = [
@@ -260,7 +273,7 @@ The validation occurs when `->set()` is invoked and will throw exceptions.
 
 Note that you don't have to include `NULL` or `EMPTY` values in your validators to allow them. `NULL/NOT NULL` are to be configured in your database, so that the framework knows which column can, and cannot be null.
 
-**Please be aware that doing a batch ->update (aka : not using distinct objects/Records) on a table will circumvent those validators. This will get fixed in a later version.**
+**Please be aware that doing a batch ->update (aka : not using distinct objects/Entities) on a table will circumvent those validators. This will get fixed in a later version.**
 
 
 ### Data filtering 
@@ -275,7 +288,7 @@ To enforce data filtering, declare a `FILTERS` constant array in your model, eac
 ```php
 
 // an imaginary group model, that represent a group of people
-Models\Groups extends Polyfony\Record {
+Models\Groups extends Polyfony\Entity {
 
 	const FILTERS = [
 		// replaces , with a dot and removes everything except 0-9 + - .
@@ -319,7 +332,7 @@ This filter allows for nicer and cleaner databases, it has been designed for old
 Check out the following Model, View and HTML output.
 
 ```php
-class User extends Polyfony\Record {
+class User extends Polyfony\Entity {
 	const FILTERS = [
 		'user_login'=>['email','length128']
 	];
@@ -334,7 +347,19 @@ class User extends Polyfony\Record {
 
 Your input also gets a `required="required"` attribute if the column cannot be null. This is deduced from the database schema.
 
-**Please be aware that doing a batch ->update (aka : not using distinct objects/Records) on a table will circumvent those validators. This will get fixed in a later version.**
+**Please be aware that doing a batch ->update (aka : not using distinct objects/Entities) on a table will circumvent those validators. This will get fixed in a later version.**
+
+
+### Data auto-population 
+
+The framework will look for some common columns and try to populate them with either the unix epoch or the ID of the currently authenticated user.
+
+Upon `Entity` **creation** : `creation_by`, `creation_date`, `created_by`, `created_at`, `creation_datetime`
+
+Upon `Entity` **modification** : `modification_by`, `modification_date`, `modified_by`, `modified_at`
+
+
+
 
 
 ### [Router](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyrouter)
@@ -348,21 +373,22 @@ Routes are to be declared in each bundle's `Loader` directory, in a file called 
 
 ###### Routes can accept a number of parameters, and lack thereof 
 * `Router::map('/admin/:what/:id/', 'Bundle/Controller@{what}')`.
-* `Router::map('/url/', 'Bundle/Controller@action)`.
+* `Router::map('/url/', 'Bundle/Controller@action')`.
 
 ###### The action can 
 * be a parameter of the url (as with the first example. The action would be the 2nd parameter `{what}`)
-* be ommited. In that case an `indexAction` is called. If it doesn't exist, `defaultAction()` will be called, if it doesn't exist an exception is thrown.
+* be ommited. In that case an `->index()` is called. If it doesn't exist, `->default()` will be called, if it doesn't exist an exception is thrown.
 
-Before calling the desired action a `preAction()` method will be called on the controller. *You can declare one, or ommit it.*  
-after the desired action has been be called, a `postAction()` method will be called on the controller. *You can declare one, or ommit it.*
+Before calling the desired action a `->before()` method will be called on the controller. *You can declare one, or ommit it.*  
+after the desired action has been be called, a `->after()` method will be called on the controller. *You can declare one, or ommit it.*
 
 
 * The following route will match a GET request to /about-us/  
 ```php
 Router::get('/about-us/', 'Pages/Static@aboutUs');
 ```
-It will call `Private/Bundles/Pages/Controllers/Static.php->aboutUsAction();`
+
+It will call `Private/Bundles/Pages/Controllers/Static.php->aboutUs();`
 
 
 * The following route will match a request of any method (GET,POST...) to /admin/{edit,update,delete,create}/ and /admin/  
@@ -383,7 +409,8 @@ Router::map('/admin/:section/:id/', 'Admin/Main@{section}')
 		]
 	]);
 ```
-It will call `Private/Bundles/Admin/Controllers/Main.php->{section}Action();`
+
+It will call `Private/Bundles/Admin/Controllers/Main.php->{section}();`
 
 *Route can also be generated dynamically, over database iterations.*
 
@@ -530,24 +557,46 @@ Having distinct configuration files allows you to :
 
 ### [Security](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonysecurity)
 
+The security is based around on a common email/password couple. 
+Passwords are strongly hashed and salted before storage in the database. The hash algorithm can be tweaked using the `algo` (default is `sha512`) and `salt` parameters.
+
+In addition, two mechanisms tighten the security : 
+
+* a throttling mechanism preventing bruteforce attacks. It can be tweaked using `forcing_timeframe` and `forcing_maximum_attempts` parameters.
+* an anti cookie-theft mechanism, checking that the used that initially logged in is still the same one. Even if he/she has the correct session cookie in his/her possession. This can be disabled by changing the `enable_signature_verification` parameter (default is `1` - enabled)
+
+You can disable the cookie theft protection on a per-request basis.
+By chaging the configuration on the fly `Config::set('security','enable_signature_verification', 0)` which can be useful in very specific cases
+
+
 ###### To secure a page (require a user to be logged in)
 ```php
-Security::enforce();
+Security::authenticate();
 ```
+
+Users can have any number of roles `AccountsRoles` and permissions `AccountsPermissions` directly assigned to them.
+Roles themselves can have permissions assigned to them. Users will inherit permissions from their roles.
+Permissions must be grouped into at least one logical group `AccountsPermissionsGroups`.
 
 Failure to authenticate will throw an exception, and redirect to `Private/Config/Config.ini` -> `[router]` -> `login_route = ""`
 
-###### If you want to require a specific module (that can be bypassed by a level optionally)
+###### If a page or action requires a specific permission
 ```php
-Security::enforce('MOD_NAME', $bypass_level);
+Security::denyUnlessHasPermission('permission_name or permission_id or permission entity');
 ```
 
 Failure to comply with those requirements will throw an exception, but won't redirect the user anywhere.
 
 ###### To check manually for credentials 
 ```php
-Security::hasModule($module_name);
-Security::hasLevel($level);
+Security::getAccount()
+	->hasPermission(
+		$permission_id // or permission_name or permission entity
+	);
+Security::getAccount()
+	->hasRole(
+		$role_id // // or role_name or role entity
+	);
 ```
 
 ### [Profiler](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyprofiler)
@@ -605,8 +654,12 @@ Throw new Exception($error_message, $http_status_code);
 
 ### [Response](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyresponse)
 
-The response if preconfigured according to the Config.ini
-You can alter the response type and parameters at runtime, ex.
+The response if preconfigured according to the Config.ini to render an full HTML page (body, header, metas,, stylesheets, etc.)
+You can alter the response type and parameters at runtime.
+
+Anything that is common to **all** responses, you will find in `Response`.
+**As `links`, `scripts`, and `metas` are specific to HTML `Response`s, those are set in the subnamespace  `Response\HTML`** 
+
 
 ###### To redirect
 ```php
@@ -656,6 +709,7 @@ Response\HTML::setLinks(['//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstra
 ```
 
 You can also specify optional attributes, such as `media`
+
 ```php
 Response\HTML::setLinks([
 	'//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css'=>[
@@ -665,6 +719,7 @@ Response\HTML::setLinks([
 ```
 
 Or even set totaly different types of links, such as a favicon
+
 ```php
 Response\HTML::setLinks([
 	'/Assets/Shared/Svg/Favicon.svg'=>[
@@ -683,14 +738,28 @@ Response\HTML::setScripts([
 ]) 
 ```
 
+
 ###### to add a meta tag
 ```php
 Response\HTML::setMetas(['google-site-verification'=>'google-is-watching-you'])
 ```
 
 
-Anything that is common to **all** responses, you will find in `Response`.
-**As `links`, `scripts`, and `metas` are specific to HTML `Response`s, those are set in the subnamespace  `Response\HTML`** 
+###### to manually push and preload assets using HTTP/2 feature
+
+```php
+Response::push([
+	'/Assets/Css/Shared/common.css'	=>'style',
+	'/Assets/Js/Shared/common.js'	=>'script',
+	'/Assets/Img/Website/header.wep'=>'image',
+]) 
+```
+
+###### to automatically push all assets declared to Response\HTML
+
+Enable the parameter `push_assets` in the `[response]` section.
+This will push your assets before the DOM has been loaded and parsed. Making for quicker webpages loading.
+
 
 
 #### To output a spreadsheet
@@ -766,7 +835,7 @@ A cache hit will always use less than 400 Ko of RAM and execute much faster, und
 < X-Footprint: 13.5 ms 436.9 Ko
 < X-Environment: Prod
 < Date: Mon, 19 Feb 2018 19:54:19 +0100
-< Expires: Mon, 19 Feb 2018 23:54:19 +0100
+< Expires: Mon, 19 Feb 2	018 23:54:19 +0100
 < X-Cache: hit
 < X-Cache-Footprint: 1.2 ms 418.2 Ko
 
@@ -798,7 +867,7 @@ Some of those engines have more capabilities than others, but all implement the 
 
 ###### Storing some bundle specific data 
 
-Configurations that are specific to a bundle should be placed in `Bundles/MyBundle/Loader/Config.php` (ex. static list choices, etc.) 
+Configurations that are specific to a bundle should be placed in `Bundles/{MyBundle}/Loader/Config.php` (ex. static list choices, etc.) 
 *Note that these configurations are merged with `Config.ini` + `Dev.ini`/`Prod.ini` so all your configs are available with one interface : `Config::{get()/set()}`*
 
 ```php
@@ -816,7 +885,7 @@ Config::get($group, $key);
 ### [Emails](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonymail)
 
 Emails are very simple to use and built over PHPMailer. 
-They extend `Record` object, so there are normal database entries that have a few more methods, and they can be sent !
+They extend `Entity` object, so there are normal database entries that have a few more methods, and they can be sent !
 
 ```php
 (new Models\Emails)
@@ -858,48 +927,104 @@ since the email has been retrieved from the database, upon sending, it's sending
 ```php
 (new Models\Emails)
 	->set([
-		'template'	=>'../Private/Storage/Data/Templates/Demo-Email.html',
 		'subject'	=>'Another passionnating subject',
 		'to'		=>[
-			'email@domain.com'	=>'Jack',
-			'email2@domain2.com'=>'Jill'
+			'jack@domain.com'	=>'Jack',
+			'jill@domain.com'	=>'Jill'
 		],
-		'body'		=>[
-			'something'			=>'that I want replaced by this text',
-			'something-else'	=>'that I also want replaced'
+
+		// set a PHP view, that is searched for in the "Emails" bundle.
+		'view'		=>'OrderConfirmation' // fake column, .php is suffixed automatically
+		
+		// pass variables to the view, instead of directly setting the body
+		'body'		=>[ 
+			'firstname'		=>'Louis',
+			'order_number'	=>'XH20210722',
+			'order_products'=>[$product_1,$product_2]
+		],
+
+		// pass any number of CSS files. They will get inlined into style="" attributes of your view
+		'css'		=>[
+			'OrderConfirmationStyling', // .css is suffixed automatically
 		]
 	])
 	->send(true)
 	->isSent() ? do_something() : do_something_else();
 ```
 
-Templates use variables enclosed with double braquets `{{variable_name}}`, example 
+Your `Bundles/Emails/Views/OrderConfirmation.php` view could look something like this 
 
 ```html
 <body>
+	
 	<h1>
-		{{something}}
+		Order Confirmation N° <?= $order_number; ?>
 	</h1>
+
 	<p>
-		{{something-else}}
+		Hi <?= $firstname; ?>, <br />
+		We have received your order and will ship it as soon as possible.
 	</p>
+
+	<table class="products-table">
+		<?php foreach($products as $product): ?>
+			<tr>
+				<td>
+					<?= $product->getName(); ?>
+				</td>
+			</tr>
+		<?php endforeach; ?>
+	</table>
 </body>
 ```
 
-get's transformed into
+Your `Bundles/Emails/Assets/Css/OrderConfirmationStyling.css` css could look something like this
+
+```css
+body {
+	background: #efefef;
+}
+h1 {
+	font-size: 16px;
+}
+p {
+	font-weight: bold;
+}
+table {
+	padding: 25px;
+}
+```
+
+And the sent email would look like this
 
 ```html
-<body>
-	<div>
-		that I want replaced by this text
-	</div>
-	<p>
-		that I also want replaced
+<body style="background: #efefef">
+	
+	<h1 style="font-size: 16px;">
+		Order Confirmation N° XH20210722
+	</h1>
+
+	<p style="font-weight: bold;">
+		Hi Louis, <br />
+		We have received your order and will ship it as soon as possible.
 	</p>
+
+	<table style="padding: 25px;">
+		<tr>
+			<td>
+				F1 Steering Wheel signed by Louis Hamilton signed
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Driving shoes, size 43
+			</td>
+		</tr>
+	</table>
 </body>
 ```
 
-Beware of inserting non-validated user inputs into emails.
+Always pay **serious attention** to validate user inputs that are inserted into emails (or anywhere for that matter).
 
 
 ### [Element](https://github.com/polyfony-inc/polyfony/wiki/Reference#interface-polyfonyelement)
@@ -972,7 +1097,7 @@ Setting `value` will escape its html so will with setting `text`.
 ```
 
 
-Shortcuts are available from objects that extends the `Record` class (ex: your Models).
+Shortcuts are available from objects that extends the `Entity` class (ex: your Models).
 
 ###### retrieve an account from its id
 ```php
@@ -991,7 +1116,7 @@ List of available elements :
 * textarea
 * checkbox
 
-Form elements general syntax is : `$name, $value, $options` when you get a form element from a `Record`, the `$name` and `$value` are set automatically, only `$options` are available. The select elements is slighly different : `$name, $list, $value, $options`
+Form elements general syntax is : `$name, $value, $options` when you get a form element from a `Entity`, the `$name` and `$value` are set automatically, only `$options` are available. The select elements is slighly different : `$name, $list, $value, $options`
 
 To obtain, say, a password field, simply add this to your array of attributes : 'type'=>'password'
 
@@ -1112,9 +1237,9 @@ composer update
 
 | **Previous Feature**   | **Status**   | **Replacement**         | **How to get it**                     |
 |------------------------|--------------|-------------------------|---------------------------------------|
-| Polyfony\HttpRequest() | DEPRECATED   | Curl\Curl()             | require php-curl-class/php-curl-class |
-| Polyfony\Filesystem()  | DEPRECATED   | Filesystem\Filesystem() | require symfony/filesystem            |
-| Polyfony\Uploader()    | DEPRECATED   | FileUpload\FileUpload() | require gargron/fileupload            |
+| Polyfony\HttpRequest() | DISCONTINUED | Curl\Curl()             | require php-curl-class/php-curl-class |
+| Polyfony\Filesystem()  | DISCONTINUED | Filesystem\Filesystem() | require symfony/filesystem            |
+| Polyfony\Uploader()    | DISCONTINUED | FileUpload\FileUpload() | require gargron/fileupload            |
 | Polyfony\Validate()    | DISCONTINUED | Validator\Validation()  | require symfony/validator             |
 | Polyfony\Thumnbail()   | DISCONTINUED | Intervention\Image()    | require intervention/image            |
 | Polyfony\Notice()      | DISCONTINUED | Bootstrap\Alert()       | require polyfony-inc/bootstrap        |
@@ -1124,14 +1249,15 @@ composer update
 
 | Version   | Major change                                                                                                                                                             |
 |-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 2.0-alpha | Major rewrite from 1.x new folder structure, routes syntax, new helpers, new configuration files, MVC architecture, database entries are instanciated as Record objects. |
-| 2.0       | Better ORM, Database entries now are instanciated as Models/{TableName} that inherit the Record class                                                                    |
+| 2.0-alpha | Major rewrite from 1.x new folder structure, routes syntax, new helpers, new configuration files, MVC architecture, database entries are instanciated as Entity objects. |
+| 2.0       | Better ORM, Database entries now are instanciated as Models/{TableName} that inherit the Entity class                                                                    |
 | 2.1       | PHP 7.2 support, composer support, new debugging tools are introduced (Profiler), deprecation of old helpers                                                             |
 | 2.2       | Old routes syntax have been dropped, redirections are now supported directly in routes declaration                                                                       |
-| 2.3       | XSS escaping as default for all Record->get(), Filters are now supported, Validators are enhanced                                                                        |
+| 2.3       | XSS escaping as default for all Entity->get(), Filters are now supported on Entities, Entities Validators are enhanced                                                   |
 | 2.4       | Query->first() used to return false when no result were found, it now returns null.                                                                                      |
 | 2.5       | Query->get() shortcut for ->first()->execute(), enhanced Profiler, Console shortcut                                                                                      |
-| 2.6       | Emails refactoring, Tests support via PHPUnit support, Events support                                                                                                    |
+| 2.6       | Emails refactoring, Tests support via PHPUnit, Events support                                                                                                            |
+| 3.0       | New ACLs, PHP views and CSS inlining for emails, new accessors for Entities, HTTP/2 push support, discontinuation of HttpRequest, Filesystem and Uploader classes        |
 
 ## [Performance](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
 Polyfony has been designed to be fast, no compromise (> 2000 req/s). 

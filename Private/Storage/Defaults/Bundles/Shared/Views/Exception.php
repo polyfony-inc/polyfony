@@ -1,10 +1,10 @@
 <?php 
-use Polyfony as pf; 
-use Polyfony\Locales as Loc;
-use Polyfony\Format as Fmt;
-use Polyfony\Request as Req;
-use Polyfony\Config as Cfg;
-use Polyfony\Security as Sec;
+use Polyfony\Locales as Locales;
+use Polyfony\Format as Format;
+use Polyfony\Request as Request;
+use Polyfony\Config as Config;
+use Polyfony\Security as Security;
+use Polyfony\Exception as Exception;
 ?>
 <style type="text/css">
 	.row {
@@ -15,62 +15,108 @@ use Polyfony\Security as Sec;
 		display: none;
 		line-height: 24px;
 	}
-	strong {
+	code strong {
 		font-weight: bold;
+	}
+	#trace, 
+	#dump {
+		display: none;
+	}
+	.buttons {
+		margin-top: 20px;
+	}
+	.card {
+		font-family: monospace;
+		font-size: 14px;
 	}
 </style>
 <div class="container-fluid">
+	
 	<div class="row justify-content-center" >
-		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8">	
+		
+		<div class="col-12 col-sm-12 col-md-10 col-lg-8">	
+			
 			<h1>
-				<span class="<?= $this->icon; ?>"></span> 
-				<?= Loc::get($this->Exception->getMessage()); ?>
+				
+				<span class="<?= $icon; ?>"></span> 
+				<?= Locales::get($message); ?>
+			
 			</h1>
-			<?php if($this->Exception->getCode() < 401 || $this->Exception->getCode() > 404): ?>
-			<div class="">
-				<a href="#" class="btn btn-warning" onclick="reportIncident()">
-					<span class="fa fa-send"></span> 
-					<?= Loc::get('Send_event_to_tech_support'); ?> 
-				</a> 
-				<a href="#" class="btn btn-outline-secondary" onclick="document.getElementById('trace').style.display='block';">
-					<?= Loc::get('Technical_details'); ?> 
-					<span class="fa fa-caret-down"></span>
-				</a>
-			</div>
-			<div class="card" id="trace">
-				<?= Polyfony\Exception::convertTraceToHtml($this->Exception->getTrace()); ?>
-			</div>
-<textarea id="dump" style="display:none;">
-Error : <?= $this->Exception->getMessage(); ?>
 
-Code : <?= $this->Exception->getCode(); ?>
+			<?php if($requires_attention): ?>
+		
+			<code>
+				<strong>
+					@line <?= $line; ?>
+				</strong> 
+				in <?= $file; ?> 
+			</code>
+
+			<div class="buttons">
+
+				<div class="btn-group">
+					
+					<a 
+					href="#report-incident" 
+					class="btn btn-warning" 
+					onclick="reportIncident()">
+					
+						<span class="fa fa-envelope"></span> 
+						<?= Locales::get('Send_event_to_tech_support'); ?> 
+					
+					</a> 
+
+					<a 
+					href="#techical-details" 
+					class="btn btn-light" 
+					onclick="$('#trace').toggle(250);">
+					
+						<span class="fa fa-caret-down"></span> 
+						<?= Locales::get('Technical_details'); ?> 
+
+					</a>
+
+				</div>
+
+			</div>
+
+			<div 
+			class="card" 
+			id="trace">
+				<?= $html_trace; ?>
+			</div>
+
+<textarea id="dump">
+Error : <?= $message; ?>
+
+Code : <?= $code; ?>
 
 Date : <?= date('r'); ?> 
-URL : <?= Fmt::htmlSafe(Req::getUrl()); ?>
+URL : <?= Format::htmlSafe(Request::getUrl()); ?>
 
-Method : <?= Req::isPost() ? 'POST' : 'GET'; ?>
+Method : <?= Request::isPost() ? 'POST' : 'GET'; ?>
 
-REFERER : <?= Fmt::htmlSafe(Req::server('HTTP_REFERER', 'None')); ?>
+REFERER : <?= Format::htmlSafe(Request::server('HTTP_REFERER', 'None')); ?>
 
-Domain : <?= Cfg::get('router','domain'); ?>
+Domain : <?= Config::get('router','domain'); ?>
 
-Agent : <?= Fmt::htmlSafe(Req::server('HTTP_USER_AGENT')); ?>
+Agent : <?= Format::htmlSafe(Request::server('HTTP_USER_AGENT')); ?>
 
-IP : <?= Fmt::htmlSafe(Req::server('REMOTE_ADDR')); ?>
+IP : <?= Format::htmlSafe(Request::server('REMOTE_ADDR')); ?>
 
-Protocol : <?= Req::getProtocol(); ?>
+Protocol : <?= Request::getProtocol(); ?>
 
-User : <?= Sec::get('id'); ?>
+User : <?= !Security::isAuthenticated() ?: Security::getAccount()->get('login'); ?>
 
 Trace : 
-<?= $this->Exception->getTraceAsString(); ?>
+<?= $string_trace; ?>
 </textarea>
 <?php endif; ?>
 <script type="text/javascript">
 function reportIncident() {
 
-	var link = "mailto:"+'<?= Cfg::get('mail','tech_support_mail'); ?>'
-	+ "?subject=" + escape("Exception (<?= Cfg::get('router','domain'); ?>) - <?= $this->Exception->getMessage(); ?>")
+	var link = "mailto:"+'<?= Config::get('mail','tech_support_mail'); ?>'
+	+ "?subject=" + escape("Exception (<?= Config::get('router','domain'); ?>) - <?= $message; ?>")
 	+ "&body=" + escape(document.getElementById('dump').value);
 
 	window.location.href = link;

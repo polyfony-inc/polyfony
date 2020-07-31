@@ -1,6 +1,6 @@
 <?php
 
-namespace Polyfony\Record;
+namespace Polyfony\Entity;
 use Polyfony\Element as Element;
 
 class Form extends Accessor {

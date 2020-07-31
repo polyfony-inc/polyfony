@@ -276,7 +276,7 @@ class Query extends Query\Conditions {
 	}
 
 	// return only the first result, and does it right now
-	public function get() :?Record {
+	public function get() :?Entity {
 		// all in one 
 		return $this
 			->first()
@@ -286,7 +286,7 @@ class Query extends Query\Conditions {
 
 	// return only the first result
 	public function first() :self {
-		// return only the first record
+		// return only the first Entity
 		$this->First = true;
 		// artificially restrict the number of results to one
 		$this->limitTo(0,1);
@@ -322,13 +322,13 @@ class Query extends Query\Conditions {
 		}
 
 		// if a forced type of object has been defined
-		$this->Object = $this->Object && $this->Object != 'Record' ? 
+		$this->Object = $this->Object && $this->Object != 'Entity' ? 
 			'\Models\\'.$this->Object : 
 			'\Models\\'.$this->Table;
 
 		// temporary fix, if we don't have an object class at all
 		if($this->Object == '\Models\\') {
-			$this->Object = '\Polyfony\\Record';
+			$this->Object = '\Polyfony\\Entity';
 		}
 
 		// tweak for Microsoft SQL Server and MySQL
@@ -371,8 +371,15 @@ class Query extends Query\Conditions {
 	}
 
 	private function formatSelectResult() :void {
+		// handle passthru select properly
 		// actions of type SELECT & first element
-		if($this->Action == 'SELECT' && $this->First) {
+		if(
+			(
+				$this->Action == 'SELECT' || 
+				$this->getExecutedAction()
+			) && 
+			$this->First
+		) {
 			$this->Result = isset($this->Result[0]) ? 
 				$this->Result[0] : null;
 		}
@@ -420,9 +427,13 @@ class Query extends Query\Conditions {
 		// if action is an update
 		if($this->Action == 'UPDATE') {
 			// if the table is missing
-			if(!$this->Table) { Throw new Exception('Query->buildQuery() : No table to update'); }
+			if(!$this->Table) { Throw new Exception(
+				'Query->buildQuery() : No table to update'
+			); }
 			// if there is nothing to update
-			if(!count($this->Updates)) { Throw new Exception('Query->buildQuery() : No changes have been made, no columns to update'); }
+			if(!count($this->Updates)) { Throw new Exception(
+				'Query->buildQuery() : No changes have been made, no columns to update'
+			); }
 			// assemble the updates
 			$this->Updates = implode(', ', $this->Updates);
 			// prepare the update query
@@ -436,11 +447,18 @@ class Query extends Query\Conditions {
 			$this->Query .= " $this->Joins";
 		}
 		// if the action needs conditions
-		if($this->Action == 'SELECT' || $this->Action == 'UPDATE' || $this->Action == 'DELETE') {
+		if(
+			$this->Action == 'SELECT' || 
+			$this->Action == 'UPDATE' || 
+			$this->Action == 'DELETE'
+		) {
 			// if conditions are provided
 			if(count($this->Conditions)) {
 				// assemble the conditions
-				$this->Conditions = trim(implode(' ', $this->Conditions), 'AND /OR ');
+				$this->Conditions = trim(
+					implode(' ', $this->Conditions), 
+					'AND /OR '
+				);
 				// assemble the query
 				$this->Query .= " WHERE $this->Conditions";
 			}
@@ -488,7 +506,8 @@ class Query extends Query\Conditions {
 		).":$this->Query";
 		// throw an exception
 		Throw new Exception(
-			"Query->{$occured_on}() failed because : {$exception_infos}"
+			"Query->{$occured_on}() failed because : {$exception_infos}",
+			500
 		);
     }
 	

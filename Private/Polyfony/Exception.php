@@ -10,69 +10,114 @@ class Exception extends \Exception {
 		// set the handler for all non-catched exceptions
 		set_exception_handler('Polyfony\Exception::catchException');
 
-		// set handler for all non catched PHP errors if Config::get('core','use_strict')	
-		!Config::get('config','use_strict') ?: set_error_handler('Polyfony\Exception::catchErrorException');
+		// set handler for all PHP errors	
+		set_error_handler('Polyfony\Exception::catchError', E_ALL);
 		
+		// register a shutdown function to catch fatal errors that slipped thru
+		register_shutdown_function('Polyfony\Exception::catchCatastrophicError');
+
+	}
+
+	// this will convert a PHP error into an exception, 
+	// even for a notice or warning
+	public static function catchError(
+		int $severity, 
+		string $message, 
+		string $filename, 
+		int $line_number
+	) {
+
+		// if we are not already on the exception route
+		if(Router::getCurrentRoute()->name != 'exception-handler') {
+			// throw a new exception in case of notice, warning, anything !
+			Throw new Exception(
+				"$message at line $line_number in $filename" , 
+				500
+			); 
+		}
+
+		
+
 	}
 	
-	// this will convert a PHP error into an exception, even for a notice or warning
-	public static function catchErrorException($severity, $message, $filename, $lineno) {
-		
-		// build message
-		$message = "$message at line $lineno in $filename";
-		// throw a new exception in case of notice, warning, anything !
-		throw new Exception($message , 500); 
-		
-	}
-	
-	public static function catchException($exception) {
-	
+	// all non-catched exception are going thru this method
+	public static function catchException(
+		\Throwable $exception
+	) {
+
 		// if the router has an exception route
-		if(Router::hasRoute('exception')) {
-			// change the status code of the response
-			Response::setStatus($exception->getCode() ? $exception->getCode() : 500);
-			// store the exception so that the error controller can format it later on
+		if(Router::hasRoute('exception-handler')) {
+			// store the exception so that the error controller 
+			// can format it properly later on
 			Store\Request::put('exception', $exception, true);
-			// dispatch to the exception route
-			Router::forward(Router::getRoute('exception'));
-			// render the response
+			// dispatch to the exception handler route
+			Router::forward(Router::getRoute('exception-handler'));
+			// prevent any further processing of code after the rendering of the exception
 			Response::render();
 		}
-		// no exception handler or output is not html, throw normal exception
+		// no exception handler is defined, we don't bother handling it
 		else {
+
 			// hard set the error code
-			header(Request::server('SERVER_PROTOCOL') . ' 500 Internal Server Error', true, 500);
+			header(
+				Request::server('SERVER_PROTOCOL') . 
+				' 500 Internal Server Error', 
+				true, 
+				500
+			);
 			// hard set cache restriction
 			header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
 			// throw exception normally
-			Throw $exception;
+			Throw $exception; // doesn't that create a recursive loop?
 		}
 		
 	}
 	
+	// this is able to catch catastrophic errors such as a parse error
+	public static function catchCatastrophicError() :void {
+
+		if(
+			// if we encountered a PHP error
+			$error = error_get_last() && 
+			// and if we were not already handling the error/exception
+			Router::getCurrentRoute()->name != 'exception-handler'
+		){
+
+			// redirect the exception handler
+			Throw new \Exception(
+				"{$error['message']} at line {$error['line']} in {$error['file']}", 
+				500
+			);
+		}
+
+	}
+
 	public static function convertTraceToHtml(
-		array $trace
+		$exception
 	) :string {
 
 		$stack = '<div class="card-body">';
 
+		$trace = $exception->getTrace();
+
+		// use polyfony Elements instead
 		foreach($trace as $index => $call) {
 			// in case the stack element is not from an object
 			$class 	= isset($call['class']) ? $call['class'] : '';
 			$type 	= isset($call['type']) ? $call['type'] : '';
 			// shorten the file path to lower cognitive load
-			$file 	= str_replace('/var/www/', '', $call['file']); 
+			$file 	= !isset($call['file']) ?: str_replace('/var/www/', '', $call['file']); 
 			// format a clean call
 			$stack .= 
-			"<span class=\"lead\">{$index} {$class}<strong>{$type}{$call['function']}</strong></span> ";
+			"<span class=\"index-and-class\">{$index} {$class}<strong>{$type}{$call['function']}</strong></span> ";
 			$stack .= 
-			"<span class=\"badge bg-warning text-black\">@line {$call['line']}</span> in <span class=\"text-secondary\">{$file}</span><br />";
+			!isset($call['line']) ?: "<span class=\"badge bg-warning text-black\">@line {$call['line']}</span> in <span class=\"text-secondary\">{$file}</span><br />";
 		}
 
 		return "$stack</div>";
 
 	}
-	
+	/*
 	private function __toHtml() {
 		
 		// return the formatted trace
@@ -91,9 +136,46 @@ class Exception extends \Exception {
 	public function __toString() {
 		
 		// if the output type different from html
-		return(in_array(Response::getType(), array('html','html-page')) ? 
-			$this->__toHtml() : $this->__toText());
+		return $this->getMessage();
 		
+	}
+*/
+	public static function isAttentionRequiring($exception) :bool {
+		return 
+			$exception->getCode() < 401 || 
+			$exception->getCode() > 404 || 
+			Config::isDev();
+	}
+
+	public static function getIcon($exception) :string {
+
+		// error is of type forbidden/bad request
+		if(
+			$exception->getCode() >= 400 && 
+			$exception->getCode() <= 403
+		) {
+			$icon = 'fa fa-ban';
+		}
+		// error is of type internal error
+		elseif(
+			$exception->getCode() >= 500 && 
+			$exception->getCode() <= 599
+		) {
+			$icon = 'fa fa-bug';
+		}
+		// error is not found
+		elseif(
+			$exception->getCode() == 404
+		) {
+			$icon = 'fa fa-exclamation-circle';
+		}
+		// any other type of errors
+		else {
+			$icon = 'fa fa-exclamation-triangle';
+		}
+
+		return $icon;
+
 	}
 	
 }

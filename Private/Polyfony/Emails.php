@@ -2,7 +2,9 @@
 
 namespace Polyfony;
 
-class Emails extends Record {
+use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
+
+class Emails extends Entity {
 
 	const recipients_types_to_phpmailer_methods = [
 		'to'		=>'addAddress',
@@ -27,23 +29,94 @@ class Emails extends Record {
 		// fill voids with static configuration
 		return $this
 			->set([
-				'from_email' => $this->get('from_email') ?: 
-				Config::get('email', 'from_email'),
-				'from_name' => $this->get('from_name') ?: 
-				Config::get('email', 'from_name'),
-				'charset' => $this->get('charset') ?: 
-				Config::get('email', 'default_charset'),
-				'format' => $this->get('format') ?: 
-				Config::get('email', 'format'),
+				'from_email' 	=> $this->get('from_email') ?: 
+					Config::get('email', 'from_email'),
+				'from_name' 	=> $this->get('from_name') ?: 
+					Config::get('email', 'from_name'),
+				'charset' 		=> $this->get('charset') ?: 
+					Config::get('email', 'default_charset'),
+				'format' 		=> $this->get('format') ?: 
+					Config::get('email', 'format'),
 				'creation_date' => $this->get('creation_date', true) ?: 
-				time(),
+					time(),
 				'smtp' => [
 					'host' => Config::get('email', 'smtp_host'),
 					'user' => Config::get('email', 'smtp_user'),
 					'pass' => Config::get('email', 'smtp_pass')
 				]
 			]);
-			//->removeUnusedPlaceholders();
+
+	}
+
+	private function render() :self {
+
+		// if the view has already been rendered, or if there is no view
+		if(
+			isset($this->_['rendered']) || 
+			!isset($this->_['view'])
+		) {
+			return $this;
+		}
+
+		// define a marker to benchmark the rendering
+		$id_marker = Profiler::setMarker(
+			'Emails.render.'.uniqid(), 
+			'email',
+			['Email'=>$this]
+		);
+
+		// render the PHP view 
+		$this->renderView();
+
+		// render the CSS (inlining)
+		$this->renderCSS();
+
+		// release the marker
+		Profiler::releaseMarker($id_marker);
+
+		// memorize
+		$this->_['rendered'] = true;
+
+		// allow chaining
+		return $this;
+
+	}
+
+	public function renderView() :void {
+
+		// start a new buffer for rending the email's view
+		ob_start();
+		// extract the variables for that view
+		extract(isset($this->_['variables']) ? $this->_['variables']: []);
+		// include the actual email's view
+		include($this->_['view']);
+		// get the rendered view
+		$rendered_view = ob_get_contents();
+		// terminate the buffer
+		ob_end_clean();
+		// update the body with the rendered view
+		$this->set(['body'=>$rendered_view]);
+
+	}
+
+	public function renderCSS() :void {
+
+		// if the email is html, and we have some css
+		if(
+			$this->isHTML() && 
+			isset($this->_['css'])
+		) {
+			// inline the css into the email's body
+			$this->set([
+				'body'=>(new CssToInlineStyles)
+					->convert(
+						$this->get('body', true),
+						$this->_['css']
+					)
+			]);
+		}
+
+
 
 	}
 
@@ -127,6 +200,8 @@ class Emails extends Record {
 
 	}
 
+	
+
 	// this is not to be called directly
 	// it's only used to simplify the ->set() method
 	private function setIncludingFakeColumns(
@@ -137,9 +212,17 @@ class Emails extends Record {
 		if($column == 'body' && is_array($value)) {
 			$this->setVariables($value);
 		}
-		// allow to set the template 
-		elseif($column == 'template') {
-			$this->setTemplate($value);
+		// allow to set the view 
+		elseif($column == 'view') {
+			$this->setView($value);
+		}
+		// allow to set multiple css 
+		elseif($column == 'css' && is_array($value)) {
+			$this->setCSS($value);
+		}
+		// allow to set a single css 
+		elseif($column == 'css' && is_string($value)) {
+			$this->setCSS([$value]);
 		}
 		// allow to change the smtp
 		elseif($column == 'smtp') {
@@ -158,68 +241,71 @@ class Emails extends Record {
 		}
 	}
 
-	private function setTemplate(string $template_path) :self {
+	private function setView(
+		string $view_name
+	) :self {
+		// prepare the view
+		$view_path = Config::absolutizePath(
+			"Private/Bundles/Emails/Views/{$view_name}.php"
+		);
 		// if the template file exists
-		if(file_exists($template_path)) {
-			// set the path
-			return $this->set([
-				'body'=>file_get_contents($template_path)
-			]);
-		}
-		// template file does not exist
-		else {
+		if(!file_exists($view_path)) {
 			// throw an exeption
 			Throw new Exception(
-				'Emails->setTemplate() the template file does not exist', 
+				'Emails->setView() the view file does not exist', 
 				404
 			);
 		}
-
+		$this->_['view'] = $view_path;
+		return $this;
 	}
 
 	private function setVariables(
 		array $placeholders_and_values
 	) :self {
 
-		// for each values
-		foreach(
-			$placeholders_and_values as 
-			$placeholder => $value
-		) {
-			// replace the placeholder with it's actual value
-			$this->set([
-				'body'=> str_replace(
-					[
-						'__'.$placeholder.'__', // this allows for some backward compatibility
-						'{{'.$placeholder.'}}'
-					], 
-					$value, 
-					$this->get('body', true)
-				)
-			]);
-		}
+		// place the variable in a hidden variable container
+		$this->_['variables'] = $placeholders_and_values;
 
 		// allow for chaining
 		return $this;
 
 	}
 
-	// private function removeUnusedPlaceholders() :self {
+	private function setCSS(
+		array $stylesheets
+	) :self {
 
-	// 	// replace unused placeholder with nothing
-	// 	return $this->get('body') ? $this->set([
-	// 		'body'=> preg_replace(
-	// 			'/{{([A-Za-z0-9_])+}}/gi',
-	// 			'',
-	// 			$this->get('body', true)
-	// 		)
-	// 	]);
+		// initialize css container
+		$this->_['css'] = '';
 
-	// }
+
+		foreach($stylesheets as $stylesheet) {
+			// prepare the stylesheet
+			$stylesheet_path = Config::absolutizePath(
+				"Private/Bundles/Emails/Assets/Css/{$stylesheet}.css"
+			);
+			// if the stylesheet does not exist
+			if(!file_exists($stylesheet_path)) {
+				// throw an exeption
+				Throw new Exception(
+					'Emails->setStylesheets() the stylesheet does not exist', 
+					404
+				);
+			}
+			// append the css content to existing content
+			$this->_['css'] .= ' ' . file_get_contents($stylesheet_path);
+
+		}
+		return $this;
+
+	}
 
 	public function getError() {
 		// return the textual representation for the last error
-		return isset($this->_['mailer']) ? $this->_['mailer']->ErrorInfo : '';
+		return isset($this->_['mailer']) ? 
+			$this->_['mailer']->ErrorInfo : 
+			'';
 	}
 
 	public function isSent() :bool {
@@ -245,21 +331,29 @@ class Emails extends Record {
 			$this->_['id_marker'] = Profiler::setMarker(null, 'email', ['Email'=>$this]);
 		}
 
+		// render if need be
+		$this->render();
+
 		// use normal saving of record class
 		return parent::save();
 
 	}
 
-	public function send(?bool $save = false) :self {
+	public function send(
+		?bool $save = false
+	) :self {
 
 		// autoconfigure
 		$this->autoConfigure();
 
 		// place a marker
-		$this->_['id_marker'] = Profiler::setMarker(null, 'email', ['Email'=>$this]);
+		$id_marker = Profiler::setMarker(null, 'email', ['Email'=>$this]);
 
 		// configure the php mailer object
 		$this->configurePHPMailer();
+
+		// render if need be
+		$this->render();
 
 		// try sending
 		try {
@@ -278,7 +372,7 @@ class Emails extends Record {
 		}
 
 		// release the marker
-		Profiler::releaseMarker($this->_['id_marker']);
+		Profiler::releaseMarker($id_marker);
 
 		// if we asked to save the object of if we're from the database already
 		// aka we have an id/primary key

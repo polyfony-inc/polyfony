@@ -78,12 +78,13 @@ class Integrity {
 	}
 
 	protected static function throwExceptionBecause(
-		string $error_message, bool $prevent_redirection
+		string $error_message, 
+		bool $prevent_redirection
 	) {
 		// soft redirect to the previous page after a few seconds
 		$prevent_redirection ?: Response::setRedirect(Request::server('HTTP_REFERER'), 3);
 		// throw an exception to prevent this action from succeeding
-		Throw new \Polyfony\Exception($error_message, 400);
+		Throw new \Polyfony\Exception($error_message, 403);
 	}
 
 }

@@ -216,6 +216,16 @@ class Database {
 		}
 
 	}
+
+	public static function doesColumnExist(
+		$column_name, 
+		$table_name
+	) :bool {
+		// get the allowed null columns
+		$allowed_nulls = \Polyfony\Database::describe($table_name);
+		// check if the column exists
+		return array_key_exists($column_name, $allowed_nulls);
+	}
 	
 }	
 

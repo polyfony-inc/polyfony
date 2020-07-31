@@ -19,7 +19,10 @@ class Router {
 	}
 
 	private static function canWeUseCachedRoutes() :bool {
-		return Config::isProd() && Cache::has('Routes') && Config::get('router', 'cache');
+		return 
+			Config::isProd() && 
+			Cache::has('Routes') && 
+			Config::get('router', 'cache');
 	}
 	
 	private static function restoreCachedRoutes() :void {
@@ -59,7 +62,10 @@ class Router {
 	
 	// new syntax for mapping routes
 	public static function map(
-		string $url = null, string $destination, string $route_name = null, string $method = null
+		string $url = null, 
+		string $destination, 
+		string $route_name = null, 
+		string $method = null
 	) :Route {
 		// We cannot allow duplicate route names for reversing reasons
 		if($route_name && self::hasRoute($route_name)) {
@@ -80,27 +86,47 @@ class Router {
 	}
 
 	// new syntax for mapping routes
-	public static function get(string $url, string $destination, $route_name = null) :Route {
+	public static function get(
+		string $url, 
+		string $destination, 
+		$route_name = null
+	) :Route {
 		return self::map($url, $destination, $route_name, 'get');
 	}
 
 	// new syntax for mapping routes
-	public static function post(string $url, string $destination, $route_name = null) :Route {	
+	public static function post(
+		string $url, 
+		string $destination, 
+		$route_name = null
+	) :Route {	
 		return self::map($url, $destination, $route_name, 'post');
 	}
 
 	// new syntax for mapping routes
-	public static function delete(string $url, string $destination, $route_name = null) :Route {	
+	public static function delete(
+		string $url, 
+		string $destination, 
+		$route_name = null
+	) :Route {	
 		return self::map($url, $destination, $route_name, 'delete');
 	}
 
 	// new syntax for mapping routes
-	public static function put(string $url, string $destination, $route_name = null) :Route {	
+	public static function put(
+		string $url, 
+		string $destination, 
+		$route_name = null
+	) :Route {	
 		return self::map($url, $destination, $route_name, 'put');
 	}
 
 	// new syntax for quick redirects
-	public static function redirect(string $source_url, string $redirection_url, int $status_code=301)  {
+	public static function redirect(
+		string $source_url, 
+		string $redirection_url, 
+		int $status_code=301
+	)  {
 		// create a new route
 		$route = new Route();
 		// add it to the list of known routes
@@ -175,7 +201,11 @@ class Router {
 	 * @param  Core\Route $route      A Route declared by the application.
 	 * @return boolean
 	 */
-	private static function routeMatch(string $request_url, string $request_method, Route $route) :bool {
+	private static function routeMatch(
+		string $request_url, 
+		string $request_method, 
+		Route $route
+	) :bool {
 
 		// if the method is set for that route, and it doesn't match
 		if(!$route->hasMethod($request_method)) {
@@ -188,7 +218,9 @@ class Router {
 		// if we've got a redirect, let's go for it
 		$route->redirectIfItIsOne();
 		// get a list of current request parameters, with numerical indexes
-		$indexed_request_parameters = Request::getUrlIndexedParameters($route->staticSegment);
+		$indexed_request_parameters = Request::getUrlIndexedParameters(
+			$route->staticSegment
+		);
 		// if restricttion against url parameters don't match
 		if(!$route->validatesTheseParameters($indexed_request_parameters)) {
 			return false;
@@ -224,21 +256,32 @@ class Router {
 		// if the specified route doesn't exist
 		if(!self::hasRoute($route_name)) {
 			// we cannot reverse a route that does not exist
-			throw new Exception("Router::reverse() : The [{$route_name}] route does not exist");
+			Throw new Exception("Router::reverse() : The [{$route_name}] route does not exist");
 		}
 		// return the reversed url
-		return self::$_routes[$route_name]->getAssembledUrl($parameters, $is_absolute, $force_tls);
+		return self::$_routes[$route_name]->getAssembledUrl(
+			$parameters, 
+			$is_absolute, 
+			$force_tls
+		);
 	}
 	
 	public static function forward(Route $route) :void {
 
 		// get the full destination
-		list($script, $class, $method) = $route->getDestination();
+		list(
+			$script, 
+			$class, 
+			$method
+		) = $route->getDestination();
 		// if script is missing from the bundle
 		if(!file_exists($script)) {
+			var_dump(Request::server('DOCUMENT_ROOT'));
 			// new polyfony exception
 			Throw new Exception(
-				"Dispatcher::forward() : Controller file [{$script}] does not exist", 500);	
+				"Dispatcher::forward() : Controller file [{$script}] does not exist", 
+				500
+			);	
 		}
 		// include the controller's file
 		require_once($script);
@@ -246,7 +289,9 @@ class Router {
 		if(!class_exists($class,false)) {
 			// new polyfony exception
 			Throw new Exception(
-				"Dispatcher::forward() : Controller class [{$class}] does not exist in [{$script}]", 500);	
+				"Dispatcher::forward() : Controller class [{$class}] does not exist in [{$script}]", 
+				500
+			);	
 		}
 		// update the current route
 		self::setCurrentRoute($route);
@@ -259,9 +304,9 @@ class Router {
 				"Dispatcher::forward() : Method [{$method}] does not exist in [{$class}]", 500);	
 		}
 		// marker
-		$id_pre_marker = Profiler::setMarker("{$route->controller}.preAction", "controller");
-		// pre action
-		self::$_controller->preAction();
+		$id_pre_marker = Profiler::setMarker("{$route->controller}.before", "controller");
+		// before action
+		self::$_controller->before();
 		// marker
 		Profiler::releaseMarker($id_pre_marker);
 		// marker
@@ -271,9 +316,9 @@ class Router {
 		// marker
 		Profiler::releaseMarker($id_marker);
 		// marker
-		$id_post_marker = Profiler::setMarker("{$route->controller}.postAction", "controller");
-		// post action
-		self::$_controller->postAction();
+		$id_post_marker = Profiler::setMarker("{$route->controller}.after", "controller");
+		// after action
+		self::$_controller->after();
 		// marker
 		Profiler::releaseMarker($id_post_marker);
 		
