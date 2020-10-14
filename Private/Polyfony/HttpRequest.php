@@ -245,7 +245,9 @@ class HttpRequest {
 			// get body portion from the response
 			$this->response['content'] = substr($response, $header_size);
 			// success now depends on more than just getting a response, we need a 200 OK
-			$this->response['success'] = stripos($this->response['headers'],'200 OK') !== false ? 
+			$this->response['success'] = 
+				stripos($this->response['headers'],'200 OK') !== false || 
+				stripos($this->response['headers'],'HTTP/2 200') !== false ? 
 				true : false;
 			// format the headers properly
 			$this->response['headers'] = explode("\n",$this->response['headers']);
