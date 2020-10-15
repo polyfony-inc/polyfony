@@ -8,7 +8,7 @@ class Database {
 	// no database connection at first
 	private static $_handle = null;
 	// no database configuration at first
-	private static $_config = null;
+	private static ?array $_config = null;
 
 	// configure the database
 	public static function configureAndGetDSN() :string {
@@ -218,8 +218,8 @@ class Database {
 	}
 
 	public static function doesColumnExist(
-		$column_name, 
-		$table_name
+		string $column_name, 
+		string $table_name
 	) :bool {
 		// get the allowed null columns
 		$allowed_nulls = \Polyfony\Database::describe($table_name);

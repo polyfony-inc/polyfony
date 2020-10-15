@@ -28,7 +28,7 @@ class Router {
 	private static function restoreCachedRoutes() :void {
 		// restore the routes from the cache
 		foreach(Cache::get('Routes') as $route_name => $route) {
-			// reinstanciate a route
+			// reinstanciate a route (maybe there's a better way, this looks very much like a hack)
 			$route_object = new Route($route_name);
 			// for each attribute
 			foreach($route as $key => $value) {
@@ -193,14 +193,7 @@ class Router {
 	}
 
 
-	/**
-	 * Test to see if this route is valid against the URL.
-	 *
-	 * @access private
-	 * @param  array      $requestUrl The URL to test the route against.
-	 * @param  Core\Route $route      A Route declared by the application.
-	 * @return boolean
-	 */
+	// Test to see if this route is valid against the URL.
 	private static function routeMatch(
 		string $request_url, 
 		string $request_method, 
@@ -212,41 +205,31 @@ class Router {
 			return false;
 		}
 		// if the url doesn't begin with the static segment or that route
-		if(!$route->hasStaticUrlSegment($request_url)) {
+		if(!$route->hasStaticSegment($request_url)) {
 			return false;
 		}
 		// if we've got a redirect, let's go for it
-		$route->redirectIfItIsOne();
-		// get a list of current request parameters, with numerical indexes
-		$indexed_request_parameters = Request::getUrlIndexedParameters(
+		$route->redirectIfAny();
+		// get a list of current request parameters, by numerical position (index)
+		$request_parameters_indexed_by_position = Request::getUrlIndexedParameters(
 			$route->staticSegment
 		);
 		// if restricttion against url parameters don't match
-		if(!$route->validatesTheseParameters($indexed_request_parameters)) {
+		if(!$route->hasValidParameters($request_parameters_indexed_by_position)) {
 			return false;
 		}
-		// send the named parameters to the request class
-		$route->sendNamedParametersToRequest($indexed_request_parameters);
-		// deduce the dynamic action from the url parameters if necessary
-		$route->deduceAction();
+		// if the url's signature doesn't match
+		if(!$route->hasValidSignature($request_parameters_indexed_by_position)) {
+			return false;
+		}
+		// set route as matching
+		$route->setAsMatching($request_parameters_indexed_by_position);
 		// check if they match defined constraints
 		return true;
 
 	}
 
-	/**
-	 * Reverse the router.
-	 *
-	 * Make a URL out of a route name and parameters, rather than parsing one.
-	 * Note that this function does not care about URL paths!
-	 *
-	 * @access public
-	 * @param  string    $route_name	The name of the route we wish to generate a URL for.
-	 * @param  array     $parameters	The parameters that the route requires.
-	 * @return string
-	 * @throws \Exception           If the route does not exist.
-	 * @static
-	 */
+	// Generate an URL from an known route and url parameters
 	public static function reverse(
 		string $route_name, 
 		array $parameters = [], 
@@ -258,8 +241,13 @@ class Router {
 			// we cannot reverse a route that does not exist
 			Throw new Exception("Router::reverse() : The [{$route_name}] route does not exist");
 		}
+		// if the route is to be signed
+		if(self::$_routes[$route_name]) {
+			// generate a signature of the parameters and add it after existing parameters
+			$parameters[Config::get('router','signature_parameter_name')] = Hashs::get([$route_name,$parameters]);
+		}
 		// return the reversed url
-		return self::$_routes[$route_name]->getAssembledUrl(
+		return self::$_routes[$route_name]->getAssembledSegments(
 			$parameters, 
 			$is_absolute, 
 			$force_tls
@@ -276,7 +264,6 @@ class Router {
 		) = $route->getDestination();
 		// if script is missing from the bundle
 		if(!file_exists($script)) {
-			var_dump(Request::server('DOCUMENT_ROOT'));
 			// new polyfony exception
 			Throw new Exception(
 				"Dispatcher::forward() : Controller file [{$script}] does not exist", 

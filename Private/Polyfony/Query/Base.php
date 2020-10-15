@@ -6,25 +6,26 @@ class Base {
 
 	// internal attributes
 	protected	$Query;
-	protected	$Values;
+	protected	?array $Values;
 	protected	$Prepared;
-	protected	$Success;
+	protected	bool $Success;
 	protected	$Result;
-	protected	$Action;
-	protected	$Hash;
-	protected	$Quote;
+	protected	?string $Action;
+	protected	?string $Hash;
+	protected	string $Quote;
 	
 	// attributes to build a query
-	protected	$Table;
-	protected	$Selects;
-	protected	$Joins;
-	protected	$Operator;
-	protected	$Conditions;
-	protected	$Updates;
-	protected	$Inserts;
-	protected	$Groups;
-	protected	$Order;
-	protected	$Limit;
+	protected	string $Object 		= "Entity";
+	protected	?string $Table 		= null;
+	protected	string $Operator 	= 'AND';
+	protected	array $Selects 		= [];
+	protected	$Joins 				= []; // array|string
+	protected	$Conditions 		= []; // array|string
+	protected	$Updates 			= []; // array|string
+	protected	$Inserts 			= []; // array|string
+	protected	$Groups 			= []; // array|string
+	protected	$Order 				= []; // array|string
+	protected	$Limit 				= []; // array|string
 
 	// instanciate a new query
 	public function __construct(string $quote = '') {
@@ -47,19 +48,6 @@ class Base {
 		$this->Hash			= null;
 		// set the quote symbol (if any to use for columns)
 		$this->Quote 		= $quote;
-
-		// initialize attributes
-		$this->Object		= 'Entity';
-		$this->Table		= null;
-		$this->Operator		= 'AND';
-		$this->Selects		= [];
-		$this->Joins		= [];
-		$this->Conditions	= [];
-		$this->Updates		= [];
-		$this->Inserts		= [];
-		$this->Groups		= [];
-		$this->Order		= [];
-		$this->Limit		= [];
 		
 	}
 

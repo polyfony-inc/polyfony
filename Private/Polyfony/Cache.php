@@ -5,13 +5,13 @@ namespace Polyfony;
 class Cache {
 
 	// number of cache hits
-	private static $hits_count = 0;
+	private static int $hits_count = 0;
 	// number of cache misses
-	private static $misses_count = 0;
+	private static int $misses_count = 0;
 	// elapsed time putting into the cache
-	private static $cache_in_time = 0;
+	private static int $cache_in_time = 0;
 	// elapsed time retrieving from cache
-	private static $cache_out_time = 0;
+	private static int $cache_out_time = 0;
 
 	public static function getStatistics() :array {
 		return [
@@ -59,7 +59,12 @@ class Cache {
 	}
 	
 
-	public static function put(string $variable, $value=null, $overwrite=false, $lifetime=false) :bool {
+	public static function put(
+		string $variable, 
+		$value=null, 
+		$overwrite=false, 
+		$lifetime=false
+	) :bool {
 	
 		// already exists and no overwrite
 		if(self::has($variable) && !$overwrite) {
@@ -83,7 +88,7 @@ class Cache {
 			self::$cache_in_time += microtime(true) - $start;
 		}
 		// return status
-		return(self::has($variable));
+		return self::has($variable);
 		
 	}
 	
@@ -122,7 +127,7 @@ class Cache {
 		// remove it
 		unlink(self::path($variable));
 		// return it	
-		return(!self::has($variable));
+		return !self::has($variable);
 		
 	}
 	

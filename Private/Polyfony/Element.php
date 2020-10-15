@@ -8,9 +8,9 @@ class Element {
 	private static $_auto = array('input', 'img', 'hr', 'br', 'meta', 'link');
 
 	// internal of the DOM element
-	private $type;
-	private $attributes;
-	private $content;
+	private string $type;
+	private array $attributes;
+	private string $content;
 
 	// main constructor
 	public function __construct(string $type='div', array $options=null) {

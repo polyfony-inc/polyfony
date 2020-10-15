@@ -9,7 +9,7 @@ use Polyfony\Database as Database;
 class Aware {
 	
 	// storing variable that does not reflect the database table structure
-	protected $_;
+	protected array $_;
 	
 	// columns that are to be auto-populated
 	const AUTO_POPULATE_COLUMNS = [

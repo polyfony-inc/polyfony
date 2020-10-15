@@ -6,24 +6,23 @@ class Format {
 
 	// file or folder name that is safe for the filesystem
 	public static function fsSafe(
-		$string, 
+		string $string, 
 		$replacement_symbol = '-'
 	) :string {
 		// remove any symbol that does not belong in a file name of folder name
-		return(str_replace(
+		return str_replace(
 				['..','/','\\',':','@','$','?','*','<','>','&','(',')','{','}',',','%','`','\'','#'], 
 				$replacement_symbol, 
 				$string
-			)
-		);
+			);
 	}
 
 	// string that is safe for javascript variable
 	public static function jsSafe(
-		$string
+		string $string
 	) :string {
 		// escape all single quotes
-		return(json_encode($string));
+		return json_encode($string);
 	}
 	
 	// safe for outputing in html tag or html attribute
@@ -31,7 +30,7 @@ class Format {
 		$string
 	) :string {
 		// just remove html entities
-		return(filter_var($string, FILTER_SANITIZE_FULL_SPECIAL_CHARS));
+		return filter_var($string, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 	}
 
 	// safe from uppercase abuse
@@ -83,7 +82,7 @@ class Format {
 		// declare units
 		$unit = ['b','Ko','Mo','Go','To','Po'];
 		// make human readable
-		return(round($integer/pow(1024, ($i=floor(log($integer, 1024)))), $precision) . ' ' . $unit[$i]);
+		return round($integer/pow(1024, ($i=floor(log($integer, 1024)))), $precision) . ' ' . $unit[$i];
 	}
 	
 	// relative date
@@ -103,7 +102,7 @@ class Format {
 		// use the right keyword for a future or past date
 		$keyword 	= $delta > 0 ? Locales::get('dans _delta_') : Locales::get('il y\'a _delta_');
 		// replace from the locale placeholder
-		return(str_replace('_delta_', $duration, $keyword));
+		return str_replace('_delta_', $duration, $keyword);
 
 	}
 	
@@ -170,7 +169,7 @@ class Format {
 		// the phone is in international format
 		else {
 			// return the phone number, truncate at 31 chars (the world longest possible phone number)
-			return(self::truncate($phone, 31));
+			return self::truncate($phone, 31);
 		}
 	}
 	
@@ -212,16 +211,14 @@ class Format {
 			)
 		);
 		// replace all but 0-9 a-z remove triples/doubles and trim the edges
-		return(
-			trim(
+		return trim(
 				str_replace(
 					array('---','--'), 
 					'-', 
 					preg_replace('#[^a-z0-9\-]#', '-', $string)
 				), 
 				'-'
-			)
-		);
+			);
 	}
 	
 	// create a link
@@ -240,11 +237,10 @@ class Format {
 		int $length=16
 	) {
 		// if string is longer than authorized truncate, else do nothing
-		return(
+		return 
 			strlen($string) > $length ? 
 			trim(mb_substr(strip_tags($string), 0, $length - 2, Response::getCharset())).'…' : 
-			$string
-		);
+			$string;
 	}
 	
 	// will wrap a portion of text in another
@@ -277,7 +273,7 @@ class Format {
 		$string
 	) {
 		// remove all formatting symbols and double spaces	
-		return(str_replace('  ', ' ', str_replace(array("\t", "\n", "\r"), '', $string)));
+		return str_replace('  ', ' ', str_replace(array("\t", "\n", "\r"), '', $string));
 	}
 
 	// will clean the value of anything but 0-9 and minus preserve sign return integer
@@ -290,7 +286,7 @@ class Format {
 		elseif(strrpos($value, ',')) {
 			$value = str_replace('.', '' , $value);
 		} 
-		return(intval(preg_replace('/[^0-9.\-]/', '', str_replace(',', '.' , $value))));
+		return intval(preg_replace('/[^0-9.\-]/', '', str_replace(',', '.' , $value)));
 	}
 	
 	// will clean the value of anything but 0-9\.- preserve sign return float
@@ -304,9 +300,9 @@ class Format {
 		elseif(strrpos($value, ',')) {
 			$value = str_replace('.', '' , $value);
 		} 
-		return(floatval(
+		return floatval(
 			round(preg_replace('/[^0-9.\-]/', '', str_replace(',', '.' , $value)), $precision)
-		));
+		);
 	}
 
 	// convert an array to a csv

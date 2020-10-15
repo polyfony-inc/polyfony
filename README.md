@@ -13,7 +13,7 @@ It features routing, bundles, controllers, profiler, views, ORM, tests, caches, 
 * ≤ 2.5 ms (cold)
 
 ## Requirements
-You need a POSIX compatible system (Linux/MacOS/xBSD), PHP >= 7.1 with ext-pdo, ext-sqlite3, ext-mbstring, ext-msgpack and a rewrite module for your webserver. 
+You need a POSIX compatible system (Linux/MacOS/xBSD), PHP >= 7.4 with ext-pdo, ext-sqlite3, ext-mbstring, ext-msgpack and a rewrite module for your webserver. 
 
 ## Disclaimer
 If you are considering using this framework instead of a major and well supported framework such as Laravel, there is something very wrong with your decision making process and/or project assesment. 
@@ -481,6 +481,50 @@ Router::redirect('/some-old-url/', '/the-new-url/', [$status_code=301]);
 ```
 *Those are static redirections, not rewrite rules. They cannot include dynamic parameters.*
 
+###### URL Parameters signing
+
+Sometimes, you may want to share a link with someone who doesn't have an account on your software.
+You may not want to bother those people with the requirements of having an account. 
+In those cases, signing the url parameters and passing the hash along is a good way of securing an URL.
+The generated URL will be unique and unpredictable. 
+
+To require a route to be signed, apply the `->sign()` method to your route declaration.
+
+```php
+
+// the associated signed URL can be sent by email
+// the client would not have to log in to track their order, how comfortable
+Router::get(
+	'/track/shipping/:id_client/:id_order/'
+	'External/Tracking@order',
+	'order-tracking'
+)->sign();
+
+``` 
+
+
+To get a signed URL, use the `Router::reverse()` method, the generated URL will automatically be signed.
+
+```php
+
+// this will generate an URL looking like this 
+// https://my.domain.com/track/shipping/4289/24389/E29E798A097F099827/
+Router::reverse(
+	'order-tracking'
+	[
+		'id_client'=>$client->get('id'),
+		'id_order'=>$order->get('id')
+	], 
+	true, 	// force TLS
+	true 	// include domain name
+);
+
+``` 
+
+You can customize the name of the hash parameter in `Config.ini` then `[router]` then `signing_parameter_name = 'url_parameters_hash'`, so that it doesn't conflict with your named parameters.
+
+
+
 ### Environments
 
 https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyconfig
@@ -488,7 +532,7 @@ https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyconfig
 Environments characterize a context of execution, with their own set of variables. 
 **Two environments exist in Polyfony** 
 * `Dev`, the development environment (this is where your coding occurs, most likely on your local developement server, or your own computer), 
-* `Prod`, the production environment (also refered to as `Live`).
+* `Prod`, the production environment (also referred to as `Live`).
 
 Variables that are common to both environments should be put in the main configuration file `Private/Config/Config.ini` 
 The environment detection can be based on either : 
@@ -507,13 +551,15 @@ Depending on the detected environment, either
 * `Private/Config/Prod.ini` 
 will overload/merge with the main `Config.ini`
 
+Contrary to many frameworks, your development application folder and production folder are strictly identical. You do not need to use different .env files on your production server.	
 
-###### Bellow is sample `Dev.ini` with its development domain
+
+###### Bellow is a sample `Dev.ini` with its development domain
 ```
 Private/Config/Dev.ini
 
 [router]
-domain = my-project.my-company.ext.devel
+domain = project.company.tld.test
 port = 80
 ```
 
@@ -524,7 +570,7 @@ port = 80
 Private/Config/Prod.ini
 
 [router]
-domain = my-project.my-company.ext
+domain = project.company.tld
 port 80
 
 [response]
@@ -537,6 +583,8 @@ pack_css = 1
 ```
 
 *Default configurations files with ready-to-go settings are put in place by composer during installation*
+
+You will need to modify your `/etc/hosts` file to point `project.company.tld.test` to `127.0.0.1` or modify your local DNS server.
 
 ###### To retrieve configurations values (from the merged configurations files)
 ```php
@@ -1233,7 +1281,7 @@ git stash apply
 composer update
 ```
 
-## Deprecated and discontinued features 
+## Deprecated, discontinued and renamed features 
 
 | **Previous Feature**   | **Status**   | **Replacement**         | **How to get it**                     |
 |------------------------|--------------|-------------------------|---------------------------------------|
@@ -1243,6 +1291,7 @@ composer update
 | Polyfony\Validate()    | DISCONTINUED | Validator\Validation()  | require symfony/validator             |
 | Polyfony\Thumnbail()   | DISCONTINUED | Intervention\Image()    | require intervention/image            |
 | Polyfony\Notice()      | DISCONTINUED | Bootstrap\Alert()       | require polyfony-inc/bootstrap        |
+| Polyfony\Keys()        | RENAMED      | Polyfony\Hashs()        | bundled with polyfony                 |
 
 
 ## Release history
@@ -1257,7 +1306,9 @@ composer update
 | 2.4       | Query->first() used to return false when no result were found, it now returns null.                                                                                      |
 | 2.5       | Query->get() shortcut for ->first()->execute(), enhanced Profiler, Console shortcut                                                                                      |
 | 2.6       | Emails refactoring, Tests support via PHPUnit, Events support                                                                                                            |
-| 3.0       | New ACLs, PHP views and CSS inlining for emails, new accessors for Entities, HTTP/2 push support, discontinuation of HttpRequest, Filesystem and Uploader classes        |
+| 3.0       | New ACLs, PHP views and CSS inlining in emails, new helper accessors for Entities, HTTP/2 push support, discontinuation of HttpRequest, Filesystem and Uploader classes  |
+| 3.1       | New Routes signature feature, Keys renamed to Hashs, PHP 7.4+ required                                                                                                   |
+| 4.1       | PHP 8.0+ required, minor refactoring of some classes                                                                                                                     |
 
 ## [Performance](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
 Polyfony has been designed to be fast, no compromise (> 2000 req/s). 

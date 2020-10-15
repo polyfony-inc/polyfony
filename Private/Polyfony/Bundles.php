@@ -4,9 +4,9 @@ namespace Polyfony;
  
 class Bundles {
 
-	protected static $_bundles		= array();
-	protected static $_routes		= array();
-	protected static $_configs		= array();
+	protected static array $_bundles	= [];
+	protected static array $_routes		= [];
+	protected static array $_configs	= [];
 
 	// will get the list of bundles and get their routes and runtimes
 	public static function init() :void {

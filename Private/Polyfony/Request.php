@@ -109,7 +109,21 @@ class Request {
 			// if it's a header
 			if(substr($name, 0, 5) == 'HTTP_') { 
 				// clean it
-				self::$_headers[str_replace(' ','-',ucwords(strtolower(str_replace('_',' ',substr($name,5)))))] = $value; 
+				self::$_headers[
+					str_replace(
+						' ',
+						'-',
+						ucwords(
+							strtolower(
+								str_replace(
+									'_',
+									' ',
+									substr($name,5)
+								)
+							)
+						)
+					)
+				] = $value; 
 			} 
 		} 
 		

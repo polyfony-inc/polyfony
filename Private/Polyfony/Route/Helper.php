@@ -7,7 +7,10 @@ use Polyfony\Request as Req;
 
 class Helper {
 
-	public static function prefixIt(string $url='/', bool $force_tls = false) :string {
+	public static function prefixIt(
+		string $url='/', 
+		bool $force_tls = false
+	) :string {
 		$desired_protocol = self::getProtocol($force_tls);
 		return 
 			$desired_protocol . 

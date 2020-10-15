@@ -4,10 +4,10 @@ namespace Polyfony;
 
 class Locales {
 	
-	protected static $_locales = null;
-	protected static $_language = null;
+	protected static ?array $_locales 	= null;
+	protected static ?string $_language = null;
 	
-	protected static $_load_time = 0;
+	protected static int $_load_time = 0;
 
 	public static function init() {
 
@@ -137,7 +137,11 @@ class Locales {
 		
 	}
 	
-	public static function get($key, $language=null, ?array $variables=[]) {
+	public static function get(
+		string $key, 
+		$language=null, 
+		?array $variables=[]
+	) :?string {
 	
 		// if locales are not loaded yet
 		self::$_locales !== null ?: self::init();

@@ -15,14 +15,21 @@ class Form {
 		));
 	}
 
-	private static function addCheckedAttributeIfTrue(array $attributes, bool $is_checked) :array {
+	private static function addCheckedAttributeIfTrue(
+		array $attributes, 
+		bool $is_checked
+	) :array {
 		if($is_checked) {
 			$attributes['checked'] = 'checked';
 		}
 		return $attributes;
 	}
 
-	public static function input(string $name, $value='', array $attributes=[]) :Element {
+	public static function input(
+		string $name, 
+		$value='', 
+		array $attributes=[]
+	) :Element {
 		return self::builder('input', [
 			'type'	=>'input',
 			'name'	=>$name,
@@ -30,7 +37,11 @@ class Form {
 		], $attributes);
 	}
 	
-	public static function textarea(string $name, $value='', array $attributes=[]) :Element {
+	public static function textarea(
+		string $name, 
+		$value='', 
+		array $attributes=[]
+	) :Element {
 		return self::builder('textarea', [
 			'type'=>'textarea',
 			'name'=>$name,
@@ -38,14 +49,23 @@ class Form {
 		], $attributes);
 	}
 	
-	public static function checkbox(string $name, bool $checked=false, array $attributes=[]) :Element {
+	public static function checkbox(
+		string $name, 
+		bool $checked=false, 
+		array $attributes=[]
+	) :Element {
 		return self::builder('input', [
 			'type'	=>'checkbox',
 			'name'	=>$name
 		], self::addCheckedAttributeIfTrue($attributes, $checked));
 	}
 	
-	public static function radio(string $name, $value, bool $checked=false, array $attributes=[]) :Element {
+	public static function radio(
+		string $name, 
+		$value, bool 
+		$checked=false, 
+		array $attributes=[]
+	) :Element {
 		return self::builder('input', [
 			'type'	=>'radio',
 			'name'	=>$name,
@@ -53,7 +73,10 @@ class Form {
 		], self::addCheckedAttributeIfTrue($attributes, $checked));
 	}
 
-	private static function isThisOptionSelected($option_key, $selected_value=null) :bool {
+	private static function isThisOptionSelected(
+		$option_key, 
+		$selected_value=null
+	) :bool {
 		return (
 				is_array($selected_value) && 
 				in_array($option_key, $selected_value)
@@ -64,7 +87,10 @@ class Form {
 			);
 	}
 
-	private static function buildSelectName(string $name, array $attributes=[]) :string {
+	private static function buildSelectName(
+		string $name, 
+		array $attributes=[]
+	) :string {
 		if( isset($attributes['multiple']) && substr($name, -2, 2) != '[]' ) {
 			$name .= '[]';
 		}
@@ -72,7 +98,11 @@ class Form {
 		return $name;
 	}
 
-	private static function buildSelectOption($option_key, $option_name, $selected_value=null) :Element {
+	private static function buildSelectOption(
+		$option_key, 
+		$option_name, 
+		$selected_value=null
+	) :Element {
 
 		// define option attributes
 		$option_attributes = array(
@@ -90,20 +120,33 @@ class Form {
 	}
 
 	public static function select(
-		string $name, array $select_options=[], $selected_value=null, array $attributes=[]
+		string $name, 
+		array $select_options=[], 
+		$selected_value=null, 
+		array $attributes=[]
 	) :Element {
 		// format the initial and empty select element
 		$select = self::builder('select', ['name'=>self::buildSelectName($name, $attributes)], $attributes);
 		// for each options available
-		foreach($select_options as $option_key => $option_name) {
+		foreach(
+			$select_options as 
+			$option_key => $option_name
+		) {
 			// if the value is an array (we enter an optgroup)
 			if(is_array($option_name)) {
 				// create an optgroup
 				$optgroup = new Element('optgroup', array('label'=> Locales::get($option_key)));
 				// iterate on the group
-				foreach($option_name as $sub_option_key => $sub_option_name) {
+				foreach(
+					$option_name as 
+					$sub_option_key => $sub_option_name
+				) {
 					// build option
-					$optgroup->adopt(self::buildSelectOption($sub_option_key, $sub_option_name, $selected_value));
+					$optgroup->adopt(self::buildSelectOption(
+						$sub_option_key, 
+						$sub_option_name, 
+						$selected_value
+					));
 				}
 				// put the optgroup in the select
 				$select->adopt($optgroup);
@@ -111,7 +154,11 @@ class Form {
 			// the value is normal, it is a simple list choice
 			else {
 				// build option
-				$select->adopt(self::buildSelectOption($option_key, $option_name, $selected_value));
+				$select->adopt(self::buildSelectOption(
+					$option_key, 
+					$option_name, 
+					$selected_value
+				));
 			}
 
 		}

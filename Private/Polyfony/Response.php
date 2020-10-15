@@ -6,22 +6,22 @@ class Response {
 
 	// set manually
 	protected static $_content;					// raw content before internal formatting
-	protected static $_type;					// type of the output (html/json/…)
-	protected static $_headers 			= [];	// list of headers
-	protected static $_status 			= 200;	// the HTTP status code to use
-	protected static $_redirect;				// url to redirect to
-	protected static $_delay;					// delay before redirection
-	protected static $_charset;					// charset of the response
-	protected static $_modification;			// modification date of the content
+	protected static string $_type;				// type of the output (html/json/…)
+	protected static array $_headers 	= [];	// list of headers
+	protected static int $_status 		= 200;	// the HTTP status code to use
+	protected static ?string $_redirect;		// url to redirect to
+	protected static ?int $_delay;				// delay before redirection
+	protected static ?string $_charset;			// charset of the response
+	protected static ?int $_modification = null;// modification date of the content
 
 	// stuff about caching
-	protected static $_browserCache 	= true;	// allow browser to cache the response
-	protected static $_outputCache 		= 0;	// allow the framework to cache the response
+	protected static bool $_browserCache = true;// allow browser to cache the response
+	protected static int $_outputCache 	= 0;	// allow the framework to cache the response
 	
 	// computed by the class itself
-	protected static $_formatted;				// content after formatting
-	protected static $_length;					// length of the content
-	protected static $_checksum;				// checksum of the content
+	protected static string $_formatted;		// content after formatting
+	protected static int $_length;				// length of the content
+	protected static string $_checksum;			// checksum of the content
 
 	// list of http status codes and messages
 	const CODES = [

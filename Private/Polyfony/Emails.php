@@ -13,14 +13,14 @@ class Emails extends Entity {
 		'reply_to'	=>'addReplyTo'
 	];
 
-	public $creation_date		= null;
-	public $sending_date		= null;
+	public ?int $creation_date	= null;
+	public ?int $sending_date	= null;
 	public $body 				= '';
-	public $subject 			= '';
-	public $format 				= ''; // html of text
-	public $charset 			= ''; // utf8, etc.
-	public $from_name 			= '';
-	public $from_email 			= '';
+	public ?string $subject 	= '';
+	public ?string $format 		= ''; // html of text
+	public ?string $charset 	= ''; // utf8, etc.
+	public ?string $from_name 	= '';
+	public ?string $from_email 	= '';
 	public $files_array 		= '[]';
 	public $recipients_array 	= '{"to":[],"cc":[],"bcc":[],"reply_to":[]}';
 

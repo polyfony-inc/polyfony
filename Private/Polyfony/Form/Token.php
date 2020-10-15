@@ -1,17 +1,13 @@
 <?php
 
 namespace Polyfony\Form;
-use \Polyfony\Config as Config;
-use \Polyfony\Request as Request;
-use \Polyfony\Store\Session as Session;
-use \Polyfony\Keys as Keys;
-use \Polyfony\Element as Element;
-use \Polyfony\Response as Response;
+use \Polyfony\{Config, Request, Store\Session, Hashs, Element, Response}; 
+
 
 class Token extends Integrity {
 
 	// the actual value of the token
-	private $value 	= null;
+	private ?string $value 	= null;
 
 	// this will instanciate a token
 	public function __construct() {
@@ -22,7 +18,7 @@ class Token extends Integrity {
 		Response::disableOutputCache();
 
 		// a unique token will be generated, and will live in the PHP session
-		$this->value = strtolower(Keys::generate(
+		$this->value = strtolower(Hashs::get(
 			Config::get('form','token_name') . uniqid(false,true)
 		));
 

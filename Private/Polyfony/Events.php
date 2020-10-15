@@ -4,7 +4,7 @@ namespace Polyfony;
  
 class Events {
 
-	private static $tasks = [
+	private static array $tasks = [
 		'onTerminate'				=>[],
 //		'beforeRender'				=>[], // might be implemented later on
 //		'afterRender'				=>[], // might be implemented later on

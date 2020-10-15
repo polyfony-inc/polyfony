@@ -5,11 +5,11 @@ namespace Polyfony\Response;
 class HTML {
 	
 	// store the list of links (css, favicons...)
-	protected static $_links 	= [];
+	protected static array $_links 		= [];
 	// store the list of scripts (javascript)
-	protected static $_scripts 	= [];
+	protected static array $_scripts 	= [];
 	// store the list of metas tags (title, description, robots...)
-	protected static $_metas 	= [];
+	protected static array $_metas 		= [];
 
 	// set links for the current HTML page
 	public static function setLinks(

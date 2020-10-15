@@ -4,8 +4,8 @@ namespace Polyfony;
 
 class Config {
 	
-	protected static $_environment;
-	protected static $_config;
+	protected static string $_environment;
+	protected static array $_config;
 	
 	public static function init() :void {
 	
@@ -13,11 +13,11 @@ class Config {
 		Profiler::setMarker('Config.init', 'framework', [], true);
 
 		// get all configurations available
-		self::$_config = array(
+		self::$_config = [
 			'Current'	=> parse_ini_file('../Private/Config/Config.ini', true),
 			'Dev'		=> parse_ini_file('../Private/Config/Dev.ini', true),
 			'Prod'		=> parse_ini_file('../Private/Config/Prod.ini', true)
-		);
+		];
 	
 		// depending on the context, detect environment differently
 		Request::isCli() ? self::detectFromCLI() : self::detectFromHTTP();
@@ -37,7 +37,7 @@ class Config {
 	}
 	
 	public static function includeBundlesConfigs(
-		$bundles_configuration_files
+		array $bundles_configuration_files = []
 	) :void {
 		// for each of those files
 		foreach($bundles_configuration_files as $file) {
@@ -124,22 +124,21 @@ class Config {
 		$key=null
 	) {
 		// return the proper config
-		return($key ? 
+		return $key ? 
 			// make sure the group's key exists before trying to access it
 			(isset(self::$_config['Current'][$group][$key]) ? self::$_config['Current'][$group][$key] : null) : 
 			// make sure the group exists before trying to access it
-			(isset(self::$_config['Current'][$group]) ? self::$_config['Current'][$group] : null)
-		);
+			(isset(self::$_config['Current'][$group]) ? self::$_config['Current'][$group] : null);
 	}
 
 	public static function isDev() :bool {
 		// return boolean
-		return(self::$_environment == 'Dev');
+		return self::$_environment == 'Dev';
 	}
 	
 	public static function isProd() :bool {
 		// return boolean
-		return(self::$_environment == 'Prod');
+		return self::$_environment == 'Prod';
 	}
 
 	// will convert a relative path to the application's root folder, into an absolute path

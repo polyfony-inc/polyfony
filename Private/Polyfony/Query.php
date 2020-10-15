@@ -441,7 +441,7 @@ class Query extends Query\Conditions {
 		}
 		// if the select has joined tables
 		if($this->Action == 'SELECT' && count($this->Joins)) {
-			// assemble the joinds
+			// assemble the joins
 			$this->Joins = implode(' ', $this->Joins);
 			// assemble the query
 			$this->Query .= " $this->Joins";
