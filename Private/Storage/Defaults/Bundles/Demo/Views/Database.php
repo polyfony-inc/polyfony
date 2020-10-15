@@ -13,7 +13,7 @@
 
 	<div class="row">
 
-		<div class="col-8">
+		<div class="col-6">
 			<div class="card">
 				<!-- Default panel contents -->
 				<div class="card-header">
@@ -29,7 +29,11 @@
 			</div>
 		</div>
 
-		<form class="col-4" action="" method="post" class="form form-inline">
+		<form 
+		class="col-6" 
+		action="" 
+		method="post" 
+		class="form form-inline">
 
 			<?= new Polyfony\Form\Token(); ?>
 
@@ -59,7 +63,7 @@
 							); ?>
 						</div>
 					</div>
-
+					<?php /*
 					<div class="form-group row">
 						<label class="col-3 col-form-label text-right">
 							Level
@@ -71,7 +75,7 @@
 								['class'=>'form-control']
 							); ?>
 						</div>
-					</div>
+					</div>*/ ?>
 
 					<div class="form-group row">
 						<label class="col-3 col-form-label text-right">
@@ -92,7 +96,7 @@
 						</label>
 						<div class="col-9">
 							<?= $rootAccount->input(
-								'account_expiration_date', [
+								'is_expiring_on', [
 									'type'			=>'date',
 									'placeholder'	=>'DD/MM/YYYY',
 									'class'			=>'form-control'
@@ -103,16 +107,44 @@
 
 					<div class="form-group row">
 						<label class="col-3 col-form-label text-right">
-							New password (optional)
+							New password
 						</label>
 						<div class="col-9">
 							<?= Polyfony\Form::input(
 								'password', null, [
-									'type'		=>'password',
-									'class'		=>'form-control',
-									'minlength'	=>$minimumPasswordLength
+									'type'			=>'password',
+									'class'			=>'form-control',
+									'placeholder'	=>'optional',
+									'minlength'		=>$minimumPasswordLength
 								]
 							); ?>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-3 col-form-label text-right">
+							Name
+						</label>
+						<div class="col-9">
+							<div class="input-group">
+
+								<?= $rootAccount->input(
+									'firstname', 
+									[
+										'class'			=>'form-control',
+										'placeholder'	=>'Firstname'
+									]
+								); ?>
+								
+								<?= $rootAccount->input(
+									'lastname', 
+									[
+										'class'=>'form-control',
+										'placeholder'	=>'Lastname'
+									]
+								); ?>
+
+							</div>
 						</div>
 					</div>
 				</div>

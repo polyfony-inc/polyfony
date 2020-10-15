@@ -1,22 +1,22 @@
 <table class="table">
 	<tr>
 		<th>
-			Login
+			Login (truncated)
 		</th>
 		<th>
-			Session expiration (raw)
+			Account expiration (raw)
 		</th>
 		<th>
-			Session expiration (relative)
+			Account expiration
 		</th>
 		<th>
-			Session expiration
+			
 		</th>
 		<th>
-			Level
+			
 		</th>
 		<th>
-			Last login date
+			
 		</th>
 	</tr>
 	<?php foreach($accounts as $account): ?>
@@ -28,31 +28,22 @@
 			</td>
 			<td>
 				<code>
-					<?= $account->get('session_expiration_date',true); ?>
+					<?= $account->get('is_expiring_on',true); ?>
 				</code>
 			</td>
 			<td>
 				<code>
-					<?= Polyfony\Format::date(
-						$account->get('session_expiration_date',true)
-					); ?>
+					<?= $account->get('is_expiring_on'); ?>
 				</code>
 			</td>
 			<td>
-				<span class="label label-warning">
-					<?= $account->get('session_expiration_date'); ?>
-				</span>
+				
 			</td>
 			<td>
-				<?= $account->getLevel(); ?>
-				(<code>
-					<?= $account->get('id_level'); ?>
-				</code>) 
+				
 			</td>
 			<td>
-				<span class="label label-success">
-					<?= $account->get('last_login_date'); ?>
-				</span>
+				
 			</td>
 		</tr>
 	<?php endforeach; ?>

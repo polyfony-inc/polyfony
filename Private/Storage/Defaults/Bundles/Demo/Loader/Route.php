@@ -1,18 +1,29 @@
 <?php
 
+namespace Polyfony;
 
 // new syntax for the login route (the route name is now optional)
-Polyfony\Router::get('/login/','Demo/Demo@login');
+Router::get(
+	'/login/',
+	'Demo/Demo@login'
+);
 
 
 // new syntax, with method restriction built in (GET), 
 // we can map a post request on / to a totaly different bundle/controller@action
-Polyfony\Router::get('/','Demo/Demo@welcome', 'index');
+Router::get(
+	'/',
+	'Demo/Demo@welcome', 
+	'index'
+);
 
 
 // new syntax
-Polyfony\Router::map('/demo/:category/', 'Demo/Demo@{category}', 'demo')
-->where([
+Router::map(
+	'/demo/:category/', 
+	'Demo/Demo@{category}', 
+	'demo'
+)->where([
 	'category'=>['in_array'=>[
 		'',
 		'secure',
@@ -30,5 +41,11 @@ Polyfony\Router::map('/demo/:category/', 'Demo/Demo@{category}', 'demo')
 		'vendorGoogle'
 	]]
 ]);
+
+// use an existing favicon elsewhere
+Router::redirect(
+	'/favicon.ico',
+	'/Assets/Img/Demo/favicon.png'
+);
 
 ?>

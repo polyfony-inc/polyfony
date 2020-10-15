@@ -1,0 +1,16 @@
+h1 {
+	font-size: 38px;
+	padding-bottom: 40px;
+}
+.name {
+	background: #efefef;
+	padding: 16px 24px 16px 24px;
+	font-size: 16px;
+	margin: 16px;
+	border-radius: 12px;
+}
+body {
+	max-width: 600px;
+	padding: 25px;
+	margin: auto;
+}

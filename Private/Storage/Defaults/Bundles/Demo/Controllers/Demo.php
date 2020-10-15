@@ -1,39 +1,39 @@
 <?php
 
-use Polyfony as pf;
-use Polyfony\Exception as Exception;
-use Polyfony\Security as Security;
-use Polyfony\Response as Response;
-use Polyfony\Request as Request;
-use Polyfony\Element as Element;
-use Polyfony\Router as Router;
-use Polyfony\Form as Form;
-use Polyfony\Config as Config;
-use Polyfony\Logger as Logger;
-use Polyfony\Form\Captcha as Captcha;
-use Polyfony\Form\Token as Token;
-use Models\Accounts as Accounts;
+namespace Controllers;
 
-use Bootstrap\Alert as Alert;
-use Bootstrap\Alert\Success as OK;
-use Bootstrap\Alert\Failure as KO;
+// from the framework
+use \Polyfony\{ 
+	Exception, Security, Response, Request, Element,
+	Router, Form, Config, Logger, Controller,
+	Form\Captcha, Form\Token
+};
+
+// from the models
+use \Models\{ Accounts, Emails };
+
+// from the vendor
+use \Bootstrap\{ Modal, Alert,
+	Alert\Success as OK,
+	Alert\Failure as KO
+};
+
+// from the vendor
+use \Illuminate\Support\Arr;
+
+// from the vendor
+use \Google\{ Map, Photo, Geocoder };
 
 // new example class to realize tests
-class DemoController extends pf\Controller {
+class Demo extends Controller {
 
-	public function preAction() {
+	public function before() {
 
 		// set some common metas and assets
 		Response\HTML::set([
-			'links'	=>[
-				'//maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css',
-				'//use.fontawesome.com/releases/v5.0.6/css/all.css'
-			],
-			'scripts'	=>[
-				'//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js',
-				'//maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.bundle.min.js'
-			],
-			'metas'	=>[
+			'links'		=>Config::get('response', 'links'),
+			'scripts'	=>Config::get('response', 'scripts'),
+			'metas'		=>[
 				'title'			=>'Bundles/Demo',
 				'description'	=>'Demo bundle with example of most features'
 			]
@@ -49,13 +49,13 @@ class DemoController extends pf\Controller {
 		
 	}
 
-	public function welcomeAction() {
+	public function welcome() {
 
 		// view the main index/welcome page
 		$this->view('Index');
 	}
 	
-	public function indexAction() {
+	public function index() {
 
 		// allow the framework to cache that page for 24 hours
 		//	Response::enableOutputCache(24);
@@ -68,20 +68,31 @@ class DemoController extends pf\Controller {
 		
 		// Accounts::create([
 		// 	'id'			=>1,
-		// 	'id_level'		=>1,
 		// 	'is_enabled'	=>1,
+		// 	'creation_date'	=>time()
 		// 	'login'			=>'root@domain.local',
 		// 	'password'		=>Security::getPassword('toor'),
-		// 	'modules_array'	=>[],
-		// 	'creation_date'	=>time()
 		// ]);
+
+		/*
+		$result = \Polyfony\Database::query()
+			->query(
+				'SELECT SUM(is_enabled * id) as messedup '.
+				'FROM Accounts'
+			)
+			->first()
+			->execute();
+
+		Logger::debug('PassThru', $result);
+
+		*/
 
 		// view the main demo index
 		$this->view('Demo');
 	
 	}
 
-	public function emailsAction() {
+	public function emails() {
 
 		// if you've posted the form
 		if(Request::isPost()) {
@@ -90,14 +101,19 @@ class DemoController extends pf\Controller {
 			Token::enforce();
 
 			// create a new email object
-			(new Models\Emails)
+			(new Emails)
 				->set([
-					'to'			=>Request::post('to_email'), // this is validated by PHPMailer
-					'reply_to'		=>'someone@somewhere.com',
-					'subject'		=>'Look at this nice README file !',
-					'body'			=>'It\'s in the attachment',
-					'format'		=>'text',
-					'charset'		=>'utf-8',
+					'to'		=>Request::post('to_email'), // this is validated by PHPMailer
+					'reply_to'	=>'someone@somewhere.com',
+					'subject'	=>'Look at this nice README file !',
+					'format'	=>'html',
+					'charset'	=>'utf-8',
+					'view'		=>'Demo',
+					'css'		=>['Demo'],
+					'body'		=>[
+						'number'	=>898724,
+						'names'		=>['John','Mike','Tom','Steeve']
+					],
 					'files_array'	=>['../README.md'=>'README.md']
 				])
 				->save() ? // this instanciates and save basic bootstrap alerts
@@ -108,27 +124,28 @@ class DemoController extends pf\Controller {
 
 		// get the list of all emails stored in the database
 		$this->view('Emails', [
-			'emails'=>Models\Emails::search()
+			'emails'=>Emails::search()
 		]);
 
 	}
 
-	public function routerAction() {
+	public function router() {
 
 		// generating an url using its route
-		$this->url = Router::reverse('demo', ['type'=>'locales'], true, true);
 		$this->view('Router');
 
 	}
 
 
-	public function loginAction() {	
+	public function login() {	
+
+	//	(new Models\Accounts(1))->setPassword('toor')->save();
 
 		// add a notice
-		(new Bootstrap\Alert([
+		(new Alert([
 			'message'	=>'A default account is provided',
 			'footer'	=>'That account\'s login is : ' . 
-				(new Models\Accounts(1))
+				(new \Models\Accounts(1))
 					->get('login') .
 			 ' its password is toor. You can change it from the database tab of this demo'
 		]))->save();
@@ -137,7 +154,7 @@ class DemoController extends pf\Controller {
 		$this->view('Login');
 	}
 	
-	public function secureAction() {	
+	public function secure() {	
 
 		// enforce XSS protection for this action
 		Token::enforce();
@@ -146,29 +163,42 @@ class DemoController extends pf\Controller {
 		Captcha::enforce();
 
 		// enforce security for this action
-		Security::enforce();
+		Security::authenticate();
 
-		// grab some informations
-		$this->Id 		= Security::get('id');
-		$this->Login 	= Security::get('login');
-		$this->Level 	= Security::get('id_level');
+		$account = Security::getAccount();
 
-		// normal view
-		$this->view('Secure');
+		Logger::debug(
+			'Permissions', 
+			$account->getPermissions()
+		);
+
+		Logger::debug(
+			'Roles', 
+			$account->getRoles()
+		);
+
+		// pass some info to the view
+		$this->view('Secure', [
+			'login'			=>$account->get('login'),
+			'id'			=>$account->get('id'),
+			'permissions'	=>$account->getPermissions(),
+			'roles'			=>$account->getRoles(),
+			'accounts'		=>Accounts::all()
+		]);
 	}
 
-	public function disconnectAction() {
+	public function disconnect() {
 
 		// close the opened session
 		Security::disconnect();
 
 	}
 	
-	public function localesAction() {
+	public function locales() {
 		$this->view('Locales');		
 	}
 
-	public function logsAction() {
+	public function logs() {
 
 		Logger::debug('This is a log event that will not be logged in Prod, using default parameters');
 
@@ -193,7 +223,7 @@ class DemoController extends pf\Controller {
 		$this->view('Logs');		
 	}
 	
-	public function databaseAction() {
+	public function database() {
 		
 		// this should obviously be a constant of the Accounts class
 		$minimumPasswordLength = 6;
@@ -209,19 +239,23 @@ class DemoController extends pf\Controller {
 			Token::enforce();
 
 			// update some fields
-			$rootAccount->set([
-				'login'						=>Request::post('Accounts')['login'],
-				'id_level'					=>Request::post('Accounts')['id_level'],
-				'is_enabled'				=>Request::post('Accounts')['is_enabled'],
-				'account_expiration_date'	=>Request::post('Accounts')['account_expiration_date']
-			]);
+			// contrary to ->set(à, ->oset() [OnlySet] 
+			// only sets a subset of the provided array
+			$rootAccount->oset(
+				Request::post('Accounts'), 
+				[
+					'login', 
+					'is_enabled',
+					'is_expiring_on',
+					'firstname',
+					'lastname'
+				]
+			);
 
 			// in trusted cases you can do
 			// $rootAccount->set(Request::post('Accounts'));
 			// which updates all columns
 			// though this should be kept for super admins, and you could overide the id and a bunch of stuff.
-			// an alternative to that is defining a setSafely()
-			// which will unset a number of variables before doing the actual ->set
 
 			if(
 				// if the password is to be updated
@@ -229,24 +263,13 @@ class DemoController extends pf\Controller {
 				// basic "password policy" would be 6 chars here
 				strlen(Request::post('password')) >= $minimumPasswordLength
 			) {
-				// update the password
-				$rootAccount->set([
-					// convert it to a secured hash thru the Security class
-					'password'=>Security::getPassword(Request::post('password'))
-				]);
+				// update the password (Accounts are special object, the password gets hashed automatically)
+				$rootAccount->setPassword(Request::post('password'));
 			}
 			// save it and depending on the success of the operation, put an alert in the flashbag
 			$rootAccount->save() ? 
-
-				(new Alert([
-					'class'		=>'success',
-					'message'	=>'Account modified'
-				]))->save() : 
-			
-				(new Alert([
-					'class'		=>'danger',
-					'message'	=>'Failed to modify account'
-				]))->save();
+				(new OK)->save() : 
+				(new KO)->save();
 
 		}
 		
@@ -258,11 +281,11 @@ class DemoController extends pf\Controller {
 			'allAccounts'				=>Accounts::all(),
 			'recentlyCreatedAccounts'	=>Accounts::recentlyCreated(),
 			'disabledAccounts'			=>Accounts::disabled(),
-			'accountsWithErrors'		=>Accounts::withErrors()
+		//	'accountsWithErrors'		=>Accounts::withErrors()
 		]);		
 	}
 	
-	public function responseAction() {
+	public function response() {
 		
 		// new response setters shortcuts
 		Response::set([
@@ -270,19 +293,24 @@ class DemoController extends pf\Controller {
 			'metas'		=>['description'	=>'An awesome page'],
 			'headers'	=>['X-Knock-Knock'	=>'Who\'s there ?']
 		]);
+
+		// push an image to preload using HTTP/2
+	/*	Response::push([
+			'https://avatars0.githubusercontent.com/u/36459871'=>'image'
+		]);*/
 		
 		// simply import the view
 		$this->view('Response');
 	}
 	
-	public function requestAction() {
+	public function request() {
 		
 		// this will make sure a CSRF token is present, and is valid (in case of a post)
 		Token::enforce();
 
 		// check if something has been posted
 		Request::isPost() ? 
-			(new Bootstrap\Alert([
+			(new Alert([
 				'message'	=>'You use ' . Request::server('HTTP_USER_AGENT') . ' and posted the following string',
 				'footer'	=>Request::post('test')
 			]))->save() : null;
@@ -292,14 +320,14 @@ class DemoController extends pf\Controller {
 		$this->view('Request');		
 	}
 	
-	public function exceptionAction() {
+	public function exception() {
 		
 		// enhanced exceptions with automatic HTTP status code and formatting using the « exception » route declared in the tools bundle
 		Throw new Exception('This is a custom exception with proper status code',502);
 		
 	}
 
-	public function jsonAction() {
+	public function json() {
 
 		Response::set([
 			'type'		=>'json',
@@ -322,7 +350,7 @@ class DemoController extends pf\Controller {
 
 	}
 
-	public function vendorBootstrapAction() {
+	public function vendorBootstrap() {
 
 		/*
 
@@ -361,7 +389,10 @@ class DemoController extends pf\Controller {
 			'dismissible'=>true
 		]);
 
-		$modal = new Bootstrap\Modal();
+		$okAlert = new OK;
+		$koAlert = new KO;
+
+		$modal = new Modal;
 		$modal
 			->setTitle([
 				'text'=>'Which do you prefer ?'
@@ -391,11 +422,13 @@ class DemoController extends pf\Controller {
 			->adopt($successAlert)
 			->adopt($warningAlert)
 			->adopt($dangerAlert)
+			->adopt($okAlert)
+			->adopt($koAlert)
 			->adopt($modal);
 
 	}
 
-	public function vendorGoogleAction() {
+	public function vendorGoogle() {
 
 		echo new Element('h1', ['text'=>'Demo of Vendor/Google']);
 		echo new Element('p', ['text'=>'Please note that if you get errors, it is because you should provide a Google API key.']);
@@ -403,7 +436,7 @@ class DemoController extends pf\Controller {
 		$address = 'Arc de triomphe, Paris';
 		echo new Element('code', ['text'=>"(Google\Geocoder)->setAddress('{$address}')->getPosition()"]);
 		var_dump(
-			(new Google\Geocoder)
+			(new Geocoder)
 				->setAddress($address)
 				->getPosition()
 		);
@@ -413,7 +446,7 @@ class DemoController extends pf\Controller {
 		// reverse geocoder
 		echo new Element('code', ['text'=>"(Google\Geocoder)->setPosition('48.873','2.292')->getAddress()"]);
 		var_dump(
-			(new Google\Geocoder)
+			(new Geocoder)
 				->setPosition(48.873,2.292)
 				->getAddress()
 		);
@@ -424,7 +457,7 @@ class DemoController extends pf\Controller {
 		echo new Element('code', ['text'=>"new Google\Map('roadmap',400,12, 48.873, 2.292)"]);
 		echo new Element('br');
 
-		$map = new Google\Map('roadmap',400,12, 48.873, 2.292);
+		$map = new Map('roadmap',400,12, 48.873, 2.292);
 		echo new Element('a', [
 			'href'	=>$map->url(),
 			'target'=>'_blank',
@@ -438,7 +471,8 @@ class DemoController extends pf\Controller {
 		echo new Element('code', ['text'=>"new Google\Photo(400)->position(48.873,2.292)"]);
 		echo new Element('br');
 
-		$photo = (new Google\Photo(400, 90, 10))->position(48.873,2.292);
+		$photo = (new Photo(400, 90, 10))
+			->position(48.873,2.292);
 		echo new Element('a', [
 			'href'	=>$photo->url(),
 			'target'=>'_blank',
