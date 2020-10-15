@@ -20,7 +20,7 @@ class Captcha extends Integrity {
 	const DEFAULT_MUST_FAIL_OCR_TEST = false;
 
 	// the actual captcha object (Gregwar/Captcha)
-	private ?string $captcha = null;
+	private $captcha = null;
 
 	// this will instanciate a captcha
 	public function __construct(
