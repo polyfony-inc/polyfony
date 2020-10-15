@@ -2,7 +2,7 @@
 	"name":"polyfony-inc/polyfony",
 	"description":"Polyfony is a simple and powerfull PHP micro-framework",
 	"keywords": ["lightweight", "fast", "php", "framework"],	
-	"version":"3.1.1",
+	"version":"3.1.2",
 	"license":"GPL-3.0-only",
 	"type":"project",
 	"authors":[
@@ -11,7 +11,7 @@
 		}
 	],
 	"require":{
-		"php": ">=7.1.0",
+		"php": ">=7.4.0",
 		"ext-mbstring": "*",
 		"ext-sqlite3": "*",
 		"ext-pdo": "*",
