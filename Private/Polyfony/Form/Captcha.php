@@ -5,7 +5,7 @@ use Gregwar\Captcha\CaptchaBuilder;
 use \Polyfony\Config as Config;
 use \Polyfony\Request as Request;
 use \Polyfony\Store\Session as Session;
-use \Polyfony\Keys as Keys;
+use \Polyfony\Hashs as Hashs;
 use \Polyfony\Element as Element;
 use \Polyfony\Response as Response;
 use \Polyfony\Form as Form;

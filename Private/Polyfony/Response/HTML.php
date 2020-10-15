@@ -354,7 +354,7 @@ class HTML {
 		string $asset_type
 	) :array {
 		// generate a unique name for that list of assets, and the right extension
-		$name = \Polyfony\Keys::generate($assets).'.'.strtolower($asset_type);
+		$name = \Polyfony\Hashs::generate($assets).'.'.strtolower($asset_type);
 		// generate a private path to store that file
 		$path = "../Private/Storage/Cache/Assets/{$asset_type}/{$name}";
 		// return both
