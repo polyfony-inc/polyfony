@@ -14,23 +14,13 @@ class Accounts extends \Polyfony\Security\Accounts {
 		1=>'Yes'
 	];
 
-	const ID_LEVEL = [
-		0	=> 'Developer',
-		1	=> 'Admin',
-		5	=> 'Power User',
-		20	=> 'Normal User',
-	];
-
 	const VALIDATORS = [
 
 		// using PHP's built in validators
 		'login'					=>FILTER_VALIDATE_EMAIL, 
-		'last_login_origin'		=>FILTER_VALIDATE_IP,
-		'last_failure_origin'	=>FILTER_VALIDATE_IP,
 		'creation_date'			=>FILTER_VALIDATE_INT,
 		// using arrays
-		'is_enabled'			=>self::IS_ENABLED,
-		'id_level'				=>self::ID_LEVEL
+		'is_enabled'			=>self::IS_ENABLED
 
 	];
 
@@ -42,11 +32,21 @@ class Accounts extends \Polyfony\Security\Accounts {
 			'strtolower',
 			'length256'
 		],
+		'firstname' => [
+			'text',
+			'trim',
+			'strtolower',
+			'ucwords',
+			'length32'
+		],
+		'lastname' => [
+			'text',
+			'trim',
+			'strtoupper',
+			'length32'
+		]
 		
 	];
-
-	// what we mean by recent authentication failure (3 days)
-	const RECENT_FAILURE = 259200;
 
 	public function enable() :self {
 
@@ -85,31 +85,36 @@ class Accounts extends \Polyfony\Security\Accounts {
 			->execute();
 	}
 
-	// accounts that have had issues loging-in in recently
-	public static function withErrors(
-		int $recently = self::RECENT_FAILURE
-	) :array {
+	public function getRolesBadges() :string {
 
-		return self::_select()
-			->whereNotEmpty(
-				['last_failure_date']
-			)
-			->whereHigherThan(
-				['last_failure_date'=> time() - $recently]
-			)
-			->orderBy(
-				['last_failure_date'=>'DESC']
-			)
-			->limitTo(0, 10)
-			->execute();
+		$roles = [];
+
+		foreach(
+			$this->getRoles() as 
+			$role
+		) {
+			$roles[] = $role->getBadge();
+		}
+
+		return implode(' ', $roles);
 
 	}
 
-	public function getLevel() :string {
+	public function getPermissionsBadges() :string {
 
-		return self::ID_LEVEL[$this->get('id_level')];
+		$permissions = [];
+
+		foreach(
+			$this->getPermissions() as 
+			$permission
+		) {
+			$permissions[] = $permission->getBadge();
+		}
+
+		return implode(' ', $permissions);
 
 	}
+
 
 }
 
