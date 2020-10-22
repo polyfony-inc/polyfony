@@ -79,10 +79,12 @@ class Captcha extends Integrity {
 		// actually enforce using the inherited enforce method
 		self::enforceFor(
 			Config::get('form','captcha_name'), 
-			$prevent_redirection, [
+			[
 				'missing'=>'Polyfony/Form/Captcha::enforce() missing Captcha',
 				'invalid'=>'Polyfony/Form/Captcha::enforce() invalid Captcha'
-		]);
+			], 
+			$prevent_redirection
+		);
 
 	}
 	

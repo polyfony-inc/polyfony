@@ -53,9 +53,9 @@ class Filter {
 	];
 
 	public static function sanitizeThisValue(
-		string $column, 
-		$value=null, 
-		string $class_name
+		string $column,  
+		string $class_name, 
+		$value=null
 	) {
 		// get the filter
 		$filters = self::getFiltersForColumn($column, $class_name);

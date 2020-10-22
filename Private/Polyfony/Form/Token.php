@@ -51,10 +51,12 @@ class Token extends Integrity {
 		// actually enforce using the inherited enforce method
 		self::enforceFor(
 			Config::get('form','token_name'), 
-			$prevent_redirection, [
+			[
 				'missing'=>'Polyfony/Form/Token::enforce() missing Token (CSRF)',
 				'invalid'=>'Polyfony/Form/Token::enforce() invalid Token (CSRF)'
-		]);
+			], 
+			$prevent_redirection
+		);
 	}
 	
 }

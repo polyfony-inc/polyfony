@@ -30,7 +30,7 @@ class Validator {
 			);
 		}
 		// check if the value is null/empty and that it is not allowed to have such a value
-		if(self::doesNullableConstraintFail($value, $column, $allowed_nulls)) {
+		if(self::doesNullableConstraintFail($column, $allowed_nulls, $value)) {
 			// throw a useful exception
 			Throw new \Polyfony\Exception(
 				"{$class_name}->set({$column}) : cannot be null (If it should, purge the cache!)",
@@ -38,7 +38,7 @@ class Validator {
 			);
 		}
 		// check if a user defined validator exists for that column, and if it fails to pass it
-		if(self::doesUserDefinedValidatorFail($value, $column, $class_name))  {
+		if(self::doesUserDefinedValidatorFail($column, $class_name, $value))  {
 			// throw a useful exception
 			Throw new \Polyfony\Exception(
 				"{$class_name}->set({$column}) : does not conform to the regex, PHP Filter, or is not in array of allowed values",
@@ -48,10 +48,10 @@ class Validator {
 
 	}
 
-	private static function doesNullableConstraintFail(
-		$value=null, 
+	private static function doesNullableConstraintFail( 
 		string $column, 
-		array $allowed_nulls
+		array $allowed_nulls, 
+		$value=null
 	) :bool {
 
 		return 
@@ -74,10 +74,10 @@ class Validator {
 		return isset($class_name::VALIDATORS[$column]) ? $class_name::VALIDATORS[$column] : null;
 	}
 
-	private static function doesUserDefinedValidatorFail(
-		$value=null, 
+	private static function doesUserDefinedValidatorFail( 
 		string $column, 
-		string $class_name
+		string $class_name,
+		$value=null
 	) :bool {
 		// get the validator
 		$validator = self::getValidatorForColumn($column, $class_name);

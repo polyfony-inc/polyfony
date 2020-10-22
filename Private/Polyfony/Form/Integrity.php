@@ -15,8 +15,8 @@ class Integrity {
 	// this will check, upon posting the form, that it is legitimate
 	protected static function enforceFor(
 		string $variable, 
+		array $error_messages,
 		bool $prevent_redirection = false, 
-		array $error_messages
 	) :void {
 
 		// if the request is of type post

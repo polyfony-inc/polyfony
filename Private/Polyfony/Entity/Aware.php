@@ -184,8 +184,8 @@ class Aware {
 			// filter the value according to the models defined filters
 			$value = Filter::sanitizeThisValue(
 				$column_or_array, 
-				$value,
-				get_class($this)
+				get_class($this),
+				$value
 			);
 			// convert the value depending on the column name and set it
 			$converted_value_ready_for_updating = Convert::valueForDatabase(
