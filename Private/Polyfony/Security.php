@@ -24,8 +24,8 @@ class Security {
 		// and now we check if we are granted access
 		self::$_authenticated ?: 
 			self::deny(
-				'You are not or cannot be authenticated', 
-				403, 
+				'You are not authenticated', 
+				401, 
 				false, 
 				true
 			);
@@ -46,17 +46,17 @@ class Security {
 
 	}
 
-	public static function denyUnlessHasAnyPermission(
-		array $permissions
-	) :void {
+	// public static function denyUnlessHasAnyPermission(
+	// 	array $permissions
+	// ) :void {
 		
-	}
+	// }
 
-	public static function denyUnlessHasAllPermissions(
-		array $permissions
-	) :void {
+	// public static function denyUnlessHasAllPermissions(
+	// 	array $permissions
+	// ) :void {
 
-	}
+	// }
 
 	public static function denyUnlessHasRole(
 		string $role_name
