@@ -7,7 +7,7 @@ use \Polyfony\Store\Session as Session;
 
 class Integrity { 
 
-	// number of captchas and tokens to keep in the session
+	// maximum number of unused captchas and tokens to keep in the session
 	const maximum_concurrent_session_items = 10;
 
 	protected static $_errors = [
@@ -69,7 +69,7 @@ class Integrity {
 				\Polyfony\Logger::warning(
 					'Form/Integrity check failed for '.$variable_name. 
 					' ('.Request::post($variable_name).' provided and '.
-					Session::get($variable_name).' was expected)'
+					json_encode(Session::get($variable_name)).' was expected)'
 				);
 				// not valid
 				return false;
