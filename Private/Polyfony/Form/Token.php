@@ -23,7 +23,10 @@ class Token extends Integrity {
 		));
 
 		// store it in the current session
-		Session::put(Config::get('form','token_name'), $this->value, true);
+		Integrity::putInSession(
+			Config::get('form','token_name'), 
+			$this->value
+		);
 
 	}
 

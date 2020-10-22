@@ -43,9 +43,11 @@ class Captcha extends Integrity {
 			$this->captcha->buildAgainstOCR($width, $height) :
 			$this->captcha->build($width, $height);
 
-
-		// // store it in the current session
-		Session::put(Config::get('form','captcha_name'), (string) $this->getValue(), true);
+		// store it in the current session
+		Integrity::putInSession(
+			Config::get('form','captcha_name'), 
+			(string) $this->getValue()
+		);
 
 	}
 
