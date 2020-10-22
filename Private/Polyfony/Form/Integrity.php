@@ -104,7 +104,7 @@ class Integrity {
 			// get the currently available variables
 			$list_of_variables = Session::get($variable_name);
 			// complete it
-			$list_of_variables[] = $variable_value;
+			$list_of_variables[] = strtolower($variable_value);
 			// put it back in
 			return Session::put(
 				$variable_name, 
@@ -118,7 +118,7 @@ class Integrity {
 		}
 		else {
 			// create a brand new one
-			return Session::put($variable_name, [$variable_value]);
+			return Session::put($variable_name, [strtolower($variable_value)]);
 		}
 
 	}
@@ -136,7 +136,7 @@ class Integrity {
 		unset(
 			$list_of_variables[
 				array_search(
-					$variable_value,
+					strtolower($variable_value),
 					$list_of_variables
 				)
 			]
@@ -160,7 +160,7 @@ class Integrity {
 		if(Session::has($variable_name)) {
 			// check the presence of the value in the array
 			return in_array(
-				$variable_value, 
+				strtolower($variable_value), 
 				Session::get($variable_name)
 			);
 		}
