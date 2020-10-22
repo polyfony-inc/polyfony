@@ -3,6 +3,7 @@
 namespace Polyfony;
 
 use \Models\Logs as Logs;
+use \Models\Emails as Emails;
 
 class Logger {
 	
