@@ -1,7 +1,5 @@
 <?php
 
-namespace Controllers;
-
 // from the framework
 use \Polyfony\{ 
 	Exception, Security, Response, Request, Element,
@@ -25,7 +23,7 @@ use \Illuminate\Support\Arr;
 use \Google\{ Map, Photo, Geocoder };
 
 // new example class to realize tests
-class Demo extends Controller {
+class DemoController extends Controller {
 
 	public function before() {
 

@@ -1,15 +1,12 @@
 <?php
 
-// all controllers are now isolated in the Controllers namespace
-namespace Controllers;
-
 use \Polyfony\{ 
 	Security, Response, Request, Element, Store, 
 	Router, Form, Config, Logger, Controller, Locales
 };
 
 // new example class to realize tests
-class Exception extends Controller {
+class ExceptionController extends Controller {
 	
 	// this exception action is quite generic and can be kept for production
 	public function exception() {

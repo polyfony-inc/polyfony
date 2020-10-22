@@ -325,7 +325,7 @@ class Route {
 			Request::server('DOCUMENT_ROOT') . 
 			"/../Private/Bundles/{$this->bundle}/Controllers/{$this->controller}.php",
 			// destination controller class
-			'\\Controllers\\'.$this->controller,
+			$this->controller . 'Controller',
 			// destination controller method
 			$this->action ? $this->action : 'index'
 		];
