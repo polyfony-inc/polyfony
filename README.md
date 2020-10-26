@@ -1308,7 +1308,7 @@ composer update
 | 2.6       | Emails refactoring, Tests support via PHPUnit, Events support                                                                                                            |
 | 3.0       | New ACLs, PHP views and CSS inlining in emails, new helper accessors for Entities, HTTP/2 push support, discontinuation of HttpRequest, Filesystem and Uploader classes  |
 | 3.1       | New Routes signature feature, Keys renamed to Hashs, PHP 7.4+ required                                                                                                   |
-| 4.1       | PHP 8.0+ required, minor refactoring of some classes                                                                                                                     |
+| 4.0       | PHP 8.0+ required, minor refactoring of some classes                                                                                                                     |
 
 ## [Performance](https://github.com/polyfony-inc/polyfony/wiki/Benchmark)
 Polyfony has been designed to be fast, no compromise (> 2000 req/s). 

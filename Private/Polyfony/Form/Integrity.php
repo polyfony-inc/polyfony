@@ -19,7 +19,7 @@ class Integrity {
 	protected static function enforceFor(
 		string $variable_name, 
 		array $error_messages,
-		bool $prevent_redirection = false, 
+		bool $prevent_redirection = false 
 	) :void {
 
 		// if the request is of type post
