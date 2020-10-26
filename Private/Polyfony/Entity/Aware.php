@@ -5,6 +5,7 @@ use Polyfony\Exception as Exception;
 use Polyfony\Query\Convert as Convert;
 use Polyfony\Query as Query;
 use Polyfony\Database as Database;
+use Polyfony\Security as Security;
 
 class Aware {
 	
@@ -134,7 +135,7 @@ class Aware {
 				// if the column is to be autopopulated with the current account's id
 				elseif(
 					$with_what == 'id_account' && 
-					Security::isAuthanticated()
+					Security::isAuthenticated()
 				) {
 					$this->set([
 						$column=>Security::getAccount()->get('id')
