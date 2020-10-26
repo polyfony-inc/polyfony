@@ -6,6 +6,7 @@ use Polyfony\Query\Convert as Convert;
 use Polyfony\Query as Query;
 use Polyfony\Database as Database;
 use Polyfony\Format as Format;
+use Polyfony\Locales as Locales;
 
 class Accessor extends Aware {
 
