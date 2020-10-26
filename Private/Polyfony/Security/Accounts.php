@@ -253,7 +253,7 @@ class Accounts extends \Polyfony\Entity {
 		// maybe		
 		// cache roles in ->_['roles']			
 
-		$roles = AccountsRoles::_select()
+		$roles = AccountsRoles::_select(['AccountsRoles.*'])
 			->join(
 				'AccountsRolesAssigned',
 				'AccountsRolesAssigned.id_role',
