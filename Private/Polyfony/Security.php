@@ -250,7 +250,7 @@ class Security {
 	}
 
 	// return the account
-	public static function getAccount() :\Models\Accounts {
+	public static function getAccount() :?\Models\Accounts {
 		return self::$_account;
 	}
 	
