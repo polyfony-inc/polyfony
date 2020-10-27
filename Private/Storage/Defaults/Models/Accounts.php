@@ -105,7 +105,7 @@ class Accounts extends \Polyfony\Security\Accounts {
 		$permissions = [];
 
 		foreach(
-			$this->getPermissions() as 
+			$this->getPermissions(true) as 
 			$permission
 		) {
 			$permissions[] = $permission->getBadge();

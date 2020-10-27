@@ -3,10 +3,13 @@
 namespace Polyfony\Security;
 
 // framework internals
-use Polyfony\Security as Security;
-use Polyfony\Config as Config;
-use Polyfony\Logger as Logger;
-use Polyfony\Store\Cookie as Cookie;
+use Polyfony\{ 
+	Security, 
+	Config, 
+	Logger, 
+	Store\Cookie, 
+	Security\Accounts\PermissionsAccessors 
+};
 
 // models
 use \Models\{
@@ -19,7 +22,7 @@ use \Models\{
 	AccountsRoles
 };
 
-class Accounts extends \Polyfony\Entity {
+class Accounts extends PermissionsAccessors {
 
 	public static function getByLogin(
 		string $posted_login
@@ -239,114 +242,12 @@ class Accounts extends \Polyfony\Entity {
 	}
 
 	public function hasThisPassword(
-		string $uncertain_password
+		string $plaintext_password_to_compare_against
 	) :bool {
 		// compare the existing signature, with the signature of the password to check
 		return 
 			$this->get('password') === 
-			Security::getPassword($uncertain_password);
-
-	}
-
-	public function getRoles() :array {
-
-		// maybe		
-		// cache roles in ->_['roles']			
-
-		$roles = AccountsRoles::_select(['AccountsRoles.*'])
-			->join(
-				'AccountsRolesAssigned',
-				'AccountsRolesAssigned.id_role',
-				'AccountsRoles.id'
-			)
-			->where(['AccountsRolesAssigned.id_account'=>$this->get('id')])
-			->execute();
-
-		return $roles;
-	}
-
-	public function hasRole(
-		// PHP8 typing : string | int | AccountsRoles
-		$role_id_or_name_or_object
-	) :bool {
-		$role = AccountsRoles::getFromMixed(
-			$role_id_or_name_or_object
-		);
-		
-		return in_array(
-			$role, 
-			$this->getRoles()
-		);
-	}
-
-	public function getPermissions() :array {
-
-		// if we have cached permissions in ->_['permissions']
-		if(isset($this->_['permissions'])) {
-			return $this->_['permissions'];
-		}
-
-		// directly assigned permissions
-		$directly_assigned_permissions = AccountsPermissions::_select([
-				'AccountsPermissions.*'
-			])
-			->join(
-				'AccountsPermissionsAssigned',
-				'AccountsPermissionsAssigned.id_permission',
-				'AccountsPermissions.id'
-			)
-			->where(['AccountsPermissionsAssigned.id_account'=>$this->get('id')])
-			->execute();
-
-		// inherited permissions
-		$inherited_permissions = AccountsPermissions::_select([
-				'AccountsPermissions.*',
-				// leave a trace of where that permission comes from
-				// to allow for better end user understanding of their permissions
-				// and inheritence of permissions
-				'AccountsRolesAssigned.id_role'
-			])
-			// get permissions that are actually assigned
-			->join(
-				'AccountsPermissionsAssigned',
-				'AccountsPermissions.id',
-				'AccountsPermissionsAssigned.id_permission'
-			)
-			// get permissions that are assigned to a role
-			->join(
-				'AccountsRolesAssigned',
-				'AccountsRolesAssigned.id_role',
-				'AccountsPermissionsAssigned.id_role'
-			)
-			// restrict to roles that are assigned to that account
-			->where(['AccountsRolesAssigned.id_account'=>$this->get('id')])
-			->execute();
-
-		// deduplicate
-		$permissions = array_unique(array_merge(
-			$directly_assigned_permissions, 
-			$inherited_permissions
-		));
-
-		// cache the permissions for later
-		$this->_['permissions'] = $permissions;
-		// return those
-		return $permissions;
-	}
-
-	public function hasPermission(
-		// PHP8 typing : string | int | AccountsPermissions
-		$permission_id_or_name_or_object
-	) :bool {
-		
-		$permission = AccountsPermissions::getFromMixed(
-			$permission_id_or_name_or_object
-		);
-
-		return in_array(
-			$permission,
-			$this->getPermissions()
-		);
+			Security::getPassword($plaintext_password_to_compare_against);
 
 	}
 

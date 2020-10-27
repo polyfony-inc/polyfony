@@ -10,8 +10,7 @@ class Security {
 		Dropdown $security_dropdown
 	) : Dropdown {
 
-		$account = \Polyfony\Security::isAuthenticated() ? 
-			\Polyfony\Security::getAccount() : null;
+		$account = \Polyfony\Security::getAccount();
 
 		$login = new Element('code', [
 			'text'=>$account ? $account->get('login', true) : 'n/a'
@@ -47,11 +46,9 @@ class Security {
 		$security_dropdown->addDivider();
 		$security_dropdown->addHeader(['text'=>'Permissions']);
 
-	
-
 		if($account) {
 			foreach(
-				$account->getPermissions() as 
+				$account->getPermissions(true) as 
 				$permission
 			) {
 				

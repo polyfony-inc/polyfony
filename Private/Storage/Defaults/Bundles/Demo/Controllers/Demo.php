@@ -167,7 +167,7 @@ class DemoController extends Controller {
 
 		Logger::debug(
 			'Permissions', 
-			$account->getPermissions()
+			$account->getPermissions(true)
 		);
 
 		Logger::debug(
@@ -179,7 +179,7 @@ class DemoController extends Controller {
 		$this->view('Secure', [
 			'login'			=>$account->get('login'),
 			'id'			=>$account->get('id'),
-			'permissions'	=>$account->getPermissions(),
+			'permissions'	=>$account->getPermissions(true),
 			'roles'			=>$account->getRoles(),
 			'accounts'		=>Accounts::all()
 		]);
