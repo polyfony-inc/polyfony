@@ -65,11 +65,11 @@ class Cache {
 					'<strong>Request</strong> ' . 
 					(\Polyfony\Request::isCacheAllowed() ? 
 						new Element('span', [
-							'class'=>'badge badge-success',
+							'class'=>'badge bg-success text-light',
 							'text'=>'Allowed'
 						]) : 
 						new Element('span', [
-							'class'=>'badge badge-warning',
+							'class'=>'badge text-light bg-warning',
 							'text'=>'Disallowed'
 						]))
 			])
@@ -78,11 +78,11 @@ class Cache {
 					'<strong>Response</strong> ' . 
 					(\Polyfony\Config::get('response','cache') ? 
 						new Element('span', [
-							'class'=>'badge badge-success',
+							'class'=>'badge text-light bg-success',
 							'text'=>'Allowed'
 						]) : 
 						new Element('span', [
-							'class'=>'badge badge-warning',
+							'class'=>'badge text-light bg-warning',
 							'text'=>'Disallowed'
 						]))
 			]);
@@ -108,7 +108,7 @@ class Cache {
 			->setTrigger([
 				'html'	=>' Cache ' . 
 					(new Element('span',[
-						'class'=>'badge badge-light',
+						'class'=>'badge text-light bg-light',
 						'html'=> self::$statistics['hits_count'] . ' hits' . 
 						'<span class="text-secondary" style="font-weight:lighter;"> in <strong>'.
 						round(self::$statistics['cache_out_time']*1000, 1)

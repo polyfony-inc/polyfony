@@ -17,7 +17,7 @@ class Emails {
 		foreach($types_of_recipients as $recipient_type => $recipient_class) {
 
 			foreach($debug_data['recipients'][$recipient_type] as $recipient_email => $recipient_name) {
-				$recipient_container 	= new \Polyfony\Element('span', 	['class'=>'badge badge-'.$recipient_class]);
+				$recipient_container 	= new \Polyfony\Element('span', 	['class'=>'badge text-light bg-'.$recipient_class]);
 				$type 					= new \Polyfony\Element('strong', 	['text'=>$recipient_type.': ']);
 				$email 					= new \Polyfony\Element('span', 	['text'=>$recipient_email]);
 				$recipients[] 			= $recipient_container
@@ -68,7 +68,7 @@ class Emails {
 		$emails_modal = new \Bootstrap\Modal();
 		$emails_modal
 			->setTrigger([
-				'html'	=>' Emails <span class="badge badge-light">'.count($emails).
+				'html'	=>' Emails <span class="badge text-dark bg-light">'.count($emails).
 					' <span class="text-secondary" style="font-weight:lighter;">in <strong>' . 
 					round($emails_duration, 1) .'</strong> ms</span></span>',
 				'class'	=>'btn btn-email' . (\Polyfony\Config::get('profiler','use_small_buttons') ? ' btn-sm' : ''),

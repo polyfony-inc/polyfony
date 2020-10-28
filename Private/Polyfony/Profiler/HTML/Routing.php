@@ -12,19 +12,19 @@ class Routing {
 		return $routing_dropdown
 			->addItem([
 				'html'=>'<strong>SSL/TLS</strong> '.(\Polyfony\Request::isSecure() ? 
-				new Element('span',['class'=>'badge badge-success','text'=>'Yes']) :
-				new Element('span',['class'=>'badge badge-warning','text'=>'No']) 
+				new Element('span',['class'=>'badge text-light bg-success','text'=>'Yes']) :
+				new Element('span',['class'=>'badge text-light bg-warning','text'=>'No']) 
 				)
 			])
 			->addItem([
 				'html'=>'<strong>Method</strong> '.	(new Element('span',[
-					'class'=>'badge badge-primary',
+					'class'=>'badge text-light bg-primary',
 					'text'=>strtoupper(\Polyfony\Request::getMethod())
 				]))
 			])
 			->addItem([
 				'html'=>'<strong>Environment</strong> '.(new Element('span',[
-					'class'=>'badge badge-primary',
+					'class'=>'badge text-light bg-primary',
 					'text'=>\Polyfony\Config::isProd() ? 'Prod' : 'Dev'
 				]))
 			])
@@ -102,11 +102,11 @@ class Routing {
 			\Polyfony\Response::getStatus() >= 200 && 
 			\Polyfony\Response::getStatus() < 300 ? 
 				new Element('span',[
-					'class'=>'badge badge-success',
+					'class'=>'badge text-light bg-success',
 					'text'=>\Polyfony\Response::getStatus()
 				]) : 
 				new Element('span',[
-					'class'=>'badge badge-warning',
+					'class'=>'badge text-light bg-warning',
 					'text'=>\Polyfony\Response::getStatus()
 				]);
 	}

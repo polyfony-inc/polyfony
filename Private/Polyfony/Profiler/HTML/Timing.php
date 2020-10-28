@@ -111,7 +111,7 @@ class Timing {
 		return [
 			'html'	=>' Execution '.
 			(new Element('span',[
-				'class'	=>'badge badge-light',
+				'class'	=>'badge text-dark badge-light',
 				'html'	=> $execution_time_in_seconds . ' sec' . 
 				'<span class="text-secondary" style="font-weight:lighter;"> and <strong>'.
 				\Polyfony\Format::size(memory_get_peak_usage())
@@ -127,27 +127,27 @@ class Timing {
 		// the general legend for the waterfall graphics
 		$legend=[];
 		$legend[] = new Element('span',[
-			'class'=>'badge badge-'.Profiler::USERS_CLASSES['framework'],
+			'class'=>'badge text-light badge-'.Profiler::USERS_CLASSES['framework'],
 			'text'=>'Framework'
 		]);
 		$legend[] = new Element('span',[
-			'class'=>'badge badge-'.Profiler::USERS_CLASSES['controller'],	
+			'class'=>'badge text-light badge-'.Profiler::USERS_CLASSES['controller'],	
 			'text'=>'Controllers'
 		]);
 		$legend[] = new Element('span',[
-			'class'=>'badge badge-'.Profiler::USERS_CLASSES['view'],	
+			'class'=>'badge text-light badge-'.Profiler::USERS_CLASSES['view'],	
 			'text'=>'Views'
 		]);
 		$legend[] = new Element('span',[
-			'class'=>'badge badge-'.Profiler::USERS_CLASSES['database'],	
+			'class'=>'badge text-light badge-'.Profiler::USERS_CLASSES['database'],	
 			'text'=>'Database'
 		]);
 		$legend[] = new Element('span',[
-			'class'=>'badge badge-'.Profiler::USERS_CLASSES['email'],	
+			'class'=>'badge text-light badge-'.Profiler::USERS_CLASSES['email'],	
 			'text'=>'Emails'
 		]);
 		$legend[] = new Element('span',[
-			'class'=>'badge badge-'.Profiler::USERS_CLASSES['log'],	
+			'class'=>'badge text-light badge-'.Profiler::USERS_CLASSES['log'],	
 			'text'=>'User defined'
 		]);
 		return $legend;
