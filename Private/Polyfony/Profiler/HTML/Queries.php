@@ -63,7 +63,7 @@ class Queries {
 		$queries_modal
 			->setTrigger([
 				'html'	=>
-					' Queries <span class="badge badge-light">'.count($queries).
+					' Queries <span class="badge bg-light text-dark">'.count($queries).
 					' <span class="text-secondary" style="font-weight:lighter;">in <strong>' . 
 					round($queries_duration, 1) .'</strong> ms</span></span>',
 				'class'	=>'btn btn-database' . (\Polyfony\Config::get('profiler','use_small_buttons') ? ' btn-sm' : ''),

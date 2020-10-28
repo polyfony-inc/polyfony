@@ -22,7 +22,7 @@ class Cache {
 			))
 			->addItem(Locales::createItem(
 				'Time',
-				'light',
+				'dark',
 				round(
 					self::$statistics['cache_out_time']*1000, 
 					1
@@ -44,7 +44,7 @@ class Cache {
 			))
 			->addItem(Locales::createItem(
 				'Time',
-				'light',
+				'dark',
 				round(
 					self::$statistics['cache_in_time']*1000, 
 					1
@@ -108,7 +108,7 @@ class Cache {
 			->setTrigger([
 				'html'	=>' Cache ' . 
 					(new Element('span',[
-						'class'=>'badge text-light bg-light',
+						'class'=>'badge text-dark bg-light',
 						'html'=> self::$statistics['hits_count'] . ' hits' . 
 						'<span class="text-secondary" style="font-weight:lighter;"> in <strong>'.
 						round(self::$statistics['cache_out_time']*1000, 1)

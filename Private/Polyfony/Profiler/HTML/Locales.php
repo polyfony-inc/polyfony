@@ -18,7 +18,7 @@ class Locales {
 			'html'=>
 				'<strong>'.$title.'</strong> ' . 
 				(new Element('span',[
-					'class'=>'badge badge-'.$class,
+					'class'=>'badge text-light bg-'.$class,
 					'text'=>$value
 				]))
 		];
@@ -56,7 +56,7 @@ class Locales {
 			->setTrigger([
 				'html'	=>' Locales ' . 
 					(new Element('span',[
-						'class'=>'badge badge-light',
+						'class'=>'badge bg-light text-dark',
 						'html'=> self::$statistics['locales_count'] . ' ' . 
 						'<span class="text-secondary" style="font-weight:lighter;"> in <strong>'.
 						round(self::$statistics['load_time']*1000, 1)

@@ -111,7 +111,7 @@ class Timing {
 		return [
 			'html'	=>' Execution '.
 			(new Element('span',[
-				'class'	=>'badge text-dark badge-light',
+				'class'	=>'badge text-dark bg-light',
 				'html'	=> $execution_time_in_seconds . ' sec' . 
 				'<span class="text-secondary" style="font-weight:lighter;"> and <strong>'.
 				\Polyfony\Format::size(memory_get_peak_usage())
