@@ -140,11 +140,11 @@ class PermissionsAccessors extends \Polyfony\Entity {
 	}
 
 	// PHP 8 AccountsPermissions|int|string
-	public function removePermission() :bool {
+	public function removePermission($mixed_permission) :bool {
 		// remove permission 
 		return (new AccountsPermissionsAssigned([
 			'id_account'=>$this->get('id'),
-			'id_permission'	=>AccountsPermissions::getFromMixed($mixed_role)->get('id')
+			'id_permission'	=>AccountsPermissions::getFromMixed($mixed_permission)->get('id')
 		]))->delete();
 	}
 
