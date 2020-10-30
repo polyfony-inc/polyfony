@@ -109,6 +109,12 @@ class AccountsPermissions extends Entity {
 		);
 	}
 
+	public function isInherited() :bool {
+
+		return isset($this->id_role);
+
+	}
+
 	public function __toString() :string {
 
 		return $this->getName();

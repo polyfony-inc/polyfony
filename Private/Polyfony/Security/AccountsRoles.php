@@ -52,6 +52,54 @@ class AccountsRoles extends Entity {
 
 	}
 
+	// get permissions that are inherited from this role
+	public function getPermissions(
+		// if we want to keep a trace of what that permission whas inherited from
+		bool $with_parent_role_id = false
+	) :array {
+
+		return AccountsPermissions::_select([
+				($with_parent_role_id ? 
+					[
+						'AccountsPermissions.*', 
+						'AccountsRolesAssigned.id_role'
+					] : 
+					['AccountsPermissions.*'])
+			])
+			->join(
+				'AccountsPermissionsAssigned', 
+				'AccountsPermissions.id', 
+				'AccountsPermissionsAssigned.id_permission'
+			)
+			->where(['AccountsPermissionsAssigned.id_role'=>$this->get('id')])
+			->execute();
+
+	}
+
+	public function addPermission(
+		AccountsPermissions $permission
+	) :bool {
+
+		return (new AccountsPermissionsAssigned)
+			->set([
+				'id_role'		=>$this->get('id'),
+				'id_permission'	=>$permission->get('id')
+			])->save();
+
+	}
+
+	public function removePermission(
+		AccountsPermissions $permission
+	) :bool {
+
+		return (bool) (new AccountsPermissionsAssigned([
+				'id_role'		=>$this->get('id'),
+				'id_permission'	=>$permission->get('id')
+			]))
+			->delete();
+
+	}
+
 	public function getName() :string {
 		return Locales::get(
 			$this->get('name', true)
