@@ -49,9 +49,14 @@ class Controller {
 
 		// if the file does not exist
 		if(!file_exists($view_path)) {
+			// provide debbuging insights
+			Logger::debug('Controller->view()', [
+				'view_name'		=>$view_name,
+				'view_bundle'	=>$view_bundle
+			]);
 			// throw an exception
 			Throw new Exception(
-				"Controller->view() View file does not exist [{$view_path}]", 
+				"Controller->view() View file does not exist [{$view_name}]", 
 				500
 			);
 		}
