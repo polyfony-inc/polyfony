@@ -80,7 +80,7 @@ class AccountsRoles extends Entity {
 		AccountsPermissions $permission
 	) :bool {
 
-		return (new AccountsPermissionsAssigned)
+		return (new \Models\AccountsPermissionsAssigned)
 			->set([
 				'id_role'		=>$this->get('id'),
 				'id_permission'	=>$permission->get('id')
@@ -92,7 +92,7 @@ class AccountsRoles extends Entity {
 		AccountsPermissions $permission
 	) :bool {
 
-		return (bool) (new AccountsPermissionsAssigned([
+		return (bool) (new \Models\AccountsPermissionsAssigned([
 				'id_role'		=>$this->get('id'),
 				'id_permission'	=>$permission->get('id')
 			]))
