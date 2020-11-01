@@ -58,14 +58,14 @@ class AccountsRoles extends Entity {
 		bool $with_parent_role_id = false
 	) :array {
 
-		return AccountsPermissions::_select([
+		return \Models\AccountsPermissions::_select(
 				($with_parent_role_id ? 
 					[
 						'AccountsPermissions.*', 
 						'AccountsRolesAssigned.id_role'
 					] : 
 					['AccountsPermissions.*'])
-			])
+			)
 			->join(
 				'AccountsPermissionsAssigned', 
 				'AccountsPermissions.id', 
