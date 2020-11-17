@@ -20,6 +20,7 @@ class Filter {
 		'email'		=>'toEmail',
 		'phone'		=>'toPhone',
 		'text'		=>'toText',
+		'name'		=>'toName',
 		'slug'		=>'toSlug',
 		'length4'	=>'length4',
 		'length8'	=>'length8',
@@ -155,6 +156,10 @@ class Filter {
 				$value
 			)
 		);
+	}
+
+	private static function toName($value) {
+		return preg_replace('/[^\p{L}’ ]/u','',self::toText($value));
 	}
 
 	private static function toSlug($value) {

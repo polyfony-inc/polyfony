@@ -320,6 +320,7 @@ The filtering occurs when `->set()` is invoked, and after the validations (if an
 | phone              | removes anything but 0 to 9 the plus sign and parenthesis            |
 | email              | applies FILTER_SANITIZE_EMAIL                                        |
 | text               | replaces ' with ’ then removes < > & " \ /                           |
+| text               | removes anything but letters, space and ’                            |
 | slug               | applies Polyfony/Format::slug()                                      |
 | length{4-4096}     | applies mb_substr()                                                  |
 | capslock{30,50,70} | applies ucfirst(mb_strtolower()) if the uppercase ratio exceeds XX % |
