@@ -58,14 +58,14 @@ class AccountsRoles extends Entity {
 		bool $with_parent_role_id = false
 	) :array {
 
-		return AccountsPermissions::_select([
+		return \Models\AccountsPermissions::_select(
 				($with_parent_role_id ? 
 					[
 						'AccountsPermissions.*', 
 						'AccountsRolesAssigned.id_role'
 					] : 
 					['AccountsPermissions.*'])
-			])
+			)
 			->join(
 				'AccountsPermissionsAssigned', 
 				'AccountsPermissions.id', 
@@ -80,7 +80,7 @@ class AccountsRoles extends Entity {
 		AccountsPermissions $permission
 	) :bool {
 
-		return (new AccountsPermissionsAssigned)
+		return (new \Models\AccountsPermissionsAssigned)
 			->set([
 				'id_role'		=>$this->get('id'),
 				'id_permission'	=>$permission->get('id')
@@ -92,7 +92,7 @@ class AccountsRoles extends Entity {
 		AccountsPermissions $permission
 	) :bool {
 
-		return (bool) (new AccountsPermissionsAssigned([
+		return (bool) (new \Models\AccountsPermissionsAssigned([
 				'id_role'		=>$this->get('id'),
 				'id_permission'	=>$permission->get('id')
 			]))
