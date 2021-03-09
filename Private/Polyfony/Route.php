@@ -205,6 +205,15 @@ class Route {
 		// if the route needs a signature to be a match
 		if($this->signing) {
 
+			// if we don't even have the same number of provided vs. expected parameters
+			if(
+				count($this->indexedParameters) != 
+				count(array_filter($request_parameters_indexed_by_position))
+			) {
+				// don't bother going futher
+				return false; 
+			}
+
 			// combine URL parameters names (keys) with their values
 			$associative_parameters = array_combine(
 				$this->indexedParameters, 
