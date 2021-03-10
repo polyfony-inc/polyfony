@@ -39,7 +39,7 @@ use Polyfony\Exception as Exception;
 			<h1>
 				
 				<span class="<?= $icon; ?>"></span> 
-				<?= Locales::get($message); ?>
+				<?= Format::htmlSafe(Locales::get($message)); ?>
 			
 			</h1>
 
@@ -47,9 +47,9 @@ use Polyfony\Exception as Exception;
 		
 			<code>
 				<strong>
-					@line <?= $line; ?>
+					@line <?= Format::htmlSafe($line); ?>
 				</strong> 
-				in <?= $file; ?> 
+				in <?= Format::htmlSafe($file); ?> 
 			</code>
 
 			<div class="buttons">
@@ -87,9 +87,9 @@ use Polyfony\Exception as Exception;
 			</div>
 
 <textarea id="dump">
-Error : <?= $message; ?>
+Error : <?= Format::htmlSafe($message); ?>
 
-Code : <?= $code; ?>
+Code : <?= Format::htmlSafe($code); ?>
 
 Date : <?= date('r'); ?> 
 URL : <?= Format::htmlSafe(Request::getUrl()); ?>
@@ -98,25 +98,25 @@ Method : <?= Request::isPost() ? 'POST' : 'GET'; ?>
 
 REFERER : <?= Format::htmlSafe(Request::server('HTTP_REFERER', 'None')); ?>
 
-Domain : <?= Config::get('router','domain'); ?>
+Domain : <?= Format::htmlSafe(Config::get('router','domain')); ?>
 
 Agent : <?= Format::htmlSafe(Request::server('HTTP_USER_AGENT')); ?>
 
 IP : <?= Format::htmlSafe(Request::server('REMOTE_ADDR')); ?>
 
-Protocol : <?= Request::getProtocol(); ?>
+Protocol : <?= Format::htmlSafe(Request::getProtocol()); ?>
 
-User : <?= !Security::isAuthenticated() ?: Security::getAccount()->get('login'); ?>
+User : <?= Format::htmlSafe(!Security::isAuthenticated() ?: Security::getAccount()->get('login')); ?>
 
 Trace : 
-<?= $string_trace; ?>
+<?= Format::htmlSafe($string_trace); ?>
 </textarea>
 <?php endif; ?>
 <script type="text/javascript">
 function reportIncident() {
 
 	var link = "mailto:"+'<?= Config::get('mail','tech_support_mail'); ?>'
-	+ "?subject=" + escape("Exception (<?= Config::get('router','domain'); ?>) - <?= $message; ?>")
+	+ "?subject=" + escape("Exception (<?= Config::get('router','domain'); ?>) - <?= Format::htmlSafe($message); ?>")
 	+ "&body=" + escape(document.getElementById('dump').value);
 
 	window.location.href = link;
