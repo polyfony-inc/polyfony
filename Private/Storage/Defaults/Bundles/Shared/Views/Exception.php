@@ -24,7 +24,7 @@ use Polyfony\Security as Sec;
 		<div class="col-xs-12 col-sm-12 col-md-12 col-lg-8">	
 			<h1>
 				<span class="<?= $this->icon; ?>"></span> 
-				<?= Loc::get($this->Exception->getMessage()); ?>
+				<?= Fmt::htmlSafe(Loc::get($this->Exception->getMessage())); ?>
 			</h1>
 			<?php if($this->Exception->getCode() < 401 || $this->Exception->getCode() > 404): ?>
 			<div class="">
@@ -41,7 +41,7 @@ use Polyfony\Security as Sec;
 				<?= Polyfony\Exception::convertTraceToHtml($this->Exception->getTrace()); ?>
 			</div>
 <textarea id="dump" style="display:none;">
-Error : <?= $this->Exception->getMessage(); ?>
+Error : <?= Fmt::htmlSafe($this->Exception->getMessage()); ?>
 
 Code : <?= $this->Exception->getCode(); ?>
 
@@ -58,7 +58,7 @@ Agent : <?= Fmt::htmlSafe(Req::server('HTTP_USER_AGENT')); ?>
 
 IP : <?= Fmt::htmlSafe(Req::server('REMOTE_ADDR')); ?>
 
-Protocol : <?= Req::getProtocol(); ?>
+Protocol : <?= Fmt::htmlSafe(Req::getProtocol()); ?>
 
 User : <?= Sec::get('id'); ?>
 
@@ -70,7 +70,7 @@ Trace :
 function reportIncident() {
 
 	var link = "mailto:"+'<?= Cfg::get('mail','tech_support_mail'); ?>'
-	+ "?subject=" + escape("Exception (<?= Cfg::get('router','domain'); ?>) - <?= $this->Exception->getMessage(); ?>")
+	+ "?subject=" + escape("Exception (<?= Cfg::get('router','domain'); ?>) - <?= Fmt::htmlSafe($this->Exception->getMessage()); ?>")
 	+ "&body=" + escape(document.getElementById('dump').value);
 
 	window.location.href = link;

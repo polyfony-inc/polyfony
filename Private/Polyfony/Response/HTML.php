@@ -102,7 +102,10 @@ class HTML {
 	// build an html page
 	public static function buildAndGetPage(string $content) :string {
 		// initial content
-		$page = '<!doctype html><html lang="'.\Polyfony\Locales::getLanguage().'"><head><title>'.(isset(self::$_metas['title']) ? self::$_metas['title'] : '').'</title><meta http-equiv="content-type" content="text/html; charset=' . \Polyfony\Response::getCharset() . '" />';
+		$page = 
+			'<!doctype html><html lang="'.\Polyfony\Locales::getLanguage().'"><head><title>'.
+			\Polyfony\Format::htmlSafe(isset(self::$_metas['title']) ? self::$_metas['title'] : '').
+			'</title><meta http-equiv="content-type" content="text/html; charset=' . \Polyfony\Response::getCharset() . '" />';
 		// add the meta tags and the links
 		$page .= self::buildMetasTags() . self::buildLinksTags();
 		// close the head, add the body, and add the scripts
