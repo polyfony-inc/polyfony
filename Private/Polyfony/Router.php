@@ -256,7 +256,7 @@ class Router {
 		if(!method_exists($class,$method)) {
 			// new polyfony exception
 			Throw new Exception(
-				"Dispatcher::forward() : Method [{$method}] does not exist in [{$class}]", 500);	
+				"Dispatcher::forward() : Method not implemented in [{$class}]", 501);	
 		}
 		// marker
 		$id_pre_marker = Profiler::setMarker("{$route->controller}.preAction", "controller");
