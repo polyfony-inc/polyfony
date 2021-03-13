@@ -286,9 +286,11 @@ class Router {
 		self::$_controller = new $class;
 		// if the method does not exist in the controller
 		if(!method_exists($class,$method)) {
-			// new polyfony exception
+			// new polyfony exception 
+			// Method name removed from error message for safety reason (method is a user input).
+			// DO NOT ADD IT BACK IN. 
 			Throw new Exception(
-				"Dispatcher::forward() : Method [{$method}] does not exist in [{$class}]", 500);	
+				"Dispatcher::forward() : Method not implemented in [{$class}]", 501);	
 		}
 		// marker
 		$id_pre_marker = Profiler::setMarker("{$route->controller}.before", "controller");

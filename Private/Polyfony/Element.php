@@ -17,7 +17,7 @@ class Element {
 		// initialize variables
 		$this->content 		= '';
 		$this->type 		= $type;
-		$this->attributes 	= array();
+		$this->attributes 	= [];
 		// set the options if any
 		!$options ?: $this->set($options);
 	}
@@ -27,7 +27,7 @@ class Element {
 		// append by default or replace text
 		$this->content = $append ? $this->content . Format::htmlSafe($text) : Format::htmlSafe($text);
 		// return self
-		return($this);
+		return $this;
 	}
 
 	// set the html in the tag
@@ -35,7 +35,7 @@ class Element {
 		// append by default or replace html
 		$this->content = $append ? $this->content . $html : $html;
 		// return self
-		return($this);
+		return $this;
 	}
 
 	// set the style for the tag
@@ -45,18 +45,18 @@ class Element {
 		// for each of the css properties
 		foreach($css_properties as $css_property => $css_value) {
 			// add them to the already existing ones
-			$this->attributes['style'] .= $css_property.':'.$css_value.';';
+			$this->attributes['style'] .= Format::htmlAttributeSafe($css_property.':'.$css_value.';');
 		}
 		// return self
-		return($this);
+		return $this;
 	}
 
 	// set the value of a tag
 	public function setValue($value=null) :self {
 		// append by default or replace html
-		$this->attributes['value'] = Format::htmlSafe($value);
+		$this->attributes['value'] = Format::htmlAttributeSafe($value);
 		// return self
-		return($this);
+		return $this;
 	}
 
 	// set everything, mostly attribute but also content
@@ -69,7 +69,7 @@ class Element {
 				$this->set($single_attribute, $single_value);
 			}
 			// return self
-			return($this);
+			return $this;
 		}
 		// specific case of text
 		if($attribute == 'text') {
@@ -97,7 +97,7 @@ class Element {
 			$this->attributes[$attribute] = is_array($value) ? implode(' ', $value) : $value;
 		}
 		// return self
-		return($this);
+		return $this;
 	}
 
 	// adopt an element of the same kind

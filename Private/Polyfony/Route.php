@@ -343,8 +343,8 @@ class Route {
 	private function deduceAction() :void {
 		// if no action has been defined and a trigger has
 		if(!$this->action && $this->trigger) {
-			// we deduce the action from a request parameter
-			$this->action = Request::get($this->trigger) ?: 'index';
+			// we deduce the action from a request parameter (with removal of special chars to prevent abuse)
+			$this->action = Format::fsSafe(Request::get($this->trigger, 'index') ?: 'index');
 		}
 	}
 

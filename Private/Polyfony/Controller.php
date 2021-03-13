@@ -78,7 +78,7 @@ class Controller {
 	// forward to another controller in the same bundle
 	final public function forward(
 		string $controller, 
-		$action = null
+		$action = 'index'
 	) :void {
 
 		// get the current route as a base
@@ -86,7 +86,8 @@ class Controller {
 		
 		// and alter it
 		$route->controller	= $controller;
-		$route->action		= $action;
+		// prevent action names abuse
+		$route->action		= Format::fsSafe($action);
 		
 		// forward to the new route
 		Router::forward($route);

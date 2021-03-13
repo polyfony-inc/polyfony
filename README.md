@@ -371,7 +371,6 @@ Routes are to be declared in each bundle's `Loader` directory, in a file called 
 
 *Example : `Private/Bundles/{BundleName}/Loader/Route.php`*
 
-
 ###### Routes can accept a number of parameters, and lack thereof 
 * `Router::map('/admin/:what/:id/', 'Bundle/Controller@{what}')`.
 * `Router::map('/url/', 'Bundle/Controller@action')`.
@@ -379,6 +378,8 @@ Routes are to be declared in each bundle's `Loader` directory, in a file called 
 ###### The action can 
 * be a parameter of the url (as with the first example. The action would be the 2nd parameter `{what}`)
 * be ommited. In that case an `->index()` is called. If it doesn't exist, `->default()` will be called, if it doesn't exist an exception is thrown.
+
+Note that as an additional safety measure, _Actions_ can only contain alphanumerical characters, `-`, `_` and `.`.
 
 Before calling the desired action a `->before()` method will be called on the controller. *You can declare one, or ommit it.*  
 after the desired action has been be called, a `->after()` method will be called on the controller. *You can declare one, or ommit it.*

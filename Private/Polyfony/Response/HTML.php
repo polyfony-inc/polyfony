@@ -2,6 +2,14 @@
 
 namespace Polyfony\Response;
 
+use Polyfony\{ 
+	Format, 
+	Response, 
+	Config, 
+	Locales, 
+	Element 
+};
+
 class HTML {
 	
 	// store the list of links (css, favicons...)
@@ -140,18 +148,18 @@ class HTML {
 		// initial content
 		$page = 
 			'<!doctype html><html lang="'.
-			\Polyfony\Locales::getLanguage().
+			Locales::getLanguage().
 			'"><head><title>'.
-			(isset(self::$_metas['title']) ? self::$_metas['title'] : '').
+			Format::htmlSafe(isset(self::$_metas['title']) ? self::$_metas['title'] : '').
 			'</title><meta http-equiv="content-type" content="text/html; charset=' . 
-			\Polyfony\Response::getCharset() . '" />';
+			Response::getCharset() . '" />';
 
 		// add the meta tags and the links
 		$page .= self::buildMetasTags() . self::buildLinksTags();
 		// close the head, add the body, and add the scripts
 		$page .= '</head><body>' . $content . self::buildScriptsTags();
 		// add the profiler (if enabled)
-		$page .= \Polyfony\Config::get('profiler', 'enable') ? new \Polyfony\Profiler\HTML : '';
+		$page .= Config::get('profiler', 'enable') ? new \Polyfony\Profiler\HTML : '';
 		// close the document and return the assembled html page
 		return $page . '</body></html>';
 
@@ -168,7 +176,7 @@ class HTML {
 			// add the formated the meta
 			$metas .= 
 				'<meta name="'.$name.'" content="'.
-				\Polyfony\Format::htmlSafe($content).'" />';
+				Format::htmlAttributeSafe($content).'" />';
 		}
 		return $metas;
 
@@ -188,7 +196,7 @@ class HTML {
 			// sort the attributes (compulse order needs)
 			ksort($attributes);
 			// build as base stylesheet link and merge its attributes
-			$links[] = new \Polyfony\Element('link', $attributes);
+			$links[] = new Element('link', $attributes);
 		}
 		return implode('', $links);
 	}
@@ -321,7 +329,7 @@ class HTML {
 	) :bool {
 		// we have to be in prod, and the packing of this type of assets has to be allowed
 		return 
-			\Polyfony\Config::get('response','pack_'.$asset_type) == '1';
+			Config::get('response','pack_'.$asset_type) == '1';
 	}
 
 	// if this pack needs to be generated again
@@ -332,7 +340,7 @@ class HTML {
 			// if the file does not exist
 			!file_exists($pack_path) || 
 			// or if we're not allowed to use cached items
-			!\Polyfony\Config::get('response','cache');
+			!Config::get('response','cache');
 	}
 
 	// assets path converter
@@ -367,7 +375,7 @@ class HTML {
 		object $packer_object=null
 	) :string {
 		// if we are allowed to minify
-		return \Polyfony\Config::get('response','minify') ? 
+		return Config::get('response','minify') ? 
 			($packer_object)->add($pack_contents)->minify() : 
 			$pack_contents;
 
@@ -409,7 +417,7 @@ class HTML {
 			$assets[$script] = 'script';
 		}
 		// push all those using HTTP/2
-		\Polyfony\Response::push($assets);
+		Response::push($assets);
 
 	}
 

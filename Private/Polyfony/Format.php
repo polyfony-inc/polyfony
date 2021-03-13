@@ -2,6 +2,8 @@
 
 namespace Polyfony;
 
+use Zend\Escaper\Escaper;
+
 class Format {
 
 	// file or folder name that is safe for the filesystem
@@ -10,27 +12,53 @@ class Format {
 		$replacement_symbol = '-'
 	) :string {
 		// remove any symbol that does not belong in a file name of folder name
-		return str_replace(
-				['..','/','\\',':','@','$','?','*','<','>','&','(',')','{','}',',','%','`','\'','#'], 
-				$replacement_symbol, 
-				$string
-			);
+		return preg_replace(
+			'/[^A-Za-z0-9_\-\.]/', 
+			$replacement_symbol, 
+			$string
+		);
 	}
 
 	// string that is safe for javascript variable
 	public static function jsSafe(
 		string $string
 	) :string {
-		// escape all single quotes
-		return json_encode($string);
+		return $string ? (new Escaper(Config::get('response','charset')))
+			->escapeJs($string) : '';
+	}
+
+	// string that is safe for css code
+	public static function cssSafe(
+		string $string
+	) :string {
+		return $string ? (new Escaper(Config::get('response','charset')))
+			->escapeCss($string) : '';
+	}
+
+	// string that is safe for css code
+	public static function urlSafe(
+		string $string
+	) :string {
+		return $string ? (new Escaper(Config::get('response','charset')))
+			->escapeUrl($string) : '';
 	}
 	
 	// safe for outputing in html tag or html attribute
 	public static function htmlSafe(
 		$string
 	) :string {
-		// just remove html entities
-		return filter_var($string, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+		// protect against XSS
+		return $string ? (new Escaper(Config::get('response','charset')))
+			->escapeHtml($string) : '';
+	}
+
+	// safe for outputing in html tag or html attribute
+	public static function htmlAttributeSafe(
+		$string
+	) :string {
+		// protect against XSS
+		return $string ? (new Escaper(Config::get('response','charset')))
+			->escapeHtmlAttr($string) : '';
 	}
 
 	// safe from uppercase abuse
@@ -241,31 +269,6 @@ class Format {
 			strlen($string) > $length ? 
 			trim(mb_substr(strip_tags($string), 0, $length - 2, Response::getCharset())).'…' : 
 			$string;
-	}
-	
-	// will wrap a portion of text in another
-	public static function wrap(
-		$text, 
-		$phrase, 
-		$wrapper = '<strong class="highlight">\\1</strong>'
-	) {
-		if(empty($text)) {
-			return '';
-		}
-		if(empty($phrase)) {
-			return $text;
-		}
-		if(is_array($phrase)) {
-			foreach ($phrase as $word) {
-				$pattern[] = '/(' . preg_quote($word, '/') . ')/i';
-				$replacement[] = $wrapper;
-			}
-		}
-		else {
-			$pattern = '/('.preg_quote($phrase, '/').')/i';
-			$replacement = $wrapper;
-		}
-		return preg_replace($pattern, $replacement, $text);
 	}
 	
 	// remove all formatting and invisible symbols to get the shortest possible string
