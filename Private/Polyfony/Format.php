@@ -46,16 +46,16 @@ class Format {
 	// safe for outputing in html tag or html attribute
 	public static function htmlSafe(
 		$string
-	) :string {
+	) {
 		// protect against XSS
 		return $string ? (new Escaper(Config::get('response','charset')))
-			->escapeHtml($string) : '';
+			->escapeHtml($string) : $string;
 	}
 
 	// safe for outputing in html tag or html attribute
 	public static function htmlAttributeSafe(
 		$string
-	) :string {
+	) {
 		// protect against XSS
 		return $string ? (new Escaper(Config::get('response','charset')))
 			->escapeHtmlAttr($string) : '';
@@ -63,7 +63,7 @@ class Format {
 
 	// safe from uppercase abuse
 	public static function uppercaseSafe(
-		string $string,
+		?string $string = '',
 		float $maximum_tolerated_uppercare_ratio = 0.33
 	) :string {
 
@@ -145,6 +145,9 @@ class Format {
 			// there is no conversion to do at all
 			return '';
 		}
+		elseif($seconds < 60) {
+			return  Locales::get('quelques instants');
+		} 
 		// list of deltas by period
 		$deltas[1] = array(60, Locales::get('minute'));
 		$deltas[2] = array(3600, Locales::get('heure'));
