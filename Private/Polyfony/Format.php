@@ -58,7 +58,7 @@ class Format {
 	) {
 		// protect against XSS
 		return $string ? (new Escaper(Config::get('response','charset')))
-			->escapeHtmlAttr($string) : '';
+			->escapeHtmlAttr($string) : $string;
 	}
 
 	// safe from uppercase abuse
