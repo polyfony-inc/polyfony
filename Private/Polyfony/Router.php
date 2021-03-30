@@ -282,6 +282,8 @@ class Router {
 		}
 		// update the current route
 		self::setCurrentRoute($route);
+		// apply rate-limiting restrictions 
+		$route->throttleIfAny();
 		// instanciate
 		self::$_controller = new $class;
 		// if the method does not exist in the controller

@@ -57,7 +57,15 @@ class Cookie implements StoreInterface {
 		// encode and compress the value
 		$value = gzcompress(json_encode($value));
 		// actually set the cookie
-		setcookie($variable, $value, $lifetime, '/');
+		setcookie(
+			$variable, 
+			$value, [
+				'path'		=>'/',
+				'expires'	=>$lifetime,
+				'secure'	=>Request::isSecure(),
+				'httponly'	=>true,
+				'samesite'	=>'Strict'
+		]);
 		// set it manually into the superglobal
 		$_COOKIE[$variable] = $value;
 		// return its presence

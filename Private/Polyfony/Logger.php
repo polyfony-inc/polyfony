@@ -79,7 +79,7 @@ class Logger {
 		$message, 
 		$context = null
 	) :void {
-
+	
 		// if the logger is enabled and the log event level is supposed to be logged
 		if(
 			Config::get('logger', 'enable') && 
@@ -88,13 +88,13 @@ class Logger {
 
 			// format the log event
 			$log = self::formatLogMessage($level, $message, $context);
-
+			
 			// if the profiler is enabled
 			if(Config::get('profiler', 'enable')) {
 				// send the log event to the profiler
 				try { self::toProfiler($log); } catch (Exception $e) {}
 			}
-
+			
 			// if we want to log to a file
 			if(
 				Config::get('logger', 'driver') == 'file' && 
@@ -109,7 +109,7 @@ class Logger {
 				// insert record in the database
 				try { self::toDatabase($log); } catch (Exception $e) {}
 			}
-
+			
 			// an email reporting address is set and level is above 3
 			if(
 				Config::get('logger', 'email') && 
@@ -138,8 +138,8 @@ class Logger {
 			'context'		=> $context,
 			'creation_date'	=> time(),
 			'login'			=> Security::isAuthenticated() ? Security::getAccount()->get('login') : '',
-			'bundle'		=> Router::getCurrentRoute()->bundle,
-			'controller'	=> Router::getCurrentRoute()->controller,
+			'bundle'		=> isset(Router::getCurrentRoute()->bundle) ? Router::getCurrentRoute()->bundle : null,
+			'controller'	=> isset(Router::getCurrentRoute()->controller) ? Router::getCurrentRoute()->controller : null ,
 			'method'		=> Request::isPost() ? 'post' : 'get',
 			'url'			=> Format::truncate(Request::getUrl(), 256),
 			'ip'			=> Format::truncate(Request::server('REMOTE_ADDR'), 15),

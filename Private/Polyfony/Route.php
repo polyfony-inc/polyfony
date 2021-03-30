@@ -24,7 +24,10 @@ class Route {
 	public ?int $redirectStatus 			= null;
 	// (optional) if we want to sign the url
 	public bool $signing 					= false;
-
+	// (optional) how many hits allowed
+	public ?int $throttleLimitTo 			= null;
+	// (optional) in what timeframe are they allowed
+	public ?int $throttleTimeframe 			= null;
 
 	// information deduced dynamically, for route matching
 	public ?string $staticSegment 				= '';
@@ -56,6 +59,24 @@ class Route {
 		return $this;
 	}
 
+	public function throttle(
+		int $limit_to, 
+		int $timeframe
+	) :self {
+		// check that the route is not auto-named
+		if(stripos($this->name, 'route-') === 0) {
+			Throw new Exception(
+				'You must explicitely name the route to use throttling', 
+				500
+			);
+		}
+		// set the throttling parameters
+		$this->throttleLimitTo = $limit_to;
+		$this->throttleTimeframe = $timeframe;
+		// chain
+		return $this;
+	}
+
 	public function sign() :self {
 		// save the fact that we want to sign
 		$this->signing = true;
@@ -74,6 +95,24 @@ class Route {
 		]);
 		// chain
 		return $this;
+	}
+
+	public function throttleIfAny() :void {
+		// if we have throttling restrictions
+		if(
+			$this->throttleLimitTo && 
+			$this->throttleTimeframe && 
+			$this->name
+		) {
+			Throttle::enforce(
+				$this->throttleLimitTo, 
+				$this->throttleTimeframe,
+				Hashs::get([
+					$this->name,
+					Request::server('REMOTE_ADDR')
+				])
+			);
+		}
 	}
 
 	public function redirectIfAny() :void {

@@ -525,7 +525,50 @@ Router::reverse(
 
 You can customize the name of the hash parameter in `Config.ini` then `[router]` then `signing_parameter_name = 'url_parameters_hash'`, so that it doesn't conflict with your named parameters.
 
+###### Rate-limiting
 
+Throttling is by default based on the route name and the remote address (IP), you therefor must name your routes.
+The mechanisms used is [Leaky Bucket](https://en.wikipedia.org/wiki/Leaky_bucket). 
+
+To throttle **a route**
+```php
+
+Router::put(
+	'/place-order/:id_customer/'
+	'External/Tracking@order',
+	'place-order'
+)->throttle(2, 3600); // enforces a limit of 2 requests every 3600 minutes (one hour, leaky bucket)
+
+```
+
+To throttle **manually** (in a controller)
+```php
+
+// you can use the method enforce (this limits to 5 per hour)
+Throttle::enforce(5, 3600);
+
+// method shortcuts (this limits to 2 per minute)
+Throttle::perMinute(2); 
+//Throttle::perSecond();
+//Throttle::perHour();
+//Throttle::perDay();
+
+// and even define your own keys (here, the lookup table will use a hash of id_client+IP instead of the IP address + route name)
+Throttle::perHour(
+	2, 
+	Hashs::get([
+		$id_client, 
+		Request::server('REMOTE_ADDR')
+	])
+);
+
+```
+
+When someone is being throttle, a `403` Exception is thrown with the message _You are being rate-limited_. 
+Note that 
+* new hits while being rate-limited will not extend a lock
+* there is not burst support
+* the backend used is APCu for performance and DoS safety reasons 
 
 ### Environments
 
