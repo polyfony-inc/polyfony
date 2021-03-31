@@ -62,7 +62,7 @@ class Cookie implements StoreInterface {
 			$value, [
 				'path'		=>'/',
 				'expires'	=>$lifetime,
-				'secure'	=>Request::isSecure(),
+				'secure'	=>\Polyfony\Request::isSecure(),
 				'httponly'	=>true,
 				'samesite'	=>'Strict'
 		]);
