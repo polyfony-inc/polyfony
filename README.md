@@ -106,7 +106,7 @@ $webpage = new Pages(67);
 // Retrieve another database entity by its `url` column
 $webpage = new Pages(['url'=>'/my-awesome-vegan-burger-recipe/']);
 
-// Retrieve a single Entity by its ID and generate an input to change it's title property, with a custom css class
+// Retrieve a single Entity by its ID and generate an input to change its title property, with a custom css class
 // note that any html in the title field will be escaped in the <input> to prevent XSS
 // returns <input type="etextmail" name="Pages[title]" value="My awesome Vegan burger recipe is so yummy" />
 (new Pages(67))
@@ -340,7 +340,7 @@ class User extends Polyfony\Entity {
 }
 ```
 ```php
-<?= (new Models\Users->input('user_login'); ?>
+<?= (new Models\Users->input('user_login')); ?>
 ```
 ```html
 <input name="Users[user_login]" type="email" maxlength="128" value="" />
@@ -441,7 +441,7 @@ class PagesController extends Controller {
 	public function viewAction() {
 
 		// retrieve your webpage from the database
-		// using not it's id, but it's url column value !
+		// using not its id, but its url column value !
 		$page = new Pages(['url'=>Request::getUrl()])
 
 		// maybe set the title and description using that database object
@@ -1004,7 +1004,7 @@ They extend `Entity` object, so there are normal database entries that have a fe
 ```
 
 An email that fails to send, but has ->send(true) will end up in the Emails table. You can send it later.
-It's `creation_date` column will be filled, but it will have an empty `sending_date` column, making it really easy to retry later.
+Its `creation_date` column will be filled, but it will have an empty `sending_date` column, making it really easy to retry later.
 
 ```php
 (new Emails(267)) // assuming its id is 267
@@ -1012,7 +1012,7 @@ It's `creation_date` column will be filled, but it will have an empty `sending_d
 ```
 
 Even though `->save()` isn't explicitely called, nor is `->send(true)`, 
-since the email has been retrieved from the database, upon sending, it's sending_date column will be updated and **it will be saved**. 
+since the email has been retrieved from the database, upon sending, its sending_date column will be updated and **it will be saved**. 
 
 
 ###### Using templates

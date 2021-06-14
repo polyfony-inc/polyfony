@@ -55,7 +55,9 @@ class Cookie implements StoreInterface {
 			time() + $lifetime * 3600 : 
 			time() + 24 * 3600;
 		// encode and compress the value
-		$value = gzcompress(json_encode($value));
+		$value = \Polyfony\Config::get('store', 'compress') ? 
+			gzcompress(json_encode($value)) :
+			json_encode($value);
 		// actually set the cookie
 		setcookie(
 			$variable, 
@@ -96,7 +98,10 @@ class Cookie implements StoreInterface {
 
 		return $raw ? 
 			$_COOKIE[$variable] : 
-			json_decode(gzuncompress($_COOKIE[$variable]));
+			(\Polyfony\Config::get('store', 'compress') ? 
+				json_decode(gzuncompress($_COOKIE[$variable])) :
+				json_decode($_COOKIE[$variable])
+			);
 
 	}
 
