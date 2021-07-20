@@ -25,7 +25,7 @@ class Element {
 	// set the text in the tag
 	public function setText(string $text=null, bool $append=true) :self {
 		// append by default or replace text
-		$this->content = $append ? $this->content . Format::htmlSafe($text) : Format::htmlSafe($text);
+		$this->content = $append ? $this->content . Format::htmlAttributeSafe($text) : Format::htmlAttributeSafe($text);
 		// return self
 		return $this;
 	}

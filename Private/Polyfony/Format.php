@@ -57,8 +57,9 @@ class Format {
 		$string
 	) {
 		// protect against XSS
-		return $string ? (new Escaper(Config::get('response','charset')))
-			->escapeHtmlAttr($string) : $string;
+		return $string ? 
+			filter_var($string, FILTER_SANITIZE_FULL_SPECIAL_CHARS) : 
+			$string;
 	}
 
 	// safe from uppercase abuse
