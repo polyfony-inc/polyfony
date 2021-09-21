@@ -52,9 +52,15 @@ class Security {
 				$permission
 			) {
 				
-				$security_dropdown->addItem([
-					'html'=>$permission->getBadge()
-				]);
+				// only include permissions not inherited from a role
+				if(!$permission->get('id_role')) { 
+					// add that permission
+					$security_dropdown->addItem([
+						'html'=>$permission->getBadge()
+					]);
+
+				}
+
 			}
 		}
 
