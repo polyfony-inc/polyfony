@@ -759,6 +759,11 @@ Anything that is common to **all** responses, you will find in `Response`.
 Response::setRedirect($url [, $after_seconds=0])
 ```
 
+###### To redirect to the previous page
+```php
+Response::previous()
+```
+
 ###### to change the charset
 ```php
 Response::setCharset('utf-8')
@@ -788,6 +793,22 @@ Response::setStatus(400)
 ```php
 Response::setType('text')
 ```
+
+###### to output html
+
+This outputs only the HTML you build in your view.
+```php
+Response::setType('html')
+```
+
+This builds a page for you, including `<header>`, `<style>`, `<script>`, `<title>` metas.
+The HTML you build is placed in the `<body>` of the built page.
+```php
+Response::setType('html')
+```
+
+_Note that changing `setType` cleans any buffered output_.
+
 
 ###### to output json
 ```php
