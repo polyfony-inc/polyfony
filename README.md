@@ -122,7 +122,7 @@ $webpage = new Pages(['url'=>'/my-awesome-vegan-burger-recipe/']);
 		'modification_date'	=> time(), 
 		'contents'			=> 'Meh...',
 		'categories_array'	=> ['Cooking', 'Organic'], // this get's saved as json automagically
-		'id_creator'		=> Security::getAccount()->get('id') // assuming you are logged in
+		'id_creator'		=> Security::getAccount()?->get('id') // assuming you are logged in
 	])
 	->save();
 
