@@ -188,7 +188,7 @@ $pages = Pages::_select(['title','id'])
 | ->set(['picture_size'=>'24938'])             |       24938       | ->get('picture_size')      | string '24.4 Ko'          |
 | ->set(['picture_size'=>'24938'])             |       24938       | ->get('picture_size',true) | string '24938'            |
 
-You add easily add elements to the end of an `_array` column. 
+You can easily add elements to the end of an `_array` column. 
 Assuming you have a `Process` **object**/table, which has a `events_array` **attribute**/column.
 
 ```php
