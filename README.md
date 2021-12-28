@@ -243,12 +243,6 @@ Models\Accounts extends Polyfony\Security\Accounts {
 // Normal model classes extend Polyfony\Entity. 
 // Accounts extends an intermediate (but transparent) class that adds authentication logic.
 
-	const ID_LEVEL = [
-		0		=>'Admin',
-		5		=>'Privileged User',
-		10		=>'Simple User',
-	];
-
 	const IS_ENABLED = [
 		0	=>'No',
 		1	=>'Yes'
