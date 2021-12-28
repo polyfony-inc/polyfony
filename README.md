@@ -647,10 +647,14 @@ Having distinct configuration files allows you to :
 The security is based around on a common email/password couple. 
 Passwords are strongly hashed and salted before storage in the database. The hash algorithm can be tweaked using the `algo` (default is `sha512`) and `salt` parameters.
 
+Users can have any number of roles `AccountsRoles` and permissions `AccountsPermissions` directly assigned to them.
+Roles themselves can have permissions assigned to them. Users will inherit permissions from their roles.
+Permissions must be grouped into at least one logical group `AccountsPermissionsGroups`.
+
 In addition, two mechanisms tighten the security : 
 
 * a throttling mechanism preventing bruteforce attacks. It can be tweaked using `forcing_timeframe` and `forcing_maximum_attempts` parameters.
-* an anti cookie-theft mechanism, checking that the used that initially logged in is still the same one. Even if he/she has the correct session cookie in his/her possession. This can be disabled by changing the `enable_signature_verification` parameter (default is `1` - enabled)
+* an anti cookie-theft mechanism, checking that the user that initially logged in is still the same one. Even if he/she has the correct session cookie in his/her possession. This can be disabled by changing the `enable_signature_verification` parameter (default is `1` - enabled)
 
 You can disable the cookie theft protection on a per-request basis.
 By chaging the configuration on the fly `Config::set('security','enable_signature_verification', 0)` which can be useful in very specific cases
@@ -661,11 +665,7 @@ By chaging the configuration on the fly `Config::set('security','enable_signatur
 Security::authenticate();
 ```
 
-Users can have any number of roles `AccountsRoles` and permissions `AccountsPermissions` directly assigned to them.
-Roles themselves can have permissions assigned to them. Users will inherit permissions from their roles.
-Permissions must be grouped into at least one logical group `AccountsPermissionsGroups`.
-
-Failure to authenticate will throw an exception, and redirect to `Private/Config/Config.ini` -> `[router]` -> `login_route = ""`
+Failure to authenticate will throw an exception with a `403` Status Code, and redirect to `Private/Config/Config.ini` -> `[router]` -> `login_route = ""`
 
 ###### If a page or action requires a specific permission
 ```php
