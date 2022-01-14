@@ -874,8 +874,8 @@ This will push your assets before the DOM has been loaded and parsed. Making for
 
 You can either output 
 * CSV
-* XLS (Requires phpoffice/spreadsheet)
-* XLSX (Requires phpoffice/spreadsheet) 
+* XLS (Requires phpoffice/phpspreadsheet)
+* XLSX (Requires phpoffice/phpspreadsheet) 
 
 ```php
 Response::setType('xlsx'); // xls or csv
