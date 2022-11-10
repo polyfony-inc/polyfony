@@ -105,8 +105,8 @@ class Security {
 			// if we cannot find a matching open session
 			$account ?: 
 				self::deny(
-					'Your session is no longer valid', 
-					403, true);
+					'Your session is no longer valid, please log-in again', 
+					401, true);
 			// if we are supposed to check the signature consistency
 			if(Config::get('security','enable_signature_verification'))	{
 				// if the stored key and dynamically generated mismatch, we deny access
@@ -114,8 +114,8 @@ class Security {
 					->getSession()
 					->isSignatureConsistent($account) ?: 
 						self::deny(
-							'Your computer signature has changed since your last visit, please log-in again', 
-							403, true);
+							'Your device signature has changed since your last visit, please log-in again', 
+							401, true);
 			}
 			// if account has expired, we deny access
 			!$account->hasExpired() ?:
@@ -138,18 +138,19 @@ class Security {
 		);
 		// if the account does not exist/is not found
 		if(!$account) {
-			// we deny access
+			// we deny access with 403 Status Code
 			self::deny('Account does not exist is disabled'); 
 		}
 		// if the account has been forced by that ip recently
 		if($account->isBeingForcedFrom(self::getSafeRemoteAddress())) {
 			// register that failure
 			$account->logFailedLogin('bruteforce');
-			// refuse access
+			// refuse access with 403 Status Code
 			self::deny(
 				Locales::get('You have exceeded the maximum failed login attempts, please wait ').
 				Format::duration(Config::get('security','forcing_timeframe')).' '.
-				Locales::get('before trying again')
+				Locales::get('before trying again'),
+				403
 			);
 		}
 		// if the account has expired
@@ -159,7 +160,8 @@ class Security {
 			// refuse access
 			self::deny(
 				Locales::get('Your account has expired, it was valid until').' '.
-				$account->get('is_expiring_on')
+				$account->get('is_expiring_on'),
+				403
 			);	
 		}
 		// if the posted password doesn't match the account's password
@@ -170,8 +172,8 @@ class Security {
 		)) {
 			// register that failure
 			$account->logFailedLogin('wrong password');
-			// refuse access
-			self::deny('Wrong password');
+			// refuse access with 403 Status Code
+			self::deny('Wrong password', 403);
 		}
 		// if we failed to open a session
 		if(!$account->login()) {
