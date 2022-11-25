@@ -17,7 +17,7 @@ class Throttle {
 		// check if we are being rate limited
 		if(apcu_exists(self::getPrefixedLockedKey($key))) {
 			// stop here if we have a lock
-			Throw new \Polyfony\Exception('Throttle::enforce() You are being rate-limited', 403);
+			Throw new \Polyfony\Exception('Throttle::enforce() You are being rate-limited', 429);
 		}
 
 		// check if we have already something stored
