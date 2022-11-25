@@ -558,7 +558,7 @@ Throttle::perHour(
 
 ```
 
-When someone is being throttle, a `403` Exception is thrown with the message _You are being rate-limited_. 
+When someone is being throttle, a `429` Exception is thrown with the message _You are being rate-limited_. 
 Note that 
 * new hits while being rate-limited will not extend a lock
 * there is not burst support
