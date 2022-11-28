@@ -9,9 +9,9 @@ class Cache {
 	// number of cache misses
 	private static int $misses_count = 0;
 	// elapsed time putting into the cache
-	private static int $cache_in_time = 0;
+	private static float $cache_in_time = 0;
 	// elapsed time retrieving from cache
-	private static int $cache_out_time = 0;
+	private static float $cache_out_time = 0;
 
 	public static function getStatistics() :array {
 		return [
