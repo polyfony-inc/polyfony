@@ -111,7 +111,7 @@ class Format {
 		// declare units
 		$unit = ['b','Ko','Mo','Go','To','Po'];
 		// make human readable
-		return round($integer/pow(1024, ($i=floor(log($integer, 1024)))), $precision) . ' ' . $unit[$i];
+		return round($integer/pow(1024, ($i=floor(log($integer, 1024)))), $precision) . ' ' . $unit[(int)$i];
 	}
 	
 	// relative date
