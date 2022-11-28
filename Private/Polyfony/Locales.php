@@ -7,7 +7,7 @@ class Locales {
 	protected static ?array $_locales 	= null;
 	protected static ?string $_language = null;
 	
-	protected static int $_load_time = 0;
+	protected static float $_load_time = 0;
 
 	public static function init() {
 
