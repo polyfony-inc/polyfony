@@ -28,7 +28,7 @@ class Exception extends \Exception {
 	) {
 
 		// if we are not already on the exception route
-		if(Router::getCurrentRoute()->name != 'exception-handler') {
+		if((Router::getCurrentRoute()->name ?? '') != 'exception-handler') {
 			// throw a new exception in case of notice, warning, anything !
 			Throw new Exception(
 				"$message at line $line_number in $filename" , 
@@ -80,7 +80,7 @@ class Exception extends \Exception {
 			// if we encountered a PHP error
 			$error = error_get_last() && 
 			// and if we were not already handling the error/exception
-			Router::getCurrentRoute()->name != 'exception-handler'
+			(Router::getCurrentRoute()->name ?? '') != 'exception-handler'
 		){
 
 			// redirect the exception handler

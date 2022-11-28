@@ -126,10 +126,10 @@ class Route {
 	} 
 
 	public function setMethod(
-		string $method = null
+		?string $method = null
 	) :self {
 		$this->method = in_array(
-			strtolower($method), 
+			strtolower($method ?? ''), 
 			Request::METHODS
 		) ? strtolower($method) : null;
 		return $this;
@@ -197,7 +197,7 @@ class Route {
 
 	private function buildSegments() :void {
 		// if we have parameters in the url
-		if(strstr($this->url, ':') !== false) {
+		if(strstr($this->url ?? '', ':') !== false) {
 			// explode all parameters from the route
 			$list_of_parameters = explode(':', $this->url);
 			// define the static segment for that route
