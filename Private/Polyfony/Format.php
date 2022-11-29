@@ -2,7 +2,7 @@
 
 namespace Polyfony;
 
-use Zend\Escaper\Escaper;
+use Laminas\Escaper\Escaper;
 
 class Format {
 
