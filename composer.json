@@ -20,7 +20,7 @@
 		"matthiasmullie/minify": "^1.3",
 		"tijsverkoyen/css-to-inline-styles": "^2.2",
 		"laminas/laminas-escaper": "^2.12",
-		"polyfony-inc/captcha": "^1.1",
+		"polyfony-inc/captcha": "dev-master",
 		"polyfony-inc/google": "dev-master",
 		"polyfony-inc/bootstrap": "dev-master",
 		"polyfony-inc/console": "dev-master"
