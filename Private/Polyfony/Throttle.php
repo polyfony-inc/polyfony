@@ -93,11 +93,11 @@ class Throttle {
 			// if we have reached the maximum number of hits
 			count($hits) == $limit_to && 
 			// and if the oldest one is still in the timeframe
-			$hits[0] > time() - $timeframe
+			(int) $hits[0] > time() - $timeframe
 		) {
 			// the lock's ttl is the current time, minus oldest hit of the list + timeframe
 			// this provides a leaky bucket with a lock expiring at the oldest hit date + timeframe
-			$ttl =  $timeframe - (time() - $hits[0]);
+			$ttl =  $timeframe - (time() - (int) $hits[0]);
 			// create the lock (avoiding 0 ttl, never expiring ones)
 			apcu_store(self::getPrefixedLockedKey($key), true, ($ttl == 0 ? 1 : $ttl) );
 		}
