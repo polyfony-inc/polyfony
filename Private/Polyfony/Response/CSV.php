@@ -68,16 +68,16 @@ class CSV {
 	public static function getDelimiter() :string {
 
 		// get the configured delimited, or the default one
-		return strlen(Config::get('response', 'csv_delimiter')) > 0 ? 
-			Config::get('response', 'csv_delimiter') : self::default_delimiter;
+		return Config::get('response', 'csv_delimiter') ?:  
+			self::default_delimiter;
 
 	}
 
 	public static function getEncloser() :string {
 
 		// get the configured delimited, or the default one
-		return strlen(Config::get('response', 'csv_encloser')) > 0 ? 
-			Config::get('response', 'csv_encloser') : self::default_encloser;
+		return Config::get('response', 'csv_encloser') ?: 
+			self::default_encloser;
 
 	}
 
