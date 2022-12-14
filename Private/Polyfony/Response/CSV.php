@@ -42,7 +42,7 @@ class CSV {
 				// remove conflicting symbols, enclose with proper character and spool the cell
 				$cells[] = 
 					self::getEncloser() . 
-					str_replace(self::getCharactersToRemove(), ' ', $cell) . 
+					str_replace(self::getCharactersToRemove(), ' ', $cell ?? '') . 
 					self::getEncloser();
 			}
 			// implode the array
