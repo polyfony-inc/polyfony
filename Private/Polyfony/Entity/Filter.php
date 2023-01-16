@@ -126,7 +126,7 @@ class Filter {
 	private static function toNumeric($value) {
 		// keep only digit, +/- and dot
 		return filter_var(
-			str_replace(',','.',$value), 
+			str_replace(',','.',(string)$value), 
 			FILTER_SANITIZE_NUMBER_FLOAT, 
 			FILTER_FLAG_ALLOW_FRACTION
 		);
