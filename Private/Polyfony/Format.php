@@ -180,10 +180,10 @@ class Format {
 
 	// phone number
 	public static function phone(
-		$phone = ''
+		$phone
 	) :string {
 		// remove all spaces from the number
-		$phone = str_replace(' ', '', $phone);
+		$phone = str_replace(' ', '', $phone ?? '');
 		// remove all symbols except + and ()
 		$phone = preg_replace('/[^0-9\+()]/', '', $phone);
 		// reformat special symbols
