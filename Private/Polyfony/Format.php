@@ -180,7 +180,7 @@ class Format {
 
 	// phone number
 	public static function phone(
-		$phone
+		$phone = ''
 	) :string {
 		// remove all spaces from the number
 		$phone = str_replace(' ', '', $phone);
