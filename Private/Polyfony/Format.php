@@ -270,8 +270,8 @@ class Format {
 	) {
 		// if string is longer than authorized truncate, else do nothing
 		return 
-			strlen($string) > $length ? 
-			trim(mb_substr(strip_tags($string), 0, $length - 2, Response::getCharset())).'…' : 
+			strlen((string)$string) > $length ? 
+			trim(mb_substr(strip_tags((string)$string), 0, $length - 2, Response::getCharset())).'…' : 
 			$string;
 	}
 	
