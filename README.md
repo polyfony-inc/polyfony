@@ -160,6 +160,8 @@ $pages = Pages::_select(['title','id'])
 ->whereNull() 			// NULL
 ->whereGreaterThan() 		// < $value
 ->whereLessThan() 		// > $value
+->whereIn() 			// IN ( values )
+->whereNotIn() 			// NOT IN ( values )
 ```
 
 #### Options
