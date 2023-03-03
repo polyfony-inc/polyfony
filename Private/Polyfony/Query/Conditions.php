@@ -4,7 +4,7 @@ namespace Polyfony\Query;
 
 class Conditions extends Base {
 
-	public function in(array $conditions, bool $invert=false) :self {
+	public function whereIn(array $conditions, bool $invert=false) :self {
 		// for each provided strict condition
 		foreach($conditions as $column => $values) {
 			// if we have to conditions
@@ -36,9 +36,9 @@ class Conditions extends Base {
 		return $this;
 	}
 
-	public function notIn(array $conditions) :self {
+	public function whereNotIn(array $conditions) :self {
 		// same as the in method, but inverted
-		return $this->in($conditions, true);
+		return $this->whereIn($conditions, true);
 	}
 	
 	// whereIdenticalTo
