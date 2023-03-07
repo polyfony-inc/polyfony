@@ -18,6 +18,9 @@ class HTML {
 	];
 
 	const STYLES = '
+#pfProfiler {
+	user-select:text
+}
 #pfProfiler .btn-framework, 
 #pfProfiler .badge-framework,
 #pfProfiler .bg-framework {

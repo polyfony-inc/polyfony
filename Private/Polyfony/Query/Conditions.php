@@ -4,6 +4,43 @@ namespace Polyfony\Query;
 
 class Conditions extends Base {
 
+	public function whereIn(array $conditions, bool $invert=false) :self {
+		// for each provided strict condition
+		foreach($conditions as $column => $values) {
+			// if we have to conditions
+			if(!is_array($values) || empty($values)) {
+				Throw new \Polyfony\Exception('Unsafe ->in() query with empty list of values');
+			}
+			// list of placeholders
+			$placeholders = [];
+			// secure the column name
+			list(
+				$column, 
+				$placeholder
+			) = Convert::columnToPlaceholder($this->Quote ,$column);
+			// for each possible values
+			foreach($values as $index => $value) {
+				list(,$placeholder) = Convert::columnToPlaceholder($this->Quote ,$column.'_'.$index);
+				// save the value
+				$this->Values[":{$placeholder}"] = $value;
+				// save the placeholder
+				$placeholders[] = ':'.$placeholder;
+			}
+			// save the condition
+			$this->Conditions[] = 
+				"{$this->Operator} ( {$column} ".
+				($invert ? 'NOT ' : '').
+				"IN ( ".implode(', ', $placeholders)." ) )";
+		}
+		// return self to the next method
+		return $this;
+	}
+
+	public function whereNotIn(array $conditions) :self {
+		// same as the in method, but inverted
+		return $this->whereIn($conditions, true);
+	}
+	
 	// whereIdenticalTo
 	// add a condition
 	public function where(array $conditions) :self {

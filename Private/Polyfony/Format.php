@@ -183,7 +183,7 @@ class Format {
 		$phone
 	) :string {
 		// remove all spaces from the number
-		$phone = str_replace(' ', '', $phone);
+		$phone = str_replace(' ', '', $phone ?? '');
 		// remove all symbols except + and ()
 		$phone = preg_replace('/[^0-9\+()]/', '', $phone);
 		// reformat special symbols
@@ -270,8 +270,8 @@ class Format {
 	) {
 		// if string is longer than authorized truncate, else do nothing
 		return 
-			strlen($string) > $length ? 
-			trim(mb_substr(strip_tags($string), 0, $length - 2, Response::getCharset())).'…' : 
+			strlen((string)$string) > $length ? 
+			trim(mb_substr(strip_tags((string)$string), 0, $length - 2, Response::getCharset())).'…' : 
 			$string;
 	}
 	
