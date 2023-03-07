@@ -7,11 +7,12 @@ use Polyfony\Query as Query;
 use Polyfony\Database as Database;
 use Polyfony\Security as Security;
 
+#[\AllowDynamicProperties]
 class Aware {
 	
 	// storing variable that does not reflect the database table structure
 	protected array $_;
-	
+
 	// columns that are to be auto-populated
 	const AUTO_POPULATE_COLUMNS = [
 		// column that are autopopulated upon creation
@@ -126,16 +127,24 @@ class Aware {
 				$column, 
 				$this->_['table']
 			)) {
-				// if the column is to be autopopulated with the unix epoch
-				if($with_what == 'time') {
+				
+				if(
+					// if the column is to be autopopulated with the unix epoch
+					$with_what == 'time' && 
+					// and if it has not already been altered manually
+					!in_array($column, $this->_['altered'])
+				) {
 					$this->set([
 						$column=>time()
 					]);
 				}
-				// if the column is to be autopopulated with the current account's id
 				elseif(
+					// if the column is to be autopopulated with the current account's id
 					$with_what == 'id_account' && 
-					Security::isAuthenticated()
+					// and if we have a account id to provide
+					Security::isAuthenticated() && 
+					// and if it has not already been altered manually
+					!in_array($column, $this->_['altered'])
 				) {
 					$this->set([
 						$column=>Security::getAccount()->get('id')

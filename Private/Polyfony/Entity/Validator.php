@@ -25,7 +25,7 @@ class Validator {
 		if(!\Polyfony\Database::doesColumnExist($column, $table_name)) {
 			// throw a useful exception
 			Throw new \Polyfony\Exception(
-				"{$class_name}->set({$column}) : column does not exist (If it does, purge the cache!)",
+				"{$class_name}->set({$column}) : column does not exist (If it does, purge the framework cache!)",
 				400
 			);
 		}
@@ -33,7 +33,7 @@ class Validator {
 		if(self::doesNullableConstraintFail($column, $allowed_nulls, $value)) {
 			// throw a useful exception
 			Throw new \Polyfony\Exception(
-				"{$class_name}->set({$column}) : cannot be null (If it should, purge the cache!)",
+				"{$class_name}->set({$column}) : cannot be null (If it should, purge the framework cache!)",
 				400
 			);
 		}

@@ -241,6 +241,7 @@ class Security {
 
 	// generate the hash for a specific password (useful for creating users)
 	public static function getPassword(
+		#[\SensitiveParameter]
 		string $string
 	) :string {
 		// get a signature using (the provided string + salt)

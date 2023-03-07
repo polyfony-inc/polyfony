@@ -234,6 +234,7 @@ class Accounts extends PermissionsAccessors {
 	}
 
 	public function setPassword(
+		#[\SensitiveParameter]
 		string $plaintext_password
 	) :self {
 		return $this->set([
@@ -242,6 +243,7 @@ class Accounts extends PermissionsAccessors {
 	}
 
 	public function hasThisPassword(
+		#[\SensitiveParameter]
 		string $plaintext_password_to_compare_against
 	) :bool {
 		// compare the existing signature, with the signature of the password to check

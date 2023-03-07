@@ -9,6 +9,7 @@ class Base {
 	protected	?array $Values;
 	protected	$Prepared;
 	protected	bool $Success;
+	protected	bool $First;
 	protected	$Result;
 	protected	?string $Action;
 	protected	?string $Hash;
