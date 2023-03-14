@@ -109,7 +109,8 @@ class Convert {
 	public static function columnToPlaceholder(
 		string $quote_symbol, 
 		string $column, 
-		bool $allow_symbols = false
+		?bool $allow_symbols = false,
+		?string $prepend = null
 	) :array {
 		// apply the secure regex for the column name
 		$column = preg_replace(
@@ -123,6 +124,8 @@ class Convert {
 		);    
 		// cleanup the placeholder
 		$placeholder = str_replace(['.', '*', ' ', '-', '+'], '_', strtolower($column)); 
+		// prepend the placeholder with a string if needed
+		$placeholder = $prepend ? $prepend . '_' . $placeholder : $placeholder;
 		// return cleaned column
 		return([$quote_symbol . $column . $quote_symbol, $placeholder]);
 	}

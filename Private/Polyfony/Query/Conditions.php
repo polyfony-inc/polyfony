@@ -17,10 +17,20 @@ class Conditions extends Base {
 			list(
 				$column, 
 				$placeholder
-			) = Convert::columnToPlaceholder($this->Quote ,$column);
+			) = Convert::columnToPlaceholder(
+				$this->Quote ,
+				$column, 
+				false, 
+				$invert ? 'where_not_in' : 'where_in'
+			);
 			// for each possible values
 			foreach($values as $index => $value) {
-				list(,$placeholder) = Convert::columnToPlaceholder($this->Quote ,$column.'_'.$index);
+				list(,$placeholder) = Convert::columnToPlaceholder(
+					$this->Quote ,
+					$column.'_'.$index,
+					false,
+					$invert ? 'where_not_in' : 'where_in'
+				);
 				// save the value
 				$this->Values[":{$placeholder}"] = $value;
 				// save the placeholder
@@ -50,7 +60,7 @@ class Conditions extends Base {
 			list(
 				$column, 
 				$placeholder
-			) = Convert::columnToPlaceholder($this->Quote ,$column);
+			) = Convert::columnToPlaceholder($this->Quote ,$column, false, 'where');
 			// save the condition
 			$this->Conditions[] = "{$this->Operator} ( {$column} = :{$placeholder} )";
 			// save the value
@@ -70,7 +80,7 @@ class Conditions extends Base {
 			list(
 				$column, 
 				$placeholder
-			) = Convert::columnToPlaceholder($this->Quote ,$column);
+			) = Convert::columnToPlaceholder($this->Quote ,$column, false, 'where_not');
 			// save the condition
 			$this->Conditions[] = "{$this->Operator} ( {$column} <> :{$placeholder} OR {$column} IS NULL )";
 			// save the value
@@ -88,7 +98,7 @@ class Conditions extends Base {
 			list(
 				$column, 
 				$placeholder
-			) = Convert::columnToPlaceholder($this->Quote ,$column);
+			) = Convert::columnToPlaceholder($this->Quote ,$column, false, 'where_starts_with');
 			// save the condition
 			$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
 			// save the value
@@ -106,7 +116,7 @@ class Conditions extends Base {
 			list(
 				$column, 
 				$placeholder
-			) = Convert::columnToPlaceholder($this->Quote ,$column);
+			) = Convert::columnToPlaceholder($this->Quote ,$column, false, 'where_ends_with');
 			// save the condition
 			$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
 			// save the value
@@ -124,7 +134,7 @@ class Conditions extends Base {
 			list(
 				$column, 
 				$placeholder
-			) = Convert::columnToPlaceholder($this->Quote ,$column);
+			) = Convert::columnToPlaceholder($this->Quote ,$column, false, 'where_contains');
 			// save the condition
 			$this->Conditions[] = "{$this->Operator} ( {$column} LIKE :{$placeholder} )";
 			// save the value
@@ -142,7 +152,7 @@ class Conditions extends Base {
 			list(
 				$column, 
 				$placeholder
-			) = Convert::columnToPlaceholder($this->Quote ,$column);
+			) = Convert::columnToPlaceholder($this->Quote ,$column, false, 'where_match');
 			// save the condition
 			$this->Conditions[] = "{$this->Operator} ( {$column} MATCH :{$placeholder} )";
 			// save the value
@@ -164,7 +174,7 @@ class Conditions extends Base {
 			list(
 				$column, 
 				$placeholder
-			) = Convert::columnToPlaceholder($this->Quote ,$column);
+			) = Convert::columnToPlaceholder($this->Quote ,$column, false, 'where_greater_than');
 			// save the condition
 			$this->Conditions[] = "{$this->Operator} ( {$column} > :{$placeholder} )";
 			// save the value
@@ -186,7 +196,7 @@ class Conditions extends Base {
 			list(
 				$column, 
 				$placeholder
-			) = Convert::columnToPlaceholder($this->Quote ,$column);
+			) = Convert::columnToPlaceholder($this->Quote ,$column, false, 'where_less_than');
 			// save the condition
 			$this->Conditions[] = "{$this->Operator} ( {$column} < :{$placeholder} )";
 			// save the value
@@ -206,7 +216,7 @@ class Conditions extends Base {
 		list(
 			$column, 
 			$placeholder
-		) = Convert::columnToPlaceholder($this->Quote ,$column);
+		) = Convert::columnToPlaceholder($this->Quote ,$column, false, 'where_between');
 		// save the condition
 		$this->Conditions[] = "{$this->Operator} ( {$column} BETWEEN :min_{$placeholder} AND :max_{$placeholder} )";
 		// add the min value
@@ -233,7 +243,7 @@ class Conditions extends Base {
 			list(
 				$column, 
 				$placeholder
-			) = Convert::columnToPlaceholder($this->Quote ,$conditions);
+			) = Convert::columnToPlaceholder($this->Quote ,$conditions, false, 'where_empty');
 			// save the condition
 			$this->Conditions[] = "{$this->Operator} ( {$column} == :empty_{$placeholder} OR {$column} IS NULL )";
 			// add the empty value
@@ -259,7 +269,7 @@ class Conditions extends Base {
 			list(
 				$column, 
 				$placeholder
-			) = Convert::columnToPlaceholder($this->Quote ,$conditions);
+			) = Convert::columnToPlaceholder($this->Quote ,$conditions, false, 'where_not_empty');
 			// save the condition
 			$this->Conditions[] = "{$this->Operator} ( {$column} <> :empty_{$placeholder} AND {$column} IS NOT NULL )";
 			// add the empty value
@@ -276,7 +286,7 @@ class Conditions extends Base {
 		list(
 			$column, 
 			$placeholder
-		) = Convert::columnToPlaceholder($this->Quote ,$column);
+		) = Convert::columnToPlaceholder($this->Quote ,$column, false, 'where_null');
 		// save the condition
 		$this->Conditions[] = "{$this->Operator} ( {$column} IS NULL )";
 		// add the empty value
@@ -289,7 +299,7 @@ class Conditions extends Base {
 	// this behavior is not coherent with the rest of the class
 	public function whereNotNull($column) :self {
 		// secure the column name
-		list($column) = Convert::columnToPlaceholder($this->Quote ,$column);
+		list($column) = Convert::columnToPlaceholder($this->Quote ,$column, false, 'where_not_null');
 		// save the condition
 		$this->Conditions[] = "{$this->Operator} ( {$column} IS NOT NULL )";
 		// return self to the next method

@@ -106,7 +106,7 @@ class Query extends Query\Conditions {
 		// for each provided strict condition
 		foreach($columns_and_values as $column => $value) {
 			// secure the column name
-			list($column, $placeholder) = Convert::columnToPlaceholder($this->Quote ,$column);
+			list($column, $placeholder) = Convert::columnToPlaceholder($this->Quote ,$column, false, 'set');
 			// save the condition
 			$this->Updates[] = "{$column} = :{$placeholder}";
 			// save the value (converted if necessary)
