@@ -121,7 +121,7 @@ class Security {
 			!$account->hasExpired() ?:
 				self::deny(
 					"Your account has expired, it was valid until {$account->get('is_expiring_on')}", 
-					403, true);
+					403, true, false);
 			// update our credentials
 			self::$_account = $account;
 			// set security status as authenticated
