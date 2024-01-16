@@ -34,9 +34,7 @@ class Exception extends \Exception {
 				"$message at line $line_number in $filename" , 
 				500
 			); 
-		}
-
-		
+		}		
 
 	}
 	
@@ -78,7 +76,7 @@ class Exception extends \Exception {
 
 		if(
 			// if we encountered a PHP error
-			$error = error_get_last() && 
+			($error = error_get_last()) && 
 			// and if we were not already handling the error/exception
 			(Router::getCurrentRoute()->name ?? '') != 'exception-handler'
 		){
@@ -117,29 +115,7 @@ class Exception extends \Exception {
 		return "$stack</div>";
 
 	}
-	/*
-	private function __toHtml() {
-		
-		// return the formatted trace
-		return(self::convertTraceToHtml($this->getTrace()));
-		
-	}
-	
-	private function __toText() {
-	
-		// raw text format
-		return($this->getTraceAsString());
-		
-	}
-	
-	// a better looking exception stack based on bootstrap/xdebug support
-	public function __toString() {
-		
-		// if the output type different from html
-		return $this->getMessage();
-		
-	}
-*/
+
 	public static function isAttentionRequiring($exception) :bool {
 		return 
 			$exception->getCode() < 401 || 
