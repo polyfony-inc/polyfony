@@ -7,7 +7,7 @@ use \Polyfony\{ Element, Locales };
 class AccountsPermissions extends \Polyfony\Security\AccountsPermissions {
 	
 	const FILTERS = [
-		'name'=>['length64','trim','ucfirst','capslock30']
+		'name'=>['length64','trim','capslock30']
 	];
 
 	public function getBadge() :Element {
