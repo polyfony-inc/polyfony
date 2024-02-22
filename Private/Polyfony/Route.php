@@ -325,6 +325,11 @@ class Route {
 					}
 
 				}
+				// the route does not expire
+				else {
+					// and signature is valid
+					return true;
+				}
 			
 			}
 			// invalid signature
