@@ -242,7 +242,12 @@ class Router {
 			Throw new Exception("Router::reverse() : The [{$route_name}] route does not exist");
 		}
 		// if the route is to be signed
-		if(self::$_routes[$route_name]) {
+		if(self::$_routes[$route_name]->signing) {
+			// if the route is to expire
+			if(self::$_routes[$route_name]->expiring) {
+				// generate the expiration timestamp
+				$parameters[Config::get('router','url_parameters_expiration')] = time() + self::$_routes[$route_name]->expiringTtl;
+			}
 			// generate a signature of the parameters and add it after existing parameters
 			$parameters[Config::get('router','signature_parameter_name')] = Hashs::get([$route_name,$parameters]);
 		}

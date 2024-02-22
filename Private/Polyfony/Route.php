@@ -24,6 +24,10 @@ class Route {
 	public ?int $redirectStatus 			= null;
 	// (optional) if we want to sign the url
 	public bool $signing 					= false;
+	// (optional) if we want url to expire
+	public bool $expiring					= false;
+	// (optional) how long these URLs are valid
+	public ?int $expiringTtl				= null;
 	// (optional) how many hits allowed
 	public ?int $throttleLimitTo 			= null;
 	// (optional) in what timeframe are they allowed
@@ -95,6 +99,35 @@ class Route {
 		]);
 		// chain
 		return $this;
+	}
+
+	public function expires(int $ttl_in_seconds) :self {
+	
+		// if signature has already been declared
+		if($this->signing) {
+			// this cannot be allowed
+			trigger_error('->sign() must be invoked after ->expires()');
+		}
+		// save the fact that we want these urls to expire
+		$this->expiring = true;
+		// save the ttl
+		$this->expiringTtl = $ttl_in_seconds;
+		// add an expiration timestamp parameter to the existing url
+		$this->setUrl(
+			'/'. trim($this->url,'/') . 
+			'/:'.Config::get('router','url_parameters_expiration').'/'
+		);
+		// re-build segments (not ideal for performances... but generated routes get cached anyways)
+		$this->buildSegments();
+		// add a typing constraint on the expiration parameter
+		$this->where([
+			Config::get('router','url_parameters_expiration')=>[
+				'is_numeric'
+			]
+		]);
+		// chain
+		return $this;
+
 	}
 
 	public function throttleIfAny() :void {
@@ -266,13 +299,38 @@ class Route {
 			unset($associative_parameters[Config::get('router','signature_parameter_name')]);
 
 			// compare the provided signature with a newly generated one
-			return Hashs::compare(
+			$is_signature_valid = Hashs::compare(
 				$url_signature,
 				[
 					$this->name,
 					$associative_parameters
 				]
-			);	
+			);
+
+			// if the signing signature is valid
+			if($is_signature_valid) {
+			
+				// if the route is expiring
+				if($this->expiring) {
+				
+					// if the expiration is in the future
+					if($associative_parameters[Config::get('router','url_parameters_expiration')] > time()) {
+						// route is valid
+						return true;
+					}
+					// route has expired
+					else {
+						// throw a 410 Gone.
+						Throw new Exception('This link has expired', 410);
+					}
+
+				}
+			
+			}
+			// invalid signature
+			else {
+				return false;
+			}
 
 		}
 		// the route doesn't need a signature, we consider it's always OK
