@@ -222,6 +222,12 @@ class Aware {
 	// update or create
 	public function save() :bool {
 		
+		// if nothing has changed on this object
+		if(!count($this->_['altered'])) {
+			// we consider the object saved without touching the database
+			return true;
+		}
+
 		// if an id already exists
 		if($this->_['id']) {
 			// autopopulate
