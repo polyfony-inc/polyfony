@@ -234,8 +234,10 @@ class HTML {
 				foreach(self::$_scripts as $index => $file) {
 					// if that file is not remote we can include it in the pack
 					if(!self::isAssetPathRemote($file)) {
-						// append he contents of that file to the pack
-						$pack_contents .= " \n".file_get_contents('.'.$file);
+						// append the contents of that file to the pack
+						$pack_contents .= " \n".file_get_contents(
+							'.'.self::getNameWithoutCacheInvalidationString($file)
+						);
 					}
 				}
 				// populate the cache file
@@ -298,7 +300,9 @@ class HTML {
 					// foreach stylesheet for this media
 					foreach($list_of_stylesheets as $attributes) {
 						// get the contents of that stylesheet
-						$pack_contents .= file_get_contents('.'.$attributes['href']);
+						$pack_contents .= file_get_contents(
+							'.'.self::getNameWithoutCacheInvalidationString($attributes['href'])
+						);
 					}
 					// then add to the pack
 					file_put_contents($pack_path, self::getMinifiedPackIfAllowed($pack_contents, new \MatthiasMullie\Minify\CSS));
@@ -314,6 +318,14 @@ class HTML {
 				unset($pack_contents);
 			}
 		}
+	}
+
+	// remove the ?timestamp from a path, if any
+	private static function getNameWithoutCacheInvalidationString(string $path) :string {
+		// based on the presence of ?
+		return strpos($path, '?') !== false ? 
+			explode('?', $path)[0] : 
+			$path;
 	}
 
 	// assets externalness detector
@@ -348,13 +360,23 @@ class HTML {
 		string $asset_path, 
 		string $asset_type
 	) :string {
-		// if the asset path is absolute in any way
-		return (
-			substr($asset_path,0,1) == '/' || 
-			substr($asset_path,0,4) == 'http'
-		) ?
-			// it is returned as is, // otherwise it is made relative to the Assets folder
-			$asset_path : "/Assets/{$asset_type}/$asset_path";
+		
+		// this is a remote ressource
+		if(self::isAssetPathRemote($asset_path)) {
+			// return it as-is
+			return $asset_path;
+		}
+		// this is a local ressource
+		else {
+			// build the public path
+			$public_path = "/Assets/{$asset_type}/$asset_path";
+			// get the modification timestamp of the asset
+			$modification = filemtime('../Public'.$public_path);
+			// append the modification date to the public path
+			$public_path .= '?'.$modification;
+			// return the assembled public path
+			return $public_path;
+		}
 	}
 
 	public static function getPackingNameAndPathFor(
