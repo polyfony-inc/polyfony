@@ -10,8 +10,7 @@ class AccountsRoles extends Entity {
 	// return an actual role, 
 	// from its id, name, or object
 	public static function getFromMixed(
-		$role_id_or_name_or_object
-		// string|int|AccountsRoles $role_id_or_name_or_object // PHP 8 only
+		string|int|AccountsRoles $role_id_or_name_or_object
 	) :self {
 		// already is an object
 		if(is_object($role_id_or_name_or_object)) {

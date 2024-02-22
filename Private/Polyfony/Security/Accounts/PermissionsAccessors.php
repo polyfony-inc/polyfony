@@ -39,8 +39,7 @@ class PermissionsAccessors extends \Polyfony\Entity {
 	}
 
 	public function hasRole(
-		// PHP8 typing : string | int | AccountsRoles
-		$mixed_role
+		string|int|AccountsRoles $mixed_role
 	) :bool {
 		$role = AccountsRoles::getFromMixed(
 			$mixed_role
@@ -116,8 +115,7 @@ class PermissionsAccessors extends \Polyfony\Entity {
 	}
 
 	public function hasPermission(
-		// PHP8 typing : string | int | AccountsPermissions
-		$mixed_permission
+		string|int|AccountsPermissions $mixed_permission
 	) :bool {
 		
 		$permission = AccountsPermissions::getFromMixed(
@@ -140,7 +138,9 @@ class PermissionsAccessors extends \Polyfony\Entity {
 	}
 
 	// PHP 8 AccountsPermissions|int|string
-	public function removePermission($mixed_permission) :bool {
+	public function removePermission(
+		string|int|AccountsPermissions $mixed_permission
+	) :bool {
 		// remove permission 
 		return (new AccountsPermissionsAssigned([
 			'id_account'=>$this->get('id'),
@@ -157,7 +157,9 @@ class PermissionsAccessors extends \Polyfony\Entity {
 	}
 
 	// PHP 8 AccountsPermissions|int|string
-	public function addPermission($mixed_permission) :bool {
+	public function addPermission(
+		string|int|AccountsPermissions $mixed_permission
+	) :bool {
 		// create a new permission assignment (rely on SQL constraints to prevent duplicates)
 		return (new AccountsPermissionsAssigned)
 			->set([
@@ -187,7 +189,9 @@ class PermissionsAccessors extends \Polyfony\Entity {
 	}
 
 	// PHP 8 AccountsRoles|int|string $mixed_role
-	public function removeRole($mixed_role) :bool {
+	public function removeRole(
+		string|int|AccountsRoles $mixed_role
+	) :bool {
 		// remove role 
 		return (new AccountsRolesAssigned([
 			'id_account'=>$this->get('id'),
@@ -204,7 +208,9 @@ class PermissionsAccessors extends \Polyfony\Entity {
 	}
 
 	// PHP 8 AccountsRoles|int|string $mixed_role
-	public function addRole($mixed_role) :bool {
+	public function addRole(
+		string|int|AccountsRoles $mixed_role
+	) :bool {
 		// create a new role assignment (rely on SQL constraints to prevent duplicates)
 		return (new AccountsRolesAssigned)
 			->set([

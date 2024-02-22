@@ -9,8 +9,7 @@ class AccountsPermissions extends Entity {
 
 	// return an actual permission, 
 	public static function getFromMixed(
-		$permission_id_or_name_or_object
-		// string|int|AccountsPermissions $permission // PHP 8 only
+		string|int|AccountsPermissions $permission_id_or_name_or_object
 	) :\Models\AccountsPermissions {
 		
 		// if we were provided with its name
