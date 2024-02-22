@@ -156,7 +156,7 @@ class Emails extends Entity {
 			// get the current list of recipients
 			$recipients = $this->getRecipients();
 			// add one
-			$recipients[$type][$email] = $name;
+			$recipients[$type][mb_strtolower($email)] = $name;
 			// push to the table
 			$this->set([
 				'recipients_array'=>$recipients
