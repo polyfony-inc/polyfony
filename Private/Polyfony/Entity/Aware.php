@@ -291,6 +291,11 @@ class Aware {
 			->execute();
 	}
 
+	// checks if the object has been persisted to database
+	public function exists() :bool {
+		return !is_null($this->_['id']);
+	}
+
 	// returns the name of the class that has extended this one (aka, the Table name)
 	protected static function tableName() :string {
 		// removed the namespace from the class name
