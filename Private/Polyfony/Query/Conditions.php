@@ -289,8 +289,6 @@ class Conditions extends Base {
 		) = Convert::columnToPlaceholder($this->Quote ,$column, false, 'where_null');
 		// save the condition
 		$this->Conditions[] = "{$this->Operator} ( {$column} IS NULL )";
-		// add the empty value
-		$this->Values[":empty_{$placeholder}"] = '';
 		// return self to the next method
 		return $this;
 	}
