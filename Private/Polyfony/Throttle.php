@@ -39,11 +39,11 @@ class Throttle {
 	}
 
 	private static function getPrefixedHitsKey(string $key) :string {
-		return Config::get('throttle','prefix') . $key . '::HITS';
+		return Config::get('apcu','prefix') . '::THROTTLE::' . $key . '::HITS';
 	}
 
 	private static function getPrefixedLockedKey(string $key) :string {
-		return Config::get('throttle','prefix') . $key . '::LOCK';
+		return Config::get('apcu','prefix') . '::THROTTLE::' . $key . '::LOCK';
 	}
 
 	public static function perSecond(

@@ -22,6 +22,8 @@ class Session implements StoreInterface
 		if(session_status() == PHP_SESSION_NONE) {
 			// we name it
 			session_name(\Polyfony\Config::get('store', 'cookie'));
+			// we set the handler
+			session_set_save_handler(new \Polyfony\Store\Session\APCu, true);
 			// we have to start one
 			session_start();
 		}

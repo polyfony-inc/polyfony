@@ -4,133 +4,120 @@ namespace Polyfony;
 
 class Cache {
 
-	// number of cache hits
+	// number of cache hits (when data is successfully retrieved from the cache)
 	private static int $hits_count = 0;
-	// number of cache misses
+	// number of cache misses (when data is not found in the cache)
 	private static int $misses_count = 0;
-	// elapsed time putting into the cache
+	// total time spent putting items into the cache
 	private static float $cache_in_time = 0;
-	// elapsed time retrieving from cache
+	// total time spent retrieving items from the cache
 	private static float $cache_out_time = 0;
 
+	// Return the cache statistics (hits, misses, cache in time, cache out time)
 	public static function getStatistics() :array {
 		return [
-			'hits_count'	=>self::$hits_count,
-			'misses_count'	=>self::$misses_count,
-			'cache_in_time'	=>self::$cache_in_time,
-			'cache_out_time'=>self::$cache_out_time,
+			'hits_count'	=>self::$hits_count, // total number of cache hits
+			'misses_count'	=>self::$misses_count, // total number of cache misses
+			'cache_in_time'	=>self::$cache_in_time, // total time spent caching items
+			'cache_out_time'=>self::$cache_out_time, // total time spent retrieving items from cache
 		];
 	}
 
-	private static function path($variable) :string {
+	// Prefix a variable key for caching
+	private static function getPrefixedKey($variable) :string {
 
-		// secure the variable name
+		// Sanitize the variable name to make it filesystem safe
 		$variable = \Polyfony\Format::fsSafe($variable);
-		// build the path
-		return Config::get('cache', 'path') . $variable;
+		// Add a prefix to the variable to create a unique cache key
+		return Config::get('apcu', 'prefix') . '::CACHE::' .$variable;
 
 	}
 
+	// Check if a variable exists in the cache
 	public static function has(string $variable) :bool {
 
-		// set the variable path
-		$path = self::path($variable);
-		// if the file exists 
-		if(file_exists($path)) {
-			// if it expired
-			if(filemtime($path) < time()) {
-				// the file expired, remove it
-				unlink($path);
-				// we don't have that element
-				return false;
-			}
-			// the cache file has not expired yet
-			else {
-				// we do have the file
-				return true;
-			}
-		}
-		// file doesn't even exist
-		else {
-			// we don't have that element
-			return false;
-		}
+		// Get the prefixed key for the variable
+		$getPrefixedKey = self::getPrefixedKey($variable);
+		// Return true if the item exists in the cache, false otherwise
+		return apcu_exists($getPrefixedKey);
 
 	}
 	
-
+	// Put an item into the cache
 	public static function put(
-		string $variable, 
-		$value=null, 
-		$overwrite=false, 
-		$lifetime=false
+		string $variable,  // The cache key
+		$value = null,     // The value to be stored in the cache
+		$overwrite = false, // Whether to overwrite existing value
+		$lifetime = false   // Optional lifetime of the cache item (in seconds)
 	) :bool {
 	
-		// already exists and no overwrite
-		if(self::has($variable) && !$overwrite) {
-			// throw an exception
-			Throw new \Polyfony\Exception("{$variable} already exists in the store.");
-		}
-		// only if the profiler is enabled
-		if(Config::get('profiler','enable')) {
-			// feed the statistics
-			self::$misses_count++;
-			$start = microtime(true);
-		}
-		// store it
-		file_put_contents(self::path($variable), msgpack_pack($value));
-		// compute the expiration time or set to a year by default
-		$lifetime = $lifetime ? time() + $lifetime : time() + 365 * 24 * 3600;
-		// alter the modification time
-		touch(self::path($variable), $lifetime);
-		// only if the profiler is enabled
-		if(Config::get('profiler','enable')) {
-			self::$cache_in_time += microtime(true) - $start;
-		}
-		// return status
-		return self::has($variable);
+		// If the variable exists in the cache and overwrite is not allowed, throw an exception
+		if (self::has($variable) && !$overwrite) {
+            throw new \Polyfony\Exception("{$variable} already exists in the store.");
+        }
+        // If profiling is enabled, increment the cache misses and start the timer
+        if (Config::get('profiler', 'enable')) {
+            self::$misses_count++;
+            $start = microtime(true);
+        }
+        // Get the cache key with the appropriate prefix
+        $key = self::getPrefixedKey($variable);
+        // Set the time-to-live (TTL) for the cache item (default to one year if not provided)
+        $ttl = $lifetime ?? 365 * 24 * 3600; // Default to one year
+        // Store the value in the cache with the calculated TTL
+        apcu_store($key, $value, $ttl);
+        // If profiling is enabled, calculate and store the time spent adding the item to the cache
+        if (Config::get('profiler', 'enable')) {
+            self::$cache_in_time += microtime(true) - $start;
+        }
+        // Return true if the item now exists in the cache, false otherwise
+        return self::has($variable);
 		
 	}
 	
-
+	// Get an item from the cache
 	public static function get(string $variable) {
 
-		// doesn't exist in the store
-		if(!self::has($variable)) {
-			// throw an exception
-			Throw new \Polyfony\Exception("{$variable} does not exist in the store.");
-		}
-		// only if the profiler is enabled
-		if(Config::get('profiler','enable')) {
-			// feed the statistics
-			self::$hits_count++;
-			$start = microtime(true);
-		}
-		// get it, unpack it 
-		$cache_item = msgpack_unpack(file_get_contents(self::path($variable)));
-		// only if the profiler is enabled
-		if(Config::get('profiler','enable')) {
-			self::$cache_out_time += microtime(true) - $start;
-		}
-		return $cache_item;
+		// If the variable does not exist in the cache, throw an exception
+		if (!self::has($variable)) {
+            throw new \Polyfony\Exception("{$variable} does not exist in the store.");
+        }
+        // If profiling is enabled, increment the cache hits and start the timer
+        if (Config::get('profiler', 'enable')) {
+            self::$hits_count++;
+            $start = microtime(true);
+        }
+        // Get the cache key with the appropriate prefix
+        $key = self::getPrefixedKey($variable);
+        // Fetch the item from the cache, store the success flag
+        $cache_item = apcu_fetch($key, $success);
+        // If fetching the item fails, throw an exception
+        if (!$success) {
+            throw new \Polyfony\Exception("Failed to retrieve {$variable} from the store.");
+        }
+        // If profiling is enabled, calculate and store the time spent retrieving the item from the cache
+        if (Config::get('profiler', 'enable')) {
+            self::$cache_out_time += microtime(true) - $start;
+        }
+        // Return the cached item
+        return $cache_item;
 		
 	}
 	
-	
+	// Remove an item from the cache
 	public static function remove(string $variable) :bool {
 		
-		// doesn't exist in the store
-		if(!self::has($variable)) {
-			// return false
-			return(false);	
-		}
-		// remove it
-		unlink(self::path($variable));
-		// return it	
-		return !self::has($variable);
+		// If the variable does not exist in the cache, return false
+		if (!self::has($variable)) {
+            return false;
+        }
+        // Get the cache key with the appropriate prefix
+        $key = self::getPrefixedKey($variable);
+        // Delete the item from the cache
+        apcu_delete($key);
+        // Return true if the item was successfully deleted, false otherwise
+        return !self::has($variable);
 		
 	}
 	
-}	
-
-?>
+}

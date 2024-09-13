@@ -85,9 +85,9 @@ class Config {
 	private static function merge() :void {
 
 		// if in production a an aggregated cache is already available, load it
-		if(Config::isProd() && Cache::has('Config')) {
+		if(Config::isProd() && Cache::has('PolyfonyConfig')) {
 			// load from the cache file
-			self::$_config['Current'] = Cache::get('Config');
+			self::$_config['Current'] = Cache::get('PolyfonyConfig');
 			// stop the function
 			return;
 		}
@@ -105,7 +105,7 @@ class Config {
 				);
 			}
 			// if we are in production, cache the merged file
-			!Config::isProd() ?: Cache::put('Config', self::$_config['Current'], true);
+			!Config::isProd() ?: Cache::put('PolyfonyConfig', self::$_config['Current'], true);
 		}
 
 	}
