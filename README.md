@@ -688,6 +688,14 @@ Security::getAccount()
 	);
 ```
 
+###### Opportunistic authentication
+
+In some cases, you might use signed URLs for anonymous users but still want to authenticate users who are already logged in.
+
+To achieve this, use `Security::authenticate(opportunistic: true)` **in addition** to the signed URLs. If the user has an active session, they will be authenticated; if not, no further action will occur, and script execution will continue as usual.
+
+Note that this approach does **not** enforce security—it will neither deny access nor throw an exception. It simply attempts to authenticate the user **if possible**.
+
 ### [Profiler](https://github.com/polyfony-inc/polyfony/wiki/Reference#class-polyfonyprofiler)
 
 Set markers arounds heavy code blocks to estimate the time and memory impact of that block.

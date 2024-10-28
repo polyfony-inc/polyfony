@@ -13,7 +13,9 @@ class Security {
 	protected static $_account 			= null;
 	
 	// main authentication method that will authenticate a user
-	public static function authenticate() :void {
+	// be extremely careful with opportunistic=true! 
+	// it will NOT stop your script if the user cannot be authenticated
+	public static function authenticate(?bool $opportunistic=false) :void {
 
 		// if we have a security cookie we authenticate with it
 		!Cookie::has(Config::get('security','cookie')) ?: self::authenticateBySession();
@@ -22,7 +24,7 @@ class Security {
 		!Request::post(Config::get('security','login')) ?: self::authenticateByForm();
 
 		// and now we check if we are granted access
-		self::$_authenticated ?: 
+		self::$_authenticated || $opportunistic ?: 
 			self::deny(
 				'You are not authenticated', 
 				401, 
@@ -35,7 +37,7 @@ class Security {
 		string $permission_name
 	) :void {
 		// the account lacks proper permission
-		if(!self::$_account->hasPermission($permission_name)) {
+		if(!self::$_account?->hasPermission($permission_name)) {
 			// it stops stop here
 			self::deny(
 				Locales::get('You do not have the') . ' '.
@@ -62,7 +64,7 @@ class Security {
 		string $role_name
 	) :void {
 		// the account lacks proper role
-		if(!self::$_account->hasRole($role_name)) {
+		if(!self::$_account?->hasRole($role_name)) {
 			// it stops stop here
 			self::deny(
 				Locales::get('You do not have the') . ' '.
