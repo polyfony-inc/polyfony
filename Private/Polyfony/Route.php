@@ -41,14 +41,14 @@ class Route {
 
 	// construct the route given its name
 	public function __construct(
-		string $name = null
+		?string $name = null
 	) {
 		$this->name = $name ?: uniqid('route-');
 	}
 	
 	// set the url to match
 	public function setUrl(
-		string $url = null
+		?string $url = null
 	) :self {
 		$this->url = $url;
 		return $this;

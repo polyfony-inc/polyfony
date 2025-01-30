@@ -394,7 +394,7 @@ class HTML {
 	// minify the packed content if it's allowed, otherwise return is at is
 	private static function getMinifiedPackIfAllowed(
 		string $pack_contents, 
-		object $packer_object=null
+		?object $packer_object=null
 	) :string {
 		// if we are allowed to minify
 		return Config::get('response','minify') ? 

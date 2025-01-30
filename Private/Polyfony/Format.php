@@ -116,7 +116,7 @@ class Format {
 	
 	// relative date
 	public static function date(
-		int $timestamp = null
+		?int $timestamp = null
 	) :string {
 
 		// if no timestamp is provided
@@ -137,8 +137,8 @@ class Format {
 	
 	// neutral duration
 	public static function duration(
-		int $seconds = null, 
-		int $precision = 0
+		?int $seconds = null, 
+		?int $precision = 0
 	) :string {
 
 		// if no timestamp is provided

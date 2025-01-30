@@ -58,7 +58,7 @@ class Session implements StoreInterface
 		string $variable, 
 		$value, 
 		bool $overwrite = false,
-		int $lifetime = null
+		?int $lifetime = null
 	) :bool {
 		self::startSessionIfNeeded();
 		// If it exists, and we do not want to overwrite, then throw exception

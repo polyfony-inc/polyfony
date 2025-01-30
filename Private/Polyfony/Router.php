@@ -62,10 +62,10 @@ class Router {
 	
 	// new syntax for mapping routes
 	public static function map(
-		string $url = null, 
-		string $destination, 
-		string $route_name = null, 
-		string $method = null
+		?string $url = null, 
+		?string $destination = null, 
+		?string $route_name = null, 
+		?string $method = null
 	) :Route {
 		// We cannot allow duplicate route names for reversing reasons
 		if($route_name && self::hasRoute($route_name)) {

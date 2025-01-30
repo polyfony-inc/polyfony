@@ -13,7 +13,7 @@ class Element {
 	private string $content;
 
 	// main constructor
-	public function __construct(string $type='div', array $options=null) {
+	public function __construct(string $type='div', ?array $options=null) {
 		// initialize variables
 		$this->content 		= '';
 		$this->type 		= $type;
@@ -23,7 +23,7 @@ class Element {
 	}
 
 	// set the text in the tag
-	public function setText(string $text=null, bool $append=true) :self {
+	public function setText(?string $text=null, bool $append=true) :self {
 		// append by default or replace text
 		$this->content = $append ? $this->content . Format::htmlAttributeSafe($text) : Format::htmlAttributeSafe($text);
 		// return self
@@ -31,7 +31,7 @@ class Element {
 	}
 
 	// set the html in the tag
-	public function setHtml(string $html=null, bool $append=true) :self {
+	public function setHtml(?string $html=null, bool $append=true) :self {
 		// append by default or replace html
 		$this->content = $append ? $this->content . $html : $html;
 		// return self
